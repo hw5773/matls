@@ -160,8 +160,11 @@ def content(f, of, start, domains):
         dom = dname.split("_")[-1]
         cdname = dname + "/contents"
         print ("Domain Name: ", dname)
-        os.mkdir(dname)
-        os.mkdir(cdname)
+        try:
+            os.mkdir(dname)
+            os.mkdir(cdname)
+        except:
+            continue
         get_index_file(dname, dom)
         n = get_contents(dname, cdname, dom) # n: # of contents + index.html
         s = str(num) + ", " + str(n) + "\n"

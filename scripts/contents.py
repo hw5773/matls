@@ -15,7 +15,7 @@ def get_index_file(dname, dom):
     path = dname + "/header"
     index = dname + "/index"
     num = int(dname.split("_")[0])
-    cmd = "curl -A \"Mozilla/5.0\" -L -s -D %s \"www.%s\" > %s" % (path, dom, index)
+    cmd = "timeout 10 curl -A \"Mozilla/5.0\" -L -s -D %s \"www.%s\" > %s" % (path, dom, index)
     os.system(cmd)
     
     for lib in hash_lst:
@@ -114,7 +114,7 @@ def get_contents(dname, cdname, dom):
             continue
 
 
-        cmd = "curl -A \"Mozilla/5.0\" -L -s -D %s \"%s\" > %s" % (hdr, content, body)
+        cmd = "timeout 10 curl -A \"Mozilla/5.0\" -L -s -D %s \"%s\" > %s" % (hdr, content, body)
         cname = cdname + "/name.%s" % i
         name = open(cname, "w")
         name.write(content)

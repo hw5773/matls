@@ -20,11 +20,19 @@ def get_index_file(dname, dom):
     
     for lib in hash_lst:
         h = hashlib.new(lib)
-        c = open(index, "rb")
-        h.update(c.read())
-        hash_val = h.hexdigest()
-        c.close()
-        statinfo = os.stat(index)
+        try:
+            c = open(index, "rb")
+        except:
+            break
+        try:
+            h.update(c.read())
+            hash_val = h.hexdigest()
+        except:
+            c.close()
+        try:
+            statinfo = os.stat(index)
+        except:
+            break
         size = statinfo.st_size
         s = "%s, %s, %s\n" % (num, size, hash_val)
         out[lib].write(s)
@@ -34,7 +42,10 @@ def get_index_file(dname, dom):
 def get_content_lst(dname):
     index = dname + "/index"
     lst = []
-    f = open(index, "r")
+    try:
+        f = open(index, "r")
+    except:
+        return []
     try:
         doc = f.read()
     except:
@@ -70,7 +81,10 @@ def get_content_lst(dname):
 
 def get_contents(dname, cdname, dom):
     index = dname + "/index"
-    f = open(index, "r")
+    try:
+        f = open(index, "r")
+    except:
+        return 0
     try:
         doc = f.read()
     except:
@@ -89,12 +103,15 @@ def get_contents(dname, cdname, dom):
         num = int(dname.split("_")[0])
         content = lst[i]
 
-        if content[0:2] == "//":
-            content = "http:" + content
-        elif content[0] == "/" and content[1] != "/":
-            content = "http://" + dom + content
-        elif content[0:4] != "http":
-            content = "http://" + dom + "/" + content
+        try:
+            if content[0:2] == "//":
+                content = "http:" + content
+            elif content[0] == "/" and content[1] != "/":
+                content = "http://" + dom + content
+            elif content[0:4] != "http":
+                content = "http://" + dom + "/" + content
+        except:
+            continue
 
 
         cmd = "curl -A \"Mozilla/5.0\" -L -s -D %s \"%s\" > %s" % (hdr, content, body)
@@ -106,7 +123,10 @@ def get_contents(dname, cdname, dom):
         os.system(cmd)
         print ("  Progress: ", i+1, " of ", n)
 
-        statinfo = os.stat(body)
+        try:
+            statinfo = os.stat(body)
+        except:
+            continue
         size = statinfo.st_size
 
         if size == 0:
@@ -114,8 +134,8 @@ def get_contents(dname, cdname, dom):
 
         for lib in hash_lst:
             h = hashlib.new(lib)
-            c = open(body, "rb")
             try:
+                c = open(body, "rb")
                 h.update(c.read())
             except:
                 break

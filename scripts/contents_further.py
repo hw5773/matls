@@ -12,38 +12,39 @@ def usage():
     exit(1)
 
 def store_hash(dname):
-	index = dname + "/index"
+    num = dname.split("_")[0]
+    index = dname + "/index"
 
-	for lib in hash_lst:
-		h = hashlib.new(lib)
-		try:
-			c = open(index, "rb")
-		except:
-			break
-		try:
-			h.update(c.read())
-			hash_val = h.hexdigest()
-		except:
-			c.close()
-		try:
-			statinfo = os.stat(index)
-		except:
-			break
-		size = statinfo.st_size
-		s = "%s, %s, %s\n" % (num, size, hash_val)
-		out[lib].write(s)
+    for lib in hash_lst:
+        h = hashlib.new(lib)
+        try:
+            c = open(index, "rb")
+        except:
+            break
+        try:
+            h.update(c.read())
+            hash_val = h.hexdigest()
+        except:
+            c.close()
+        try:
+            statinfo = os.stat(index)
+        except:
+            break
+        size = statinfo.st_size
+        s = "%s, %s, %s\n" % (num, size, hash_val)
+        out[lib].write(s)
 
 def get_index_file(dname, dom):
     path = dname + "/header"
     index = dname + "/index"
     num = int(dname.split("_")[0])
-    cmd = "timeout 10 curl -A \"Mozilla/5.0\" -L -s -D %s \"www.%s\" > %s" % (path, dom, index)
+    cmd = "timeout 10 curl -A \"Mozilla/5.0\" --insecure -L -s -D %s \"www.%s\" > %s" % (path, dom, index)
     os.system(cmd)
-	store_hash(dname)
+    store_hash(dname)
     print ("  Get: ", index)
 
 def make_index_hash(f, of, start, domains):
-	num = 0
+    num = 0
     for line in f:
         num = num + 1
 
@@ -60,12 +61,12 @@ def make_index_hash(f, of, start, domains):
             os.mkdir(dname)
             os.mkdir(cdname)
         except:
-			index = dname + "/index"
-			statinfo = os.stat(index)
-			if statinfo.st_size != 190:
-				store_hash(dname)
-				print ("Exist: ", dname)
-            	continue
+            index = dname + "/index"
+            statinfo = os.stat(index)
+            if statinfo.st_size > 0 and statinfo.st_size != 190:
+                store_hash(dname)
+                print ("Exist: ", dname)
+                continue
         get_index_file(dname, dom)
         s = str(num) + "\n"
         of.write(s)

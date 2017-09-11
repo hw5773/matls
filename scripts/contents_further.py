@@ -2,6 +2,10 @@ from bs4 import BeautifulSoup
 import os
 import sys
 import hashlib
+import smtplib
+
+sender = "hwlee2014@mmlab.snu.ac.kr"
+receivers = ["hwlee2014@mmlab.snu.ac.kr"]
 
 hash_lst = ["md5", "sha1", "sha224", "sha256", "ripemd160"]
 out = {}
@@ -10,6 +14,22 @@ def usage():
     print ("Get contents from each domain")
     print ("python3 contents.py <top domains> <result file> <start number> <num of domains>")
     exit(1)
+
+def send_email(msg):
+	message = """From: Hyunwoo Lee <hwlee2014@mmlab.snu.ac.kr>
+To: Hyunwoo Lee <hwlee2014@mmlab.snu.ac.kr>
+Subject: Experiment Report
+
+The experiment is on going:
+%s
+""" % (msg)
+
+	try:
+		smtpObj = smtplib.SMTP(host="old-mmlab.snu.ac.kr")
+		smtpObj.sendmail(sender, receivers, message)
+		print ("Successfully sent email")
+	except SMTPException:
+		print ("Error: unable to send email")
 
 def store_hash(dname):
     num = dname.split("_")[0]
@@ -70,6 +90,10 @@ def make_index_hash(f, of, start, domains):
         get_index_file(dname, dom)
         s = str(num) + "\n"
         of.write(s)
+
+        if num % 10000 == 0:
+            msg = "Progress: %s out of %s" % (num - start, start + domains)
+            send_email(msg)
 
 def main():
     if len(sys.argv) != 5:

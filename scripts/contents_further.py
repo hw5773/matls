@@ -83,7 +83,7 @@ def make_index_hash(f, of, start, domains):
         except:
             index = dname + "/index"
             statinfo = os.stat(index)
-            if statinfo.st_size > 0 and statinfo.st_size != 190:
+            if statinfo.st_size > 0 and statinfo.st_size != 190 and statinfo.st_size != 160:
                 store_hash(dname)
                 print ("Exist: ", dname)
                 continue

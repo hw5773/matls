@@ -51,7 +51,7 @@ def get_contents(f, start, end):
 
 
 def main():
-    if len(sys.argv) != 2:
+    if len(sys.argv) != 4:
         usage()
 
     f = open(sys.argv[1], "r")

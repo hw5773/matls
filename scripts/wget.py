@@ -11,13 +11,21 @@ def usage():
     print ("python3 contents.py <top domains> <start> <end>")
     exit(1)
 
-def send_email(msg, start, end):
+def send_email(start, end):
     message = """From: Hyunwoo Lee <hwlee2014@mmlab.snu.ac.kr>
 To: Hyunwoo Lee <hwlee2014@mmlab.snu.ac.kr>
 Subject: Content Experiment Report <%s, %s>
 
 The Experiment for Content from %s to %s is completed.
 """ % (start, end)
+
+    try:
+        smtpObj = smtplib.SMTP(host="old-mmlab.snu.ac.kr")
+        smtpObj.sendmail(sender, receivers, message)
+        print ("Successfully sent email")
+    except SMTPException:
+        print ("Error: unable to send email")
+
 
 def get_contents(f, start, end):
     n = start
@@ -53,6 +61,7 @@ def main():
     get_contents(f, start, end)
 
     f.close()
+    send_email(start, end)
 
 if __name__ == "__main__":
     main()

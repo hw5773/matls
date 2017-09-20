@@ -6,6 +6,7 @@ import json
 import urllib.request
 import time
 from socket import gethostbyname
+import smtplib
 
 sender = "hwlee2014@mmlab.snu.ac.kr"
 receivers = ["hwlee2014@mmlab.snu.ac.kr"]
@@ -15,13 +16,21 @@ def usage():
     print ("python3 domain.py <input file name> <output file name> <start> <end>")
     exit(1)
 
-def send_email(msg, start, end):
+def send_email(start, end):
     message = """From: Hyunwoo Lee <hwlee2014@mmlab.snu.ac.kr>
 To: Hyunwoo Lee <hwlee2014@mmlab.snu.ac.kr>
 Subject: Experiment Report <%s, %s>
 
 The Experiment from %s to %s is completed.
 """ % (start, end)
+
+    try:
+        smtpObj = smtplib.SMTP(host="old-mmlab.snu.ac.kr")
+        smtpObj.sendmail(sender, receivers, message)
+        print ("Successfully sent email")
+    except SMTPException:
+        print ("Error: unable to send email")
+
 
 def crawler(f, of, start, end):
     num = start
@@ -109,6 +118,8 @@ def main():
 
     f.close()
     g.close()
+
+    send_email(start, end)
 
 if __name__ == "__main__":
     main()

@@ -7,10 +7,21 @@ import urllib.request
 import time
 from socket import gethostbyname
 
+sender = "hwlee2014@mmlab.snu.ac.kr"
+receivers = ["hwlee2014@mmlab.snu.ac.kr"]
+
 def usage():
     print ("Find the related domain for ipinfo.io")
     print ("python3 domain.py <input file name> <output file name> <start> <end>")
     exit(1)
+
+def send_email(msg, start, end):
+    message = """From: Hyunwoo Lee <hwlee2014@mmlab.snu.ac.kr>
+To: Hyunwoo Lee <hwlee2014@mmlab.snu.ac.kr>
+Subject: Experiment Report <%s, %s>
+
+The Experiment from %s to %s is completed.
+""" % (start, end)
 
 def crawler(f, of, start, end):
     num = start

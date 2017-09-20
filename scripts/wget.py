@@ -3,20 +3,34 @@ import sys
 import time
 import random
 
-hash_lst = ["md5", "sha1", "sha224", "sha256", "ripemd160"]
-out = {}
+sender = "hwlee2014@mmlab.snu.ac.kr"
+receivers = ["hwlee2014@mmlab.snu.ac.kr"]
 
 def usage():
     print ("Get contents from each domain")
-    print ("python3 contents.py <top domains>")
+    print ("python3 contents.py <top domains> <start> <end>")
     exit(1)
 
-def get_contents(f):
+def send_email(msg, start, end):
+    message = """From: Hyunwoo Lee <hwlee2014@mmlab.snu.ac.kr>
+To: Hyunwoo Lee <hwlee2014@mmlab.snu.ac.kr>
+Subject: Content Experiment Report <%s, %s>
+
+The Experiment for Content from %s to %s is completed.
+""" % (start, end)
+
+def get_contents(f, start, end):
+    n = start
+    for i in range(start - 1):
+        f.readline()
+
     for line in f:
+        if n > end:
+            break
         tmp = line.strip().split(",")
         num = int(tmp[0].strip())
         dom = "www." + tmp[1].strip()
-        cmd = "wget --no-clobber --convert-links --random-wait -p -E -e robots=off -U mozilla -P %s %s" % (num, dom)
+        cmd = "wget --dns-timeout 3 --connect-timeout 3 --read-timeout 3 --no-clobber --convert-links --random-wait -p -E -e robots=off -U mozilla -P %s %s" % (num, dom)
         print ("%s) %s" % (num, dom))
         try:
             os.system(cmd)
@@ -33,8 +47,10 @@ def main():
         usage()
 
     f = open(sys.argv[1], "r")
+    start = int(sys.argv[2])
+    end = int(sys.argv[3])
     
-    get_contents(f)
+    get_contents(f, start, end)
 
     f.close()
 

@@ -38,7 +38,7 @@ def get_contents(f, start, end):
         tmp = line.strip().split(",")
         num = int(tmp[0].strip())
         dom = "www." + tmp[1].strip()
-        cmd = "wget --dns-timeout 3 --connect-timeout 3 --read-timeout 3 --wait-retry=1 --tries=1 --no-clobber --convert-links --random-wait -p -E -e robots=off -U mozilla -P %s %s" % (num, dom)
+        cmd = "wget --dns-timeout 3 --connect-timeout 3 --read-timeout 3 --tries=1 --no-clobber --convert-links --random-wait -p -E -e robots=off -U mozilla -P %s %s" % (num, dom)
         print ("%s) %s" % (num, dom))
         try:
             os.system(cmd)

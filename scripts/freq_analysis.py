@@ -1,4 +1,8 @@
 import sys
+import smtplib
+
+sender = "hwlee2014@mmlab.snu.ac.kr"
+receivers = ["hwlee2014@mmlab.snu.ac.kr"]
 
 hash_lst = ["md5", "sha1", "sha224", "sha256", "ripemd160"]
 out = {}
@@ -6,6 +10,22 @@ out = {}
 def usage():
 	print ("python3 freq_analysis.py")
 	exit(-1)
+
+def send_email(msg):
+	message = """From: Hyunwoo Lee <hwlee2014@mmlab.snu.ac.kr>
+To: Hyunwoo Lee <hwlee2014@mmlab.snu.ac.kr>
+Subject: Experiment Report
+
+The experiment is on going:
+%s
+""" % (msg)
+
+	try:
+		smtpObj = smtplib.SMTP(host="old-mmlab.snu.ac.kr")
+		smtpObj.sendmail(sender, receivers, message)
+		print ("Successfully sent email")
+	except SMTPException:
+		print ("Error: unable to send email")
 
 def initialize():
 	for h in hash_lst:
@@ -22,7 +42,7 @@ def initialize():
 		freq(h)
 
 def freq(h):
-	fname = h + ".csv"
+	fname = "hash_" + h + ".csv"
 	ofname1 = h + "_coll1.csv"
 	ofname2 = h + "_coll2.csv"
 
@@ -36,7 +56,7 @@ def freq(h):
 		n = n + 1
 		tmp = line.strip().split(",")
 		num = int(tmp[0].strip())
-		size = int(tmp[1].strip())
+		size = int(tmp[3].strip())
 		hvalue = tmp[5].strip()
 
 		idx1 = int(hvalue[0], 16)
@@ -77,6 +97,9 @@ def write_freq(h):
 
 	of1.close()
 	of2.close()
+
+	msg = "%s is complete" % h
+	send_email(msg)
 
 def main():
 	initialize()

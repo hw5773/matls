@@ -56,8 +56,8 @@ def freq(h):
 		n = n + 1
 		tmp = line.strip().split(",")
 		num = int(tmp[0].strip())
-		size = int(tmp[3].strip())
-		hvalue = tmp[5].strip()
+		size = int(tmp[2].strip())
+		hvalue = tmp[4].strip()
 
 		idx1 = int(hvalue[0], 16)
 		idx2 = int(hvalue[0:2], 16)
@@ -72,8 +72,10 @@ def freq(h):
 		else:
 			out[h][2][idx2].append(hvalue)
 
-		if (n % 1000) == 0:
-			print (h, ": ", n, " lines complete.")
+		if (n % 1000000) == 0:
+			msg = "%s: %d lines complete." % (h, n)
+			print (msg)
+			send_email(msg)
 
 	of1.close()
 	of2.close()
@@ -103,6 +105,8 @@ def write_freq(h):
 
 def main():
 	initialize()
+	msg = "Experiment is complete"
+	send_email(msg)
 
 if __name__ == "__main__":
 	main()

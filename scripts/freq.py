@@ -75,7 +75,7 @@ def write_freq(h):
 	of = open(ofname, "w")
 
 	for i in range(65536):
-		s = hex(i)[4:] + ", " + str(len(out[h][4][i])) + "\n"
+		s = hex(i) + ", " + str(len(out[h][4][i])) + "\n"
 		of.write(s)
 
 	of.close()

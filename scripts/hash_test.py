@@ -38,16 +38,17 @@ def main():
 
 	of = open(sys.argv[1], "w")
 	num = int(sys.argv[2])
-	h = hashlib.sha256()
 
 	for i in range(1, num+1):
 		fname = "./%d/index.html" % i
 		try:
-			with open(fname, "rb") as f:
-				data = f.read()
-				h.update(data)
-				s = "%s, %s\n" % (i, h.hexdigest())
-				of.write(s)
+			f = open(fname, "rb")
+			data = f.read()
+			f.close()
+			h = hashlib.sha256()
+			h.update(data)
+			s = "%s, %s\n" % (i, h.hexdigest())
+			of.write(s)
 		except:
 			s = "%s, no file exception\n" % i
 			of.write(s)

@@ -52,6 +52,9 @@ def main():
 			s = "%s, no file exception\n" % i
 			of.write(s)
 
+		if i % 1000 == 0:
+			print ("Progress: %d / 798441" % i)
+
 	of.close()
 
 	# insert the title and the message you want.

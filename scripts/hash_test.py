@@ -58,7 +58,7 @@ def main():
 			f = open(INDEX, "rb")
 			data = f.read()
 			f.close()
-			os.rmdir(INDEX)
+			os.remove(INDEX)
 			h = hashlib.sha256()
 			h.update(data)
 			s = "%s, %s\n" % (i, h.hexdigest())

@@ -8,11 +8,14 @@ sender = "hwlee2014@mmlab.snu.ac.kr"
 # insert the receivers email address
 receivers = ["hwlee2014@mmlab.snu.ac.kr"]
 
+INDEX = "index.html"
+NUM_OF_DIRECTORY = 798441
+
 def usage():
 	# input the usage of this script
 	print ("Hashing every index files")
 	# input the command to execute this script
-	print ("python3 hash_test.py <output file> <num of directories>")
+	print ("python3 hash_test.py <prefix> <ip> <port> <start> <end>")
 	exit(1)
 
 def send_email(title, msg):
@@ -33,18 +36,29 @@ The experiment is on going:
 
 def main():
 	# check the number of arguments. change the number in the below statement according to the design.
-	if len(sys.argv) != 3:
+	if len(sys.argv) != 6:
 		usage()
 
-	of = open(sys.argv[1], "w")
-	num = int(sys.argv[2])
+	prefix = sys.argv[1]
+	fname = "%s_hash.out" % prefix
+	of = open(fname, "w")
+	ip = sys.argv[2]
+	port = int(sys.argv[3])
+	start = int(sys.argv[4])
+	end = int(sys.argv[5])
 
-	for i in range(1, num+1):
-		fname = "./%d/index.html" % i
+	if (start == 0) and (end == 0):
+		start = 1
+		end = NUM_OF_DIRECTORY
+
+	for i in range(start, end+1):
+		cmd = "wget http://%s:%d/%d/index.html -O index.html" % (ip, port, i)
 		try:
-			f = open(fname, "rb")
+			os.system(cmd)
+			f = open(INDEX, "rb")
 			data = f.read()
 			f.close()
+			os.rmdir(INDEX)
 			h = hashlib.sha256()
 			h.update(data)
 			s = "%s, %s\n" % (i, h.hexdigest())
@@ -53,13 +67,16 @@ def main():
 			s = "%s, no file exception\n" % i
 			of.write(s)
 
-		if i % 1000 == 0:
-			print ("Progress: %d / 798441" % i)
+		if i % 100000 == 0:
+			title = "Progress Report: %s" % prefix
+			msg = "Progress: %d / 798441" % i
+			print (msg)
+			send_email(title, msg)
 
 	of.close()
 
 	# insert the title and the message you want.
-	title = "Making the groundtruth complete"
+	title = "Hashing for %s complete" %s
 	msg = "The output file is %s" % sys.argv[1]
 
 	# send the email to the receivers from sender.

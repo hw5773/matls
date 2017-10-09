@@ -52,7 +52,7 @@ def main():
         end = NUM_OF_DIRECTORY
 
     for i in range(start, end+1):
-        cmd = "wget --ca-certificate=ca_carol.pem https://%s:%d/%d/index.html -O index.html" % (ip, port, i)
+        cmd = "wget --ca-certificate=ca_carol.pem https://%s:%d/%d/index.html -O %s.html" % (ip, port, i, prefix)
         try:
             os.system(cmd)
             f = open(INDEX, "rb")
@@ -76,7 +76,7 @@ def main():
     of.close()
 
     # insert the title and the message you want.
-    title = "Hashing for %s complete" %s
+    title = "Hashing for %s complete" % prefix
     msg = "The output file is %s" % sys.argv[1]
 
     # send the email to the receivers from sender.

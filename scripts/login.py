@@ -154,9 +154,9 @@ def main():
 	num = 0
 	for root, dirs, files in os.walk("./"):
 		for fn in files:
-			if "index" in fn:
+			if ".html" in fn:
 				fname = os.path.join(root, fn)
-				dom = root.split("/")[-1].strip()
+				dom = '.'.join(fn.split("_")[-1].strip().split(".")[0:-1])
 				search_key(dom, fname, of, err)
 				num = num + 1
 

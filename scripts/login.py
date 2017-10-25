@@ -13,6 +13,7 @@ receivers = ["hwlee2014@mmlab.snu.ac.kr"]
 
 net_domain = {}
 dom_cdn = {}
+success = 0
 
 def usage():
 	print ("Search the login form and its target URL.")
@@ -104,15 +105,16 @@ def search_key(dom, fn, of, err):
 								s = s1 + ", " + s2 + "\n"
 								print (s)
 								err.write("%s, no related domain\n" % fn)
-								continue
+								break
 
 						s = s1 + ", " + s2 + "\n"
 						print (s)
 
 						of.write(s)
 					except:
-						err.write("%s, No action in\n" % fn)
+						err.write("%s, no action in\n" % fn)
 					break
+		success = success + 1
 	except:
 		e = "%s\n" % fn
 		err.write(e)
@@ -165,6 +167,15 @@ def main():
 
 	of.close()
 	err.close()
+
+	print ("Complete: %d / %d" % (success, num))
+
+	cname = sys.argv[1] + ".result"
+	com = open(cname, "w")
+	com.write(str(success))
+	com.write("\n")
+	com.write(str(num))
+	com.close()
 
 #	title = "Experiment Complete"
 #	msg = "Privacy Search Complete"

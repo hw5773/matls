@@ -7,6 +7,8 @@ sender = "hwlee2014@mmlab.snu.ac.kr"
 # insert the receivers email address
 receivers = ["hwlee2014@mmlab.snu.ac.kr"]
 
+cdns = ["accelia", "akamai", "ananke", "aryaka", "azion", "azure", "bitgravity", "bitrix", "cachefly", "cdn77", "cdnetworks", "cdnsun", "cdnvideo", "cedexis", "chinacache", "chinanetcenter", "cloudflare", "cloudfront", "dnion", "edgecast", "fastly", "g-cdn", "google", "hibernia", "inap", "incapsula", "instartlogic", "isprime", "leaseweb", "level3", "limelight", "maxcdn", "ngenix", "powercdn", "rackspace", "reflected", "scaleengine", "section.io", "skypark", "taobao", "tencent", "turbobytes", "txnetworks", "xinnet", "yotta", "keycdn", "stackpath", "instart logic", "medianova", "airee", "panther", "swiftcdn"]
+
 def usage():
 	print ("Search the keyword in the document.")
 	print ("python3 summarize.py <output file name> <keyword>")
@@ -63,6 +65,8 @@ def main():
 
 	if len(sys.argv) == 3:
 		keywords = [sys.argv[2]]
+	elif sys.argv[2] == "cdn":
+		keywords = cdns
 	else:
 		keywords = ["proxy", "proxies", "third party", "third parties", "content delivery network", "cdn", "processor"]
 

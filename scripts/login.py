@@ -2,11 +2,18 @@ from bs4 import BeautifulSoup
 import sys
 import os
 import smtplib
+import socket
+import urllib.request
+import json
 
 # insert the sender email address
 sender = "hwlee2014@mmlab.snu.ac.kr"
 # insert the receivers email address
 receivers = ["hwlee2014@mmlab.snu.ac.kr"]
+
+net_domain = {}
+dom_cdn = {}
+success = 0
 
 def usage():
 	print ("Search the login form and its target URL.")
@@ -49,12 +56,65 @@ def search_key(dom, fn, of, err):
 							write_fname = True
 						action = form.get('action')
 						target = action.split("//")[1].split("/")[0]
-						s = fn + ", " + action + ", " + target + ", " + str(dom == target) + "\n"
+						s1 = fn + ", " + dom + ", " + target + ", " + str(dom == target)
+						dom_lst = []
+						target_lst = []
+
+						ais1 = socket.getaddrinfo(dom, 0, 0, 0, 0)
+						ais2 = socket.getaddrinfo(target, 0, 0, 0, 0)
+
+						for result in ais1:
+							dom_lst.append(result[-1][0])
+						
+						for result in ais2:
+							target_lst.append(result[-1][0])
+
+						dom_lst = set(dom_lst)
+						target_lst = set(target_lst)
+
+						union = dom_lst.union(target_lst)
+
+						if dom in dom_cdn:
+							cdn = dom_cdn[dom]
+						else:
+							cdn = "NONE"
+
+						if dom == target:
+							s2 = "True, " + cdn
+						else:
+
+							if len(union) > 0:
+								s2 = "True"
+								for ip in union:
+									net = '.'.join(ip.split(".")[0:3])
+								
+									if net in net_domain:
+										s2 = s2 + ", " + net_domain[net]
+										break
+							else:
+								s2 = "False"
+								for ip in target_lst:
+									net = '.'.join(ip.split(".")[0:3])
+
+									if net in net_domain:
+										s2 = s2 + ", " + net_domain[net]
+										break
+
+							if s2 == "True" or s2 == "False":
+								s2 = s2 + ", NONE"
+								s = s1 + ", " + s2 + "\n"
+								print (s)
+								err.write("%s, no related domain\n" % fn)
+								break
+
+						s = s1 + ", " + s2 + "\n"
 						print (s)
+
 						of.write(s)
 					except:
-						err.write("%s, No action in\n" % fn)
+						err.write("%s, no action in\n" % fn)
 					break
+		success = success + 1
 	except:
 		e = "%s\n" % fn
 		err.write(e)
@@ -70,15 +130,33 @@ def main():
 	fname = sys.argv[1] + ".out"
 	ename = sys.argv[1] + ".err"
 
+	f = open("nslookup_rd_cdn", "r")
+
+	for line in f:
+		cdn = line.strip().split(":")[1].strip()
+
+		if "NO" in cdn:
+			continue
+
+		tmp = line.strip().split(":")[0].split(",")
+		ip = tmp[2].split("/")[-1].strip()
+		network = '.'.join(ip.split(".")[0:3])
+		domain = tmp[1].strip()
+		net_domain[network] = cdn
+		dom_cdn[domain] = cdn
+		print (network, ": ", cdn)
+
 	of = open(fname, "w")
 	err = open(ename, "w")
+
+	of.write("file name, action, target, domain, same URL?, common IP?, CDN\n")
 
 	num = 0
 	for root, dirs, files in os.walk("./"):
 		for fn in files:
-			if "index" in fn:
+			if ".html" in fn:
 				fname = os.path.join(root, fn)
-				dom = root.split("/")[-1].strip()
+				dom = '.'.join(fn.split("_")[-1].strip().split(".")[0:-1])
 				search_key(dom, fname, of, err)
 				num = num + 1
 
@@ -89,6 +167,15 @@ def main():
 
 	of.close()
 	err.close()
+
+	print ("Complete: %d / %d" % (success, num))
+
+	cname = sys.argv[1] + ".result"
+	com = open(cname, "w")
+	com.write(str(success))
+	com.write("\n")
+	com.write(str(num))
+	com.close()
 
 #	title = "Experiment Complete"
 #	msg = "Privacy Search Complete"

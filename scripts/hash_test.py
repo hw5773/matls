@@ -53,19 +53,19 @@ def main():
 
 	for i in range(start, end+1):
 		cmd = "wget http://%s:%d/%d/index.html -O index.html" % (ip, port, i)
-		try:
-			os.system(cmd)
-			f = open(INDEX, "rb")
-			data = f.read()
-			f.close()
-			os.rmdir(INDEX)
-			h = hashlib.sha256()
-			h.update(data)
-			s = "%s, %s\n" % (i, h.hexdigest())
-			of.write(s)
-		except:
-			s = "%s, no file exception\n" % i
-			of.write(s)
+#		try:
+		os.system(cmd)
+		f = open(INDEX, "rb")
+		data = f.read()
+		f.close()
+		os.remove(INDEX)
+		h = hashlib.sha256()
+		h.update(data)
+		s = "%s, %s\n" % (i, h.hexdigest())
+		of.write(s)
+#		except:
+#			s = "%s, no file exception\n" % i
+#			of.write(s)
 
 		if i % 100000 == 0:
 			title = "Progress Report: %s" % prefix

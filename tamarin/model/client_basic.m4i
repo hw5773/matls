@@ -1,0 +1,52 @@
+dnl(
+/*
+  Client rules for standard handshake of TLS 1.2
+*/)
+
+dnl Middlebox Extensions for basic ClientHello
+define(<!ClientHelloExtensions!>, <!<TokenBinding, Middlebox>!>)
+
+rule send_client_hello:
+let
+  // Initialize state variables to zero.
+  init_state()
+
+  C = $C
+  S = $S
+
+  nc = ~nc
+  tid = nc
+
+  messages = <messages, ClientHello>
+in
+  [ Fr(nc)
+  ]
+--[ C0(tid),
+    Start(tid, C, 'client'),
+    running_client(Identity, C),
+  ]->
+  [ State(C1, tid, C, S, ClientState),
+    Out(ClientHello)
+  ]
+
+rule recv_server_hello:
+let
+  set_state()
+  ns = new_ns
+
+  C = $C
+  S = $S
+
+  messages = <messages, ServerHello>
+in
+  [ State(C1, tid, C, S, PrevClientState),
+    In(ServerHello)
+  ]
+--[ C1(tid),
+    Instance(tid, C, 'client'),
+    running_client(Nonces, nc, ns)
+  ]->
+  [ State(C2, tid, C, S, ClientState)
+  ]
+
+

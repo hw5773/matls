@@ -1783,6 +1783,8 @@ int SSL_get_cc_len(const SSL *s);
 
 int SSL_enable_ttpa(SSL *s);
 int SSL_disable_ttpa(SSL *s);
+int SSL_CTX_enable_ttpa(SSL_CTX *ctx);
+int SSL_CTX_disable_ttpa(SSL_CTX *ctx);
 #endif /* OPENSSL_NO_TTPA */
 
 #ifndef OPENSSL_NO_MB

@@ -2542,13 +2542,13 @@ int SSL_disable_ttpa(SSL *s)
 
 int SSL_CTX_enable_ttpa(SSL_CTX *ctx)
 {
-  s->mb_enabled = 1;
+  ctx->ttpa_enabled = 1;
   return 1;
 }
 
 int SSL_CTX_disable_ttpa(SSL_CTX *ctx)
 {
-  s->mb_enabled = 0;
+  ctx->ttpa_enabled = 0;
   return 1;
 }
 

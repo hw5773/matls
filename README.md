@@ -1,1 +1,1 @@
-# network security function for content authentication
+# A Trustworthy Middlebox-aware Networking Architecture

@@ -47,36 +47,4 @@ struct pkt
   int phl;            /**< The length of the payload */
 };
 
-/**
- * @brief IP related process
- * @param buf IP packet, including transport layer and application layer
- * @param len Length of the IP packet
- * @return Error code (defined in error.h)
- */
-int process_ip(uint8_t *buf, int len);
-
-/**
- * @brief TCP related process
- * @param buf TCP segment
- * @param len Length of the TCP segment
- * @return Error code (defined in error.h)
- */
-int process_tcp(uint8_t *buf, int len);
-
-/**
-* @brief UDP related process
-* @param buf UDP segment
-* @param len Length of the UDP segment
-* @return Error code (defined in error.h)
-*/
-int process_udp(uint8_t *buf, int len);
-
-/**
- * @brief Print IP address and port of the packet
- * @param ip IP address of the packet
- * @param port Port of the packet
- * @return void
- */
-void print_info(int ip, int port);
-
 #endif

@@ -1,1 +1,1 @@
-# network security function for content authentication
+# Middlebox-aware TLS

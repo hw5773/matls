@@ -13,7 +13,7 @@ var searchData=
   ['declare_5fpem_5frw',['DECLARE_PEM_rw',['../ssl_8h.html#a39f57e3c3395bd1e5e2cd0f60104636f',1,'ssl.h']]],
   ['default_5fif',['DEFAULT_IF',['../middlebox_8h.html#aa09b857081f02c337190b7fd4e7096c4',1,'middlebox.h']]],
   ['default_5fkey_5flength',['DEFAULT_KEY_LENGTH',['../prf_8h.html#a9220b48bd21153fb98f8a034142542a8',1,'prf.h']]],
-  ['default_5fmac_5flength',['DEFAULT_MAC_LENGTH',['../prf_8h.html#abfa54a547bded4af9893aca763ca4f6a',1,'DEFAULT_MAC_LENGTH():&#160;prf.h'],['../record_8h.html#abfa54a547bded4af9893aca763ca4f6a',1,'DEFAULT_MAC_LENGTH():&#160;record.h']]],
+  ['default_5fmac_5flength',['DEFAULT_MAC_LENGTH',['../prf_8h.html#abfa54a547bded4af9893aca763ca4f6a',1,'prf.h']]],
   ['default_5fpasswd_5fcallback',['default_passwd_callback',['../structssl__ctx__st.html#a8065ec3c28e4a61ff8041119cc029aa2',1,'ssl_ctx_st']]],
   ['default_5fpasswd_5fcallback_5fuserdata',['default_passwd_callback_userdata',['../structssl__ctx__st.html#a66ba3cb88f01250883fd336791b354b2',1,'ssl_ctx_st']]],
   ['default_5fverify_5fcallback',['default_verify_callback',['../structssl__ctx__st.html#a60a59026ec7843603b54dbda1d46ba10',1,'ssl_ctx_st']]],

@@ -1625,7 +1625,7 @@ var searchData=
   ['store_5fhash',['store_hash',['../namespacecontents__further.html#a1c62a4a01c8cd0f31525e28b886d52a6',1,'contents_further.store_hash()'],['../namespacehash.html#a9640499322c5cb9608ade7379d670b04',1,'hash.store_hash()']]],
   ['strength',['strength',['../structsrp__ctx__st.html#a7c4b3e2077d11a9ad4b45424bc098148',1,'srp_ctx_st']]],
   ['strength_5fbits',['strength_bits',['../structssl__cipher__st.html#ae3a40fb67452514df7770e334a99c32d',1,'ssl_cipher_st']]],
-  ['success',['SUCCESS',['../errors_8h.html#aa90cac659d18e8ef6294c7ae337f6b58',1,'SUCCESS():&#160;errors.h'],['../namespacelogin.html#a343cc2be9c464c78c5d4227471e75d58',1,'login.success()']]],
+  ['success',['success',['../namespacelogin.html#a343cc2be9c464c78c5d4227471e75d58',1,'login.success()'],['../errors_8h.html#aa90cac659d18e8ef6294c7ae337f6b58',1,'SUCCESS():&#160;errors.h']]],
   ['summarize',['summarize',['../namespacesummarize.html',1,'']]],
   ['summarize_2epy',['summarize.py',['../summarize_8py.html',1,'']]]
 ];

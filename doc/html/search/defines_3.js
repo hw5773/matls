@@ -5,7 +5,7 @@ var searchData=
   ['dec32',['DEC32',['../ssl__locl_8h.html#a51ceb0cdeb792bcf68ca917b55c8b2ac',1,'ssl_locl.h']]],
   ['default_5fif',['DEFAULT_IF',['../middlebox_8h.html#aa09b857081f02c337190b7fd4e7096c4',1,'middlebox.h']]],
   ['default_5fkey_5flength',['DEFAULT_KEY_LENGTH',['../prf_8h.html#a9220b48bd21153fb98f8a034142542a8',1,'prf.h']]],
-  ['default_5fmac_5flength',['DEFAULT_MAC_LENGTH',['../prf_8h.html#abfa54a547bded4af9893aca763ca4f6a',1,'DEFAULT_MAC_LENGTH():&#160;prf.h'],['../record_8h.html#abfa54a547bded4af9893aca763ca4f6a',1,'DEFAULT_MAC_LENGTH():&#160;record.h']]],
+  ['default_5fmac_5flength',['DEFAULT_MAC_LENGTH',['../prf_8h.html#abfa54a547bded4af9893aca763ca4f6a',1,'prf.h']]],
   ['dtls_5fctrl_5fget_5ftimeout',['DTLS_CTRL_GET_TIMEOUT',['../ssl_8h.html#a8876c4eafc27596bca3233442d4055d5',1,'ssl.h']]],
   ['dtls_5fctrl_5fhandle_5ftimeout',['DTLS_CTRL_HANDLE_TIMEOUT',['../ssl_8h.html#a9bcb73cce75a8966b1bc035098c965e5',1,'ssl.h']]],
   ['dtls_5fctrl_5flisten',['DTLS_CTRL_LISTEN',['../ssl_8h.html#a13f4df0f8fdcfb652ddcb8b875742ad7',1,'ssl.h']]],

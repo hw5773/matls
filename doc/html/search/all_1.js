@@ -2,11 +2,10 @@ var searchData=
 [
   ['a',['A',['../structsrp__ctx__st.html#a65bcccab6ee5eb609c2304fd3a2a7c3f',1,'srp_ctx_st::A()'],['../structsrp__ctx__st.html#a5d063ec2dc87cc7351ced5b25de67e3f',1,'srp_ctx_st::a()'],['../prf_8h.html#a90d7d8700543afd59f05013cdb654233',1,'a():&#160;prf.h']]],
   ['ack',['ack',['../structpair__entry.html#a5663beddd73df4484d031a1677a4e106',1,'pair_entry']]],
-  ['add_5fendpoint_5fmac',['add_endpoint_mac',['../record_8h.html#a9bacf6a985caac0d5912a13f8f306c8f',1,'record.h']]],
   ['add_5fglobal_5fmac',['add_global_mac',['../record_8h.html#a5427ee390d0fbcf933ad289475a86630',1,'record.h']]],
   ['add_5fpair_5fto_5ftable',['add_pair_to_table',['../pair__repo_8c.html#ae0d70af68951f21a5bbef1ed68a8c81e',1,'add_pair_to_table(struct pair_entry *tmp):&#160;pair_repo.c'],['../pair__repo_8h.html#ae0d70af68951f21a5bbef1ed68a8c81e',1,'add_pair_to_table(struct pair_entry *tmp):&#160;pair_repo.c']]],
   ['add_5frecord',['add_record',['../record_8c.html#a2593b1a730045189aecf866f6370b530',1,'record.c']]],
-  ['add_5fsource_5fmac',['add_source_mac',['../record_8c.html#a3d5bd635369e2190ee204e370458b577',1,'record.c']]],
+  ['add_5fsource_5fmac',['add_source_mac',['../record_8c.html#a3d5bd635369e2190ee204e370458b577',1,'add_source_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *msg, int mlen, unsigned char *key, int klen):&#160;record.c'],['../record_8h.html#a3d5bd635369e2190ee204e370458b577',1,'add_source_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *msg, int mlen, unsigned char *key, int klen):&#160;record.c']]],
   ['alert_5fvalue',['alert_value',['../structssl3__enc__method.html#aad11cf6fc0fe09469b05f387f7a11a80',1,'ssl3_enc_method']]],
   ['alg_5fbits',['alg_bits',['../structssl__cipher__st.html#a451f084cd7c875897f5986a35a482628',1,'ssl_cipher_st']]],
   ['algo_5fstrength',['algo_strength',['../structssl__cipher__st.html#a7c6a3fecb3d246870ccb803260dc2b51',1,'ssl_cipher_st']]],

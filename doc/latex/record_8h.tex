@@ -10,6 +10,7 @@
 {\ttfamily \#include $<$sys/time.\-h$>$}\\*
 {\ttfamily \#include $<$sys/socket.\-h$>$}\\*
 {\ttfamily \#include $<$sys/queue.\-h$>$}\\*
+{\ttfamily \#include \char`\"{}prf.\-h\char`\"{}}\\*
 Include dependency graph for record.\-h\-:
 This graph shows which files directly or indirectly include this file\-:
 \subsection*{Classes}
@@ -19,11 +20,6 @@ struct \hyperlink{structentry}{entry}
 \begin{DoxyCompactList}\small\item\em Data structure for global M\-A\-C. \end{DoxyCompactList}\item 
 struct \hyperlink{structmodification__record}{modification\-\_\-record}
 \begin{DoxyCompactList}\small\item\em Data structure for the modification record. \end{DoxyCompactList}\end{DoxyCompactItemize}
-\subsection*{Macros}
-\begin{DoxyCompactItemize}
-\item 
-\#define \hyperlink{record_8h_abfa54a547bded4af9893aca763ca4f6a}{D\-E\-F\-A\-U\-L\-T\-\_\-\-M\-A\-C\-\_\-\-L\-E\-N\-G\-T\-H}~16
-\end{DoxyCompactItemize}
 \subsection*{Typedefs}
 \begin{DoxyCompactItemize}
 \item 
@@ -36,18 +32,12 @@ int \hyperlink{record_8h_a43c42ddc99d5462b78d93c9233acef0f}{init\-\_\-record} (\
 \begin{DoxyCompactList}\small\item\em Initialize the modification record. \end{DoxyCompactList}\item 
 int \hyperlink{record_8h_a0c6a69afb5dc0c06d3ff6da84b483a9d}{free\-\_\-record} (\hyperlink{record_8h_a9e2e75eff1397e3a7be9a5da10e07c7b}{M\-O\-D\-\_\-\-R\-E\-C\-O\-R\-D} $\ast$mr)
 \begin{DoxyCompactList}\small\item\em Destruct the modification record. \end{DoxyCompactList}\item 
-int \hyperlink{record_8h_a9bacf6a985caac0d5912a13f8f306c8f}{add\-\_\-endpoint\-\_\-mac} (\hyperlink{prf_8h_a2e4c9fad15fd913a2f3bc5557701fdc2}{S\-E\-C\-U\-R\-I\-T\-Y\-\_\-\-P\-A\-R\-A\-M\-S} $\ast$sp, \hyperlink{record_8h_a9e2e75eff1397e3a7be9a5da10e07c7b}{M\-O\-D\-\_\-\-R\-E\-C\-O\-R\-D} $\ast$mr, unsigned char $\ast$msg, int mlen, unsigned char $\ast$key, int klen)
-\item 
+int \hyperlink{record_8h_a3d5bd635369e2190ee204e370458b577}{add\-\_\-source\-\_\-mac} (\hyperlink{prf_8h_a2e4c9fad15fd913a2f3bc5557701fdc2}{S\-E\-C\-U\-R\-I\-T\-Y\-\_\-\-P\-A\-R\-A\-M\-S} $\ast$sp, \hyperlink{record_8h_a9e2e75eff1397e3a7be9a5da10e07c7b}{M\-O\-D\-\_\-\-R\-E\-C\-O\-R\-D} $\ast$mr, unsigned char $\ast$msg, int mlen, unsigned char $\ast$key, int klen)
+\begin{DoxyCompactList}\small\item\em Add the endpoint's M\-A\-C. \end{DoxyCompactList}\item 
 int \hyperlink{record_8h_a5427ee390d0fbcf933ad289475a86630}{add\-\_\-global\-\_\-mac} (unsigned char $\ast$record, int rec\-\_\-len, unsigned char $\ast$id, int id\-\_\-len, unsigned char $\ast$mac\-\_\-key, int mk\-\_\-len, unsigned char $\ast$prev, int prev\-\_\-len, unsigned char $\ast$next, int next\-\_\-len)
 \item 
 int \hyperlink{record_8h_a00dc42186825f0081101d2a702010e66}{verify\-\_\-record} ()
 \end{DoxyCompactItemize}
-
-
-\subsection{Macro Definition Documentation}
-\hypertarget{record_8h_abfa54a547bded4af9893aca763ca4f6a}{\index{record.\-h@{record.\-h}!D\-E\-F\-A\-U\-L\-T\-\_\-\-M\-A\-C\-\_\-\-L\-E\-N\-G\-T\-H@{D\-E\-F\-A\-U\-L\-T\-\_\-\-M\-A\-C\-\_\-\-L\-E\-N\-G\-T\-H}}
-\index{D\-E\-F\-A\-U\-L\-T\-\_\-\-M\-A\-C\-\_\-\-L\-E\-N\-G\-T\-H@{D\-E\-F\-A\-U\-L\-T\-\_\-\-M\-A\-C\-\_\-\-L\-E\-N\-G\-T\-H}!record.h@{record.\-h}}
-\subsubsection[{D\-E\-F\-A\-U\-L\-T\-\_\-\-M\-A\-C\-\_\-\-L\-E\-N\-G\-T\-H}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\-E\-F\-A\-U\-L\-T\-\_\-\-M\-A\-C\-\_\-\-L\-E\-N\-G\-T\-H~16}}\label{record_8h_abfa54a547bded4af9893aca763ca4f6a}
 
 
 \subsection{Typedef Documentation}
@@ -61,18 +51,6 @@ Data structure for the modification record.
 
 
 \subsection{Function Documentation}
-\hypertarget{record_8h_a9bacf6a985caac0d5912a13f8f306c8f}{\index{record.\-h@{record.\-h}!add\-\_\-endpoint\-\_\-mac@{add\-\_\-endpoint\-\_\-mac}}
-\index{add\-\_\-endpoint\-\_\-mac@{add\-\_\-endpoint\-\_\-mac}!record.h@{record.\-h}}
-\subsubsection[{add\-\_\-endpoint\-\_\-mac}]{\setlength{\rightskip}{0pt plus 5cm}int add\-\_\-endpoint\-\_\-mac (
-\begin{DoxyParamCaption}
-\item[{{\bf S\-E\-C\-U\-R\-I\-T\-Y\-\_\-\-P\-A\-R\-A\-M\-S} $\ast$}]{sp, }
-\item[{{\bf M\-O\-D\-\_\-\-R\-E\-C\-O\-R\-D} $\ast$}]{mr, }
-\item[{unsigned char $\ast$}]{msg, }
-\item[{int}]{mlen, }
-\item[{unsigned char $\ast$}]{key, }
-\item[{int}]{klen}
-\end{DoxyParamCaption}
-)}}\label{record_8h_a9bacf6a985caac0d5912a13f8f306c8f}
 \hypertarget{record_8h_a5427ee390d0fbcf933ad289475a86630}{\index{record.\-h@{record.\-h}!add\-\_\-global\-\_\-mac@{add\-\_\-global\-\_\-mac}}
 \index{add\-\_\-global\-\_\-mac@{add\-\_\-global\-\_\-mac}!record.h@{record.\-h}}
 \subsubsection[{add\-\_\-global\-\_\-mac}]{\setlength{\rightskip}{0pt plus 5cm}int add\-\_\-global\-\_\-mac (
@@ -89,6 +67,40 @@ Data structure for the modification record.
 \item[{int}]{next\-\_\-len}
 \end{DoxyParamCaption}
 )}}\label{record_8h_a5427ee390d0fbcf933ad289475a86630}
+\hypertarget{record_8h_a3d5bd635369e2190ee204e370458b577}{\index{record.\-h@{record.\-h}!add\-\_\-source\-\_\-mac@{add\-\_\-source\-\_\-mac}}
+\index{add\-\_\-source\-\_\-mac@{add\-\_\-source\-\_\-mac}!record.h@{record.\-h}}
+\subsubsection[{add\-\_\-source\-\_\-mac}]{\setlength{\rightskip}{0pt plus 5cm}int add\-\_\-source\-\_\-mac (
+\begin{DoxyParamCaption}
+\item[{{\bf S\-E\-C\-U\-R\-I\-T\-Y\-\_\-\-P\-A\-R\-A\-M\-S} $\ast$}]{sp, }
+\item[{{\bf M\-O\-D\-\_\-\-R\-E\-C\-O\-R\-D} $\ast$}]{mr, }
+\item[{unsigned char $\ast$}]{msg, }
+\item[{int}]{mlen, }
+\item[{unsigned char $\ast$}]{key, }
+\item[{int}]{klen}
+\end{DoxyParamCaption}
+)}}\label{record_8h_a3d5bd635369e2190ee204e370458b577}
+
+
+Add the endpoint's M\-A\-C. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sp} & Security Parameters \\
+\hline
+{\em mr} & Modification Record \\
+\hline
+{\em msg} & Source Message \\
+\hline
+{\em mlen} & Length of the source message \\
+\hline
+{\em key} & Secret value \\
+\hline
+{\em klen} & Length of the key \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\hyperlink{errors_8h_aa90cac659d18e8ef6294c7ae337f6b58}{S\-U\-C\-C\-E\-S\-S(1)}/\-F\-A\-I\-L\-U\-R\-E(0) 
+\end{DoxyReturn}
 \hypertarget{record_8h_a0c6a69afb5dc0c06d3ff6da84b483a9d}{\index{record.\-h@{record.\-h}!free\-\_\-record@{free\-\_\-record}}
 \index{free\-\_\-record@{free\-\_\-record}!record.h@{record.\-h}}
 \subsubsection[{free\-\_\-record}]{\setlength{\rightskip}{0pt plus 5cm}int free\-\_\-record (

@@ -1,0 +1,147 @@
+\hypertarget{prf_8c}{\section{record/prf.c File Reference}
+\label{prf_8c}\index{record/prf.\-c@{record/prf.\-c}}
+}
+
+
+This file is to implement the prf.  
+
+
+{\ttfamily \#include \char`\"{}prf.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}errors.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}logs.\-h\char`\"{}}\\*
+Include dependency graph for prf.\-c\-:
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+unsigned char $\ast$ \hyperlink{prf_8c_a51c7b3780ddd9293dfa9eeae775fabdd}{hmac\-\_\-hash} (\hyperlink{prf_8h_a2e4c9fad15fd913a2f3bc5557701fdc2}{S\-E\-C\-U\-R\-I\-T\-Y\-\_\-\-P\-A\-R\-A\-M\-S} $\ast$sp, unsigned char $\ast$key, int klen, unsigned char $\ast$msg, int mlen, unsigned char $\ast$result, int $\ast$rlen)
+\begin{DoxyCompactList}\small\item\em Perform H\-M\-A\-C. \end{DoxyCompactList}\item 
+unsigned char $\ast$ \hyperlink{prf_8c_a1e808a6ad372ec831d4aefa01212990b}{p\-\_\-hash} (\hyperlink{prf_8h_a2e4c9fad15fd913a2f3bc5557701fdc2}{S\-E\-C\-U\-R\-I\-T\-Y\-\_\-\-P\-A\-R\-A\-M\-S} $\ast$sp, unsigned char $\ast$key, int klen, unsigned char $\ast$seed, int slen, unsigned char $\ast$result, int rlen)
+\begin{DoxyCompactList}\small\item\em Perform p\-\_\-hash defined in R\-F\-C5246. \end{DoxyCompactList}\item 
+unsigned char $\ast$ \hyperlink{prf_8c_a42a24fb0a80685643e8ec4e991088b26}{prf} (\hyperlink{prf_8h_a2e4c9fad15fd913a2f3bc5557701fdc2}{S\-E\-C\-U\-R\-I\-T\-Y\-\_\-\-P\-A\-R\-A\-M\-S} $\ast$sp, unsigned char $\ast$key, int klen, unsigned char $\ast$label, int llen, unsigned char $\ast$seed, int slen, int $\ast$rlen)
+\begin{DoxyCompactList}\small\item\em Pseudorandom Function defined in R\-F\-C5246. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This file is to implement the prf. \begin{DoxyAuthor}{Author}
+Hyunwoo Lee 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+21 Feb 2018 
+\end{DoxyDate}
+
+
+\subsection{Function Documentation}
+\hypertarget{prf_8c_a51c7b3780ddd9293dfa9eeae775fabdd}{\index{prf.\-c@{prf.\-c}!hmac\-\_\-hash@{hmac\-\_\-hash}}
+\index{hmac\-\_\-hash@{hmac\-\_\-hash}!prf.c@{prf.\-c}}
+\subsubsection[{hmac\-\_\-hash}]{\setlength{\rightskip}{0pt plus 5cm}unsigned char$\ast$ hmac\-\_\-hash (
+\begin{DoxyParamCaption}
+\item[{{\bf S\-E\-C\-U\-R\-I\-T\-Y\-\_\-\-P\-A\-R\-A\-M\-S} $\ast$}]{sp, }
+\item[{unsigned char $\ast$}]{key, }
+\item[{int}]{klen, }
+\item[{unsigned char $\ast$}]{msg, }
+\item[{int}]{mlen, }
+\item[{unsigned char $\ast$}]{result, }
+\item[{int $\ast$}]{rlen}
+\end{DoxyParamCaption}
+)}}\label{prf_8c_a51c7b3780ddd9293dfa9eeae775fabdd}
+
+
+Perform H\-M\-A\-C. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sp} & Security parameters \\
+\hline
+{\em key} & Secret value \\
+\hline
+{\em klen} & Length of the key \\
+\hline
+{\em msg} & Message to be H\-M\-A\-Ced \\
+\hline
+{\em mlen} & Length of the message \\
+\hline
+{\em result} & Array of the result \\
+\hline
+{\em rlen} & Length of the result \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Result of H\-M\-A\-C 
+\end{DoxyReturn}
+\hypertarget{prf_8c_a1e808a6ad372ec831d4aefa01212990b}{\index{prf.\-c@{prf.\-c}!p\-\_\-hash@{p\-\_\-hash}}
+\index{p\-\_\-hash@{p\-\_\-hash}!prf.c@{prf.\-c}}
+\subsubsection[{p\-\_\-hash}]{\setlength{\rightskip}{0pt plus 5cm}unsigned char$\ast$ p\-\_\-hash (
+\begin{DoxyParamCaption}
+\item[{{\bf S\-E\-C\-U\-R\-I\-T\-Y\-\_\-\-P\-A\-R\-A\-M\-S} $\ast$}]{sp, }
+\item[{unsigned char $\ast$}]{key, }
+\item[{int}]{klen, }
+\item[{unsigned char $\ast$}]{seed, }
+\item[{int}]{slen, }
+\item[{unsigned char $\ast$}]{result, }
+\item[{int}]{rlen}
+\end{DoxyParamCaption}
+)}}\label{prf_8c_a1e808a6ad372ec831d4aefa01212990b}
+
+
+Perform p\-\_\-hash defined in R\-F\-C5246. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sp} & Security parameters \\
+\hline
+{\em key} & Secret value \\
+\hline
+{\em klen} & Length of the key \\
+\hline
+{\em seed} & Seed value \\
+\hline
+{\em slen} & Length of the seed \\
+\hline
+{\em result} & Array of the result \\
+\hline
+{\em rlen} & Length of the result \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Result of H\-M\-A\-C 
+\end{DoxyReturn}
+\hypertarget{prf_8c_a42a24fb0a80685643e8ec4e991088b26}{\index{prf.\-c@{prf.\-c}!prf@{prf}}
+\index{prf@{prf}!prf.c@{prf.\-c}}
+\subsubsection[{prf}]{\setlength{\rightskip}{0pt plus 5cm}unsigned char$\ast$ prf (
+\begin{DoxyParamCaption}
+\item[{{\bf S\-E\-C\-U\-R\-I\-T\-Y\-\_\-\-P\-A\-R\-A\-M\-S} $\ast$}]{sp, }
+\item[{unsigned char $\ast$}]{key, }
+\item[{int}]{klen, }
+\item[{unsigned char $\ast$}]{label, }
+\item[{int}]{llen, }
+\item[{unsigned char $\ast$}]{seed, }
+\item[{int}]{slen, }
+\item[{int $\ast$}]{rlen}
+\end{DoxyParamCaption}
+)}}\label{prf_8c_a42a24fb0a80685643e8ec4e991088b26}
+
+
+Pseudorandom Function defined in R\-F\-C5246. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sp} & Security parameters \\
+\hline
+{\em key} & Secret value \\
+\hline
+{\em klen} & Length of the key \\
+\hline
+{\em label} & Label \\
+\hline
+{\em llen} & Length of the label \\
+\hline
+{\em seed} & Seed value \\
+\hline
+{\em slen} & Length of the seed \\
+\hline
+{\em rlen} & Length of the result \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Result of P\-R\-F (This value must be freed outside) 
+\end{DoxyReturn}

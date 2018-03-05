@@ -1,0 +1,61 @@
+\hypertarget{t1__ttpa_8c}{\section{openssl-\/1.0.1j/ssl/t1\-\_\-ttpa.c File Reference}
+\label{t1__ttpa_8c}\index{openssl-\/1.\-0.\-1j/ssl/t1\-\_\-ttpa.\-c@{openssl-\/1.\-0.\-1j/ssl/t1\-\_\-ttpa.\-c}}
+}
+{\ttfamily \#include $<$stdio.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/objects.\-h$>$}\\*
+{\ttfamily \#include \char`\"{}ssl\-\_\-locl.\-h\char`\"{}}\\*
+Include dependency graph for t1\-\_\-ttpa.\-c\-:
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{t1__ttpa_8c_a06adc8ef6d5ced41c8916cf13d79880a}{ssl\-\_\-add\-\_\-clienthello\-\_\-ttpa\-\_\-ext} (S\-S\-L $\ast$s, unsigned char $\ast$\hyperlink{ssl__locl_8h_a4014c6f4a6fa0e565ca592bcaca0fa58}{p}, int $\ast$len, int maxlen)
+\item 
+int \hyperlink{t1__ttpa_8c_a4b21cd3b9a5fcb59a92aad05c7f91b1f}{ssl\-\_\-parse\-\_\-clienthello\-\_\-ttpa\-\_\-ext} (S\-S\-L $\ast$s, unsigned char $\ast$d, int len, int $\ast$al)
+\item 
+int \hyperlink{t1__ttpa_8c_a50a4368a97061081e45b6d784ccd661b}{ssl\-\_\-add\-\_\-serverhello\-\_\-ttpa\-\_\-ext} (S\-S\-L $\ast$s, unsigned char $\ast$\hyperlink{ssl__locl_8h_a4014c6f4a6fa0e565ca592bcaca0fa58}{p}, int $\ast$len, int maxlen)
+\item 
+int \hyperlink{t1__ttpa_8c_a1c9838c222136a3fe630f614f2f3a3a8}{ssl\-\_\-parse\-\_\-serverhello\-\_\-ttpa\-\_\-ext} (S\-S\-L $\ast$s, unsigned char $\ast$\hyperlink{ssl__locl_8h_a4014c6f4a6fa0e565ca592bcaca0fa58}{p}, int size, int $\ast$al)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{t1__ttpa_8c_a06adc8ef6d5ced41c8916cf13d79880a}{\index{t1\-\_\-ttpa.\-c@{t1\-\_\-ttpa.\-c}!ssl\-\_\-add\-\_\-clienthello\-\_\-ttpa\-\_\-ext@{ssl\-\_\-add\-\_\-clienthello\-\_\-ttpa\-\_\-ext}}
+\index{ssl\-\_\-add\-\_\-clienthello\-\_\-ttpa\-\_\-ext@{ssl\-\_\-add\-\_\-clienthello\-\_\-ttpa\-\_\-ext}!t1_ttpa.c@{t1\-\_\-ttpa.\-c}}
+\subsubsection[{ssl\-\_\-add\-\_\-clienthello\-\_\-ttpa\-\_\-ext}]{\setlength{\rightskip}{0pt plus 5cm}int ssl\-\_\-add\-\_\-clienthello\-\_\-ttpa\-\_\-ext (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s, }
+\item[{unsigned char $\ast$}]{p, }
+\item[{int $\ast$}]{len, }
+\item[{int}]{maxlen}
+\end{DoxyParamCaption}
+)}}\label{t1__ttpa_8c_a06adc8ef6d5ced41c8916cf13d79880a}
+\hypertarget{t1__ttpa_8c_a50a4368a97061081e45b6d784ccd661b}{\index{t1\-\_\-ttpa.\-c@{t1\-\_\-ttpa.\-c}!ssl\-\_\-add\-\_\-serverhello\-\_\-ttpa\-\_\-ext@{ssl\-\_\-add\-\_\-serverhello\-\_\-ttpa\-\_\-ext}}
+\index{ssl\-\_\-add\-\_\-serverhello\-\_\-ttpa\-\_\-ext@{ssl\-\_\-add\-\_\-serverhello\-\_\-ttpa\-\_\-ext}!t1_ttpa.c@{t1\-\_\-ttpa.\-c}}
+\subsubsection[{ssl\-\_\-add\-\_\-serverhello\-\_\-ttpa\-\_\-ext}]{\setlength{\rightskip}{0pt plus 5cm}int ssl\-\_\-add\-\_\-serverhello\-\_\-ttpa\-\_\-ext (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s, }
+\item[{unsigned char $\ast$}]{p, }
+\item[{int $\ast$}]{len, }
+\item[{int}]{maxlen}
+\end{DoxyParamCaption}
+)}}\label{t1__ttpa_8c_a50a4368a97061081e45b6d784ccd661b}
+\hypertarget{t1__ttpa_8c_a4b21cd3b9a5fcb59a92aad05c7f91b1f}{\index{t1\-\_\-ttpa.\-c@{t1\-\_\-ttpa.\-c}!ssl\-\_\-parse\-\_\-clienthello\-\_\-ttpa\-\_\-ext@{ssl\-\_\-parse\-\_\-clienthello\-\_\-ttpa\-\_\-ext}}
+\index{ssl\-\_\-parse\-\_\-clienthello\-\_\-ttpa\-\_\-ext@{ssl\-\_\-parse\-\_\-clienthello\-\_\-ttpa\-\_\-ext}!t1_ttpa.c@{t1\-\_\-ttpa.\-c}}
+\subsubsection[{ssl\-\_\-parse\-\_\-clienthello\-\_\-ttpa\-\_\-ext}]{\setlength{\rightskip}{0pt plus 5cm}int ssl\-\_\-parse\-\_\-clienthello\-\_\-ttpa\-\_\-ext (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s, }
+\item[{unsigned char $\ast$}]{d, }
+\item[{int}]{len, }
+\item[{int $\ast$}]{al}
+\end{DoxyParamCaption}
+)}}\label{t1__ttpa_8c_a4b21cd3b9a5fcb59a92aad05c7f91b1f}
+\hypertarget{t1__ttpa_8c_a1c9838c222136a3fe630f614f2f3a3a8}{\index{t1\-\_\-ttpa.\-c@{t1\-\_\-ttpa.\-c}!ssl\-\_\-parse\-\_\-serverhello\-\_\-ttpa\-\_\-ext@{ssl\-\_\-parse\-\_\-serverhello\-\_\-ttpa\-\_\-ext}}
+\index{ssl\-\_\-parse\-\_\-serverhello\-\_\-ttpa\-\_\-ext@{ssl\-\_\-parse\-\_\-serverhello\-\_\-ttpa\-\_\-ext}!t1_ttpa.c@{t1\-\_\-ttpa.\-c}}
+\subsubsection[{ssl\-\_\-parse\-\_\-serverhello\-\_\-ttpa\-\_\-ext}]{\setlength{\rightskip}{0pt plus 5cm}int ssl\-\_\-parse\-\_\-serverhello\-\_\-ttpa\-\_\-ext (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s, }
+\item[{unsigned char $\ast$}]{p, }
+\item[{int}]{size, }
+\item[{int $\ast$}]{al}
+\end{DoxyParamCaption}
+)}}\label{t1__ttpa_8c_a1c9838c222136a3fe630f614f2f3a3a8}

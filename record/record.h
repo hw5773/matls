@@ -21,6 +21,9 @@
 
 #define DEFAULT_MAC_LENGTH 16
 
+/**
+ * @brief Data structure for global MAC
+ */
 struct entry
 {
   unsigned char *writer;                    /**< The writer who modifies the message */
@@ -28,6 +31,9 @@ struct entry
   unsigned char *modification_hash;         /**< The hash value which shows the modification */
 };
 
+/**
+ * @brief Data structure for the modification record
+ */
 typedef struct modification_record
 {
   unsigned char *endpoint_mac;              /**< Endpoint MAC */

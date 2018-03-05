@@ -1,0 +1,86 @@
+\hypertarget{structpkt}{\section{pkt Struct Reference}
+\label{structpkt}\index{pkt@{pkt}}
+}
+
+
+Packet structure.  
+
+
+
+
+{\ttfamily \#include $<$middlebox.\-h$>$}
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+uint8\-\_\-t $\ast$ \hyperlink{structpkt_ade4eeb65427ac816b5cac5a8cb3ae69e}{eh}
+\item 
+uint8\-\_\-t $\ast$ \hyperlink{structpkt_aea852a33d098462380781546cd19bf1f}{nh}
+\item 
+uint8\-\_\-t $\ast$ \hyperlink{structpkt_a5ebbe76e5d11cb6414429b60fe92146c}{th}
+\item 
+uint8\-\_\-t $\ast$ \hyperlink{structpkt_aa213efd0a76015d65f6f4ba745e49d99}{payload}
+\item 
+int \hyperlink{structpkt_a10a6c3fee7f10d921e69cc110affce1a}{el}
+\item 
+int \hyperlink{structpkt_add67017449f875df4752e40b3d10eda7}{nl}
+\item 
+int \hyperlink{structpkt_a669c31685e5eb281e5b40e59bdc3218d}{tl}
+\item 
+int \hyperlink{structpkt_ab298557ecf4db28c7e7cffa2fd72779a}{pl}
+\item 
+int \hyperlink{structpkt_a8613fb0e3a55e94f5c3a901e293797b6}{ehl}
+\item 
+int \hyperlink{structpkt_aae31018cd81255ca1114f0830e839cd3}{nhl}
+\item 
+int \hyperlink{structpkt_a240625d5ce4002682cec58d51a92f908}{thl}
+\item 
+int \hyperlink{structpkt_af6de953e144105f8774169652ac73204}{phl}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Packet structure. 
+
+\subsection{Member Data Documentation}
+\hypertarget{structpkt_ade4eeb65427ac816b5cac5a8cb3ae69e}{\index{pkt@{pkt}!eh@{eh}}
+\index{eh@{eh}!pkt@{pkt}}
+\subsubsection[{eh}]{\setlength{\rightskip}{0pt plus 5cm}uint8\-\_\-t$\ast$ pkt\-::eh}}\label{structpkt_ade4eeb65427ac816b5cac5a8cb3ae69e}
+This member contains the pointer to the datalink header \hypertarget{structpkt_a8613fb0e3a55e94f5c3a901e293797b6}{\index{pkt@{pkt}!ehl@{ehl}}
+\index{ehl@{ehl}!pkt@{pkt}}
+\subsubsection[{ehl}]{\setlength{\rightskip}{0pt plus 5cm}int pkt\-::ehl}}\label{structpkt_a8613fb0e3a55e94f5c3a901e293797b6}
+The length of the datalink header \hypertarget{structpkt_a10a6c3fee7f10d921e69cc110affce1a}{\index{pkt@{pkt}!el@{el}}
+\index{el@{el}!pkt@{pkt}}
+\subsubsection[{el}]{\setlength{\rightskip}{0pt plus 5cm}int pkt\-::el}}\label{structpkt_a10a6c3fee7f10d921e69cc110affce1a}
+The length of the datalink layer \hypertarget{structpkt_aea852a33d098462380781546cd19bf1f}{\index{pkt@{pkt}!nh@{nh}}
+\index{nh@{nh}!pkt@{pkt}}
+\subsubsection[{nh}]{\setlength{\rightskip}{0pt plus 5cm}uint8\-\_\-t$\ast$ pkt\-::nh}}\label{structpkt_aea852a33d098462380781546cd19bf1f}
+This member contains the pointer to the network header \hypertarget{structpkt_aae31018cd81255ca1114f0830e839cd3}{\index{pkt@{pkt}!nhl@{nhl}}
+\index{nhl@{nhl}!pkt@{pkt}}
+\subsubsection[{nhl}]{\setlength{\rightskip}{0pt plus 5cm}int pkt\-::nhl}}\label{structpkt_aae31018cd81255ca1114f0830e839cd3}
+The length of the network header \hypertarget{structpkt_add67017449f875df4752e40b3d10eda7}{\index{pkt@{pkt}!nl@{nl}}
+\index{nl@{nl}!pkt@{pkt}}
+\subsubsection[{nl}]{\setlength{\rightskip}{0pt plus 5cm}int pkt\-::nl}}\label{structpkt_add67017449f875df4752e40b3d10eda7}
+The length of the network layer \hypertarget{structpkt_aa213efd0a76015d65f6f4ba745e49d99}{\index{pkt@{pkt}!payload@{payload}}
+\index{payload@{payload}!pkt@{pkt}}
+\subsubsection[{payload}]{\setlength{\rightskip}{0pt plus 5cm}uint8\-\_\-t$\ast$ pkt\-::payload}}\label{structpkt_aa213efd0a76015d65f6f4ba745e49d99}
+This member contains the pointer to the application message \hypertarget{structpkt_af6de953e144105f8774169652ac73204}{\index{pkt@{pkt}!phl@{phl}}
+\index{phl@{phl}!pkt@{pkt}}
+\subsubsection[{phl}]{\setlength{\rightskip}{0pt plus 5cm}int pkt\-::phl}}\label{structpkt_af6de953e144105f8774169652ac73204}
+The length of the payload \hypertarget{structpkt_ab298557ecf4db28c7e7cffa2fd72779a}{\index{pkt@{pkt}!pl@{pl}}
+\index{pl@{pl}!pkt@{pkt}}
+\subsubsection[{pl}]{\setlength{\rightskip}{0pt plus 5cm}int pkt\-::pl}}\label{structpkt_ab298557ecf4db28c7e7cffa2fd72779a}
+The length of the application layer \hypertarget{structpkt_a5ebbe76e5d11cb6414429b60fe92146c}{\index{pkt@{pkt}!th@{th}}
+\index{th@{th}!pkt@{pkt}}
+\subsubsection[{th}]{\setlength{\rightskip}{0pt plus 5cm}uint8\-\_\-t$\ast$ pkt\-::th}}\label{structpkt_a5ebbe76e5d11cb6414429b60fe92146c}
+This member contains the pointer to the transport header \hypertarget{structpkt_a240625d5ce4002682cec58d51a92f908}{\index{pkt@{pkt}!thl@{thl}}
+\index{thl@{thl}!pkt@{pkt}}
+\subsubsection[{thl}]{\setlength{\rightskip}{0pt plus 5cm}int pkt\-::thl}}\label{structpkt_a240625d5ce4002682cec58d51a92f908}
+The length of the transport header \hypertarget{structpkt_a669c31685e5eb281e5b40e59bdc3218d}{\index{pkt@{pkt}!tl@{tl}}
+\index{tl@{tl}!pkt@{pkt}}
+\subsubsection[{tl}]{\setlength{\rightskip}{0pt plus 5cm}int pkt\-::tl}}\label{structpkt_a669c31685e5eb281e5b40e59bdc3218d}
+The length of the transport layer 
+
+The documentation for this struct was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+middlebox/\hyperlink{middlebox_8h}{middlebox.\-h}\end{DoxyCompactItemize}

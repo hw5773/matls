@@ -1,0 +1,135 @@
+\hypertarget{record_8c}{\section{record/record.c File Reference}
+\label{record_8c}\index{record/record.\-c@{record/record.\-c}}
+}
+
+
+This file is to implement the functions to manipulate the modification record.  
+
+
+{\ttfamily \#include \char`\"{}record.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}errors.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}logs.\-h\char`\"{}}\\*
+Include dependency graph for record.\-c\-:
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{record_8c_a43c42ddc99d5462b78d93c9233acef0f}{init\-\_\-record} (\hyperlink{record_8h_a9e2e75eff1397e3a7be9a5da10e07c7b}{M\-O\-D\-\_\-\-R\-E\-C\-O\-R\-D} $\ast$$\ast$mr, int len)
+\begin{DoxyCompactList}\small\item\em Initialize the modification record. \end{DoxyCompactList}\item 
+int \hyperlink{record_8c_a0c6a69afb5dc0c06d3ff6da84b483a9d}{free\-\_\-record} (\hyperlink{record_8h_a9e2e75eff1397e3a7be9a5da10e07c7b}{M\-O\-D\-\_\-\-R\-E\-C\-O\-R\-D} $\ast$mr)
+\begin{DoxyCompactList}\small\item\em Destruct the modification record. \end{DoxyCompactList}\item 
+int \hyperlink{record_8c_a3d5bd635369e2190ee204e370458b577}{add\-\_\-source\-\_\-mac} (\hyperlink{prf_8h_a2e4c9fad15fd913a2f3bc5557701fdc2}{S\-E\-C\-U\-R\-I\-T\-Y\-\_\-\-P\-A\-R\-A\-M\-S} $\ast$sp, \hyperlink{record_8h_a9e2e75eff1397e3a7be9a5da10e07c7b}{M\-O\-D\-\_\-\-R\-E\-C\-O\-R\-D} $\ast$mr, unsigned char $\ast$msg, int mlen, unsigned char $\ast$key, int klen)
+\begin{DoxyCompactList}\small\item\em Add the endpoint's M\-A\-C. \end{DoxyCompactList}\item 
+int \hyperlink{record_8c_a2593b1a730045189aecf866f6370b530}{add\-\_\-record} (unsigned char $\ast$record, int rec\-\_\-len, unsigned char $\ast$id, int id\-\_\-len, unsigned char $\ast$mac\-\_\-key, int mk\-\_\-len, unsigned char $\ast$prev, int prev\-\_\-len, unsigned char $\ast$next, int next\-\_\-len)
+\item 
+int \hyperlink{record_8c_a00dc42186825f0081101d2a702010e66}{verify\-\_\-record} ()
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This file is to implement the functions to manipulate the modification record. \begin{DoxyAuthor}{Author}
+Hyunwoo Lee 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+26 Feb 2018 
+\end{DoxyDate}
+
+
+\subsection{Function Documentation}
+\hypertarget{record_8c_a2593b1a730045189aecf866f6370b530}{\index{record.\-c@{record.\-c}!add\-\_\-record@{add\-\_\-record}}
+\index{add\-\_\-record@{add\-\_\-record}!record.c@{record.\-c}}
+\subsubsection[{add\-\_\-record}]{\setlength{\rightskip}{0pt plus 5cm}int add\-\_\-record (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$}]{record, }
+\item[{int}]{rec\-\_\-len, }
+\item[{unsigned char $\ast$}]{id, }
+\item[{int}]{id\-\_\-len, }
+\item[{unsigned char $\ast$}]{mac\-\_\-key, }
+\item[{int}]{mk\-\_\-len, }
+\item[{unsigned char $\ast$}]{prev, }
+\item[{int}]{prev\-\_\-len, }
+\item[{unsigned char $\ast$}]{next, }
+\item[{int}]{next\-\_\-len}
+\end{DoxyParamCaption}
+)}}\label{record_8c_a2593b1a730045189aecf866f6370b530}
+\hypertarget{record_8c_a3d5bd635369e2190ee204e370458b577}{\index{record.\-c@{record.\-c}!add\-\_\-source\-\_\-mac@{add\-\_\-source\-\_\-mac}}
+\index{add\-\_\-source\-\_\-mac@{add\-\_\-source\-\_\-mac}!record.c@{record.\-c}}
+\subsubsection[{add\-\_\-source\-\_\-mac}]{\setlength{\rightskip}{0pt plus 5cm}int add\-\_\-source\-\_\-mac (
+\begin{DoxyParamCaption}
+\item[{{\bf S\-E\-C\-U\-R\-I\-T\-Y\-\_\-\-P\-A\-R\-A\-M\-S} $\ast$}]{sp, }
+\item[{{\bf M\-O\-D\-\_\-\-R\-E\-C\-O\-R\-D} $\ast$}]{mr, }
+\item[{unsigned char $\ast$}]{msg, }
+\item[{int}]{mlen, }
+\item[{unsigned char $\ast$}]{key, }
+\item[{int}]{klen}
+\end{DoxyParamCaption}
+)}}\label{record_8c_a3d5bd635369e2190ee204e370458b577}
+
+
+Add the endpoint's M\-A\-C. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sp} & Security Parameters \\
+\hline
+{\em mr} & Modification Record \\
+\hline
+{\em msg} & Source Message \\
+\hline
+{\em mlen} & Length of the source message \\
+\hline
+{\em key} & Secret value \\
+\hline
+{\em klen} & Length of the key \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\hyperlink{errors_8h_aa90cac659d18e8ef6294c7ae337f6b58}{S\-U\-C\-C\-E\-S\-S(1)}/\-F\-A\-I\-L\-U\-R\-E(0) 
+\end{DoxyReturn}
+\hypertarget{record_8c_a0c6a69afb5dc0c06d3ff6da84b483a9d}{\index{record.\-c@{record.\-c}!free\-\_\-record@{free\-\_\-record}}
+\index{free\-\_\-record@{free\-\_\-record}!record.c@{record.\-c}}
+\subsubsection[{free\-\_\-record}]{\setlength{\rightskip}{0pt plus 5cm}int free\-\_\-record (
+\begin{DoxyParamCaption}
+\item[{{\bf M\-O\-D\-\_\-\-R\-E\-C\-O\-R\-D} $\ast$}]{mr}
+\end{DoxyParamCaption}
+)}}\label{record_8c_a0c6a69afb5dc0c06d3ff6da84b483a9d}
+
+
+Destruct the modification record. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mr} & Data structure of the modification record \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\hyperlink{errors_8h_aa90cac659d18e8ef6294c7ae337f6b58}{S\-U\-C\-C\-E\-S\-S(1)}/\-F\-A\-I\-L\-U\-R\-E(0) 
+\end{DoxyReturn}
+\hypertarget{record_8c_a43c42ddc99d5462b78d93c9233acef0f}{\index{record.\-c@{record.\-c}!init\-\_\-record@{init\-\_\-record}}
+\index{init\-\_\-record@{init\-\_\-record}!record.c@{record.\-c}}
+\subsubsection[{init\-\_\-record}]{\setlength{\rightskip}{0pt plus 5cm}int init\-\_\-record (
+\begin{DoxyParamCaption}
+\item[{{\bf M\-O\-D\-\_\-\-R\-E\-C\-O\-R\-D} $\ast$$\ast$}]{mr, }
+\item[{int}]{len}
+\end{DoxyParamCaption}
+)}}\label{record_8c_a43c42ddc99d5462b78d93c9233acef0f}
+
+
+Initialize the modification record. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mr} & Data structure of the modification record \\
+\hline
+{\em len} & Length of the M\-A\-C \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\hyperlink{errors_8h_aa90cac659d18e8ef6294c7ae337f6b58}{S\-U\-C\-C\-E\-S\-S(1)}/\-F\-A\-I\-L\-U\-R\-E(0) 
+\end{DoxyReturn}
+\hypertarget{record_8c_a00dc42186825f0081101d2a702010e66}{\index{record.\-c@{record.\-c}!verify\-\_\-record@{verify\-\_\-record}}
+\index{verify\-\_\-record@{verify\-\_\-record}!record.c@{record.\-c}}
+\subsubsection[{verify\-\_\-record}]{\setlength{\rightskip}{0pt plus 5cm}int verify\-\_\-record (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{record_8c_a00dc42186825f0081101d2a702010e66}

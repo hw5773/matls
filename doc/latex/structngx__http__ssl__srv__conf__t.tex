@@ -1,0 +1,163 @@
+\hypertarget{structngx__http__ssl__srv__conf__t}{\section{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t Struct Reference}
+\label{structngx__http__ssl__srv__conf__t}\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+}
+
+
+{\ttfamily \#include $<$ngx\-\_\-http\-\_\-ssl\-\_\-module.\-h$>$}
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+ngx\-\_\-flag\-\_\-t \hyperlink{structngx__http__ssl__srv__conf__t_a68b0e564e4ed3fdf905ccdb12c3a5546}{enable}
+\item 
+ngx\-\_\-ssl\-\_\-t \hyperlink{structngx__http__ssl__srv__conf__t_a0557f432e4d746612f66c6b3e3cdb435}{ssl}
+\item 
+ngx\-\_\-flag\-\_\-t \hyperlink{structngx__http__ssl__srv__conf__t_ab86b0e3fc651d8f2f5a4521cd5f914c6}{prefer\-\_\-server\-\_\-ciphers}
+\item 
+ngx\-\_\-uint\-\_\-t \hyperlink{structngx__http__ssl__srv__conf__t_a162bcaf3a07be001944e494ee9ac366a}{protocols}
+\item 
+ngx\-\_\-uint\-\_\-t \hyperlink{structngx__http__ssl__srv__conf__t_a61b6533eb0e54288ec5cd9ac83517b14}{verify}
+\item 
+ngx\-\_\-uint\-\_\-t \hyperlink{structngx__http__ssl__srv__conf__t_adce23a87cd5e4a717a8ee4d17fa945e4}{verify\-\_\-depth}
+\item 
+size\-\_\-t \hyperlink{structngx__http__ssl__srv__conf__t_afb896d7467c3bc2708ca5d7382d8779e}{buffer\-\_\-size}
+\item 
+ssize\-\_\-t \hyperlink{structngx__http__ssl__srv__conf__t_af592277549686060fa89e1f1db2efeb3}{builtin\-\_\-session\-\_\-cache}
+\item 
+time\-\_\-t \hyperlink{structngx__http__ssl__srv__conf__t_ad67962129ac4cb2f34c73efc86a4f5f5}{session\-\_\-timeout}
+\item 
+ngx\-\_\-array\-\_\-t $\ast$ \hyperlink{structngx__http__ssl__srv__conf__t_a3ccbb0c561aa24ad0e4a5001227f9b9b}{certificates}
+\item 
+ngx\-\_\-array\-\_\-t $\ast$ \hyperlink{structngx__http__ssl__srv__conf__t_a99b94a54f7d51cde0823f8582b4a7aad}{certificate\-\_\-keys}
+\item 
+ngx\-\_\-str\-\_\-t \hyperlink{structngx__http__ssl__srv__conf__t_a4b39986124b42fc6a6b71e69d1dfc14f}{dhparam}
+\item 
+ngx\-\_\-str\-\_\-t \hyperlink{structngx__http__ssl__srv__conf__t_ab396307a2621b13d9cab3d544a0ffaa1}{ecdh\-\_\-curve}
+\item 
+ngx\-\_\-str\-\_\-t \hyperlink{structngx__http__ssl__srv__conf__t_aee2ecc677797ed3bee99896124f3dc0f}{client\-\_\-certificate}
+\item 
+ngx\-\_\-str\-\_\-t \hyperlink{structngx__http__ssl__srv__conf__t_a6ab6799700d67935b54bd5eb80bdd3b6}{trusted\-\_\-certificate}
+\item 
+ngx\-\_\-str\-\_\-t \hyperlink{structngx__http__ssl__srv__conf__t_a1898fe47f8b093c83b6ca0d81e4e830a}{crl}
+\item 
+ngx\-\_\-str\-\_\-t \hyperlink{structngx__http__ssl__srv__conf__t_ad88dded5e7dc5c9f27275e0874336387}{ciphers}
+\item 
+ngx\-\_\-array\-\_\-t $\ast$ \hyperlink{structngx__http__ssl__srv__conf__t_aca5e5edf300f0534bf6f30497e4f61d6}{passwords}
+\item 
+ngx\-\_\-shm\-\_\-zone\-\_\-t $\ast$ \hyperlink{structngx__http__ssl__srv__conf__t_a7b57ab691f65d8bc17d99603c98dcac2}{shm\-\_\-zone}
+\item 
+ngx\-\_\-flag\-\_\-t \hyperlink{structngx__http__ssl__srv__conf__t_a3dd87b7e5fc63d6fd4012c083c0fbed4}{session\-\_\-tickets}
+\item 
+ngx\-\_\-array\-\_\-t $\ast$ \hyperlink{structngx__http__ssl__srv__conf__t_a1b22a9bc86855bd06a760023a51c1971}{session\-\_\-ticket\-\_\-keys}
+\item 
+ngx\-\_\-flag\-\_\-t \hyperlink{structngx__http__ssl__srv__conf__t_a7684b59368f17c654d390b846afc55e9}{stapling}
+\item 
+ngx\-\_\-flag\-\_\-t \hyperlink{structngx__http__ssl__srv__conf__t_a19f47b00a444e5e36bbee42760869e51}{stapling\-\_\-verify}
+\item 
+ngx\-\_\-str\-\_\-t \hyperlink{structngx__http__ssl__srv__conf__t_aaf11bff2bb433f0ecd2dd33700c30598}{stapling\-\_\-file}
+\item 
+ngx\-\_\-str\-\_\-t \hyperlink{structngx__http__ssl__srv__conf__t_a3da776aa28775569cb974d36cc46456a}{stapling\-\_\-responder}
+\item 
+u\-\_\-char $\ast$ \hyperlink{structngx__http__ssl__srv__conf__t_a6be682ad45ebf40cd00c056f1849b35a}{file}
+\item 
+ngx\-\_\-uint\-\_\-t \hyperlink{structngx__http__ssl__srv__conf__t_ae1c9efa192cc69cf445647f0988fdcc4}{line}
+\item 
+ngx\-\_\-flag\-\_\-t \hyperlink{structngx__http__ssl__srv__conf__t_a65c0d564ab8e2b90cc8bfe67790fb7fb}{ttpa}
+\item 
+ngx\-\_\-flag\-\_\-t \hyperlink{structngx__http__ssl__srv__conf__t_a77f47f03d4af566170356fcaa10c460d}{mb}
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{structngx__http__ssl__srv__conf__t_afb896d7467c3bc2708ca5d7382d8779e}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!buffer\-\_\-size@{buffer\-\_\-size}}
+\index{buffer\-\_\-size@{buffer\-\_\-size}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{buffer\-\_\-size}]{\setlength{\rightskip}{0pt plus 5cm}size\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::buffer\-\_\-size}}\label{structngx__http__ssl__srv__conf__t_afb896d7467c3bc2708ca5d7382d8779e}
+\hypertarget{structngx__http__ssl__srv__conf__t_af592277549686060fa89e1f1db2efeb3}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!builtin\-\_\-session\-\_\-cache@{builtin\-\_\-session\-\_\-cache}}
+\index{builtin\-\_\-session\-\_\-cache@{builtin\-\_\-session\-\_\-cache}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{builtin\-\_\-session\-\_\-cache}]{\setlength{\rightskip}{0pt plus 5cm}ssize\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::builtin\-\_\-session\-\_\-cache}}\label{structngx__http__ssl__srv__conf__t_af592277549686060fa89e1f1db2efeb3}
+\hypertarget{structngx__http__ssl__srv__conf__t_a99b94a54f7d51cde0823f8582b4a7aad}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!certificate\-\_\-keys@{certificate\-\_\-keys}}
+\index{certificate\-\_\-keys@{certificate\-\_\-keys}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{certificate\-\_\-keys}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-array\-\_\-t$\ast$ ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::certificate\-\_\-keys}}\label{structngx__http__ssl__srv__conf__t_a99b94a54f7d51cde0823f8582b4a7aad}
+\hypertarget{structngx__http__ssl__srv__conf__t_a3ccbb0c561aa24ad0e4a5001227f9b9b}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!certificates@{certificates}}
+\index{certificates@{certificates}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{certificates}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-array\-\_\-t$\ast$ ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::certificates}}\label{structngx__http__ssl__srv__conf__t_a3ccbb0c561aa24ad0e4a5001227f9b9b}
+\hypertarget{structngx__http__ssl__srv__conf__t_ad88dded5e7dc5c9f27275e0874336387}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!ciphers@{ciphers}}
+\index{ciphers@{ciphers}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{ciphers}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-str\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::ciphers}}\label{structngx__http__ssl__srv__conf__t_ad88dded5e7dc5c9f27275e0874336387}
+\hypertarget{structngx__http__ssl__srv__conf__t_aee2ecc677797ed3bee99896124f3dc0f}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!client\-\_\-certificate@{client\-\_\-certificate}}
+\index{client\-\_\-certificate@{client\-\_\-certificate}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{client\-\_\-certificate}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-str\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::client\-\_\-certificate}}\label{structngx__http__ssl__srv__conf__t_aee2ecc677797ed3bee99896124f3dc0f}
+\hypertarget{structngx__http__ssl__srv__conf__t_a1898fe47f8b093c83b6ca0d81e4e830a}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!crl@{crl}}
+\index{crl@{crl}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{crl}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-str\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::crl}}\label{structngx__http__ssl__srv__conf__t_a1898fe47f8b093c83b6ca0d81e4e830a}
+\hypertarget{structngx__http__ssl__srv__conf__t_a4b39986124b42fc6a6b71e69d1dfc14f}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!dhparam@{dhparam}}
+\index{dhparam@{dhparam}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{dhparam}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-str\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::dhparam}}\label{structngx__http__ssl__srv__conf__t_a4b39986124b42fc6a6b71e69d1dfc14f}
+\hypertarget{structngx__http__ssl__srv__conf__t_ab396307a2621b13d9cab3d544a0ffaa1}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!ecdh\-\_\-curve@{ecdh\-\_\-curve}}
+\index{ecdh\-\_\-curve@{ecdh\-\_\-curve}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{ecdh\-\_\-curve}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-str\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::ecdh\-\_\-curve}}\label{structngx__http__ssl__srv__conf__t_ab396307a2621b13d9cab3d544a0ffaa1}
+\hypertarget{structngx__http__ssl__srv__conf__t_a68b0e564e4ed3fdf905ccdb12c3a5546}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!enable@{enable}}
+\index{enable@{enable}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{enable}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-flag\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::enable}}\label{structngx__http__ssl__srv__conf__t_a68b0e564e4ed3fdf905ccdb12c3a5546}
+\hypertarget{structngx__http__ssl__srv__conf__t_a6be682ad45ebf40cd00c056f1849b35a}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!file@{file}}
+\index{file@{file}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{file}]{\setlength{\rightskip}{0pt plus 5cm}u\-\_\-char$\ast$ ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::file}}\label{structngx__http__ssl__srv__conf__t_a6be682ad45ebf40cd00c056f1849b35a}
+\hypertarget{structngx__http__ssl__srv__conf__t_ae1c9efa192cc69cf445647f0988fdcc4}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!line@{line}}
+\index{line@{line}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{line}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-uint\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::line}}\label{structngx__http__ssl__srv__conf__t_ae1c9efa192cc69cf445647f0988fdcc4}
+\hypertarget{structngx__http__ssl__srv__conf__t_a77f47f03d4af566170356fcaa10c460d}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!mb@{mb}}
+\index{mb@{mb}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{mb}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-flag\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::mb}}\label{structngx__http__ssl__srv__conf__t_a77f47f03d4af566170356fcaa10c460d}
+\hypertarget{structngx__http__ssl__srv__conf__t_aca5e5edf300f0534bf6f30497e4f61d6}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!passwords@{passwords}}
+\index{passwords@{passwords}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{passwords}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-array\-\_\-t$\ast$ ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::passwords}}\label{structngx__http__ssl__srv__conf__t_aca5e5edf300f0534bf6f30497e4f61d6}
+\hypertarget{structngx__http__ssl__srv__conf__t_ab86b0e3fc651d8f2f5a4521cd5f914c6}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!prefer\-\_\-server\-\_\-ciphers@{prefer\-\_\-server\-\_\-ciphers}}
+\index{prefer\-\_\-server\-\_\-ciphers@{prefer\-\_\-server\-\_\-ciphers}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{prefer\-\_\-server\-\_\-ciphers}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-flag\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::prefer\-\_\-server\-\_\-ciphers}}\label{structngx__http__ssl__srv__conf__t_ab86b0e3fc651d8f2f5a4521cd5f914c6}
+\hypertarget{structngx__http__ssl__srv__conf__t_a162bcaf3a07be001944e494ee9ac366a}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!protocols@{protocols}}
+\index{protocols@{protocols}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{protocols}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-uint\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::protocols}}\label{structngx__http__ssl__srv__conf__t_a162bcaf3a07be001944e494ee9ac366a}
+\hypertarget{structngx__http__ssl__srv__conf__t_a1b22a9bc86855bd06a760023a51c1971}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!session\-\_\-ticket\-\_\-keys@{session\-\_\-ticket\-\_\-keys}}
+\index{session\-\_\-ticket\-\_\-keys@{session\-\_\-ticket\-\_\-keys}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{session\-\_\-ticket\-\_\-keys}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-array\-\_\-t$\ast$ ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::session\-\_\-ticket\-\_\-keys}}\label{structngx__http__ssl__srv__conf__t_a1b22a9bc86855bd06a760023a51c1971}
+\hypertarget{structngx__http__ssl__srv__conf__t_a3dd87b7e5fc63d6fd4012c083c0fbed4}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!session\-\_\-tickets@{session\-\_\-tickets}}
+\index{session\-\_\-tickets@{session\-\_\-tickets}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{session\-\_\-tickets}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-flag\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::session\-\_\-tickets}}\label{structngx__http__ssl__srv__conf__t_a3dd87b7e5fc63d6fd4012c083c0fbed4}
+\hypertarget{structngx__http__ssl__srv__conf__t_ad67962129ac4cb2f34c73efc86a4f5f5}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!session\-\_\-timeout@{session\-\_\-timeout}}
+\index{session\-\_\-timeout@{session\-\_\-timeout}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{session\-\_\-timeout}]{\setlength{\rightskip}{0pt plus 5cm}time\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::session\-\_\-timeout}}\label{structngx__http__ssl__srv__conf__t_ad67962129ac4cb2f34c73efc86a4f5f5}
+\hypertarget{structngx__http__ssl__srv__conf__t_a7b57ab691f65d8bc17d99603c98dcac2}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!shm\-\_\-zone@{shm\-\_\-zone}}
+\index{shm\-\_\-zone@{shm\-\_\-zone}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{shm\-\_\-zone}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-shm\-\_\-zone\-\_\-t$\ast$ ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::shm\-\_\-zone}}\label{structngx__http__ssl__srv__conf__t_a7b57ab691f65d8bc17d99603c98dcac2}
+\hypertarget{structngx__http__ssl__srv__conf__t_a0557f432e4d746612f66c6b3e3cdb435}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!ssl@{ssl}}
+\index{ssl@{ssl}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{ssl}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-ssl\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::ssl}}\label{structngx__http__ssl__srv__conf__t_a0557f432e4d746612f66c6b3e3cdb435}
+\hypertarget{structngx__http__ssl__srv__conf__t_a7684b59368f17c654d390b846afc55e9}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!stapling@{stapling}}
+\index{stapling@{stapling}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{stapling}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-flag\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::stapling}}\label{structngx__http__ssl__srv__conf__t_a7684b59368f17c654d390b846afc55e9}
+\hypertarget{structngx__http__ssl__srv__conf__t_aaf11bff2bb433f0ecd2dd33700c30598}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!stapling\-\_\-file@{stapling\-\_\-file}}
+\index{stapling\-\_\-file@{stapling\-\_\-file}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{stapling\-\_\-file}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-str\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::stapling\-\_\-file}}\label{structngx__http__ssl__srv__conf__t_aaf11bff2bb433f0ecd2dd33700c30598}
+\hypertarget{structngx__http__ssl__srv__conf__t_a3da776aa28775569cb974d36cc46456a}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!stapling\-\_\-responder@{stapling\-\_\-responder}}
+\index{stapling\-\_\-responder@{stapling\-\_\-responder}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{stapling\-\_\-responder}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-str\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::stapling\-\_\-responder}}\label{structngx__http__ssl__srv__conf__t_a3da776aa28775569cb974d36cc46456a}
+\hypertarget{structngx__http__ssl__srv__conf__t_a19f47b00a444e5e36bbee42760869e51}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!stapling\-\_\-verify@{stapling\-\_\-verify}}
+\index{stapling\-\_\-verify@{stapling\-\_\-verify}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{stapling\-\_\-verify}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-flag\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::stapling\-\_\-verify}}\label{structngx__http__ssl__srv__conf__t_a19f47b00a444e5e36bbee42760869e51}
+\hypertarget{structngx__http__ssl__srv__conf__t_a6ab6799700d67935b54bd5eb80bdd3b6}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!trusted\-\_\-certificate@{trusted\-\_\-certificate}}
+\index{trusted\-\_\-certificate@{trusted\-\_\-certificate}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{trusted\-\_\-certificate}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-str\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::trusted\-\_\-certificate}}\label{structngx__http__ssl__srv__conf__t_a6ab6799700d67935b54bd5eb80bdd3b6}
+\hypertarget{structngx__http__ssl__srv__conf__t_a65c0d564ab8e2b90cc8bfe67790fb7fb}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!ttpa@{ttpa}}
+\index{ttpa@{ttpa}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{ttpa}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-flag\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::ttpa}}\label{structngx__http__ssl__srv__conf__t_a65c0d564ab8e2b90cc8bfe67790fb7fb}
+\hypertarget{structngx__http__ssl__srv__conf__t_a61b6533eb0e54288ec5cd9ac83517b14}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!verify@{verify}}
+\index{verify@{verify}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{verify}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-uint\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::verify}}\label{structngx__http__ssl__srv__conf__t_a61b6533eb0e54288ec5cd9ac83517b14}
+\hypertarget{structngx__http__ssl__srv__conf__t_adce23a87cd5e4a717a8ee4d17fa945e4}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}!verify\-\_\-depth@{verify\-\_\-depth}}
+\index{verify\-\_\-depth@{verify\-\_\-depth}!ngx_http_ssl_srv_conf_t@{ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t}}
+\subsubsection[{verify\-\_\-depth}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-uint\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-srv\-\_\-conf\-\_\-t\-::verify\-\_\-depth}}\label{structngx__http__ssl__srv__conf__t_adce23a87cd5e4a717a8ee4d17fa945e4}
+
+
+The documentation for this struct was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+nginx-\/1.\-12.\-0/src/http/modules/\hyperlink{ngx__http__ssl__module_8h}{ngx\-\_\-http\-\_\-ssl\-\_\-module.\-h}\end{DoxyCompactItemize}

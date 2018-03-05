@@ -1,0 +1,12 @@
+digraph "record/errors.h"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="record/errors.h",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node2 [label="record/prf.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$prf_8c.html",tooltip="This file is to implement the prf. "];
+  Node1 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node3 [label="record/record.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$record_8c.html",tooltip="This file is to implement the functions to manipulate the modification record. "];
+  Node1 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node4 [label="record/test_prf.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$test__prf_8c.html",tooltip="This file is to test prf functions. "];
+}

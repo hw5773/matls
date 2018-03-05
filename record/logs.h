@@ -26,7 +26,14 @@ int idx;
 #define APP_LOG1p(msg, arg1) \
   printf("[matls] %s: %s: %p\n", __func__, msg, arg1)
 #define APP_LOG2s(msg, arg1, arg2) \
-  printf("[matls] %s: %s: ", __func__, msg); for(idx=0;idx<arg2;idx++) printf("%02X ", arg1[idx]);printf("\n");
+  printf("[matls] %s: %s (%d bytes) ", __func__, msg, arg2); \
+  for(idx=0;idx<arg2;idx++) \
+  { \
+    if (idx % 10 == 0) \
+      printf("\n"); \
+    printf("%02X ", arg1[idx]); \
+  } \
+  printf("\n");
 #else
 #define APP_LOG(msg)
 #define APP_LOG1d(msg, arg1)

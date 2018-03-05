@@ -21,17 +21,23 @@
 
 #define DEFAULT_MAC_LENGTH  16
 #define DEFAULT_KEY_LENGTH  32
+#define MASTER_SECRET_LENGTH  48
+#define FINISHED_LENGTH 12
 
+/**
+ * @brief Data structure for Constants
+ */
 typedef struct security_parameters
 {
-  const EVP_MD *hash_function;
-  int key_length;
-  int mac_length;
+  const EVP_MD *hash_function;      /**< The hash function used in prf function */
+  int hash_length;                  /**< The output length of the hash function */
+  int key_length;                   /**< The length of the key */
+  int mac_length;                   /**< The length of the MAC */
 } SECURITY_PARAMS;
 
 int a(int, unsigned char *);
-unsigned char *p_hash(SECURITY_PARAMS *sp, unsigned char *key, int klen, unsigned char *seed, int slen, int idx, unsigned char *result, int *rlen);
-int prf(unsigned char *, unsigned char *, unsigned char *, unsigned char *);
+unsigned char *p_hash(SECURITY_PARAMS *sp, unsigned char *key, int klen, unsigned char *seed, int slen, unsigned char *result, int rlen);
+unsigned char *prf(SECURITY_PARAMS *sp, unsigned char *key, int klen, unsigned char *label, int llen, unsigned char *seed, int slen, int *rlen);
 unsigned char *hmac_hash(SECURITY_PARAMS *sp, unsigned char *key, int klen, unsigned char *msg, int mlen, unsigned char *result, int *rlen);
 
 #endif /* __PRF_H__ */

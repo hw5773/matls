@@ -14,20 +14,34 @@ int main(int argc, char *argv[])
   SECURITY_PARAMS sp;
   unsigned char *msg = "test message";
   int mlen = strlen(msg);
-  unsigned char result[128];
+  unsigned char *result;
   int i, rlen;
 
+  APP_LOG("Start test prf application");
+
   sp.hash_function = EVP_sha256();
+  sp.hash_length = SHA256_DIGEST_LENGTH;
   sp.mac_length = DEFAULT_MAC_LENGTH;
   sp.key_length = DEFAULT_KEY_LENGTH;
 
   unsigned char secret[sp.key_length];
+  unsigned char seed[16];
+  unsigned char *label1 = "master secret";
+  unsigned char *label2 = "client finished";
 
   for (i=0; i<sp.key_length; i++)
     secret[i] = i;
 
-  hmac_hash(&sp, secret, sp.key_length, msg, mlen, result, &rlen);
-  APP_LOG1d("hmac length", rlen);
+  for (i=0; i<16; i++)
+    seed[i] = 16 - i;
+
+  result = prf(&sp, secret, sp.key_length, label1, strlen(label1), seed, 16, &rlen);
+  APP_LOG2s("Hash Result", result, rlen);
+  free(result);
+
+  result = prf(&sp, secret, sp.key_length, label2, strlen(label2), seed, 16, &rlen);
+  APP_LOG2s("Hash Result", result, rlen);
+  free(result);
 
   return 0;
 }

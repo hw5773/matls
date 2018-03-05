@@ -1,0 +1,186 @@
+\hypertarget{s3__clnt_8c}{\section{openssl-\/1.0.1j/ssl/s3\-\_\-clnt.c File Reference}
+\label{s3__clnt_8c}\index{openssl-\/1.\-0.\-1j/ssl/s3\-\_\-clnt.\-c@{openssl-\/1.\-0.\-1j/ssl/s3\-\_\-clnt.\-c}}
+}
+{\ttfamily \#include $<$stdio.\-h$>$}\\*
+{\ttfamily \#include \char`\"{}ssl\-\_\-locl.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}kssl\-\_\-lcl.\-h\char`\"{}}\\*
+{\ttfamily \#include $<$openssl/buffer.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/rand.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/objects.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/evp.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/md5.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/dh.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/bn.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/engine.\-h$>$}\\*
+Include dependency graph for s3\-\_\-clnt.\-c\-:
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{s3__clnt_8c_a950f4356463ebe358a0cbae52fef9d2d}{has\-\_\-bits}(i, m)~(((i)\&(m)) == (m))
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{s3__clnt_8c_a5fc1794c8c2e239a122861dfa222c834}{I\-M\-P\-L\-E\-M\-E\-N\-T\-\_\-ssl3\-\_\-meth\-\_\-func} (\hyperlink{ssl_8h_a828e29aaa41a9c336ef090613c9dbb99}{S\-S\-Lv3\-\_\-client\-\_\-method}, \hyperlink{ssl__locl_8h_ae40115724c722a925868096a2a6cec63}{ssl\-\_\-undefined\-\_\-function}, \hyperlink{ssl__locl_8h_a203758ebdc17f7181efc69102cd39876}{ssl3\-\_\-connect}, ssl3\-\_\-get\-\_\-client\-\_\-method)
+\item 
+int \hyperlink{s3__clnt_8c_a4832917307ea4fc588c5a0f4bcc6420a}{ssl3\-\_\-client\-\_\-hello} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__clnt_8c_a5d5bcf9ca26b552f12d20b04acedd20a}{ssl3\-\_\-get\-\_\-server\-\_\-hello} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__clnt_8c_a32507b4ecdb2e2c749082249014d5ad1}{ssl3\-\_\-get\-\_\-server\-\_\-certificate} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__clnt_8c_a494fc880ca7d4f330c10657f59e8c1a1}{ssl3\-\_\-get\-\_\-key\-\_\-exchange} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__clnt_8c_aa0c7e9855b2dcf255f974a5bf6d5cf71}{ssl3\-\_\-get\-\_\-certificate\-\_\-request} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__clnt_8c_a2c2d9c71063366e97e777b0a1f4a6ca6}{ssl3\-\_\-get\-\_\-new\-\_\-session\-\_\-ticket} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__clnt_8c_a94a4e96849578349b5cc29b1d3848ed9}{ssl3\-\_\-get\-\_\-cert\-\_\-status} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__clnt_8c_aa1291ccacaaf7f13c3408e2adf9e40dd}{ssl3\-\_\-get\-\_\-server\-\_\-done} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__clnt_8c_a9137515eba9ac72e6f332b6e578c1f36}{ssl3\-\_\-send\-\_\-client\-\_\-key\-\_\-exchange} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__clnt_8c_ab903dfab4923abe491cdfcdd5c60800b}{ssl3\-\_\-send\-\_\-client\-\_\-verify} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__clnt_8c_abae5fa48f90219165c2f6b79a429e0da}{ssl3\-\_\-send\-\_\-client\-\_\-certificate} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__clnt_8c_a6f00c9f141d7841dd4155a3ddfe88576}{ssl3\-\_\-check\-\_\-cert\-\_\-and\-\_\-algorithm} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__clnt_8c_a5fa7c26e77729a332755b422190987d8}{ssl3\-\_\-send\-\_\-next\-\_\-proto} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__clnt_8c_a4dd21578003c29cdc2a4e8a71e8d1ef5}{ssl3\-\_\-check\-\_\-finished} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__clnt_8c_ad0af0e3236dd6c68cd1885c9e4c0740a}{ssl\-\_\-do\-\_\-client\-\_\-cert\-\_\-cb} (S\-S\-L $\ast$s, X509 $\ast$$\ast$px509, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$$\ast$ppkey)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{s3__clnt_8c_a950f4356463ebe358a0cbae52fef9d2d}{\index{s3\-\_\-clnt.\-c@{s3\-\_\-clnt.\-c}!has\-\_\-bits@{has\-\_\-bits}}
+\index{has\-\_\-bits@{has\-\_\-bits}!s3_clnt.c@{s3\-\_\-clnt.\-c}}
+\subsubsection[{has\-\_\-bits}]{\setlength{\rightskip}{0pt plus 5cm}\#define has\-\_\-bits(
+\begin{DoxyParamCaption}
+\item[{}]{i, }
+\item[{}]{m}
+\end{DoxyParamCaption}
+)~(((i)\&(m)) == (m))}}\label{s3__clnt_8c_a950f4356463ebe358a0cbae52fef9d2d}
+
+
+\subsection{Function Documentation}
+\hypertarget{s3__clnt_8c_a5fc1794c8c2e239a122861dfa222c834}{\index{s3\-\_\-clnt.\-c@{s3\-\_\-clnt.\-c}!I\-M\-P\-L\-E\-M\-E\-N\-T\-\_\-ssl3\-\_\-meth\-\_\-func@{I\-M\-P\-L\-E\-M\-E\-N\-T\-\_\-ssl3\-\_\-meth\-\_\-func}}
+\index{I\-M\-P\-L\-E\-M\-E\-N\-T\-\_\-ssl3\-\_\-meth\-\_\-func@{I\-M\-P\-L\-E\-M\-E\-N\-T\-\_\-ssl3\-\_\-meth\-\_\-func}!s3_clnt.c@{s3\-\_\-clnt.\-c}}
+\subsubsection[{I\-M\-P\-L\-E\-M\-E\-N\-T\-\_\-ssl3\-\_\-meth\-\_\-func}]{\setlength{\rightskip}{0pt plus 5cm}I\-M\-P\-L\-E\-M\-E\-N\-T\-\_\-ssl3\-\_\-meth\-\_\-func (
+\begin{DoxyParamCaption}
+\item[{{\bf S\-S\-Lv3\-\_\-client\-\_\-method}}]{, }
+\item[{{\bf ssl\-\_\-undefined\-\_\-function}}]{, }
+\item[{{\bf ssl3\-\_\-connect}}]{, }
+\item[{ssl3\-\_\-get\-\_\-client\-\_\-method}]{}
+\end{DoxyParamCaption}
+)}}\label{s3__clnt_8c_a5fc1794c8c2e239a122861dfa222c834}
+\hypertarget{s3__clnt_8c_a6f00c9f141d7841dd4155a3ddfe88576}{\index{s3\-\_\-clnt.\-c@{s3\-\_\-clnt.\-c}!ssl3\-\_\-check\-\_\-cert\-\_\-and\-\_\-algorithm@{ssl3\-\_\-check\-\_\-cert\-\_\-and\-\_\-algorithm}}
+\index{ssl3\-\_\-check\-\_\-cert\-\_\-and\-\_\-algorithm@{ssl3\-\_\-check\-\_\-cert\-\_\-and\-\_\-algorithm}!s3_clnt.c@{s3\-\_\-clnt.\-c}}
+\subsubsection[{ssl3\-\_\-check\-\_\-cert\-\_\-and\-\_\-algorithm}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-check\-\_\-cert\-\_\-and\-\_\-algorithm (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__clnt_8c_a6f00c9f141d7841dd4155a3ddfe88576}
+\hypertarget{s3__clnt_8c_a4dd21578003c29cdc2a4e8a71e8d1ef5}{\index{s3\-\_\-clnt.\-c@{s3\-\_\-clnt.\-c}!ssl3\-\_\-check\-\_\-finished@{ssl3\-\_\-check\-\_\-finished}}
+\index{ssl3\-\_\-check\-\_\-finished@{ssl3\-\_\-check\-\_\-finished}!s3_clnt.c@{s3\-\_\-clnt.\-c}}
+\subsubsection[{ssl3\-\_\-check\-\_\-finished}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-check\-\_\-finished (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__clnt_8c_a4dd21578003c29cdc2a4e8a71e8d1ef5}
+\hypertarget{s3__clnt_8c_a4832917307ea4fc588c5a0f4bcc6420a}{\index{s3\-\_\-clnt.\-c@{s3\-\_\-clnt.\-c}!ssl3\-\_\-client\-\_\-hello@{ssl3\-\_\-client\-\_\-hello}}
+\index{ssl3\-\_\-client\-\_\-hello@{ssl3\-\_\-client\-\_\-hello}!s3_clnt.c@{s3\-\_\-clnt.\-c}}
+\subsubsection[{ssl3\-\_\-client\-\_\-hello}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-client\-\_\-hello (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__clnt_8c_a4832917307ea4fc588c5a0f4bcc6420a}
+\hypertarget{s3__clnt_8c_a94a4e96849578349b5cc29b1d3848ed9}{\index{s3\-\_\-clnt.\-c@{s3\-\_\-clnt.\-c}!ssl3\-\_\-get\-\_\-cert\-\_\-status@{ssl3\-\_\-get\-\_\-cert\-\_\-status}}
+\index{ssl3\-\_\-get\-\_\-cert\-\_\-status@{ssl3\-\_\-get\-\_\-cert\-\_\-status}!s3_clnt.c@{s3\-\_\-clnt.\-c}}
+\subsubsection[{ssl3\-\_\-get\-\_\-cert\-\_\-status}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-get\-\_\-cert\-\_\-status (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__clnt_8c_a94a4e96849578349b5cc29b1d3848ed9}
+\hypertarget{s3__clnt_8c_aa0c7e9855b2dcf255f974a5bf6d5cf71}{\index{s3\-\_\-clnt.\-c@{s3\-\_\-clnt.\-c}!ssl3\-\_\-get\-\_\-certificate\-\_\-request@{ssl3\-\_\-get\-\_\-certificate\-\_\-request}}
+\index{ssl3\-\_\-get\-\_\-certificate\-\_\-request@{ssl3\-\_\-get\-\_\-certificate\-\_\-request}!s3_clnt.c@{s3\-\_\-clnt.\-c}}
+\subsubsection[{ssl3\-\_\-get\-\_\-certificate\-\_\-request}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-get\-\_\-certificate\-\_\-request (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__clnt_8c_aa0c7e9855b2dcf255f974a5bf6d5cf71}
+\hypertarget{s3__clnt_8c_a494fc880ca7d4f330c10657f59e8c1a1}{\index{s3\-\_\-clnt.\-c@{s3\-\_\-clnt.\-c}!ssl3\-\_\-get\-\_\-key\-\_\-exchange@{ssl3\-\_\-get\-\_\-key\-\_\-exchange}}
+\index{ssl3\-\_\-get\-\_\-key\-\_\-exchange@{ssl3\-\_\-get\-\_\-key\-\_\-exchange}!s3_clnt.c@{s3\-\_\-clnt.\-c}}
+\subsubsection[{ssl3\-\_\-get\-\_\-key\-\_\-exchange}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-get\-\_\-key\-\_\-exchange (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__clnt_8c_a494fc880ca7d4f330c10657f59e8c1a1}
+\hypertarget{s3__clnt_8c_a2c2d9c71063366e97e777b0a1f4a6ca6}{\index{s3\-\_\-clnt.\-c@{s3\-\_\-clnt.\-c}!ssl3\-\_\-get\-\_\-new\-\_\-session\-\_\-ticket@{ssl3\-\_\-get\-\_\-new\-\_\-session\-\_\-ticket}}
+\index{ssl3\-\_\-get\-\_\-new\-\_\-session\-\_\-ticket@{ssl3\-\_\-get\-\_\-new\-\_\-session\-\_\-ticket}!s3_clnt.c@{s3\-\_\-clnt.\-c}}
+\subsubsection[{ssl3\-\_\-get\-\_\-new\-\_\-session\-\_\-ticket}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-get\-\_\-new\-\_\-session\-\_\-ticket (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__clnt_8c_a2c2d9c71063366e97e777b0a1f4a6ca6}
+\hypertarget{s3__clnt_8c_a32507b4ecdb2e2c749082249014d5ad1}{\index{s3\-\_\-clnt.\-c@{s3\-\_\-clnt.\-c}!ssl3\-\_\-get\-\_\-server\-\_\-certificate@{ssl3\-\_\-get\-\_\-server\-\_\-certificate}}
+\index{ssl3\-\_\-get\-\_\-server\-\_\-certificate@{ssl3\-\_\-get\-\_\-server\-\_\-certificate}!s3_clnt.c@{s3\-\_\-clnt.\-c}}
+\subsubsection[{ssl3\-\_\-get\-\_\-server\-\_\-certificate}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-get\-\_\-server\-\_\-certificate (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__clnt_8c_a32507b4ecdb2e2c749082249014d5ad1}
+\hypertarget{s3__clnt_8c_aa1291ccacaaf7f13c3408e2adf9e40dd}{\index{s3\-\_\-clnt.\-c@{s3\-\_\-clnt.\-c}!ssl3\-\_\-get\-\_\-server\-\_\-done@{ssl3\-\_\-get\-\_\-server\-\_\-done}}
+\index{ssl3\-\_\-get\-\_\-server\-\_\-done@{ssl3\-\_\-get\-\_\-server\-\_\-done}!s3_clnt.c@{s3\-\_\-clnt.\-c}}
+\subsubsection[{ssl3\-\_\-get\-\_\-server\-\_\-done}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-get\-\_\-server\-\_\-done (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__clnt_8c_aa1291ccacaaf7f13c3408e2adf9e40dd}
+\hypertarget{s3__clnt_8c_a5d5bcf9ca26b552f12d20b04acedd20a}{\index{s3\-\_\-clnt.\-c@{s3\-\_\-clnt.\-c}!ssl3\-\_\-get\-\_\-server\-\_\-hello@{ssl3\-\_\-get\-\_\-server\-\_\-hello}}
+\index{ssl3\-\_\-get\-\_\-server\-\_\-hello@{ssl3\-\_\-get\-\_\-server\-\_\-hello}!s3_clnt.c@{s3\-\_\-clnt.\-c}}
+\subsubsection[{ssl3\-\_\-get\-\_\-server\-\_\-hello}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-get\-\_\-server\-\_\-hello (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__clnt_8c_a5d5bcf9ca26b552f12d20b04acedd20a}
+\hypertarget{s3__clnt_8c_abae5fa48f90219165c2f6b79a429e0da}{\index{s3\-\_\-clnt.\-c@{s3\-\_\-clnt.\-c}!ssl3\-\_\-send\-\_\-client\-\_\-certificate@{ssl3\-\_\-send\-\_\-client\-\_\-certificate}}
+\index{ssl3\-\_\-send\-\_\-client\-\_\-certificate@{ssl3\-\_\-send\-\_\-client\-\_\-certificate}!s3_clnt.c@{s3\-\_\-clnt.\-c}}
+\subsubsection[{ssl3\-\_\-send\-\_\-client\-\_\-certificate}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-send\-\_\-client\-\_\-certificate (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__clnt_8c_abae5fa48f90219165c2f6b79a429e0da}
+\hypertarget{s3__clnt_8c_a9137515eba9ac72e6f332b6e578c1f36}{\index{s3\-\_\-clnt.\-c@{s3\-\_\-clnt.\-c}!ssl3\-\_\-send\-\_\-client\-\_\-key\-\_\-exchange@{ssl3\-\_\-send\-\_\-client\-\_\-key\-\_\-exchange}}
+\index{ssl3\-\_\-send\-\_\-client\-\_\-key\-\_\-exchange@{ssl3\-\_\-send\-\_\-client\-\_\-key\-\_\-exchange}!s3_clnt.c@{s3\-\_\-clnt.\-c}}
+\subsubsection[{ssl3\-\_\-send\-\_\-client\-\_\-key\-\_\-exchange}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-send\-\_\-client\-\_\-key\-\_\-exchange (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__clnt_8c_a9137515eba9ac72e6f332b6e578c1f36}
+\hypertarget{s3__clnt_8c_ab903dfab4923abe491cdfcdd5c60800b}{\index{s3\-\_\-clnt.\-c@{s3\-\_\-clnt.\-c}!ssl3\-\_\-send\-\_\-client\-\_\-verify@{ssl3\-\_\-send\-\_\-client\-\_\-verify}}
+\index{ssl3\-\_\-send\-\_\-client\-\_\-verify@{ssl3\-\_\-send\-\_\-client\-\_\-verify}!s3_clnt.c@{s3\-\_\-clnt.\-c}}
+\subsubsection[{ssl3\-\_\-send\-\_\-client\-\_\-verify}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-send\-\_\-client\-\_\-verify (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__clnt_8c_ab903dfab4923abe491cdfcdd5c60800b}
+\hypertarget{s3__clnt_8c_a5fa7c26e77729a332755b422190987d8}{\index{s3\-\_\-clnt.\-c@{s3\-\_\-clnt.\-c}!ssl3\-\_\-send\-\_\-next\-\_\-proto@{ssl3\-\_\-send\-\_\-next\-\_\-proto}}
+\index{ssl3\-\_\-send\-\_\-next\-\_\-proto@{ssl3\-\_\-send\-\_\-next\-\_\-proto}!s3_clnt.c@{s3\-\_\-clnt.\-c}}
+\subsubsection[{ssl3\-\_\-send\-\_\-next\-\_\-proto}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-send\-\_\-next\-\_\-proto (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__clnt_8c_a5fa7c26e77729a332755b422190987d8}
+\hypertarget{s3__clnt_8c_ad0af0e3236dd6c68cd1885c9e4c0740a}{\index{s3\-\_\-clnt.\-c@{s3\-\_\-clnt.\-c}!ssl\-\_\-do\-\_\-client\-\_\-cert\-\_\-cb@{ssl\-\_\-do\-\_\-client\-\_\-cert\-\_\-cb}}
+\index{ssl\-\_\-do\-\_\-client\-\_\-cert\-\_\-cb@{ssl\-\_\-do\-\_\-client\-\_\-cert\-\_\-cb}!s3_clnt.c@{s3\-\_\-clnt.\-c}}
+\subsubsection[{ssl\-\_\-do\-\_\-client\-\_\-cert\-\_\-cb}]{\setlength{\rightskip}{0pt plus 5cm}int ssl\-\_\-do\-\_\-client\-\_\-cert\-\_\-cb (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s, }
+\item[{X509 $\ast$$\ast$}]{px509, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$$\ast$}]{ppkey}
+\end{DoxyParamCaption}
+)}}\label{s3__clnt_8c_ad0af0e3236dd6c68cd1885c9e4c0740a}

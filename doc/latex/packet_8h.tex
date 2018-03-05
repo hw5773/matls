@@ -1,0 +1,113 @@
+\hypertarget{packet_8h}{\section{middlebox/packet.h File Reference}
+\label{packet_8h}\index{middlebox/packet.\-h@{middlebox/packet.\-h}}
+}
+{\ttfamily \#include $<$stdio.\-h$>$}\\*
+{\ttfamily \#include $<$stdint.\-h$>$}\\*
+{\ttfamily \#include $<$linux/ip.\-h$>$}\\*
+{\ttfamily \#include $<$linux/tcp.\-h$>$}\\*
+{\ttfamily \#include $<$arpa/inet.\-h$>$}\\*
+{\ttfamily \#include \char`\"{}pair\-\_\-repo.\-h\char`\"{}}\\*
+Include dependency graph for packet.\-h\-:
+This graph shows which files directly or indirectly include this file\-:
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structpseudo__tcp}{pseudo\-\_\-tcp}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{packet_8h_a7f9a12bf0e488217a7ad3c348ea12f6a}{process\-\_\-packet} (struct \hyperlink{structpair__entry}{pair\-\_\-entry} $\ast$, struct iphdr $\ast$, int, struct tcphdr $\ast$, int, uint8\-\_\-t $\ast$, int $\ast$len)
+\item 
+int \hyperlink{packet_8h_a4ebc35db1b3a0769d486bf8080e2b87c}{\-\_\-process\-\_\-packet} (struct \hyperlink{structpair__entry}{pair\-\_\-entry} $\ast$, struct iphdr $\ast$, int, struct tcphdr $\ast$, int, uint8\-\_\-t $\ast$, int $\ast$len)
+\item 
+int \hyperlink{packet_8h_a9e8f27ee12f82ae8fd820d0e8e1b0844}{check\-\_\-checksum} (uint8\-\_\-t $\ast$buf, int len)
+\item 
+int \hyperlink{packet_8h_aff297e6eab29f759cad202aa3c1d9920}{\-\_\-ip\-\_\-checksum} (struct iphdr $\ast$buf, int len)
+\item 
+int \hyperlink{packet_8h_a414cd6df72ab38feac7ad8226b49b4b8}{\-\_\-tcp\-\_\-checksum} (struct iphdr $\ast$, struct tcphdr $\ast$, int len)
+\item 
+int \hyperlink{packet_8h_a8a1828e643f1f88f19293f684a7926ad}{make\-\_\-checksum} (uint8\-\_\-t $\ast$buf, int len)
+\item 
+int \hyperlink{packet_8h_a425ca42f11ac8e240a9678fca6ed1592}{parse\-\_\-entry} (struct \hyperlink{structpair__entry}{pair\-\_\-entry} $\ast$, uint8\-\_\-t $\ast$buf, int len)
+\item 
+void \hyperlink{packet_8h_ad70861bc70ac4d0683b7800522017dd9}{print\-\_\-ip} (int addr)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{packet_8h_aff297e6eab29f759cad202aa3c1d9920}{\index{packet.\-h@{packet.\-h}!\-\_\-ip\-\_\-checksum@{\-\_\-ip\-\_\-checksum}}
+\index{\-\_\-ip\-\_\-checksum@{\-\_\-ip\-\_\-checksum}!packet.h@{packet.\-h}}
+\subsubsection[{\-\_\-ip\-\_\-checksum}]{\setlength{\rightskip}{0pt plus 5cm}int \-\_\-ip\-\_\-checksum (
+\begin{DoxyParamCaption}
+\item[{struct iphdr $\ast$}]{buf, }
+\item[{int}]{len}
+\end{DoxyParamCaption}
+)}}\label{packet_8h_aff297e6eab29f759cad202aa3c1d9920}
+\hypertarget{packet_8h_a4ebc35db1b3a0769d486bf8080e2b87c}{\index{packet.\-h@{packet.\-h}!\-\_\-process\-\_\-packet@{\-\_\-process\-\_\-packet}}
+\index{\-\_\-process\-\_\-packet@{\-\_\-process\-\_\-packet}!packet.h@{packet.\-h}}
+\subsubsection[{\-\_\-process\-\_\-packet}]{\setlength{\rightskip}{0pt plus 5cm}int \-\_\-process\-\_\-packet (
+\begin{DoxyParamCaption}
+\item[{struct {\bf pair\-\_\-entry} $\ast$}]{, }
+\item[{struct iphdr $\ast$}]{, }
+\item[{int}]{, }
+\item[{struct tcphdr $\ast$}]{, }
+\item[{int}]{, }
+\item[{uint8\-\_\-t $\ast$}]{, }
+\item[{int $\ast$}]{len}
+\end{DoxyParamCaption}
+)}}\label{packet_8h_a4ebc35db1b3a0769d486bf8080e2b87c}
+\hypertarget{packet_8h_a414cd6df72ab38feac7ad8226b49b4b8}{\index{packet.\-h@{packet.\-h}!\-\_\-tcp\-\_\-checksum@{\-\_\-tcp\-\_\-checksum}}
+\index{\-\_\-tcp\-\_\-checksum@{\-\_\-tcp\-\_\-checksum}!packet.h@{packet.\-h}}
+\subsubsection[{\-\_\-tcp\-\_\-checksum}]{\setlength{\rightskip}{0pt plus 5cm}int \-\_\-tcp\-\_\-checksum (
+\begin{DoxyParamCaption}
+\item[{struct iphdr $\ast$}]{, }
+\item[{struct tcphdr $\ast$}]{, }
+\item[{int}]{len}
+\end{DoxyParamCaption}
+)}}\label{packet_8h_a414cd6df72ab38feac7ad8226b49b4b8}
+\hypertarget{packet_8h_a9e8f27ee12f82ae8fd820d0e8e1b0844}{\index{packet.\-h@{packet.\-h}!check\-\_\-checksum@{check\-\_\-checksum}}
+\index{check\-\_\-checksum@{check\-\_\-checksum}!packet.h@{packet.\-h}}
+\subsubsection[{check\-\_\-checksum}]{\setlength{\rightskip}{0pt plus 5cm}int check\-\_\-checksum (
+\begin{DoxyParamCaption}
+\item[{uint8\-\_\-t $\ast$}]{buf, }
+\item[{int}]{len}
+\end{DoxyParamCaption}
+)}}\label{packet_8h_a9e8f27ee12f82ae8fd820d0e8e1b0844}
+\hypertarget{packet_8h_a8a1828e643f1f88f19293f684a7926ad}{\index{packet.\-h@{packet.\-h}!make\-\_\-checksum@{make\-\_\-checksum}}
+\index{make\-\_\-checksum@{make\-\_\-checksum}!packet.h@{packet.\-h}}
+\subsubsection[{make\-\_\-checksum}]{\setlength{\rightskip}{0pt plus 5cm}int make\-\_\-checksum (
+\begin{DoxyParamCaption}
+\item[{uint8\-\_\-t $\ast$}]{buf, }
+\item[{int}]{len}
+\end{DoxyParamCaption}
+)}}\label{packet_8h_a8a1828e643f1f88f19293f684a7926ad}
+\hypertarget{packet_8h_a425ca42f11ac8e240a9678fca6ed1592}{\index{packet.\-h@{packet.\-h}!parse\-\_\-entry@{parse\-\_\-entry}}
+\index{parse\-\_\-entry@{parse\-\_\-entry}!packet.h@{packet.\-h}}
+\subsubsection[{parse\-\_\-entry}]{\setlength{\rightskip}{0pt plus 5cm}int parse\-\_\-entry (
+\begin{DoxyParamCaption}
+\item[{struct {\bf pair\-\_\-entry} $\ast$}]{, }
+\item[{uint8\-\_\-t $\ast$}]{buf, }
+\item[{int}]{len}
+\end{DoxyParamCaption}
+)}}\label{packet_8h_a425ca42f11ac8e240a9678fca6ed1592}
+\hypertarget{packet_8h_ad70861bc70ac4d0683b7800522017dd9}{\index{packet.\-h@{packet.\-h}!print\-\_\-ip@{print\-\_\-ip}}
+\index{print\-\_\-ip@{print\-\_\-ip}!packet.h@{packet.\-h}}
+\subsubsection[{print\-\_\-ip}]{\setlength{\rightskip}{0pt plus 5cm}void print\-\_\-ip (
+\begin{DoxyParamCaption}
+\item[{int}]{addr}
+\end{DoxyParamCaption}
+)}}\label{packet_8h_ad70861bc70ac4d0683b7800522017dd9}
+\hypertarget{packet_8h_a7f9a12bf0e488217a7ad3c348ea12f6a}{\index{packet.\-h@{packet.\-h}!process\-\_\-packet@{process\-\_\-packet}}
+\index{process\-\_\-packet@{process\-\_\-packet}!packet.h@{packet.\-h}}
+\subsubsection[{process\-\_\-packet}]{\setlength{\rightskip}{0pt plus 5cm}int process\-\_\-packet (
+\begin{DoxyParamCaption}
+\item[{struct {\bf pair\-\_\-entry} $\ast$}]{, }
+\item[{struct iphdr $\ast$}]{, }
+\item[{int}]{, }
+\item[{struct tcphdr $\ast$}]{, }
+\item[{int}]{, }
+\item[{uint8\-\_\-t $\ast$}]{, }
+\item[{int $\ast$}]{len}
+\end{DoxyParamCaption}
+)}}\label{packet_8h_a7f9a12bf0e488217a7ad3c348ea12f6a}

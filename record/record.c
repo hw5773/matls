@@ -10,6 +10,12 @@
 #include "errors.h"
 #include "logs.h"
 
+/**
+ * @brief Initialize the modification record
+ * @param mr Data structure of the modification record
+ * @param len Length of the MAC
+ * @return SUCCESS(1)/FAILURE(0)
+ */
 int init_record(MOD_RECORD **mr, int len)
 {
   APP_LOG("Start init_record");
@@ -29,6 +35,11 @@ int init_record(MOD_RECORD **mr, int len)
   return SUCCESS;
 }
 
+/**
+ * @brief Destruct the modification record
+ * @param mr Data structure of the modification record
+ * @return SUCCESS(1)/FAILURE(0)
+ */
 int free_record(MOD_RECORD *mr)
 {
   APP_LOG("Free the Modification Record");
@@ -39,7 +50,17 @@ int free_record(MOD_RECORD *mr)
   return SUCCESS;
 }
 
-int add_endpoint_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *msg, int mlen, unsigned char *key, int klen)
+/**
+ * @brief Add the endpoint's MAC
+ * @param sp Security Parameters
+ * @param mr Modification Record
+ * @param msg Source Message
+ * @param mlen Length of the source message
+ * @param key Secret value
+ * @param klen Length of the key
+ * @return SUCCESS(1)/FAILURE(0)
+ */
+int add_source_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *msg, int mlen, unsigned char *key, int klen)
 {
   APP_LOG1s("Add endpoint MAC with the message", msg);
   return SUCCESS;

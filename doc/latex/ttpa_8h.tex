@@ -1,0 +1,286 @@
+\hypertarget{ttpa_8h}{\section{openssl-\/1.0.1j/ssl/ttpa.h File Reference}
+\label{ttpa_8h}\index{openssl-\/1.\-0.\-1j/ssl/ttpa.\-h@{openssl-\/1.\-0.\-1j/ssl/ttpa.\-h}}
+}
+{\ttfamily \#include $<$stdio.\-h$>$}\\*
+{\ttfamily \#include $<$errno.\-h$>$}\\*
+{\ttfamily \#include $<$unistd.\-h$>$}\\*
+{\ttfamily \#include $<$malloc.\-h$>$}\\*
+{\ttfamily \#include $<$string.\-h$>$}\\*
+{\ttfamily \#include $<$time.\-h$>$}\\*
+{\ttfamily \#include $<$resolv.\-h$>$}\\*
+{\ttfamily \#include $<$netdb.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/ssl.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/evp.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/err.\-h$>$}\\*
+{\ttfamily \#include $<$sys/time.\-h$>$}\\*
+{\ttfamily \#include $<$sys/socket.\-h$>$}\\*
+Include dependency graph for ttpa.\-h\-:
+This graph shows which files directly or indirectly include this file\-:
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{ttpa_8h_afd464cc3fd54170b0469540b665914fd}{n2s}(c, s)
+\item 
+\#define \hyperlink{ttpa_8h_a11fe10daafbfb28a38ba46f7213a225f}{s2n}(s, c)
+\item 
+\#define \hyperlink{ttpa_8h_a72afb2e839409cfc2fdc27366136f17d}{l2n3}(l, c)
+\item 
+\#define \hyperlink{ttpa_8h_ad86e273361d98045c383aa131247d7e5}{n2d4}(c, d)
+\item 
+\#define \hyperlink{ttpa_8h_aee3d3095e54cef505dfb4628ac98e79d}{d2n4}(d, c)
+\item 
+\#define \hyperlink{ttpa_8h_a6bb6f1bab7d7999fb383aad2aed23b24}{n2t8}(c, t)
+\item 
+\#define \hyperlink{ttpa_8h_a74f6f78a73c54da2bc7311010f2c0a36}{t2n8}(l, c)
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{ttpa_8h_a5e8d3f9096f0faf6432a958ce25756a0}{make\-\_\-cc\-\_\-content\-\_\-body} (unsigned char $\ast$$\ast$cc, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$alice\-\_\-pub, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$carol\-\_\-pub, int nid, int $\ast$len)
+\item 
+int \hyperlink{ttpa_8h_a616efbd88ac90eaf0f3b2b52e5fb10a3}{make\-\_\-cc\-\_\-request} (unsigned char $\ast$$\ast$request, unsigned char $\ast$cc, int cc\-\_\-len, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$carol\-\_\-priv, int nid, int $\ast$len)
+\item 
+int \hyperlink{ttpa_8h_aeb5114cbb4a3065eb7d32c2f29826657}{make\-\_\-cc\-\_\-request\-\_\-with\-\_\-verify\-\_\-cc} (unsigned char $\ast$$\ast$request, unsigned char $\ast$cc, int cc\-\_\-len, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$carol\-\_\-priv, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$alice\-\_\-pub, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$carol\-\_\-pub, int nid, int $\ast$len)
+\item 
+int \hyperlink{ttpa_8h_ac3cbd7a1410bca05482233d26644437e}{make\-\_\-cc\-\_\-response} (unsigned char $\ast$$\ast$response, unsigned char $\ast$request, int req\-\_\-len, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$alice\-\_\-priv, int nid, int $\ast$len)
+\item 
+int \hyperlink{ttpa_8h_a7f55df2af33a9bb90604f5aa933d47a3}{make\-\_\-cc\-\_\-response\-\_\-with\-\_\-verify\-\_\-request} (unsigned char $\ast$$\ast$response, unsigned char $\ast$request, int req\-\_\-len, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$alice\-\_\-priv, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$alice\-\_\-pub, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$carol\-\_\-pub, int nid, int $\ast$len)
+\item 
+int \hyperlink{ttpa_8h_ac1049079c3785dd0d29e705150232d7c}{make\-\_\-signature\-\_\-block} (unsigned char $\ast$$\ast$sigblk, unsigned char $\ast$msg, int msg\-\_\-len, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$priv, int nid, size\-\_\-t $\ast$sigblk\-\_\-len)
+\item 
+int \hyperlink{ttpa_8h_a73fd00d6dbac494813160bd59aa5f8d9}{verify\-\_\-cc\-\_\-content\-\_\-body} (unsigned char $\ast$content, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$alice\-\_\-pub, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$carol\-\_\-pub)
+\item 
+int \hyperlink{ttpa_8h_a13215ebe6a7e08f4abdd4dbb3e3f17aa}{verify\-\_\-cc\-\_\-request} (unsigned char $\ast$request, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$alice\-\_\-pub, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$carol\-\_\-pub)
+\item 
+int \hyperlink{ttpa_8h_a2f4515f55eabbda868900d1285950682}{verify\-\_\-cc\-\_\-response} (unsigned char $\ast$response, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$alice\-\_\-pub, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$carol\-\_\-pub)
+\item 
+int \hyperlink{ttpa_8h_a0a8364d65504a84e3c63f0e62937b816}{verify\-\_\-signature} (unsigned char $\ast$msg, int msg\-\_\-len, uint16\-\_\-t sig\-\_\-type, uint16\-\_\-t sig\-\_\-len, unsigned char $\ast$sig, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$pub)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{ttpa_8h_aee3d3095e54cef505dfb4628ac98e79d}{\index{ttpa.\-h@{ttpa.\-h}!d2n4@{d2n4}}
+\index{d2n4@{d2n4}!ttpa.h@{ttpa.\-h}}
+\subsubsection[{d2n4}]{\setlength{\rightskip}{0pt plus 5cm}\#define d2n4(
+\begin{DoxyParamCaption}
+\item[{}]{d, }
+\item[{}]{c}
+\end{DoxyParamCaption}
+)}}\label{ttpa_8h_aee3d3095e54cef505dfb4628ac98e79d}
+{\bfseries Value\-:}
+\begin{DoxyCode}
+(*((c)++)=(\textcolor{keywordtype}{unsigned} char)(((d)>>24)&0xff), \(\backslash\)
+                         *((c)++)=(\textcolor{keywordtype}{unsigned} char)(((d)>>16)&0xff), \(\backslash\)
+                         *((c)++)=(\textcolor{keywordtype}{unsigned} char)(((d)>> 8)&0xff), \(\backslash\)
+                         *((c)++)=(\textcolor{keywordtype}{unsigned} char)(((d)    )&0xff))
+\end{DoxyCode}
+\hypertarget{ttpa_8h_a72afb2e839409cfc2fdc27366136f17d}{\index{ttpa.\-h@{ttpa.\-h}!l2n3@{l2n3}}
+\index{l2n3@{l2n3}!ttpa.h@{ttpa.\-h}}
+\subsubsection[{l2n3}]{\setlength{\rightskip}{0pt plus 5cm}\#define l2n3(
+\begin{DoxyParamCaption}
+\item[{}]{l, }
+\item[{}]{c}
+\end{DoxyParamCaption}
+)}}\label{ttpa_8h_a72afb2e839409cfc2fdc27366136f17d}
+{\bfseries Value\-:}
+\begin{DoxyCode}
+((c[0]=(\textcolor{keywordtype}{unsigned} char)(((l)>>16)&0xff), \(\backslash\)
+                          c[1]=(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char})(((l)>> 8)&0xff), \(\backslash\)
+                          c[2]=(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char})(((l)    )&0xff)),c+=3)
+\end{DoxyCode}
+\hypertarget{ttpa_8h_ad86e273361d98045c383aa131247d7e5}{\index{ttpa.\-h@{ttpa.\-h}!n2d4@{n2d4}}
+\index{n2d4@{n2d4}!ttpa.h@{ttpa.\-h}}
+\subsubsection[{n2d4}]{\setlength{\rightskip}{0pt plus 5cm}\#define n2d4(
+\begin{DoxyParamCaption}
+\item[{}]{c, }
+\item[{}]{d}
+\end{DoxyParamCaption}
+)}}\label{ttpa_8h_ad86e273361d98045c383aa131247d7e5}
+{\bfseries Value\-:}
+\begin{DoxyCode}
+(d =((uint32\_t)(*((c)++)))<<24, \(\backslash\)
+                         d|=((uint32\_t)(*((c)++)))<<16, \(\backslash\)
+                         d|=((uint32\_t)(*((c)++)))<< 8, \(\backslash\)
+                         d|=((uint32\_t)(*((c)++))))
+\end{DoxyCode}
+\hypertarget{ttpa_8h_afd464cc3fd54170b0469540b665914fd}{\index{ttpa.\-h@{ttpa.\-h}!n2s@{n2s}}
+\index{n2s@{n2s}!ttpa.h@{ttpa.\-h}}
+\subsubsection[{n2s}]{\setlength{\rightskip}{0pt plus 5cm}\#define n2s(
+\begin{DoxyParamCaption}
+\item[{}]{c, }
+\item[{}]{s}
+\end{DoxyParamCaption}
+)}}\label{ttpa_8h_afd464cc3fd54170b0469540b665914fd}
+{\bfseries Value\-:}
+\begin{DoxyCode}
+((s=(((\textcolor{keywordtype}{unsigned} int)((c)[0]))<< 8)| \(\backslash\)
+                            (((\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int})((c)[1]))    )),c+=2)
+\end{DoxyCode}
+\hypertarget{ttpa_8h_a6bb6f1bab7d7999fb383aad2aed23b24}{\index{ttpa.\-h@{ttpa.\-h}!n2t8@{n2t8}}
+\index{n2t8@{n2t8}!ttpa.h@{ttpa.\-h}}
+\subsubsection[{n2t8}]{\setlength{\rightskip}{0pt plus 5cm}\#define n2t8(
+\begin{DoxyParamCaption}
+\item[{}]{c, }
+\item[{}]{t}
+\end{DoxyParamCaption}
+)}}\label{ttpa_8h_a6bb6f1bab7d7999fb383aad2aed23b24}
+{\bfseries Value\-:}
+\begin{DoxyCode}
+(t =((uint64\_t)(*((c)++)))<<56, \(\backslash\)
+                         t|=((uint64\_t)(*((c)++)))<<48, \(\backslash\)
+                         t|=((uint64\_t)(*((c)++)))<<40, \(\backslash\)
+                         t|=((uint64\_t)(*((c)++)))<<32, \(\backslash\)
+                         t|=((uint64\_t)(*((c)++)))<<24, \(\backslash\)
+                         t|=((uint64\_t)(*((c)++)))<<16, \(\backslash\)
+                         t|=((uint64\_t)(*((c)++)))<< 8, \(\backslash\)
+                         t|=((uint64\_t)(*((c)++))))
+\end{DoxyCode}
+\hypertarget{ttpa_8h_a11fe10daafbfb28a38ba46f7213a225f}{\index{ttpa.\-h@{ttpa.\-h}!s2n@{s2n}}
+\index{s2n@{s2n}!ttpa.h@{ttpa.\-h}}
+\subsubsection[{s2n}]{\setlength{\rightskip}{0pt plus 5cm}\#define s2n(
+\begin{DoxyParamCaption}
+\item[{}]{s, }
+\item[{}]{c}
+\end{DoxyParamCaption}
+)}}\label{ttpa_8h_a11fe10daafbfb28a38ba46f7213a225f}
+{\bfseries Value\-:}
+\begin{DoxyCode}
+((c[0]=(\textcolor{keywordtype}{unsigned} char)(((s)>> 8)&0xff), \(\backslash\)
+                          c[1]=(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char})(((s)    )&0xff)),c+=2)
+\end{DoxyCode}
+\hypertarget{ttpa_8h_a74f6f78a73c54da2bc7311010f2c0a36}{\index{ttpa.\-h@{ttpa.\-h}!t2n8@{t2n8}}
+\index{t2n8@{t2n8}!ttpa.h@{ttpa.\-h}}
+\subsubsection[{t2n8}]{\setlength{\rightskip}{0pt plus 5cm}\#define t2n8(
+\begin{DoxyParamCaption}
+\item[{}]{l, }
+\item[{}]{c}
+\end{DoxyParamCaption}
+)}}\label{ttpa_8h_a74f6f78a73c54da2bc7311010f2c0a36}
+{\bfseries Value\-:}
+\begin{DoxyCode}
+(*((c)++)=(\textcolor{keywordtype}{unsigned} char)(((l)>>56)&0xff), \(\backslash\)
+                         *((c)++)=(\textcolor{keywordtype}{unsigned} char)(((l)>>48)&0xff), \(\backslash\)
+                         *((c)++)=(\textcolor{keywordtype}{unsigned} char)(((l)>>40)&0xff), \(\backslash\)
+                         *((c)++)=(\textcolor{keywordtype}{unsigned} char)(((l)>>32)&0xff), \(\backslash\)
+                         *((c)++)=(\textcolor{keywordtype}{unsigned} char)(((l)>>24)&0xff), \(\backslash\)
+                         *((c)++)=(\textcolor{keywordtype}{unsigned} char)(((l)>>16)&0xff), \(\backslash\)
+                         *((c)++)=(\textcolor{keywordtype}{unsigned} char)(((l)>> 8)&0xff), \(\backslash\)
+                         *((c)++)=(\textcolor{keywordtype}{unsigned} char)(((l)    )&0xff))
+\end{DoxyCode}
+
+
+\subsection{Function Documentation}
+\hypertarget{ttpa_8h_a5e8d3f9096f0faf6432a958ce25756a0}{\index{ttpa.\-h@{ttpa.\-h}!make\-\_\-cc\-\_\-content\-\_\-body@{make\-\_\-cc\-\_\-content\-\_\-body}}
+\index{make\-\_\-cc\-\_\-content\-\_\-body@{make\-\_\-cc\-\_\-content\-\_\-body}!ttpa.h@{ttpa.\-h}}
+\subsubsection[{make\-\_\-cc\-\_\-content\-\_\-body}]{\setlength{\rightskip}{0pt plus 5cm}int make\-\_\-cc\-\_\-content\-\_\-body (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$$\ast$}]{cc, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{alice\-\_\-pub, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{carol\-\_\-pub, }
+\item[{int}]{nid, }
+\item[{int $\ast$}]{len}
+\end{DoxyParamCaption}
+)}}\label{ttpa_8h_a5e8d3f9096f0faf6432a958ce25756a0}
+\hypertarget{ttpa_8h_a616efbd88ac90eaf0f3b2b52e5fb10a3}{\index{ttpa.\-h@{ttpa.\-h}!make\-\_\-cc\-\_\-request@{make\-\_\-cc\-\_\-request}}
+\index{make\-\_\-cc\-\_\-request@{make\-\_\-cc\-\_\-request}!ttpa.h@{ttpa.\-h}}
+\subsubsection[{make\-\_\-cc\-\_\-request}]{\setlength{\rightskip}{0pt plus 5cm}int make\-\_\-cc\-\_\-request (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$$\ast$}]{request, }
+\item[{unsigned char $\ast$}]{cc, }
+\item[{int}]{cc\-\_\-len, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{carol\-\_\-priv, }
+\item[{int}]{nid, }
+\item[{int $\ast$}]{len}
+\end{DoxyParamCaption}
+)}}\label{ttpa_8h_a616efbd88ac90eaf0f3b2b52e5fb10a3}
+\hypertarget{ttpa_8h_aeb5114cbb4a3065eb7d32c2f29826657}{\index{ttpa.\-h@{ttpa.\-h}!make\-\_\-cc\-\_\-request\-\_\-with\-\_\-verify\-\_\-cc@{make\-\_\-cc\-\_\-request\-\_\-with\-\_\-verify\-\_\-cc}}
+\index{make\-\_\-cc\-\_\-request\-\_\-with\-\_\-verify\-\_\-cc@{make\-\_\-cc\-\_\-request\-\_\-with\-\_\-verify\-\_\-cc}!ttpa.h@{ttpa.\-h}}
+\subsubsection[{make\-\_\-cc\-\_\-request\-\_\-with\-\_\-verify\-\_\-cc}]{\setlength{\rightskip}{0pt plus 5cm}int make\-\_\-cc\-\_\-request\-\_\-with\-\_\-verify\-\_\-cc (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$$\ast$}]{request, }
+\item[{unsigned char $\ast$}]{cc, }
+\item[{int}]{cc\-\_\-len, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{carol\-\_\-priv, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{alice\-\_\-pub, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{carol\-\_\-pub, }
+\item[{int}]{nid, }
+\item[{int $\ast$}]{len}
+\end{DoxyParamCaption}
+)}}\label{ttpa_8h_aeb5114cbb4a3065eb7d32c2f29826657}
+\hypertarget{ttpa_8h_ac3cbd7a1410bca05482233d26644437e}{\index{ttpa.\-h@{ttpa.\-h}!make\-\_\-cc\-\_\-response@{make\-\_\-cc\-\_\-response}}
+\index{make\-\_\-cc\-\_\-response@{make\-\_\-cc\-\_\-response}!ttpa.h@{ttpa.\-h}}
+\subsubsection[{make\-\_\-cc\-\_\-response}]{\setlength{\rightskip}{0pt plus 5cm}int make\-\_\-cc\-\_\-response (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$$\ast$}]{response, }
+\item[{unsigned char $\ast$}]{request, }
+\item[{int}]{req\-\_\-len, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{alice\-\_\-priv, }
+\item[{int}]{nid, }
+\item[{int $\ast$}]{len}
+\end{DoxyParamCaption}
+)}}\label{ttpa_8h_ac3cbd7a1410bca05482233d26644437e}
+\hypertarget{ttpa_8h_a7f55df2af33a9bb90604f5aa933d47a3}{\index{ttpa.\-h@{ttpa.\-h}!make\-\_\-cc\-\_\-response\-\_\-with\-\_\-verify\-\_\-request@{make\-\_\-cc\-\_\-response\-\_\-with\-\_\-verify\-\_\-request}}
+\index{make\-\_\-cc\-\_\-response\-\_\-with\-\_\-verify\-\_\-request@{make\-\_\-cc\-\_\-response\-\_\-with\-\_\-verify\-\_\-request}!ttpa.h@{ttpa.\-h}}
+\subsubsection[{make\-\_\-cc\-\_\-response\-\_\-with\-\_\-verify\-\_\-request}]{\setlength{\rightskip}{0pt plus 5cm}int make\-\_\-cc\-\_\-response\-\_\-with\-\_\-verify\-\_\-request (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$$\ast$}]{response, }
+\item[{unsigned char $\ast$}]{request, }
+\item[{int}]{req\-\_\-len, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{alice\-\_\-priv, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{alice\-\_\-pub, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{carol\-\_\-pub, }
+\item[{int}]{nid, }
+\item[{int $\ast$}]{len}
+\end{DoxyParamCaption}
+)}}\label{ttpa_8h_a7f55df2af33a9bb90604f5aa933d47a3}
+\hypertarget{ttpa_8h_ac1049079c3785dd0d29e705150232d7c}{\index{ttpa.\-h@{ttpa.\-h}!make\-\_\-signature\-\_\-block@{make\-\_\-signature\-\_\-block}}
+\index{make\-\_\-signature\-\_\-block@{make\-\_\-signature\-\_\-block}!ttpa.h@{ttpa.\-h}}
+\subsubsection[{make\-\_\-signature\-\_\-block}]{\setlength{\rightskip}{0pt plus 5cm}int make\-\_\-signature\-\_\-block (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$$\ast$}]{sigblk, }
+\item[{unsigned char $\ast$}]{msg, }
+\item[{int}]{msg\-\_\-len, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{priv, }
+\item[{int}]{nid, }
+\item[{size\-\_\-t $\ast$}]{sigblk\-\_\-len}
+\end{DoxyParamCaption}
+)}}\label{ttpa_8h_ac1049079c3785dd0d29e705150232d7c}
+\hypertarget{ttpa_8h_a73fd00d6dbac494813160bd59aa5f8d9}{\index{ttpa.\-h@{ttpa.\-h}!verify\-\_\-cc\-\_\-content\-\_\-body@{verify\-\_\-cc\-\_\-content\-\_\-body}}
+\index{verify\-\_\-cc\-\_\-content\-\_\-body@{verify\-\_\-cc\-\_\-content\-\_\-body}!ttpa.h@{ttpa.\-h}}
+\subsubsection[{verify\-\_\-cc\-\_\-content\-\_\-body}]{\setlength{\rightskip}{0pt plus 5cm}int verify\-\_\-cc\-\_\-content\-\_\-body (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$}]{content, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{alice\-\_\-pub, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{carol\-\_\-pub}
+\end{DoxyParamCaption}
+)}}\label{ttpa_8h_a73fd00d6dbac494813160bd59aa5f8d9}
+\hypertarget{ttpa_8h_a13215ebe6a7e08f4abdd4dbb3e3f17aa}{\index{ttpa.\-h@{ttpa.\-h}!verify\-\_\-cc\-\_\-request@{verify\-\_\-cc\-\_\-request}}
+\index{verify\-\_\-cc\-\_\-request@{verify\-\_\-cc\-\_\-request}!ttpa.h@{ttpa.\-h}}
+\subsubsection[{verify\-\_\-cc\-\_\-request}]{\setlength{\rightskip}{0pt plus 5cm}int verify\-\_\-cc\-\_\-request (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$}]{request, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{alice\-\_\-pub, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{carol\-\_\-pub}
+\end{DoxyParamCaption}
+)}}\label{ttpa_8h_a13215ebe6a7e08f4abdd4dbb3e3f17aa}
+\hypertarget{ttpa_8h_a2f4515f55eabbda868900d1285950682}{\index{ttpa.\-h@{ttpa.\-h}!verify\-\_\-cc\-\_\-response@{verify\-\_\-cc\-\_\-response}}
+\index{verify\-\_\-cc\-\_\-response@{verify\-\_\-cc\-\_\-response}!ttpa.h@{ttpa.\-h}}
+\subsubsection[{verify\-\_\-cc\-\_\-response}]{\setlength{\rightskip}{0pt plus 5cm}int verify\-\_\-cc\-\_\-response (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$}]{response, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{alice\-\_\-pub, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{carol\-\_\-pub}
+\end{DoxyParamCaption}
+)}}\label{ttpa_8h_a2f4515f55eabbda868900d1285950682}
+\hypertarget{ttpa_8h_a0a8364d65504a84e3c63f0e62937b816}{\index{ttpa.\-h@{ttpa.\-h}!verify\-\_\-signature@{verify\-\_\-signature}}
+\index{verify\-\_\-signature@{verify\-\_\-signature}!ttpa.h@{ttpa.\-h}}
+\subsubsection[{verify\-\_\-signature}]{\setlength{\rightskip}{0pt plus 5cm}int verify\-\_\-signature (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$}]{msg, }
+\item[{int}]{msg\-\_\-len, }
+\item[{uint16\-\_\-t}]{sig\-\_\-type, }
+\item[{uint16\-\_\-t}]{sig\-\_\-len, }
+\item[{unsigned char $\ast$}]{sig, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{pub}
+\end{DoxyParamCaption}
+)}}\label{ttpa_8h_a0a8364d65504a84e3c63f0e62937b816}

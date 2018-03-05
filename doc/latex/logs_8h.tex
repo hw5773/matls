@@ -1,0 +1,94 @@
+\hypertarget{logs_8h}{\section{record/logs.h File Reference}
+\label{logs_8h}\index{record/logs.\-h@{record/logs.\-h}}
+}
+
+
+This file is to define log messages.  
+
+
+{\ttfamily \#include $<$stdio.\-h$>$}\\*
+{\ttfamily \#include $<$time.\-h$>$}\\*
+{\ttfamily \#include $<$stdlib.\-h$>$}\\*
+{\ttfamily \#include $<$sys/time.\-h$>$}\\*
+Include dependency graph for logs.\-h\-:
+This graph shows which files directly or indirectly include this file\-:
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{logs_8h_a58af069a320d92822ddb05a9ea71b034}{A\-P\-P\-\_\-\-L\-O\-G}(msg)
+\item 
+\#define \hyperlink{logs_8h_aa788ed9d9cfc82fedcac5ab1e155c881}{A\-P\-P\-\_\-\-L\-O\-G1d}(msg, arg1)
+\item 
+\#define \hyperlink{logs_8h_a5fdba70896df2bb365ec63a8110095db}{A\-P\-P\-\_\-\-L\-O\-G1lu}(msg, arg1)
+\item 
+\#define \hyperlink{logs_8h_af99253a9750ed034b90345e588a6bdb3}{A\-P\-P\-\_\-\-L\-O\-G1p}(msg, arg1)
+\item 
+\#define \hyperlink{logs_8h_a2e8340d77ed5ca996cfa93a850b38f97}{A\-P\-P\-\_\-\-L\-O\-G2s}(msg, arg1, arg2)
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+unsigned long \hyperlink{logs_8h_a27468195131a6b6f8d184042e6e9345d}{get\-\_\-current\-\_\-microseconds} ()
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This file is to define log messages. \begin{DoxyAuthor}{Author}
+Hyunwoo Lee 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+21 Feb 2018 
+\end{DoxyDate}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{logs_8h_a58af069a320d92822ddb05a9ea71b034}{\index{logs.\-h@{logs.\-h}!A\-P\-P\-\_\-\-L\-O\-G@{A\-P\-P\-\_\-\-L\-O\-G}}
+\index{A\-P\-P\-\_\-\-L\-O\-G@{A\-P\-P\-\_\-\-L\-O\-G}!logs.h@{logs.\-h}}
+\subsubsection[{A\-P\-P\-\_\-\-L\-O\-G}]{\setlength{\rightskip}{0pt plus 5cm}\#define A\-P\-P\-\_\-\-L\-O\-G(
+\begin{DoxyParamCaption}
+\item[{}]{msg}
+\end{DoxyParamCaption}
+)}}\label{logs_8h_a58af069a320d92822ddb05a9ea71b034}
+\hypertarget{logs_8h_aa788ed9d9cfc82fedcac5ab1e155c881}{\index{logs.\-h@{logs.\-h}!A\-P\-P\-\_\-\-L\-O\-G1d@{A\-P\-P\-\_\-\-L\-O\-G1d}}
+\index{A\-P\-P\-\_\-\-L\-O\-G1d@{A\-P\-P\-\_\-\-L\-O\-G1d}!logs.h@{logs.\-h}}
+\subsubsection[{A\-P\-P\-\_\-\-L\-O\-G1d}]{\setlength{\rightskip}{0pt plus 5cm}\#define A\-P\-P\-\_\-\-L\-O\-G1d(
+\begin{DoxyParamCaption}
+\item[{}]{msg, }
+\item[{}]{arg1}
+\end{DoxyParamCaption}
+)}}\label{logs_8h_aa788ed9d9cfc82fedcac5ab1e155c881}
+\hypertarget{logs_8h_a5fdba70896df2bb365ec63a8110095db}{\index{logs.\-h@{logs.\-h}!A\-P\-P\-\_\-\-L\-O\-G1lu@{A\-P\-P\-\_\-\-L\-O\-G1lu}}
+\index{A\-P\-P\-\_\-\-L\-O\-G1lu@{A\-P\-P\-\_\-\-L\-O\-G1lu}!logs.h@{logs.\-h}}
+\subsubsection[{A\-P\-P\-\_\-\-L\-O\-G1lu}]{\setlength{\rightskip}{0pt plus 5cm}\#define A\-P\-P\-\_\-\-L\-O\-G1lu(
+\begin{DoxyParamCaption}
+\item[{}]{msg, }
+\item[{}]{arg1}
+\end{DoxyParamCaption}
+)}}\label{logs_8h_a5fdba70896df2bb365ec63a8110095db}
+\hypertarget{logs_8h_af99253a9750ed034b90345e588a6bdb3}{\index{logs.\-h@{logs.\-h}!A\-P\-P\-\_\-\-L\-O\-G1p@{A\-P\-P\-\_\-\-L\-O\-G1p}}
+\index{A\-P\-P\-\_\-\-L\-O\-G1p@{A\-P\-P\-\_\-\-L\-O\-G1p}!logs.h@{logs.\-h}}
+\subsubsection[{A\-P\-P\-\_\-\-L\-O\-G1p}]{\setlength{\rightskip}{0pt plus 5cm}\#define A\-P\-P\-\_\-\-L\-O\-G1p(
+\begin{DoxyParamCaption}
+\item[{}]{msg, }
+\item[{}]{arg1}
+\end{DoxyParamCaption}
+)}}\label{logs_8h_af99253a9750ed034b90345e588a6bdb3}
+\hypertarget{logs_8h_a2e8340d77ed5ca996cfa93a850b38f97}{\index{logs.\-h@{logs.\-h}!A\-P\-P\-\_\-\-L\-O\-G2s@{A\-P\-P\-\_\-\-L\-O\-G2s}}
+\index{A\-P\-P\-\_\-\-L\-O\-G2s@{A\-P\-P\-\_\-\-L\-O\-G2s}!logs.h@{logs.\-h}}
+\subsubsection[{A\-P\-P\-\_\-\-L\-O\-G2s}]{\setlength{\rightskip}{0pt plus 5cm}\#define A\-P\-P\-\_\-\-L\-O\-G2s(
+\begin{DoxyParamCaption}
+\item[{}]{msg, }
+\item[{}]{arg1, }
+\item[{}]{arg2}
+\end{DoxyParamCaption}
+)}}\label{logs_8h_a2e8340d77ed5ca996cfa93a850b38f97}
+
+
+\subsection{Function Documentation}
+\hypertarget{logs_8h_a27468195131a6b6f8d184042e6e9345d}{\index{logs.\-h@{logs.\-h}!get\-\_\-current\-\_\-microseconds@{get\-\_\-current\-\_\-microseconds}}
+\index{get\-\_\-current\-\_\-microseconds@{get\-\_\-current\-\_\-microseconds}!logs.h@{logs.\-h}}
+\subsubsection[{get\-\_\-current\-\_\-microseconds}]{\setlength{\rightskip}{0pt plus 5cm}unsigned long get\-\_\-current\-\_\-microseconds (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{logs_8h_a27468195131a6b6f8d184042e6e9345d}

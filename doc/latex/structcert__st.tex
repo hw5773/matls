@@ -1,0 +1,91 @@
+\hypertarget{structcert__st}{\section{cert\-\_\-st Struct Reference}
+\label{structcert__st}\index{cert\-\_\-st@{cert\-\_\-st}}
+}
+
+
+{\ttfamily \#include $<$ssl\-\_\-locl.\-h$>$}
+
+
+
+Collaboration diagram for cert\-\_\-st\-:
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{ssl__locl_8h_ab376b10820d145fbabe4f4fdf0b3a770}{C\-E\-R\-T\-\_\-\-P\-K\-E\-Y} $\ast$ \hyperlink{structcert__st_aaa35af0490e02946cc5695f9d538d557}{key}
+\item 
+int \hyperlink{structcert__st_a838ae8304f54182a7fd514e982d22db7}{valid}
+\item 
+unsigned long \hyperlink{structcert__st_acfbc94f3d12134f3018dc6d29e686521}{mask\-\_\-k}
+\item 
+unsigned long \hyperlink{structcert__st_a1ab05cae13ea94ef862a45f2ced1e5d5}{mask\-\_\-a}
+\item 
+unsigned long \hyperlink{structcert__st_a259c7557980181c9e7dc6c19defdd220}{export\-\_\-mask\-\_\-k}
+\item 
+unsigned long \hyperlink{structcert__st_a75029765406f9a442d9767764a2387fb}{export\-\_\-mask\-\_\-a}
+\item 
+R\-S\-A $\ast$ \hyperlink{structcert__st_a066253814d4b5677d244f93a83af231e}{rsa\-\_\-tmp}
+\item 
+R\-S\-A $\ast$($\ast$ \hyperlink{structcert__st_af734d256dd42b25ca0cd753b66d6688a}{rsa\-\_\-tmp\-\_\-cb} )(S\-S\-L $\ast$ssl, int is\-\_\-export, int keysize)
+\item 
+D\-H $\ast$ \hyperlink{structcert__st_abb30e89df1ada4afc3cf585cee30b3fd}{dh\-\_\-tmp}
+\item 
+D\-H $\ast$($\ast$ \hyperlink{structcert__st_aec67db7c449f9dbcba4a454ecc45739c}{dh\-\_\-tmp\-\_\-cb} )(S\-S\-L $\ast$ssl, int is\-\_\-export, int keysize)
+\item 
+E\-C\-\_\-\-K\-E\-Y $\ast$ \hyperlink{structcert__st_a7fb20c811cf6eaa03dce02639d65846b}{ecdh\-\_\-tmp}
+\item 
+E\-C\-\_\-\-K\-E\-Y $\ast$($\ast$ \hyperlink{structcert__st_a42879a7795442d726faf0237b9d3b5e4}{ecdh\-\_\-tmp\-\_\-cb} )(S\-S\-L $\ast$ssl, int is\-\_\-export, int keysize)
+\item 
+\hyperlink{ssl__locl_8h_ab376b10820d145fbabe4f4fdf0b3a770}{C\-E\-R\-T\-\_\-\-P\-K\-E\-Y} \hyperlink{structcert__st_a9455badb9626d3b50d67ddae1156ea44}{pkeys} \mbox{[}\hyperlink{ssl__locl_8h_ae56b6c56e5819da2bf95a533238f69f8}{S\-S\-L\-\_\-\-P\-K\-E\-Y\-\_\-\-N\-U\-M}\mbox{]}
+\item 
+int \hyperlink{structcert__st_a35da30deb4ca647a4b9e010be514621f}{references}
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{structcert__st_abb30e89df1ada4afc3cf585cee30b3fd}{\index{cert\-\_\-st@{cert\-\_\-st}!dh\-\_\-tmp@{dh\-\_\-tmp}}
+\index{dh\-\_\-tmp@{dh\-\_\-tmp}!cert_st@{cert\-\_\-st}}
+\subsubsection[{dh\-\_\-tmp}]{\setlength{\rightskip}{0pt plus 5cm}D\-H$\ast$ cert\-\_\-st\-::dh\-\_\-tmp}}\label{structcert__st_abb30e89df1ada4afc3cf585cee30b3fd}
+\hypertarget{structcert__st_aec67db7c449f9dbcba4a454ecc45739c}{\index{cert\-\_\-st@{cert\-\_\-st}!dh\-\_\-tmp\-\_\-cb@{dh\-\_\-tmp\-\_\-cb}}
+\index{dh\-\_\-tmp\-\_\-cb@{dh\-\_\-tmp\-\_\-cb}!cert_st@{cert\-\_\-st}}
+\subsubsection[{dh\-\_\-tmp\-\_\-cb}]{\setlength{\rightskip}{0pt plus 5cm}D\-H$\ast$($\ast$ cert\-\_\-st\-::dh\-\_\-tmp\-\_\-cb)(S\-S\-L $\ast$ssl, int is\-\_\-export, int keysize)}}\label{structcert__st_aec67db7c449f9dbcba4a454ecc45739c}
+\hypertarget{structcert__st_a7fb20c811cf6eaa03dce02639d65846b}{\index{cert\-\_\-st@{cert\-\_\-st}!ecdh\-\_\-tmp@{ecdh\-\_\-tmp}}
+\index{ecdh\-\_\-tmp@{ecdh\-\_\-tmp}!cert_st@{cert\-\_\-st}}
+\subsubsection[{ecdh\-\_\-tmp}]{\setlength{\rightskip}{0pt plus 5cm}E\-C\-\_\-\-K\-E\-Y$\ast$ cert\-\_\-st\-::ecdh\-\_\-tmp}}\label{structcert__st_a7fb20c811cf6eaa03dce02639d65846b}
+\hypertarget{structcert__st_a42879a7795442d726faf0237b9d3b5e4}{\index{cert\-\_\-st@{cert\-\_\-st}!ecdh\-\_\-tmp\-\_\-cb@{ecdh\-\_\-tmp\-\_\-cb}}
+\index{ecdh\-\_\-tmp\-\_\-cb@{ecdh\-\_\-tmp\-\_\-cb}!cert_st@{cert\-\_\-st}}
+\subsubsection[{ecdh\-\_\-tmp\-\_\-cb}]{\setlength{\rightskip}{0pt plus 5cm}E\-C\-\_\-\-K\-E\-Y$\ast$($\ast$ cert\-\_\-st\-::ecdh\-\_\-tmp\-\_\-cb)(S\-S\-L $\ast$ssl, int is\-\_\-export, int keysize)}}\label{structcert__st_a42879a7795442d726faf0237b9d3b5e4}
+\hypertarget{structcert__st_a75029765406f9a442d9767764a2387fb}{\index{cert\-\_\-st@{cert\-\_\-st}!export\-\_\-mask\-\_\-a@{export\-\_\-mask\-\_\-a}}
+\index{export\-\_\-mask\-\_\-a@{export\-\_\-mask\-\_\-a}!cert_st@{cert\-\_\-st}}
+\subsubsection[{export\-\_\-mask\-\_\-a}]{\setlength{\rightskip}{0pt plus 5cm}unsigned long cert\-\_\-st\-::export\-\_\-mask\-\_\-a}}\label{structcert__st_a75029765406f9a442d9767764a2387fb}
+\hypertarget{structcert__st_a259c7557980181c9e7dc6c19defdd220}{\index{cert\-\_\-st@{cert\-\_\-st}!export\-\_\-mask\-\_\-k@{export\-\_\-mask\-\_\-k}}
+\index{export\-\_\-mask\-\_\-k@{export\-\_\-mask\-\_\-k}!cert_st@{cert\-\_\-st}}
+\subsubsection[{export\-\_\-mask\-\_\-k}]{\setlength{\rightskip}{0pt plus 5cm}unsigned long cert\-\_\-st\-::export\-\_\-mask\-\_\-k}}\label{structcert__st_a259c7557980181c9e7dc6c19defdd220}
+\hypertarget{structcert__st_aaa35af0490e02946cc5695f9d538d557}{\index{cert\-\_\-st@{cert\-\_\-st}!key@{key}}
+\index{key@{key}!cert_st@{cert\-\_\-st}}
+\subsubsection[{key}]{\setlength{\rightskip}{0pt plus 5cm}{\bf C\-E\-R\-T\-\_\-\-P\-K\-E\-Y}$\ast$ cert\-\_\-st\-::key}}\label{structcert__st_aaa35af0490e02946cc5695f9d538d557}
+\hypertarget{structcert__st_a1ab05cae13ea94ef862a45f2ced1e5d5}{\index{cert\-\_\-st@{cert\-\_\-st}!mask\-\_\-a@{mask\-\_\-a}}
+\index{mask\-\_\-a@{mask\-\_\-a}!cert_st@{cert\-\_\-st}}
+\subsubsection[{mask\-\_\-a}]{\setlength{\rightskip}{0pt plus 5cm}unsigned long cert\-\_\-st\-::mask\-\_\-a}}\label{structcert__st_a1ab05cae13ea94ef862a45f2ced1e5d5}
+\hypertarget{structcert__st_acfbc94f3d12134f3018dc6d29e686521}{\index{cert\-\_\-st@{cert\-\_\-st}!mask\-\_\-k@{mask\-\_\-k}}
+\index{mask\-\_\-k@{mask\-\_\-k}!cert_st@{cert\-\_\-st}}
+\subsubsection[{mask\-\_\-k}]{\setlength{\rightskip}{0pt plus 5cm}unsigned long cert\-\_\-st\-::mask\-\_\-k}}\label{structcert__st_acfbc94f3d12134f3018dc6d29e686521}
+\hypertarget{structcert__st_a9455badb9626d3b50d67ddae1156ea44}{\index{cert\-\_\-st@{cert\-\_\-st}!pkeys@{pkeys}}
+\index{pkeys@{pkeys}!cert_st@{cert\-\_\-st}}
+\subsubsection[{pkeys}]{\setlength{\rightskip}{0pt plus 5cm}{\bf C\-E\-R\-T\-\_\-\-P\-K\-E\-Y} cert\-\_\-st\-::pkeys\mbox{[}{\bf S\-S\-L\-\_\-\-P\-K\-E\-Y\-\_\-\-N\-U\-M}\mbox{]}}}\label{structcert__st_a9455badb9626d3b50d67ddae1156ea44}
+\hypertarget{structcert__st_a35da30deb4ca647a4b9e010be514621f}{\index{cert\-\_\-st@{cert\-\_\-st}!references@{references}}
+\index{references@{references}!cert_st@{cert\-\_\-st}}
+\subsubsection[{references}]{\setlength{\rightskip}{0pt plus 5cm}int cert\-\_\-st\-::references}}\label{structcert__st_a35da30deb4ca647a4b9e010be514621f}
+\hypertarget{structcert__st_a066253814d4b5677d244f93a83af231e}{\index{cert\-\_\-st@{cert\-\_\-st}!rsa\-\_\-tmp@{rsa\-\_\-tmp}}
+\index{rsa\-\_\-tmp@{rsa\-\_\-tmp}!cert_st@{cert\-\_\-st}}
+\subsubsection[{rsa\-\_\-tmp}]{\setlength{\rightskip}{0pt plus 5cm}R\-S\-A$\ast$ cert\-\_\-st\-::rsa\-\_\-tmp}}\label{structcert__st_a066253814d4b5677d244f93a83af231e}
+\hypertarget{structcert__st_af734d256dd42b25ca0cd753b66d6688a}{\index{cert\-\_\-st@{cert\-\_\-st}!rsa\-\_\-tmp\-\_\-cb@{rsa\-\_\-tmp\-\_\-cb}}
+\index{rsa\-\_\-tmp\-\_\-cb@{rsa\-\_\-tmp\-\_\-cb}!cert_st@{cert\-\_\-st}}
+\subsubsection[{rsa\-\_\-tmp\-\_\-cb}]{\setlength{\rightskip}{0pt plus 5cm}R\-S\-A$\ast$($\ast$ cert\-\_\-st\-::rsa\-\_\-tmp\-\_\-cb)(S\-S\-L $\ast$ssl, int is\-\_\-export, int keysize)}}\label{structcert__st_af734d256dd42b25ca0cd753b66d6688a}
+\hypertarget{structcert__st_a838ae8304f54182a7fd514e982d22db7}{\index{cert\-\_\-st@{cert\-\_\-st}!valid@{valid}}
+\index{valid@{valid}!cert_st@{cert\-\_\-st}}
+\subsubsection[{valid}]{\setlength{\rightskip}{0pt plus 5cm}int cert\-\_\-st\-::valid}}\label{structcert__st_a838ae8304f54182a7fd514e982d22db7}
+
+
+The documentation for this struct was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+openssl-\/1.\-0.\-1j/ssl/\hyperlink{ssl__locl_8h}{ssl\-\_\-locl.\-h}\end{DoxyCompactItemize}

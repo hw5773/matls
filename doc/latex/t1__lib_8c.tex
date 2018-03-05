@@ -1,0 +1,344 @@
+\hypertarget{t1__lib_8c}{\section{openssl-\/1.0.1j/ssl/t1\-\_\-lib.c File Reference}
+\label{t1__lib_8c}\index{openssl-\/1.\-0.\-1j/ssl/t1\-\_\-lib.\-c@{openssl-\/1.\-0.\-1j/ssl/t1\-\_\-lib.\-c}}
+}
+{\ttfamily \#include $<$stdio.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/objects.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/evp.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/hmac.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/ocsp.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/rand.\-h$>$}\\*
+{\ttfamily \#include \char`\"{}ssl\-\_\-locl.\-h\char`\"{}}\\*
+Include dependency graph for t1\-\_\-lib.\-c\-:
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structtls12__lookup}{tls12\-\_\-lookup}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{t1__lib_8c_a01f7f0b60ceb62545e0a96f6bf51c728}{C\-H\-E\-C\-K\-L\-E\-N}(curr, val, limit)~(((curr) $>$= (limit)) $\vert$$\vert$ (size\-\_\-t)((limit) -\/ (curr)) $<$ (size\-\_\-t)(val))
+\item 
+\#define \hyperlink{t1__lib_8c_afc9ba9cd71e8d52d828d0366a2e54227}{tlsext\-\_\-sigalg\-\_\-rsa}(md)~md, \hyperlink{tls1_8h_a5b43c8c6b8b9104ee53d2f2bc11a3111}{T\-L\-S\-E\-X\-T\-\_\-signature\-\_\-rsa},
+\item 
+\#define \hyperlink{t1__lib_8c_a0c33b46134c2c58a1c6cc502753f3cd0}{tlsext\-\_\-sigalg\-\_\-dsa}(md)~md, \hyperlink{tls1_8h_a0e17a801aa079d29d3c913573d5af470}{T\-L\-S\-E\-X\-T\-\_\-signature\-\_\-dsa},
+\item 
+\#define \hyperlink{t1__lib_8c_a879d86e538a25d41ca75c8f33126863e}{tlsext\-\_\-sigalg\-\_\-ecdsa}(md)~md, \hyperlink{tls1_8h_a61c5544da75d0e1eded5e9e00b12e903}{T\-L\-S\-E\-X\-T\-\_\-signature\-\_\-ecdsa},
+\item 
+\#define \hyperlink{t1__lib_8c_ab14844a0b06a2b29cad9e7b7d6c2a76e}{tlsext\-\_\-sigalg}(md)
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+long \hyperlink{t1__lib_8c_aa87bc269413ac02c26837676c6228709}{tls1\-\_\-default\-\_\-timeout} (void)
+\item 
+int \hyperlink{t1__lib_8c_ab08aa7fd9569bf49e4f3b9c13ba53666}{tls1\-\_\-new} (S\-S\-L $\ast$s)
+\item 
+void \hyperlink{t1__lib_8c_aec33e68ae6607f6f54f30deea957d848}{tls1\-\_\-free} (S\-S\-L $\ast$s)
+\item 
+void \hyperlink{t1__lib_8c_a5198c9fac50bc91fb7bd650c3eea0663}{tls1\-\_\-clear} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{t1__lib_8c_a26bae754b7d7a456436441b8191da112}{tls1\-\_\-ec\-\_\-curve\-\_\-id2nid} (int curve\-\_\-id)
+\item 
+int \hyperlink{t1__lib_8c_ababb650e1808fbe183e709052314b63c}{tls1\-\_\-ec\-\_\-nid2curve\-\_\-id} (int nid)
+\item 
+int \hyperlink{t1__lib_8c_ae97f1646d5bf6640bd93328fddf88ad5}{tls12\-\_\-get\-\_\-req\-\_\-sig\-\_\-algs} (S\-S\-L $\ast$s, unsigned char $\ast$\hyperlink{ssl__locl_8h_a4014c6f4a6fa0e565ca592bcaca0fa58}{p})
+\item 
+unsigned char $\ast$ \hyperlink{t1__lib_8c_a34971ae8cd26cf0b2a37a597d4578d57}{ssl\-\_\-add\-\_\-clienthello\-\_\-tlsext} (S\-S\-L $\ast$s, unsigned char $\ast$buf, unsigned char $\ast$limit)
+\item 
+unsigned char $\ast$ \hyperlink{t1__lib_8c_a2f07df66b7799fbfa9597d6b5802d55b}{ssl\-\_\-add\-\_\-serverhello\-\_\-tlsext} (S\-S\-L $\ast$s, unsigned char $\ast$buf, unsigned char $\ast$limit)
+\item 
+int \hyperlink{t1__lib_8c_a1b67382af4271126be642c27ea32e774}{ssl\-\_\-parse\-\_\-clienthello\-\_\-tlsext} (S\-S\-L $\ast$s, unsigned char $\ast$$\ast$\hyperlink{ssl__locl_8h_a4014c6f4a6fa0e565ca592bcaca0fa58}{p}, unsigned char $\ast$d, int n, int $\ast$al)
+\item 
+int \hyperlink{t1__lib_8c_ae36ff53aabeec16f0ce4a4e848fc6263}{ssl\-\_\-parse\-\_\-serverhello\-\_\-tlsext} (S\-S\-L $\ast$s, unsigned char $\ast$$\ast$\hyperlink{ssl__locl_8h_a4014c6f4a6fa0e565ca592bcaca0fa58}{p}, unsigned char $\ast$d, int n, int $\ast$al)
+\item 
+int \hyperlink{t1__lib_8c_a6170a24801e563dc84e6f2f6b4ed7839}{ssl\-\_\-prepare\-\_\-clienthello\-\_\-tlsext} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{t1__lib_8c_abe4a9c7a280a7ecc6f704b81ec488416}{ssl\-\_\-prepare\-\_\-serverhello\-\_\-tlsext} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{t1__lib_8c_ad69cf662e7606dd30e600dd0a617219e}{ssl\-\_\-check\-\_\-clienthello\-\_\-tlsext\-\_\-early} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{t1__lib_8c_a4878fbb2c28459aa70c4142275150c71}{ssl\-\_\-check\-\_\-clienthello\-\_\-tlsext\-\_\-late} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{t1__lib_8c_a4b4118b4265012f6251f83c37845fd2f}{ssl\-\_\-check\-\_\-serverhello\-\_\-tlsext} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{t1__lib_8c_a18d687abe44477c2301bc1b5c50fe0fe}{tls1\-\_\-process\-\_\-ticket} (S\-S\-L $\ast$s, unsigned char $\ast$session\-\_\-id, int len, const unsigned char $\ast$limit, \hyperlink{ssl_8h_a8dd6b81bbcb1b2d769235c37779d2a94}{S\-S\-L\-\_\-\-S\-E\-S\-S\-I\-O\-N} $\ast$$\ast$ret)
+\item 
+int \hyperlink{t1__lib_8c_a9786b1e22a7e176e1b327f7b7ca00074}{tls12\-\_\-get\-\_\-sigandhash} (unsigned char $\ast$\hyperlink{ssl__locl_8h_a4014c6f4a6fa0e565ca592bcaca0fa58}{p}, const E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$pk, const E\-V\-P\-\_\-\-M\-D $\ast$md)
+\item 
+int \hyperlink{t1__lib_8c_a9f965623013df5900494cbb6dc311603}{tls12\-\_\-get\-\_\-sigid} (const E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$pk)
+\item 
+const E\-V\-P\-\_\-\-M\-D $\ast$ \hyperlink{t1__lib_8c_a2e2ef9c2b24a0367a2ec0a9ddd1bb157}{tls12\-\_\-get\-\_\-hash} (unsigned char hash\-\_\-alg)
+\item 
+int \hyperlink{t1__lib_8c_a53dec0b010c408c4e0d6d5c17ddfee1d}{tls1\-\_\-process\-\_\-sigalgs} (S\-S\-L $\ast$s, const unsigned char $\ast$data, int dsize)
+\item 
+int \hyperlink{t1__lib_8c_a175c4350583ffa59d724ec5379633a12}{tls1\-\_\-process\-\_\-heartbeat} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{t1__lib_8c_a589c9d658c6189ca1f1f7eb5bcaef24d}{tls1\-\_\-heartbeat} (S\-S\-L $\ast$s)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const char \hyperlink{t1__lib_8c_a0212c5ddd861a73bf0482ec93a7e75f7}{tls1\-\_\-version\-\_\-str} \mbox{[}$\,$\mbox{]} =\char`\"{}T\-L\-Sv1\char`\"{} O\-P\-E\-N\-S\-S\-L\-\_\-\-V\-E\-R\-S\-I\-O\-N\-\_\-\-P\-T\-E\-X\-T
+\item 
+\hyperlink{ssl__locl_8h_a943a9a9c67ba74fa9d9b2c605f817ad0}{S\-S\-L3\-\_\-\-E\-N\-C\-\_\-\-M\-E\-T\-H\-O\-D} \hyperlink{t1__lib_8c_a10582cff96c4f3337cc7e3c8a8cab2e4}{T\-L\-Sv1\-\_\-enc\-\_\-data}
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{t1__lib_8c_a01f7f0b60ceb62545e0a96f6bf51c728}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!C\-H\-E\-C\-K\-L\-E\-N@{C\-H\-E\-C\-K\-L\-E\-N}}
+\index{C\-H\-E\-C\-K\-L\-E\-N@{C\-H\-E\-C\-K\-L\-E\-N}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{C\-H\-E\-C\-K\-L\-E\-N}]{\setlength{\rightskip}{0pt plus 5cm}\#define C\-H\-E\-C\-K\-L\-E\-N(
+\begin{DoxyParamCaption}
+\item[{}]{curr, }
+\item[{}]{val, }
+\item[{}]{limit}
+\end{DoxyParamCaption}
+)~(((curr) $>$= (limit)) $\vert$$\vert$ (size\-\_\-t)((limit) -\/ (curr)) $<$ (size\-\_\-t)(val))}}\label{t1__lib_8c_a01f7f0b60ceb62545e0a96f6bf51c728}
+\hypertarget{t1__lib_8c_ab14844a0b06a2b29cad9e7b7d6c2a76e}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!tlsext\-\_\-sigalg@{tlsext\-\_\-sigalg}}
+\index{tlsext\-\_\-sigalg@{tlsext\-\_\-sigalg}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{tlsext\-\_\-sigalg}]{\setlength{\rightskip}{0pt plus 5cm}\#define tlsext\-\_\-sigalg(
+\begin{DoxyParamCaption}
+\item[{}]{md}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_ab14844a0b06a2b29cad9e7b7d6c2a76e}
+{\bfseries Value\-:}
+\begin{DoxyCode}
+\hyperlink{t1__lib_8c_afc9ba9cd71e8d52d828d0366a2e54227}{tlsext\_sigalg\_rsa}(md) \hyperlink{t1__lib_8c_a0c33b46134c2c58a1c6cc502753f3cd0}{\(\backslash\)}
+\hyperlink{t1__lib_8c_a0c33b46134c2c58a1c6cc502753f3cd0}{        tlsext\_sigalg\_dsa}(md) \hyperlink{t1__lib_8c_a879d86e538a25d41ca75c8f33126863e}{\(\backslash\)}
+\hyperlink{t1__lib_8c_a879d86e538a25d41ca75c8f33126863e}{        tlsext\_sigalg\_ecdsa}(md)
+\end{DoxyCode}
+\hypertarget{t1__lib_8c_a0c33b46134c2c58a1c6cc502753f3cd0}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!tlsext\-\_\-sigalg\-\_\-dsa@{tlsext\-\_\-sigalg\-\_\-dsa}}
+\index{tlsext\-\_\-sigalg\-\_\-dsa@{tlsext\-\_\-sigalg\-\_\-dsa}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{tlsext\-\_\-sigalg\-\_\-dsa}]{\setlength{\rightskip}{0pt plus 5cm}\#define tlsext\-\_\-sigalg\-\_\-dsa(
+\begin{DoxyParamCaption}
+\item[{}]{md}
+\end{DoxyParamCaption}
+)~md, {\bf T\-L\-S\-E\-X\-T\-\_\-signature\-\_\-dsa},}}\label{t1__lib_8c_a0c33b46134c2c58a1c6cc502753f3cd0}
+\hypertarget{t1__lib_8c_a879d86e538a25d41ca75c8f33126863e}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!tlsext\-\_\-sigalg\-\_\-ecdsa@{tlsext\-\_\-sigalg\-\_\-ecdsa}}
+\index{tlsext\-\_\-sigalg\-\_\-ecdsa@{tlsext\-\_\-sigalg\-\_\-ecdsa}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{tlsext\-\_\-sigalg\-\_\-ecdsa}]{\setlength{\rightskip}{0pt plus 5cm}\#define tlsext\-\_\-sigalg\-\_\-ecdsa(
+\begin{DoxyParamCaption}
+\item[{}]{md}
+\end{DoxyParamCaption}
+)~md, {\bf T\-L\-S\-E\-X\-T\-\_\-signature\-\_\-ecdsa},}}\label{t1__lib_8c_a879d86e538a25d41ca75c8f33126863e}
+\hypertarget{t1__lib_8c_afc9ba9cd71e8d52d828d0366a2e54227}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!tlsext\-\_\-sigalg\-\_\-rsa@{tlsext\-\_\-sigalg\-\_\-rsa}}
+\index{tlsext\-\_\-sigalg\-\_\-rsa@{tlsext\-\_\-sigalg\-\_\-rsa}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{tlsext\-\_\-sigalg\-\_\-rsa}]{\setlength{\rightskip}{0pt plus 5cm}\#define tlsext\-\_\-sigalg\-\_\-rsa(
+\begin{DoxyParamCaption}
+\item[{}]{md}
+\end{DoxyParamCaption}
+)~md, {\bf T\-L\-S\-E\-X\-T\-\_\-signature\-\_\-rsa},}}\label{t1__lib_8c_afc9ba9cd71e8d52d828d0366a2e54227}
+
+
+\subsection{Function Documentation}
+\hypertarget{t1__lib_8c_a34971ae8cd26cf0b2a37a597d4578d57}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!ssl\-\_\-add\-\_\-clienthello\-\_\-tlsext@{ssl\-\_\-add\-\_\-clienthello\-\_\-tlsext}}
+\index{ssl\-\_\-add\-\_\-clienthello\-\_\-tlsext@{ssl\-\_\-add\-\_\-clienthello\-\_\-tlsext}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{ssl\-\_\-add\-\_\-clienthello\-\_\-tlsext}]{\setlength{\rightskip}{0pt plus 5cm}unsigned char$\ast$ ssl\-\_\-add\-\_\-clienthello\-\_\-tlsext (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s, }
+\item[{unsigned char $\ast$}]{buf, }
+\item[{unsigned char $\ast$}]{limit}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_a34971ae8cd26cf0b2a37a597d4578d57}
+\hypertarget{t1__lib_8c_a2f07df66b7799fbfa9597d6b5802d55b}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!ssl\-\_\-add\-\_\-serverhello\-\_\-tlsext@{ssl\-\_\-add\-\_\-serverhello\-\_\-tlsext}}
+\index{ssl\-\_\-add\-\_\-serverhello\-\_\-tlsext@{ssl\-\_\-add\-\_\-serverhello\-\_\-tlsext}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{ssl\-\_\-add\-\_\-serverhello\-\_\-tlsext}]{\setlength{\rightskip}{0pt plus 5cm}unsigned char$\ast$ ssl\-\_\-add\-\_\-serverhello\-\_\-tlsext (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s, }
+\item[{unsigned char $\ast$}]{buf, }
+\item[{unsigned char $\ast$}]{limit}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_a2f07df66b7799fbfa9597d6b5802d55b}
+\hypertarget{t1__lib_8c_ad69cf662e7606dd30e600dd0a617219e}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!ssl\-\_\-check\-\_\-clienthello\-\_\-tlsext\-\_\-early@{ssl\-\_\-check\-\_\-clienthello\-\_\-tlsext\-\_\-early}}
+\index{ssl\-\_\-check\-\_\-clienthello\-\_\-tlsext\-\_\-early@{ssl\-\_\-check\-\_\-clienthello\-\_\-tlsext\-\_\-early}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{ssl\-\_\-check\-\_\-clienthello\-\_\-tlsext\-\_\-early}]{\setlength{\rightskip}{0pt plus 5cm}int ssl\-\_\-check\-\_\-clienthello\-\_\-tlsext\-\_\-early (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_ad69cf662e7606dd30e600dd0a617219e}
+\hypertarget{t1__lib_8c_a4878fbb2c28459aa70c4142275150c71}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!ssl\-\_\-check\-\_\-clienthello\-\_\-tlsext\-\_\-late@{ssl\-\_\-check\-\_\-clienthello\-\_\-tlsext\-\_\-late}}
+\index{ssl\-\_\-check\-\_\-clienthello\-\_\-tlsext\-\_\-late@{ssl\-\_\-check\-\_\-clienthello\-\_\-tlsext\-\_\-late}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{ssl\-\_\-check\-\_\-clienthello\-\_\-tlsext\-\_\-late}]{\setlength{\rightskip}{0pt plus 5cm}int ssl\-\_\-check\-\_\-clienthello\-\_\-tlsext\-\_\-late (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_a4878fbb2c28459aa70c4142275150c71}
+\hypertarget{t1__lib_8c_a4b4118b4265012f6251f83c37845fd2f}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!ssl\-\_\-check\-\_\-serverhello\-\_\-tlsext@{ssl\-\_\-check\-\_\-serverhello\-\_\-tlsext}}
+\index{ssl\-\_\-check\-\_\-serverhello\-\_\-tlsext@{ssl\-\_\-check\-\_\-serverhello\-\_\-tlsext}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{ssl\-\_\-check\-\_\-serverhello\-\_\-tlsext}]{\setlength{\rightskip}{0pt plus 5cm}int ssl\-\_\-check\-\_\-serverhello\-\_\-tlsext (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_a4b4118b4265012f6251f83c37845fd2f}
+\hypertarget{t1__lib_8c_a1b67382af4271126be642c27ea32e774}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!ssl\-\_\-parse\-\_\-clienthello\-\_\-tlsext@{ssl\-\_\-parse\-\_\-clienthello\-\_\-tlsext}}
+\index{ssl\-\_\-parse\-\_\-clienthello\-\_\-tlsext@{ssl\-\_\-parse\-\_\-clienthello\-\_\-tlsext}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{ssl\-\_\-parse\-\_\-clienthello\-\_\-tlsext}]{\setlength{\rightskip}{0pt plus 5cm}int ssl\-\_\-parse\-\_\-clienthello\-\_\-tlsext (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s, }
+\item[{unsigned char $\ast$$\ast$}]{p, }
+\item[{unsigned char $\ast$}]{d, }
+\item[{int}]{n, }
+\item[{int $\ast$}]{al}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_a1b67382af4271126be642c27ea32e774}
+\hypertarget{t1__lib_8c_ae36ff53aabeec16f0ce4a4e848fc6263}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!ssl\-\_\-parse\-\_\-serverhello\-\_\-tlsext@{ssl\-\_\-parse\-\_\-serverhello\-\_\-tlsext}}
+\index{ssl\-\_\-parse\-\_\-serverhello\-\_\-tlsext@{ssl\-\_\-parse\-\_\-serverhello\-\_\-tlsext}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{ssl\-\_\-parse\-\_\-serverhello\-\_\-tlsext}]{\setlength{\rightskip}{0pt plus 5cm}int ssl\-\_\-parse\-\_\-serverhello\-\_\-tlsext (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s, }
+\item[{unsigned char $\ast$$\ast$}]{p, }
+\item[{unsigned char $\ast$}]{d, }
+\item[{int}]{n, }
+\item[{int $\ast$}]{al}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_ae36ff53aabeec16f0ce4a4e848fc6263}
+\hypertarget{t1__lib_8c_a6170a24801e563dc84e6f2f6b4ed7839}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!ssl\-\_\-prepare\-\_\-clienthello\-\_\-tlsext@{ssl\-\_\-prepare\-\_\-clienthello\-\_\-tlsext}}
+\index{ssl\-\_\-prepare\-\_\-clienthello\-\_\-tlsext@{ssl\-\_\-prepare\-\_\-clienthello\-\_\-tlsext}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{ssl\-\_\-prepare\-\_\-clienthello\-\_\-tlsext}]{\setlength{\rightskip}{0pt plus 5cm}int ssl\-\_\-prepare\-\_\-clienthello\-\_\-tlsext (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_a6170a24801e563dc84e6f2f6b4ed7839}
+\hypertarget{t1__lib_8c_abe4a9c7a280a7ecc6f704b81ec488416}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!ssl\-\_\-prepare\-\_\-serverhello\-\_\-tlsext@{ssl\-\_\-prepare\-\_\-serverhello\-\_\-tlsext}}
+\index{ssl\-\_\-prepare\-\_\-serverhello\-\_\-tlsext@{ssl\-\_\-prepare\-\_\-serverhello\-\_\-tlsext}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{ssl\-\_\-prepare\-\_\-serverhello\-\_\-tlsext}]{\setlength{\rightskip}{0pt plus 5cm}int ssl\-\_\-prepare\-\_\-serverhello\-\_\-tlsext (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_abe4a9c7a280a7ecc6f704b81ec488416}
+\hypertarget{t1__lib_8c_a2e2ef9c2b24a0367a2ec0a9ddd1bb157}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!tls12\-\_\-get\-\_\-hash@{tls12\-\_\-get\-\_\-hash}}
+\index{tls12\-\_\-get\-\_\-hash@{tls12\-\_\-get\-\_\-hash}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{tls12\-\_\-get\-\_\-hash}]{\setlength{\rightskip}{0pt plus 5cm}const E\-V\-P\-\_\-\-M\-D$\ast$ tls12\-\_\-get\-\_\-hash (
+\begin{DoxyParamCaption}
+\item[{unsigned char}]{hash\-\_\-alg}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_a2e2ef9c2b24a0367a2ec0a9ddd1bb157}
+\hypertarget{t1__lib_8c_ae97f1646d5bf6640bd93328fddf88ad5}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!tls12\-\_\-get\-\_\-req\-\_\-sig\-\_\-algs@{tls12\-\_\-get\-\_\-req\-\_\-sig\-\_\-algs}}
+\index{tls12\-\_\-get\-\_\-req\-\_\-sig\-\_\-algs@{tls12\-\_\-get\-\_\-req\-\_\-sig\-\_\-algs}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{tls12\-\_\-get\-\_\-req\-\_\-sig\-\_\-algs}]{\setlength{\rightskip}{0pt plus 5cm}int tls12\-\_\-get\-\_\-req\-\_\-sig\-\_\-algs (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s, }
+\item[{unsigned char $\ast$}]{p}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_ae97f1646d5bf6640bd93328fddf88ad5}
+\hypertarget{t1__lib_8c_a9786b1e22a7e176e1b327f7b7ca00074}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!tls12\-\_\-get\-\_\-sigandhash@{tls12\-\_\-get\-\_\-sigandhash}}
+\index{tls12\-\_\-get\-\_\-sigandhash@{tls12\-\_\-get\-\_\-sigandhash}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{tls12\-\_\-get\-\_\-sigandhash}]{\setlength{\rightskip}{0pt plus 5cm}int tls12\-\_\-get\-\_\-sigandhash (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$}]{p, }
+\item[{const E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{pk, }
+\item[{const E\-V\-P\-\_\-\-M\-D $\ast$}]{md}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_a9786b1e22a7e176e1b327f7b7ca00074}
+\hypertarget{t1__lib_8c_a9f965623013df5900494cbb6dc311603}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!tls12\-\_\-get\-\_\-sigid@{tls12\-\_\-get\-\_\-sigid}}
+\index{tls12\-\_\-get\-\_\-sigid@{tls12\-\_\-get\-\_\-sigid}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{tls12\-\_\-get\-\_\-sigid}]{\setlength{\rightskip}{0pt plus 5cm}int tls12\-\_\-get\-\_\-sigid (
+\begin{DoxyParamCaption}
+\item[{const E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{pk}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_a9f965623013df5900494cbb6dc311603}
+\hypertarget{t1__lib_8c_a5198c9fac50bc91fb7bd650c3eea0663}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!tls1\-\_\-clear@{tls1\-\_\-clear}}
+\index{tls1\-\_\-clear@{tls1\-\_\-clear}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{tls1\-\_\-clear}]{\setlength{\rightskip}{0pt plus 5cm}void tls1\-\_\-clear (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_a5198c9fac50bc91fb7bd650c3eea0663}
+\hypertarget{t1__lib_8c_aa87bc269413ac02c26837676c6228709}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!tls1\-\_\-default\-\_\-timeout@{tls1\-\_\-default\-\_\-timeout}}
+\index{tls1\-\_\-default\-\_\-timeout@{tls1\-\_\-default\-\_\-timeout}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{tls1\-\_\-default\-\_\-timeout}]{\setlength{\rightskip}{0pt plus 5cm}long tls1\-\_\-default\-\_\-timeout (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_aa87bc269413ac02c26837676c6228709}
+\hypertarget{t1__lib_8c_a26bae754b7d7a456436441b8191da112}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!tls1\-\_\-ec\-\_\-curve\-\_\-id2nid@{tls1\-\_\-ec\-\_\-curve\-\_\-id2nid}}
+\index{tls1\-\_\-ec\-\_\-curve\-\_\-id2nid@{tls1\-\_\-ec\-\_\-curve\-\_\-id2nid}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{tls1\-\_\-ec\-\_\-curve\-\_\-id2nid}]{\setlength{\rightskip}{0pt plus 5cm}int tls1\-\_\-ec\-\_\-curve\-\_\-id2nid (
+\begin{DoxyParamCaption}
+\item[{int}]{curve\-\_\-id}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_a26bae754b7d7a456436441b8191da112}
+\hypertarget{t1__lib_8c_ababb650e1808fbe183e709052314b63c}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!tls1\-\_\-ec\-\_\-nid2curve\-\_\-id@{tls1\-\_\-ec\-\_\-nid2curve\-\_\-id}}
+\index{tls1\-\_\-ec\-\_\-nid2curve\-\_\-id@{tls1\-\_\-ec\-\_\-nid2curve\-\_\-id}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{tls1\-\_\-ec\-\_\-nid2curve\-\_\-id}]{\setlength{\rightskip}{0pt plus 5cm}int tls1\-\_\-ec\-\_\-nid2curve\-\_\-id (
+\begin{DoxyParamCaption}
+\item[{int}]{nid}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_ababb650e1808fbe183e709052314b63c}
+\hypertarget{t1__lib_8c_aec33e68ae6607f6f54f30deea957d848}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!tls1\-\_\-free@{tls1\-\_\-free}}
+\index{tls1\-\_\-free@{tls1\-\_\-free}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{tls1\-\_\-free}]{\setlength{\rightskip}{0pt plus 5cm}void tls1\-\_\-free (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_aec33e68ae6607f6f54f30deea957d848}
+\hypertarget{t1__lib_8c_a589c9d658c6189ca1f1f7eb5bcaef24d}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!tls1\-\_\-heartbeat@{tls1\-\_\-heartbeat}}
+\index{tls1\-\_\-heartbeat@{tls1\-\_\-heartbeat}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{tls1\-\_\-heartbeat}]{\setlength{\rightskip}{0pt plus 5cm}int tls1\-\_\-heartbeat (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_a589c9d658c6189ca1f1f7eb5bcaef24d}
+\hypertarget{t1__lib_8c_ab08aa7fd9569bf49e4f3b9c13ba53666}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!tls1\-\_\-new@{tls1\-\_\-new}}
+\index{tls1\-\_\-new@{tls1\-\_\-new}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{tls1\-\_\-new}]{\setlength{\rightskip}{0pt plus 5cm}int tls1\-\_\-new (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_ab08aa7fd9569bf49e4f3b9c13ba53666}
+\hypertarget{t1__lib_8c_a175c4350583ffa59d724ec5379633a12}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!tls1\-\_\-process\-\_\-heartbeat@{tls1\-\_\-process\-\_\-heartbeat}}
+\index{tls1\-\_\-process\-\_\-heartbeat@{tls1\-\_\-process\-\_\-heartbeat}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{tls1\-\_\-process\-\_\-heartbeat}]{\setlength{\rightskip}{0pt plus 5cm}int tls1\-\_\-process\-\_\-heartbeat (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_a175c4350583ffa59d724ec5379633a12}
+\hypertarget{t1__lib_8c_a53dec0b010c408c4e0d6d5c17ddfee1d}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!tls1\-\_\-process\-\_\-sigalgs@{tls1\-\_\-process\-\_\-sigalgs}}
+\index{tls1\-\_\-process\-\_\-sigalgs@{tls1\-\_\-process\-\_\-sigalgs}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{tls1\-\_\-process\-\_\-sigalgs}]{\setlength{\rightskip}{0pt plus 5cm}int tls1\-\_\-process\-\_\-sigalgs (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s, }
+\item[{const unsigned char $\ast$}]{data, }
+\item[{int}]{dsize}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_a53dec0b010c408c4e0d6d5c17ddfee1d}
+\hypertarget{t1__lib_8c_a18d687abe44477c2301bc1b5c50fe0fe}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!tls1\-\_\-process\-\_\-ticket@{tls1\-\_\-process\-\_\-ticket}}
+\index{tls1\-\_\-process\-\_\-ticket@{tls1\-\_\-process\-\_\-ticket}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{tls1\-\_\-process\-\_\-ticket}]{\setlength{\rightskip}{0pt plus 5cm}int tls1\-\_\-process\-\_\-ticket (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s, }
+\item[{unsigned char $\ast$}]{session\-\_\-id, }
+\item[{int}]{len, }
+\item[{const unsigned char $\ast$}]{limit, }
+\item[{{\bf S\-S\-L\-\_\-\-S\-E\-S\-S\-I\-O\-N} $\ast$$\ast$}]{ret}
+\end{DoxyParamCaption}
+)}}\label{t1__lib_8c_a18d687abe44477c2301bc1b5c50fe0fe}
+
+
+\subsection{Variable Documentation}
+\hypertarget{t1__lib_8c_a0212c5ddd861a73bf0482ec93a7e75f7}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!tls1\-\_\-version\-\_\-str@{tls1\-\_\-version\-\_\-str}}
+\index{tls1\-\_\-version\-\_\-str@{tls1\-\_\-version\-\_\-str}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{tls1\-\_\-version\-\_\-str}]{\setlength{\rightskip}{0pt plus 5cm}const char tls1\-\_\-version\-\_\-str\mbox{[}$\,$\mbox{]} =\char`\"{}T\-L\-Sv1\char`\"{} O\-P\-E\-N\-S\-S\-L\-\_\-\-V\-E\-R\-S\-I\-O\-N\-\_\-\-P\-T\-E\-X\-T}}\label{t1__lib_8c_a0212c5ddd861a73bf0482ec93a7e75f7}
+\hypertarget{t1__lib_8c_a10582cff96c4f3337cc7e3c8a8cab2e4}{\index{t1\-\_\-lib.\-c@{t1\-\_\-lib.\-c}!T\-L\-Sv1\-\_\-enc\-\_\-data@{T\-L\-Sv1\-\_\-enc\-\_\-data}}
+\index{T\-L\-Sv1\-\_\-enc\-\_\-data@{T\-L\-Sv1\-\_\-enc\-\_\-data}!t1_lib.c@{t1\-\_\-lib.\-c}}
+\subsubsection[{T\-L\-Sv1\-\_\-enc\-\_\-data}]{\setlength{\rightskip}{0pt plus 5cm}{\bf S\-S\-L3\-\_\-\-E\-N\-C\-\_\-\-M\-E\-T\-H\-O\-D} T\-L\-Sv1\-\_\-enc\-\_\-data}}\label{t1__lib_8c_a10582cff96c4f3337cc7e3c8a8cab2e4}
+{\bfseries Initial value\-:}
+\begin{DoxyCode}
+=\{
+    \hyperlink{ssl__locl_8h_a4cf85664c973f68577239d043474d6da}{tls1\_enc},
+    \hyperlink{ssl__locl_8h_a0de99be7558527b1c06eac0ee6a1a31c}{tls1\_mac},
+    \hyperlink{ssl__locl_8h_a0dedb1399eb849a5775ed8f9edec8456}{tls1\_setup\_key\_block},
+    \hyperlink{ssl__locl_8h_a9fda421a05b6a9c1550b79995603103e}{tls1\_generate\_master\_secret},
+    \hyperlink{ssl__locl_8h_ac38b102ba5ad246c20965831fc0a9a0e}{tls1\_change\_cipher\_state},
+    \hyperlink{ssl__locl_8h_abda1fefc77b5c31ba56ac9f3bf89fc26}{tls1\_final\_finish\_mac},
+    \hyperlink{tls1_8h_a814a1c12bdaa9e672e6ace7d17c103ca}{TLS1\_FINISH\_MAC\_LENGTH},
+    \hyperlink{ssl__locl_8h_a01ae857dd9924c28e426d02c0efc4470}{tls1\_cert\_verify\_mac},
+    \hyperlink{tls1_8h_a691890d0587fd27377504a1161c095ea}{TLS\_MD\_CLIENT\_FINISH\_CONST},
+      \hyperlink{tls1_8h_af1841f9ee24898c13a76f273d0559e27}{TLS\_MD\_CLIENT\_FINISH\_CONST\_SIZE},
+    \hyperlink{tls1_8h_a7e8b64b3a7a1355ef362357fe0927a4f}{TLS\_MD\_SERVER\_FINISH\_CONST},
+      \hyperlink{tls1_8h_a8395f8f2b15887a3f3ccde324e58b74d}{TLS\_MD\_SERVER\_FINISH\_CONST\_SIZE},
+    \hyperlink{ssl__locl_8h_a44b1525e9206e91ab543ae295f5054c3}{tls1\_alert\_code},
+    \hyperlink{ssl__locl_8h_a17747e65671b3a8a3eaa29a9529cb624}{tls1\_export\_keying\_material},
+    \}
+\end{DoxyCode}

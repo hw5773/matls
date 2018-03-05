@@ -1,0 +1,32 @@
+digraph "ssl_st"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="ssl_st",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node2 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" tls_session_secret_cb" ];
+  Node2 [label="ssl_cipher_st",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structssl__cipher__st.html"];
+  Node3 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" srp_ctx" ];
+  Node3 [label="srp_ctx_st",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structsrp__ctx__st.html"];
+  Node4 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" session" ];
+  Node4 [label="ssl_session_st",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structssl__session__st.html"];
+  Node2 -> Node4 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" cipher" ];
+  Node4 -> Node4 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" prev\nnext" ];
+  Node5 -> Node4 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" sess_orig_cert\nsess_cert" ];
+  Node5 [label="sess_cert_st",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structsess__cert__st.html"];
+  Node6 -> Node5 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" peer_key\npeer_pkeys" ];
+  Node6 [label="cert_pkey_st",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structcert__pkey__st.html"];
+  Node7 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" srtp_profile" ];
+  Node7 [label="srtp_protection_profile_st",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structsrtp__protection__profile__st.html"];
+  Node8 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" cert\norig_cert" ];
+  Node8 [label="cert_st",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structcert__st.html"];
+  Node6 -> Node8 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" key\npkeys" ];
+  Node9 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" method" ];
+  Node9 [label="ssl_method_st",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structssl__method__st.html"];
+  Node10 -> Node9 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" ssl3_enc" ];
+  Node10 [label="ssl3_enc_method",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structssl3__enc__method.html"];
+  Node2 -> Node9 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" get_cipher\nget_cipher_by_char" ];
+  Node9 -> Node9 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" get_ssl_method" ];
+  Node11 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" tlsext_session_ticket" ];
+  Node11 [label="tls_session_ticket\l_ext_st",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structtls__session__ticket__ext__st.html"];
+}

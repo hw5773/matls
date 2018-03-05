@@ -1,0 +1,10 @@
+digraph "record/record.h"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="record/record.h",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node2 [label="record/record.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$record_8c.html",tooltip="This file is to implement the functions to manipulate the modification record. "];
+  Node1 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node3 [label="record/test_record.c",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$test__record_8c.html",tooltip="This file is a test application for the modification record. "];
+}

@@ -19,7 +19,7 @@
 #include <sys/socket.h>
 #include <sys/queue.h>
 
-#define DEFAULT_MAC_LENGTH 16
+#include "prf.h"
 
 /**
  * @brief Data structure for global MAC
@@ -43,7 +43,7 @@ typedef struct modification_record
 int init_record(MOD_RECORD **mr, int len);  /**< Initialize the modification record */
 int free_record(MOD_RECORD *mr);            /**< Destruct the modification record */
 
-int add_endpoint_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *msg, int mlen, unsigned char *key, int klen);
+int add_source_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *msg, int mlen, unsigned char *key, int klen);
 int add_global_mac(unsigned char *record, int rec_len, unsigned char *id, int id_len, unsigned char *mac_key, int mk_len, unsigned char *prev, int prev_len, unsigned char *next, int next_len);
 int verify_record();
 

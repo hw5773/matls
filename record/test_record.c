@@ -6,21 +6,31 @@
  */
 
 #include "record.h"
+#include "logs.h"
 
 int main(int argc, char *argv[])
 {
   MOD_RECORD *mr;
   unsigned char *msg = "test message";
   int mlen = strlen(msg);
+  int i;
 
-  APP_LOG1d("message length", msg_length);
+  APP_LOG1d("message length", mlen);
 
   SECURITY_PARAMS sp;
+  sp.hash_function = EVP_sha256();
+  sp.hash_length = SHA256_DIGEST_LENGTH;
+  sp.key_length = DEFAULT_KEY_LENGTH;
   sp.mac_length = DEFAULT_MAC_LENGTH;
+
+  unsigned char secret[sp.key_length];
+
+  for (i=0; i<sp.key_length; i++)
+    secret[i] = i;
 
   init_record(&mr, sp.mac_length);
 
-  add_endpoint_mac(&sp, mr, msg, mlen, key, klen);
+  add_source_mac(&sp, mr, msg, mlen, secret, sp.key_length);
 
   free_record(mr);
   return 0;

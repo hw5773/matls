@@ -13,12 +13,26 @@
 #include <openssl/err.h>
 #include <sys/time.h>
 #include <sys/socket.h>
+#include <sys/queue.h>
 
-struct record
+struct security_parameters
 {
-
+  int mac_length;
 };
 
-int init_record();
-int add_record(unsigned char *record, int rec_len, unsigned char *id, int id_len, unsigned char *mac_key, int mk_len, unsigned char *prev, int prev_len, unsigned char *next, int next_len);
-int verify_block();
+struct entry
+{
+  unsigned char *writer;
+  unsigned char *prior_msg_hash;
+  unsigned char *modification_hash;
+};
+
+struct modification_record
+{
+  unsigned char *endpoint_mac;
+  TAILQ_ENTRY(entry) global_macs;
+};
+
+int init_mr();
+int add_global_mac(unsigned char *record, int rec_len, unsigned char *id, int id_len, unsigned char *mac_key, int mk_len, unsigned char *prev, int prev_len, unsigned char *next, int next_len);
+int verify_mr();

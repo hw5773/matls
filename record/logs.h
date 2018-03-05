@@ -35,12 +35,6 @@ int idx;
 #define APP_LOG2s(msg, arg1, arg2)
 #endif /* DEBUG */
 
-unsigned long get_current_microseconds()
-{
-  struct timeval curr;
-  gettimeofday(&curr, NULL);
-
-  return curr.tv_sec * 1000000 + curr.tv_usec;
-}
+unsigned long get_current_microseconds();
 
 #endif /* __LOGS_H__ */

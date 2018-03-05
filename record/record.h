@@ -6,7 +6,11 @@
  * chain
  */
 
+#ifndef __RECORD_H__
+#define __RECORD_H__
+
 #include <stdio.h>
+#include <string.h>
 #include <errno.h>
 #include <unistd.h>
 #include <openssl/ssl.h>
@@ -15,24 +19,26 @@
 #include <sys/socket.h>
 #include <sys/queue.h>
 
-struct security_parameters
-{
-  int mac_length;
-};
+#define DEFAULT_MAC_LENGTH 16
 
 struct entry
 {
-  unsigned char *writer;
-  unsigned char *prior_msg_hash;
-  unsigned char *modification_hash;
+  unsigned char *writer;                    /**< The writer who modifies the message */
+  unsigned char *prior_msg_hash;            /**< The prior message which is modified */
+  unsigned char *modification_hash;         /**< The hash value which shows the modification */
 };
 
-struct modification_record
+typedef struct modification_record
 {
-  unsigned char *endpoint_mac;
-  TAILQ_ENTRY(entry) global_macs;
-};
+  unsigned char *endpoint_mac;              /**< Endpoint MAC */
+  TAILQ_HEAD(,entry) global_macs_head;      /**< Modification Record, a series of global MACs */
+} MOD_RECORD;
 
-int init_mr();
+int init_record(MOD_RECORD **mr, int len);  /**< Initialize the modification record */
+int free_record(MOD_RECORD *mr);            /**< Destruct the modification record */
+
+int add_endpoint_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *msg, int mlen, unsigned char *key, int klen);
 int add_global_mac(unsigned char *record, int rec_len, unsigned char *id, int id_len, unsigned char *mac_key, int mk_len, unsigned char *prev, int prev_len, unsigned char *next, int next_len);
-int verify_mr();
+int verify_record();
+
+#endif /* __RECORD_H__ */

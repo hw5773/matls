@@ -44,7 +44,7 @@ long \hyperlink{structssl__ctx__st_a7b165f0e9fbde0499dedb660cdf0d756}{session\-\
 \item 
 int($\ast$ \hyperlink{structssl__ctx__st_ad25375ee230e8a9dafda44d9c9bcb102}{new\-\_\-session\-\_\-cb} )(struct \hyperlink{structssl__st}{ssl\-\_\-st} $\ast$ssl, \hyperlink{ssl_8h_a8dd6b81bbcb1b2d769235c37779d2a94}{S\-S\-L\-\_\-\-S\-E\-S\-S\-I\-O\-N} $\ast$sess)
 \item 
-void($\ast$ \hyperlink{structssl__ctx__st_a82fef836aeedd6eabb09c4443f8897de}{remove\-\_\-session\-\_\-cb} )(struct \hyperlink{structssl__ctx__st}{ssl\-\_\-ctx\-\_\-st} $\ast$ctx, \hyperlink{ssl_8h_a8dd6b81bbcb1b2d769235c37779d2a94}{S\-S\-L\-\_\-\-S\-E\-S\-S\-I\-O\-N} $\ast$sess)
+void($\ast$ \hyperlink{structssl__ctx__st_a82fef836aeedd6eabb09c4443f8897de}{remove\-\_\-session\-\_\-cb} )(struct \hyperlink{structssl__ctx__st}{ssl\-\_\-ctx\-\_\-st} $\ast$\hyperlink{client_8c_ad5433bcc8a463fb4df3ce5912bb11fe3}{ctx}, \hyperlink{ssl_8h_a8dd6b81bbcb1b2d769235c37779d2a94}{S\-S\-L\-\_\-\-S\-E\-S\-S\-I\-O\-N} $\ast$sess)
 \item 
 \hyperlink{ssl_8h_a8dd6b81bbcb1b2d769235c37779d2a94}{S\-S\-L\-\_\-\-S\-E\-S\-S\-I\-O\-N} $\ast$($\ast$ \hyperlink{structssl__ctx__st_a5c21087395cba272416cde57785ba09b}{get\-\_\-session\-\_\-cb} )(struct \hyperlink{structssl__st}{ssl\-\_\-st} $\ast$ssl, unsigned char $\ast$data, int len, int $\ast$copy)
 \item 
@@ -111,7 +111,7 @@ unsigned int \hyperlink{structssl__ctx__st_a59afab8285fbc901d590ab6edaa75bd0}{si
 \item 
 unsigned char \hyperlink{structssl__ctx__st_a92f94c2a4612e04ec3c075c76aae5553}{sid\-\_\-ctx} \mbox{[}\hyperlink{ssl_8h_a5cef804495c6414283f4f29d4cea0dd0}{S\-S\-L\-\_\-\-M\-A\-X\-\_\-\-S\-I\-D\-\_\-\-C\-T\-X\-\_\-\-L\-E\-N\-G\-T\-H}\mbox{]}
 \item 
-int($\ast$ \hyperlink{structssl__ctx__st_a60a59026ec7843603b54dbda1d46ba10}{default\-\_\-verify\-\_\-callback} )(int ok, X509\-\_\-\-S\-T\-O\-R\-E\-\_\-\-C\-T\-X $\ast$ctx)
+int($\ast$ \hyperlink{structssl__ctx__st_a60a59026ec7843603b54dbda1d46ba10}{default\-\_\-verify\-\_\-callback} )(int ok, X509\-\_\-\-S\-T\-O\-R\-E\-\_\-\-C\-T\-X $\ast$\hyperlink{client_8c_ad5433bcc8a463fb4df3ce5912bb11fe3}{ctx})
 \item 
 \hyperlink{ssl_8h_aa01dfe50fd8d7cc799cad6bcf13ccfbe}{G\-E\-N\-\_\-\-S\-E\-S\-S\-I\-O\-N\-\_\-\-C\-B} \hyperlink{structssl__ctx__st_a4485f799f50830d69fa26e7514b032dc}{generate\-\_\-session\-\_\-id}
 \item 
@@ -278,7 +278,7 @@ unsigned char \hyperlink{structssl__ctx__st_abc0c02aa09e6c749fe5728ef22860dba}{m
 \subsubsection[{default\-\_\-passwd\-\_\-callback\-\_\-userdata}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ ssl\-\_\-ctx\-\_\-st\-::default\-\_\-passwd\-\_\-callback\-\_\-userdata}}\label{structssl__ctx__st_a66ba3cb88f01250883fd336791b354b2}
 \hypertarget{structssl__ctx__st_a60a59026ec7843603b54dbda1d46ba10}{\index{ssl\-\_\-ctx\-\_\-st@{ssl\-\_\-ctx\-\_\-st}!default\-\_\-verify\-\_\-callback@{default\-\_\-verify\-\_\-callback}}
 \index{default\-\_\-verify\-\_\-callback@{default\-\_\-verify\-\_\-callback}!ssl_ctx_st@{ssl\-\_\-ctx\-\_\-st}}
-\subsubsection[{default\-\_\-verify\-\_\-callback}]{\setlength{\rightskip}{0pt plus 5cm}int($\ast$ ssl\-\_\-ctx\-\_\-st\-::default\-\_\-verify\-\_\-callback)(int ok, X509\-\_\-\-S\-T\-O\-R\-E\-\_\-\-C\-T\-X $\ast$ctx)}}\label{structssl__ctx__st_a60a59026ec7843603b54dbda1d46ba10}
+\subsubsection[{default\-\_\-verify\-\_\-callback}]{\setlength{\rightskip}{0pt plus 5cm}int($\ast$ ssl\-\_\-ctx\-\_\-st\-::default\-\_\-verify\-\_\-callback)(int ok, X509\-\_\-\-S\-T\-O\-R\-E\-\_\-\-C\-T\-X $\ast${\bf ctx})}}\label{structssl__ctx__st_a60a59026ec7843603b54dbda1d46ba10}
 \hypertarget{structssl__ctx__st_a1d095f8b08699e049cdce9a00b379b73}{\index{ssl\-\_\-ctx\-\_\-st@{ssl\-\_\-ctx\-\_\-st}!edge\-\_\-cert\-\_\-path@{edge\-\_\-cert\-\_\-path}}
 \index{edge\-\_\-cert\-\_\-path@{edge\-\_\-cert\-\_\-path}!ssl_ctx_st@{ssl\-\_\-ctx\-\_\-st}}
 \subsubsection[{edge\-\_\-cert\-\_\-path}]{\setlength{\rightskip}{0pt plus 5cm}unsigned char$\ast$ ssl\-\_\-ctx\-\_\-st\-::edge\-\_\-cert\-\_\-path}}\label{structssl__ctx__st_a1d095f8b08699e049cdce9a00b379b73}
@@ -380,7 +380,7 @@ unsigned char \hyperlink{structssl__ctx__st_abc0c02aa09e6c749fe5728ef22860dba}{m
 \subsubsection[{references}]{\setlength{\rightskip}{0pt plus 5cm}int ssl\-\_\-ctx\-\_\-st\-::references}}\label{structssl__ctx__st_aaefa58bdf5771d0ae34e05dbc372f6c3}
 \hypertarget{structssl__ctx__st_a82fef836aeedd6eabb09c4443f8897de}{\index{ssl\-\_\-ctx\-\_\-st@{ssl\-\_\-ctx\-\_\-st}!remove\-\_\-session\-\_\-cb@{remove\-\_\-session\-\_\-cb}}
 \index{remove\-\_\-session\-\_\-cb@{remove\-\_\-session\-\_\-cb}!ssl_ctx_st@{ssl\-\_\-ctx\-\_\-st}}
-\subsubsection[{remove\-\_\-session\-\_\-cb}]{\setlength{\rightskip}{0pt plus 5cm}void($\ast$ ssl\-\_\-ctx\-\_\-st\-::remove\-\_\-session\-\_\-cb)(struct {\bf ssl\-\_\-ctx\-\_\-st} $\ast$ctx, {\bf S\-S\-L\-\_\-\-S\-E\-S\-S\-I\-O\-N} $\ast$sess)}}\label{structssl__ctx__st_a82fef836aeedd6eabb09c4443f8897de}
+\subsubsection[{remove\-\_\-session\-\_\-cb}]{\setlength{\rightskip}{0pt plus 5cm}void($\ast$ ssl\-\_\-ctx\-\_\-st\-::remove\-\_\-session\-\_\-cb)(struct {\bf ssl\-\_\-ctx\-\_\-st} $\ast${\bf ctx}, {\bf S\-S\-L\-\_\-\-S\-E\-S\-S\-I\-O\-N} $\ast$sess)}}\label{structssl__ctx__st_a82fef836aeedd6eabb09c4443f8897de}
 \hypertarget{structssl__ctx__st_a297d3bf2019076959d84c41a41e7ac3b}{\index{ssl\-\_\-ctx\-\_\-st@{ssl\-\_\-ctx\-\_\-st}!rsa\-\_\-md5@{rsa\-\_\-md5}}
 \index{rsa\-\_\-md5@{rsa\-\_\-md5}!ssl_ctx_st@{ssl\-\_\-ctx\-\_\-st}}
 \subsubsection[{rsa\-\_\-md5}]{\setlength{\rightskip}{0pt plus 5cm}const E\-V\-P\-\_\-\-M\-D$\ast$ ssl\-\_\-ctx\-\_\-st\-::rsa\-\_\-md5}}\label{structssl__ctx__st_a297d3bf2019076959d84c41a41e7ac3b}

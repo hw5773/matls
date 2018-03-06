@@ -1,6 +1,7 @@
 var searchData=
 [
   ['mac',['mac',['../structssl3__enc__method.html#acb78dd4b89469772b680df62569d9382',1,'ssl3_enc_method']]],
+  ['mac_5falgorithm',['mac_algorithm',['../structsecurity__parameters.html#a86561290bd325ef969a3450ab8868966',1,'security_parameters']]],
   ['mac_5fflags',['mac_flags',['../structssl__st.html#a501b23b52ff9106b5cba654187324d95',1,'ssl_st']]],
   ['mac_5flength',['mac_length',['../structsecurity__parameters.html#ae14edd76dec6b2c7b9a427b892e275d0',1,'security_parameters']]],
   ['mask_5fa',['mask_a',['../structcert__st.html#a1ab05cae13ea94ef862a45f2ced1e5d5',1,'cert_st']]],

@@ -177,7 +177,7 @@ struct \hyperlink{structtls__session__ticket__ext__st}{tls\-\_\-session\-\_\-tic
 \item 
 \#define \hyperlink{tls1_8h_a0c08a21ed809a89ef27b5ae270c65650}{S\-S\-L\-\_\-set\-\_\-tlsext\-\_\-status\-\_\-ocsp\-\_\-resp}(ssl, arg, arglen)~\hyperlink{ssl__lib_8c_ad29159af33fc56076589b7792847ac89}{S\-S\-L\-\_\-ctrl}(ssl,\hyperlink{ssl_8h_a718d45a5778d22fb1a17f0c503b7318b}{S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-S\-T\-A\-T\-U\-S\-\_\-\-R\-E\-Q\-\_\-\-O\-C\-S\-P\-\_\-\-R\-E\-S\-P},arglen, (void $\ast$)arg)
 \item 
-\#define \hyperlink{tls1_8h_a7e3de4915ed0a8d493c206e311b957aa}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-servername\-\_\-callback}(ctx, cb)~\hyperlink{ssl__lib_8c_a48fdeeef457a4f142b92b1b22135a70e}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-callback\-\_\-ctrl}(ctx,\hyperlink{ssl_8h_af0be9dc2962c6f3a6132ef4ae0b73934}{S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-S\-E\-R\-V\-E\-R\-N\-A\-M\-E\-\_\-\-C\-B},(void ($\ast$)(void))cb)
+\#define \hyperlink{tls1_8h_a7e3de4915ed0a8d493c206e311b957aa}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-servername\-\_\-callback}(\hyperlink{client_8c_ad5433bcc8a463fb4df3ce5912bb11fe3}{ctx}, cb)~\hyperlink{ssl__lib_8c_a48fdeeef457a4f142b92b1b22135a70e}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-callback\-\_\-ctrl}(\hyperlink{client_8c_ad5433bcc8a463fb4df3ce5912bb11fe3}{ctx},\hyperlink{ssl_8h_af0be9dc2962c6f3a6132ef4ae0b73934}{S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-S\-E\-R\-V\-E\-R\-N\-A\-M\-E\-\_\-\-C\-B},(void ($\ast$)(void))cb)
 \item 
 \#define \hyperlink{tls1_8h_a3e1b81be404d6d7406d7c68a423cfc66}{S\-S\-L\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-E\-R\-R\-\_\-\-O\-K}~0
 \item 
@@ -187,11 +187,11 @@ struct \hyperlink{structtls__session__ticket__ext__st}{tls\-\_\-session\-\_\-tic
 \item 
 \#define \hyperlink{tls1_8h_a4134e1baca580adc8fc043bf548010bb}{S\-S\-L\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-E\-R\-R\-\_\-\-N\-O\-A\-C\-K}~3
 \item 
-\#define \hyperlink{tls1_8h_af88a71e3988e68b9b348322e7d8af3ea}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-servername\-\_\-arg}(ctx, arg)~\hyperlink{ssl__lib_8c_ae5ac67b1cbbbf45c674c9dda7d1005b2}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-ctrl}(ctx,\hyperlink{ssl_8h_aa8d23b0f52d6487ce799f31ddca16271}{S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-S\-E\-R\-V\-E\-R\-N\-A\-M\-E\-\_\-\-A\-R\-G},0, (void $\ast$)arg)
+\#define \hyperlink{tls1_8h_af88a71e3988e68b9b348322e7d8af3ea}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-servername\-\_\-arg}(\hyperlink{client_8c_ad5433bcc8a463fb4df3ce5912bb11fe3}{ctx}, arg)~\hyperlink{ssl__lib_8c_ae5ac67b1cbbbf45c674c9dda7d1005b2}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-ctrl}(\hyperlink{client_8c_ad5433bcc8a463fb4df3ce5912bb11fe3}{ctx},\hyperlink{ssl_8h_aa8d23b0f52d6487ce799f31ddca16271}{S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-S\-E\-R\-V\-E\-R\-N\-A\-M\-E\-\_\-\-A\-R\-G},0, (void $\ast$)arg)
 \item 
-\#define \hyperlink{tls1_8h_a713492159f2df7f7d13564c6be8b15e8}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-get\-\_\-tlsext\-\_\-ticket\-\_\-keys}(ctx, keys, keylen)~\hyperlink{ssl__lib_8c_ae5ac67b1cbbbf45c674c9dda7d1005b2}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-ctrl}((ctx),\hyperlink{ssl_8h_a3c8749c8230e12c52bad60274b8e141b}{S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-G\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-T\-I\-C\-K\-E\-T\-\_\-\-K\-E\-Y\-S},(keylen),(keys))
+\#define \hyperlink{tls1_8h_a713492159f2df7f7d13564c6be8b15e8}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-get\-\_\-tlsext\-\_\-ticket\-\_\-keys}(\hyperlink{client_8c_ad5433bcc8a463fb4df3ce5912bb11fe3}{ctx}, keys, keylen)~\hyperlink{ssl__lib_8c_ae5ac67b1cbbbf45c674c9dda7d1005b2}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-ctrl}((\hyperlink{client_8c_ad5433bcc8a463fb4df3ce5912bb11fe3}{ctx}),\hyperlink{ssl_8h_a3c8749c8230e12c52bad60274b8e141b}{S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-G\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-T\-I\-C\-K\-E\-T\-\_\-\-K\-E\-Y\-S},(keylen),(keys))
 \item 
-\#define \hyperlink{tls1_8h_ac0efcaab9dabce2e9b1711d7991dd18e}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-ticket\-\_\-keys}(ctx, keys, keylen)~\hyperlink{ssl__lib_8c_ae5ac67b1cbbbf45c674c9dda7d1005b2}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-ctrl}((ctx),\hyperlink{ssl_8h_aab6b7741742c6bb55ae5e8e9ee60a997}{S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-T\-I\-C\-K\-E\-T\-\_\-\-K\-E\-Y\-S},(keylen),(keys))
+\#define \hyperlink{tls1_8h_ac0efcaab9dabce2e9b1711d7991dd18e}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-ticket\-\_\-keys}(\hyperlink{client_8c_ad5433bcc8a463fb4df3ce5912bb11fe3}{ctx}, keys, keylen)~\hyperlink{ssl__lib_8c_ae5ac67b1cbbbf45c674c9dda7d1005b2}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-ctrl}((\hyperlink{client_8c_ad5433bcc8a463fb4df3ce5912bb11fe3}{ctx}),\hyperlink{ssl_8h_aab6b7741742c6bb55ae5e8e9ee60a997}{S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-T\-I\-C\-K\-E\-T\-\_\-\-K\-E\-Y\-S},(keylen),(keys))
 \item 
 \#define \hyperlink{tls1_8h_a3a59614ad5e2102475f157d37bef394e}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-status\-\_\-cb}(ssl, cb)~\hyperlink{ssl__lib_8c_a48fdeeef457a4f142b92b1b22135a70e}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-callback\-\_\-ctrl}(ssl,\hyperlink{ssl_8h_a55694a17fe7d030aa1fec2c547ece6da}{S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-S\-T\-A\-T\-U\-S\-\_\-\-R\-E\-Q\-\_\-\-C\-B},(void ($\ast$)(void))cb)
 \item 
@@ -199,9 +199,9 @@ struct \hyperlink{structtls__session__ticket__ext__st}{tls\-\_\-session\-\_\-tic
 \item 
 \#define \hyperlink{tls1_8h_a1a074b98487513a4ef1215cf5e9eec87}{S\-S\-L\-\_\-set\-\_\-tlsext\-\_\-opaque\-\_\-prf\-\_\-input}(s, src, len)~\hyperlink{ssl__lib_8c_ad29159af33fc56076589b7792847ac89}{S\-S\-L\-\_\-ctrl}(s,\hyperlink{ssl_8h_a26f76c58d9391222f2c99facb8d802a2}{S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-O\-P\-A\-Q\-U\-E\-\_\-\-P\-R\-F\-\_\-\-I\-N\-P\-U\-T}, len, src)
 \item 
-\#define \hyperlink{tls1_8h_a7fc682ea6c509fdbe3e4cdab4bc51f6e}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-opaque\-\_\-prf\-\_\-input\-\_\-callback}(ctx, cb)~\hyperlink{ssl__lib_8c_a48fdeeef457a4f142b92b1b22135a70e}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-callback\-\_\-ctrl}(ctx,\hyperlink{ssl_8h_aa4d96ef3d9123a17d25a5071ed9129cf}{S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-O\-P\-A\-Q\-U\-E\-\_\-\-P\-R\-F\-\_\-\-I\-N\-P\-U\-T\-\_\-\-C\-B}, (void ($\ast$)(void))cb)
+\#define \hyperlink{tls1_8h_a7fc682ea6c509fdbe3e4cdab4bc51f6e}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-opaque\-\_\-prf\-\_\-input\-\_\-callback}(\hyperlink{client_8c_ad5433bcc8a463fb4df3ce5912bb11fe3}{ctx}, cb)~\hyperlink{ssl__lib_8c_a48fdeeef457a4f142b92b1b22135a70e}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-callback\-\_\-ctrl}(\hyperlink{client_8c_ad5433bcc8a463fb4df3ce5912bb11fe3}{ctx},\hyperlink{ssl_8h_aa4d96ef3d9123a17d25a5071ed9129cf}{S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-O\-P\-A\-Q\-U\-E\-\_\-\-P\-R\-F\-\_\-\-I\-N\-P\-U\-T\-\_\-\-C\-B}, (void ($\ast$)(void))cb)
 \item 
-\#define \hyperlink{tls1_8h_adb67e7278fbc10855b382ec1c00005c0}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-opaque\-\_\-prf\-\_\-input\-\_\-callback\-\_\-arg}(ctx, arg)~\hyperlink{ssl__lib_8c_ae5ac67b1cbbbf45c674c9dda7d1005b2}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-ctrl}(ctx,\hyperlink{ssl_8h_a959e12519066a0c603f4d61eada5b0d0}{S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-O\-P\-A\-Q\-U\-E\-\_\-\-P\-R\-F\-\_\-\-I\-N\-P\-U\-T\-\_\-\-C\-B\-\_\-\-A\-R\-G}, 0, arg)
+\#define \hyperlink{tls1_8h_adb67e7278fbc10855b382ec1c00005c0}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-opaque\-\_\-prf\-\_\-input\-\_\-callback\-\_\-arg}(\hyperlink{client_8c_ad5433bcc8a463fb4df3ce5912bb11fe3}{ctx}, arg)~\hyperlink{ssl__lib_8c_ae5ac67b1cbbbf45c674c9dda7d1005b2}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-ctrl}(\hyperlink{client_8c_ad5433bcc8a463fb4df3ce5912bb11fe3}{ctx},\hyperlink{ssl_8h_a959e12519066a0c603f4d61eada5b0d0}{S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-O\-P\-A\-Q\-U\-E\-\_\-\-P\-R\-F\-\_\-\-I\-N\-P\-U\-T\-\_\-\-C\-B\-\_\-\-A\-R\-G}, 0, arg)
 \item 
 \#define \hyperlink{tls1_8h_a9182b877e7bcce5e9aa61b1f931b60e5}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-ticket\-\_\-key\-\_\-cb}(ssl, cb)~\hyperlink{ssl__lib_8c_a48fdeeef457a4f142b92b1b22135a70e}{S\-S\-L\-\_\-\-C\-T\-X\-\_\-callback\-\_\-ctrl}(ssl,\hyperlink{ssl_8h_a10400589816ef33b5185ca810ee8f715}{S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-T\-I\-C\-K\-E\-T\-\_\-\-K\-E\-Y\-\_\-\-C\-B},(void ($\ast$)(void))cb)
 \item 
@@ -751,43 +751,43 @@ int \hyperlink{tls1_8h_a4412e62b5895b420f39dd7e5704eb729}{S\-S\-L\-\_\-export\-\
 \index{S\-S\-L\-\_\-\-C\-T\-X\-\_\-get\-\_\-tlsext\-\_\-ticket\-\_\-keys@{S\-S\-L\-\_\-\-C\-T\-X\-\_\-get\-\_\-tlsext\-\_\-ticket\-\_\-keys}!tls1.h@{tls1.\-h}}
 \subsubsection[{S\-S\-L\-\_\-\-C\-T\-X\-\_\-get\-\_\-tlsext\-\_\-ticket\-\_\-keys}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\-S\-L\-\_\-\-C\-T\-X\-\_\-get\-\_\-tlsext\-\_\-ticket\-\_\-keys(
 \begin{DoxyParamCaption}
-\item[{}]{ctx, }
+\item[{}]{{\bf ctx}, }
 \item[{}]{keys, }
 \item[{}]{keylen}
 \end{DoxyParamCaption}
-)~{\bf S\-S\-L\-\_\-\-C\-T\-X\-\_\-ctrl}((ctx),{\bf S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-G\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-T\-I\-C\-K\-E\-T\-\_\-\-K\-E\-Y\-S},(keylen),(keys))}}\label{tls1_8h_a713492159f2df7f7d13564c6be8b15e8}
+)~{\bf S\-S\-L\-\_\-\-C\-T\-X\-\_\-ctrl}(({\bf ctx}),{\bf S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-G\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-T\-I\-C\-K\-E\-T\-\_\-\-K\-E\-Y\-S},(keylen),(keys))}}\label{tls1_8h_a713492159f2df7f7d13564c6be8b15e8}
 \hypertarget{tls1_8h_a7fc682ea6c509fdbe3e4cdab4bc51f6e}{\index{tls1.\-h@{tls1.\-h}!S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-opaque\-\_\-prf\-\_\-input\-\_\-callback@{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-opaque\-\_\-prf\-\_\-input\-\_\-callback}}
 \index{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-opaque\-\_\-prf\-\_\-input\-\_\-callback@{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-opaque\-\_\-prf\-\_\-input\-\_\-callback}!tls1.h@{tls1.\-h}}
 \subsubsection[{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-opaque\-\_\-prf\-\_\-input\-\_\-callback}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-opaque\-\_\-prf\-\_\-input\-\_\-callback(
 \begin{DoxyParamCaption}
-\item[{}]{ctx, }
+\item[{}]{{\bf ctx}, }
 \item[{}]{cb}
 \end{DoxyParamCaption}
-)~{\bf S\-S\-L\-\_\-\-C\-T\-X\-\_\-callback\-\_\-ctrl}(ctx,{\bf S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-O\-P\-A\-Q\-U\-E\-\_\-\-P\-R\-F\-\_\-\-I\-N\-P\-U\-T\-\_\-\-C\-B}, (void ($\ast$)(void))cb)}}\label{tls1_8h_a7fc682ea6c509fdbe3e4cdab4bc51f6e}
+)~{\bf S\-S\-L\-\_\-\-C\-T\-X\-\_\-callback\-\_\-ctrl}({\bf ctx},{\bf S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-O\-P\-A\-Q\-U\-E\-\_\-\-P\-R\-F\-\_\-\-I\-N\-P\-U\-T\-\_\-\-C\-B}, (void ($\ast$)(void))cb)}}\label{tls1_8h_a7fc682ea6c509fdbe3e4cdab4bc51f6e}
 \hypertarget{tls1_8h_adb67e7278fbc10855b382ec1c00005c0}{\index{tls1.\-h@{tls1.\-h}!S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-opaque\-\_\-prf\-\_\-input\-\_\-callback\-\_\-arg@{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-opaque\-\_\-prf\-\_\-input\-\_\-callback\-\_\-arg}}
 \index{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-opaque\-\_\-prf\-\_\-input\-\_\-callback\-\_\-arg@{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-opaque\-\_\-prf\-\_\-input\-\_\-callback\-\_\-arg}!tls1.h@{tls1.\-h}}
 \subsubsection[{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-opaque\-\_\-prf\-\_\-input\-\_\-callback\-\_\-arg}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-opaque\-\_\-prf\-\_\-input\-\_\-callback\-\_\-arg(
 \begin{DoxyParamCaption}
-\item[{}]{ctx, }
+\item[{}]{{\bf ctx}, }
 \item[{}]{arg}
 \end{DoxyParamCaption}
-)~{\bf S\-S\-L\-\_\-\-C\-T\-X\-\_\-ctrl}(ctx,{\bf S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-O\-P\-A\-Q\-U\-E\-\_\-\-P\-R\-F\-\_\-\-I\-N\-P\-U\-T\-\_\-\-C\-B\-\_\-\-A\-R\-G}, 0, arg)}}\label{tls1_8h_adb67e7278fbc10855b382ec1c00005c0}
+)~{\bf S\-S\-L\-\_\-\-C\-T\-X\-\_\-ctrl}({\bf ctx},{\bf S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-O\-P\-A\-Q\-U\-E\-\_\-\-P\-R\-F\-\_\-\-I\-N\-P\-U\-T\-\_\-\-C\-B\-\_\-\-A\-R\-G}, 0, arg)}}\label{tls1_8h_adb67e7278fbc10855b382ec1c00005c0}
 \hypertarget{tls1_8h_af88a71e3988e68b9b348322e7d8af3ea}{\index{tls1.\-h@{tls1.\-h}!S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-servername\-\_\-arg@{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-servername\-\_\-arg}}
 \index{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-servername\-\_\-arg@{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-servername\-\_\-arg}!tls1.h@{tls1.\-h}}
 \subsubsection[{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-servername\-\_\-arg}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-servername\-\_\-arg(
 \begin{DoxyParamCaption}
-\item[{}]{ctx, }
+\item[{}]{{\bf ctx}, }
 \item[{}]{arg}
 \end{DoxyParamCaption}
-)~{\bf S\-S\-L\-\_\-\-C\-T\-X\-\_\-ctrl}(ctx,{\bf S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-S\-E\-R\-V\-E\-R\-N\-A\-M\-E\-\_\-\-A\-R\-G},0, (void $\ast$)arg)}}\label{tls1_8h_af88a71e3988e68b9b348322e7d8af3ea}
+)~{\bf S\-S\-L\-\_\-\-C\-T\-X\-\_\-ctrl}({\bf ctx},{\bf S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-S\-E\-R\-V\-E\-R\-N\-A\-M\-E\-\_\-\-A\-R\-G},0, (void $\ast$)arg)}}\label{tls1_8h_af88a71e3988e68b9b348322e7d8af3ea}
 \hypertarget{tls1_8h_a7e3de4915ed0a8d493c206e311b957aa}{\index{tls1.\-h@{tls1.\-h}!S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-servername\-\_\-callback@{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-servername\-\_\-callback}}
 \index{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-servername\-\_\-callback@{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-servername\-\_\-callback}!tls1.h@{tls1.\-h}}
 \subsubsection[{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-servername\-\_\-callback}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-servername\-\_\-callback(
 \begin{DoxyParamCaption}
-\item[{}]{ctx, }
+\item[{}]{{\bf ctx}, }
 \item[{}]{cb}
 \end{DoxyParamCaption}
-)~{\bf S\-S\-L\-\_\-\-C\-T\-X\-\_\-callback\-\_\-ctrl}(ctx,{\bf S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-S\-E\-R\-V\-E\-R\-N\-A\-M\-E\-\_\-\-C\-B},(void ($\ast$)(void))cb)}}\label{tls1_8h_a7e3de4915ed0a8d493c206e311b957aa}
+)~{\bf S\-S\-L\-\_\-\-C\-T\-X\-\_\-callback\-\_\-ctrl}({\bf ctx},{\bf S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-S\-E\-R\-V\-E\-R\-N\-A\-M\-E\-\_\-\-C\-B},(void ($\ast$)(void))cb)}}\label{tls1_8h_a7e3de4915ed0a8d493c206e311b957aa}
 \hypertarget{tls1_8h_a158f0be0cffdda096236ca2036049a65}{\index{tls1.\-h@{tls1.\-h}!S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-status\-\_\-arg@{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-status\-\_\-arg}}
 \index{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-status\-\_\-arg@{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-status\-\_\-arg}!tls1.h@{tls1.\-h}}
 \subsubsection[{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-status\-\_\-arg}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-status\-\_\-arg(
@@ -816,11 +816,11 @@ int \hyperlink{tls1_8h_a4412e62b5895b420f39dd7e5704eb729}{S\-S\-L\-\_\-export\-\
 \index{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-ticket\-\_\-keys@{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-ticket\-\_\-keys}!tls1.h@{tls1.\-h}}
 \subsubsection[{S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-ticket\-\_\-keys}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\-S\-L\-\_\-\-C\-T\-X\-\_\-set\-\_\-tlsext\-\_\-ticket\-\_\-keys(
 \begin{DoxyParamCaption}
-\item[{}]{ctx, }
+\item[{}]{{\bf ctx}, }
 \item[{}]{keys, }
 \item[{}]{keylen}
 \end{DoxyParamCaption}
-)~{\bf S\-S\-L\-\_\-\-C\-T\-X\-\_\-ctrl}((ctx),{\bf S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-T\-I\-C\-K\-E\-T\-\_\-\-K\-E\-Y\-S},(keylen),(keys))}}\label{tls1_8h_ac0efcaab9dabce2e9b1711d7991dd18e}
+)~{\bf S\-S\-L\-\_\-\-C\-T\-X\-\_\-ctrl}(({\bf ctx}),{\bf S\-S\-L\-\_\-\-C\-T\-R\-L\-\_\-\-S\-E\-T\-\_\-\-T\-L\-S\-E\-X\-T\-\_\-\-T\-I\-C\-K\-E\-T\-\_\-\-K\-E\-Y\-S},(keylen),(keys))}}\label{tls1_8h_ac0efcaab9dabce2e9b1711d7991dd18e}
 \hypertarget{tls1_8h_a4d7a9b9f0d0d97889c3cef0aebbc444b}{\index{tls1.\-h@{tls1.\-h}!S\-S\-L\-\_\-get\-\_\-tlsext\-\_\-heartbeat\-\_\-pending@{S\-S\-L\-\_\-get\-\_\-tlsext\-\_\-heartbeat\-\_\-pending}}
 \index{S\-S\-L\-\_\-get\-\_\-tlsext\-\_\-heartbeat\-\_\-pending@{S\-S\-L\-\_\-get\-\_\-tlsext\-\_\-heartbeat\-\_\-pending}!tls1.h@{tls1.\-h}}
 \subsubsection[{S\-S\-L\-\_\-get\-\_\-tlsext\-\_\-heartbeat\-\_\-pending}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\-S\-L\-\_\-get\-\_\-tlsext\-\_\-heartbeat\-\_\-pending(

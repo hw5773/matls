@@ -1,0 +1,10 @@
+digraph "nginx-1.12.0" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_1b0ed7c345084428b66965fadae89f96 {
+    graph [ bgcolor="#eeeeff", pencolor="black", label="" URL="dir_1b0ed7c345084428b66965fadae89f96.html"];
+    dir_1b0ed7c345084428b66965fadae89f96 [shape=plaintext label="nginx-1.12.0"];
+    dir_f4b0caf9b1131a8b1d2aebad5a3a9457 [shape=box label="src" color="red" fillcolor="white" style="filled" URL="dir_f4b0caf9b1131a8b1d2aebad5a3a9457.html"];
+  }
+}

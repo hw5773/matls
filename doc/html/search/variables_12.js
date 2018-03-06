@@ -39,6 +39,7 @@ var searchData=
   ['shutdown',['shutdown',['../structssl__st.html#a12a82cfd124852a54354a46012bdd502',1,'ssl_st']]],
   ['sid_5fctx',['sid_ctx',['../structssl__session__st.html#ad465f7554a5e14d6c92ee563d5ed6fe1',1,'ssl_session_st::sid_ctx()'],['../structssl__ctx__st.html#a92f94c2a4612e04ec3c075c76aae5553',1,'ssl_ctx_st::sid_ctx()'],['../structssl__st.html#a486ddbf462473285440234c69568b9ce',1,'ssl_st::sid_ctx()']]],
   ['sid_5fctx_5flength',['sid_ctx_length',['../structssl__session__st.html#a22ec3aac135c2b8268e0ea69c66fc829',1,'ssl_session_st::sid_ctx_length()'],['../structssl__ctx__st.html#a59afab8285fbc901d590ab6edaa75bd0',1,'ssl_ctx_st::sid_ctx_length()'],['../structssl__st.html#a7b63f375f11b5232a5dff69e26f6a438',1,'ssl_st::sid_ctx_length()']]],
+  ['source_5fmac',['source_mac',['../structmodification__record.html#a1a48d3d4e76ae1da78cd61d5738cfed9',1,'modification_record']]],
   ['sport',['sport',['../structpair__entry.html#a8a5bd1e674f0da9d918390d1d4750552',1,'pair_entry']]],
   ['srp_5fcb_5farg',['SRP_cb_arg',['../structsrp__ctx__st.html#aa49970f50ded55c00d44e1601b40c9b1',1,'srp_ctx_st']]],
   ['srp_5fctx',['srp_ctx',['../structssl__ctx__st.html#a337f1046f4778a8835a72230f2c1f138',1,'ssl_ctx_st::srp_ctx()'],['../structssl__st.html#aaef9c47543427df406b33888d147f65d',1,'ssl_st::srp_ctx()']]],

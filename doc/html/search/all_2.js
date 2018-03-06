@@ -2,6 +2,7 @@ var searchData=
 [
   ['b',['B',['../structsrp__ctx__st.html#a7849b7e0d38bddd6243e44f90bc8a48d',1,'srp_ctx_st::B()'],['../structsrp__ctx__st.html#aee9feaedd4dd38b5532c35c3b8b366d5',1,'srp_ctx_st::b()']]],
   ['bbio',['bbio',['../structssl__st.html#ab0e7dbfa9d11fab6879da0ad8625b65b',1,'ssl_st']]],
+  ['bio_5ferr',['bio_err',['../client_8c.html#a4903f4ea946648d18bd6a32f4fd35361',1,'bio_err():&#160;client.c'],['../server_8c.html#a4903f4ea946648d18bd6a32f4fd35361',1,'bio_err():&#160;server.c']]],
   ['bio_5fnew_5fbuffer_5fssl_5fconnect',['BIO_new_buffer_ssl_connect',['../ssl_8h.html#a40cc1fc4320e50ecde7db452039e7fb0',1,'ssl.h']]],
   ['bio_5fnew_5fssl',['BIO_new_ssl',['../ssl_8h.html#a20928272d1306e31171c749756a8ace9',1,'ssl.h']]],
   ['bio_5fnew_5fssl_5fconnect',['BIO_new_ssl_connect',['../ssl_8h.html#a961740d54e48e2a4b124be72bb237bdf',1,'ssl.h']]],

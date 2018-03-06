@@ -1,5 +1,7 @@
 var searchData=
 [
+  ['open_5fconnection',['open_connection',['../client_8c.html#ae43cadad3a3a01c4f171074b1a80dc16',1,'client.c']]],
+  ['open_5flistener',['open_listener',['../server_8c.html#a93d18b7345956ad6c30c0e9ef8785fdc',1,'server.c']]],
   ['openssl_5fadd_5fssl_5falgorithms',['OpenSSL_add_ssl_algorithms',['../ssl_8h.html#a3a220d525f0f739677896184b0007963',1,'ssl.h']]],
   ['openssl_5fnpn_5fnegotiated',['OPENSSL_NPN_NEGOTIATED',['../ssl_8h.html#a5961e9db18c8df4f1ac06818e12626e9',1,'ssl.h']]],
   ['openssl_5fnpn_5fno_5foverlap',['OPENSSL_NPN_NO_OVERLAP',['../ssl_8h.html#a4a01f8eee8693cc900a7b38943a9eb7e',1,'ssl.h']]],

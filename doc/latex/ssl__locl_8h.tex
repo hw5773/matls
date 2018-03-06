@@ -77,9 +77,9 @@ struct \hyperlink{structopenssl__ssl__test__functions}{openssl\-\_\-ssl\-\_\-tes
 \item 
 \#define \hyperlink{ssl__locl_8h_ac2020b8602e2ced17abbf4a2c7799e25}{T\-H\-R\-E\-E\-\_\-\-B\-Y\-T\-E\-\_\-\-M\-A\-S\-K}~0x3fff
 \item 
-\#define \hyperlink{ssl__locl_8h_aefd8e49ea2c308a7fe815815eb035955}{I\-N\-C32}(\hyperlink{prf_8h_a90d7d8700543afd59f05013cdb654233}{a})~((\hyperlink{prf_8h_a90d7d8700543afd59f05013cdb654233}{a})=((\hyperlink{prf_8h_a90d7d8700543afd59f05013cdb654233}{a})+1)\&0xffffffff\-L)
+\#define \hyperlink{ssl__locl_8h_aefd8e49ea2c308a7fe815815eb035955}{I\-N\-C32}(a)~((a)=((a)+1)\&0xffffffff\-L)
 \item 
-\#define \hyperlink{ssl__locl_8h_a51ceb0cdeb792bcf68ca917b55c8b2ac}{D\-E\-C32}(\hyperlink{prf_8h_a90d7d8700543afd59f05013cdb654233}{a})~((\hyperlink{prf_8h_a90d7d8700543afd59f05013cdb654233}{a})=((\hyperlink{prf_8h_a90d7d8700543afd59f05013cdb654233}{a})-\/1)\&0xffffffff\-L)
+\#define \hyperlink{ssl__locl_8h_a51ceb0cdeb792bcf68ca917b55c8b2ac}{D\-E\-C32}(a)~((a)=((a)-\/1)\&0xffffffff\-L)
 \item 
 \#define \hyperlink{ssl__locl_8h_ac23c12aa359fff770fa0d1c12fdf6eb5}{M\-A\-X\-\_\-\-M\-A\-C\-\_\-\-S\-I\-Z\-E}~20 /$\ast$ up from 16 for S\-S\-Lv3 $\ast$/
 \item 
@@ -239,11 +239,11 @@ struct \hyperlink{structopenssl__ssl__test__functions}{openssl\-\_\-ssl\-\_\-tes
 \item 
 \#define \hyperlink{ssl__locl_8h_a6a1d0949b67424344222e28011d411fd}{S\-S\-L\-\_\-\-F\-I\-P\-S}~0x00000100\-L
 \item 
-\#define \hyperlink{ssl__locl_8h_a844e2cf5dcbb5f89cdbcba21691ee30e}{S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T}(\hyperlink{prf_8h_a90d7d8700543afd59f05013cdb654233}{a})~((\hyperlink{prf_8h_a90d7d8700543afd59f05013cdb654233}{a})\&\hyperlink{ssl__locl_8h_a5833f973ba5144643becb7b93de6a8a3}{S\-S\-L\-\_\-\-E\-X\-P\-O\-R\-T})
+\#define \hyperlink{ssl__locl_8h_a844e2cf5dcbb5f89cdbcba21691ee30e}{S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T}(a)~((a)\&\hyperlink{ssl__locl_8h_a5833f973ba5144643becb7b93de6a8a3}{S\-S\-L\-\_\-\-E\-X\-P\-O\-R\-T})
 \item 
-\#define \hyperlink{ssl__locl_8h_a7bb7536e863f6f10395a7f872dcbd177}{S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T56}(\hyperlink{prf_8h_a90d7d8700543afd59f05013cdb654233}{a})~((\hyperlink{prf_8h_a90d7d8700543afd59f05013cdb654233}{a})\&\hyperlink{ssl__locl_8h_afdfb51de863060038609b31fd67b6d9d}{S\-S\-L\-\_\-\-E\-X\-P56})
+\#define \hyperlink{ssl__locl_8h_a7bb7536e863f6f10395a7f872dcbd177}{S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T56}(a)~((a)\&\hyperlink{ssl__locl_8h_afdfb51de863060038609b31fd67b6d9d}{S\-S\-L\-\_\-\-E\-X\-P56})
 \item 
-\#define \hyperlink{ssl__locl_8h_a158fa528eb382dc3bf594ddf86eb7865}{S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T40}(\hyperlink{prf_8h_a90d7d8700543afd59f05013cdb654233}{a})~((\hyperlink{prf_8h_a90d7d8700543afd59f05013cdb654233}{a})\&\hyperlink{ssl__locl_8h_a95950388e693b2cb4cc91e2ddf471008}{S\-S\-L\-\_\-\-E\-X\-P40})
+\#define \hyperlink{ssl__locl_8h_a158fa528eb382dc3bf594ddf86eb7865}{S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T40}(a)~((a)\&\hyperlink{ssl__locl_8h_a95950388e693b2cb4cc91e2ddf471008}{S\-S\-L\-\_\-\-E\-X\-P40})
 \item 
 \#define \hyperlink{ssl__locl_8h_a7c505bbdd5516a840c09a1908570e59d}{S\-S\-L\-\_\-\-C\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T}(c)~\hyperlink{ssl__locl_8h_a844e2cf5dcbb5f89cdbcba21691ee30e}{S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T}((c)-\/$>$algo\-\_\-strength)
 \item 
@@ -251,9 +251,9 @@ struct \hyperlink{structopenssl__ssl__test__functions}{openssl\-\_\-ssl\-\_\-tes
 \item 
 \#define \hyperlink{ssl__locl_8h_aa823fa564116763b88c392da23427884}{S\-S\-L\-\_\-\-C\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T40}(c)~\hyperlink{ssl__locl_8h_a158fa528eb382dc3bf594ddf86eb7865}{S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T40}((c)-\/$>$algo\-\_\-strength)
 \item 
-\#define \hyperlink{ssl__locl_8h_ab0b98155ae41a9afb2a1b3d13458fdb8}{S\-S\-L\-\_\-\-E\-X\-P\-O\-R\-T\-\_\-\-K\-E\-Y\-L\-E\-N\-G\-T\-H}(\hyperlink{prf_8h_a90d7d8700543afd59f05013cdb654233}{a}, s)
+\#define \hyperlink{ssl__locl_8h_ab0b98155ae41a9afb2a1b3d13458fdb8}{S\-S\-L\-\_\-\-E\-X\-P\-O\-R\-T\-\_\-\-K\-E\-Y\-L\-E\-N\-G\-T\-H}(a, s)
 \item 
-\#define \hyperlink{ssl__locl_8h_a63a916d3df35e0db6be0090e803f5c59}{S\-S\-L\-\_\-\-E\-X\-P\-O\-R\-T\-\_\-\-P\-K\-E\-Y\-L\-E\-N\-G\-T\-H}(\hyperlink{prf_8h_a90d7d8700543afd59f05013cdb654233}{a})~(\hyperlink{ssl__locl_8h_a158fa528eb382dc3bf594ddf86eb7865}{S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T40}(\hyperlink{prf_8h_a90d7d8700543afd59f05013cdb654233}{a}) ? 512 \-: 1024)
+\#define \hyperlink{ssl__locl_8h_a63a916d3df35e0db6be0090e803f5c59}{S\-S\-L\-\_\-\-E\-X\-P\-O\-R\-T\-\_\-\-P\-K\-E\-Y\-L\-E\-N\-G\-T\-H}(a)~(\hyperlink{ssl__locl_8h_a158fa528eb382dc3bf594ddf86eb7865}{S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T40}(a) ? 512 \-: 1024)
 \item 
 \#define \hyperlink{ssl__locl_8h_a44e57e9cee67117462da6dfaae71ad38}{S\-S\-L\-\_\-\-C\-\_\-\-E\-X\-P\-O\-R\-T\-\_\-\-K\-E\-Y\-L\-E\-N\-G\-T\-H}(c)
 \item 
@@ -348,7 +348,7 @@ int \hyperlink{ssl__locl_8h_a2bd58467960d25ce3e9ab704bf018e71}{ssl\-\_\-get\-\_\
 \item 
 int \hyperlink{ssl__locl_8h_a768b069b7cf119670db4517b881a34d2}{ssl\-\_\-get\-\_\-prev\-\_\-session} (S\-S\-L $\ast$s, unsigned char $\ast$session, int len, const unsigned char $\ast$limit)
 \item 
-int \hyperlink{ssl__locl_8h_a1ce2cd7604ea71cd352de46b6290408d}{ssl\-\_\-cipher\-\_\-id\-\_\-cmp} (const \hyperlink{ssl_8h_a548d7a5d565a9e0e9bd45c49f8c95701}{S\-S\-L\-\_\-\-C\-I\-P\-H\-E\-R} $\ast$\hyperlink{prf_8h_a90d7d8700543afd59f05013cdb654233}{a}, const \hyperlink{ssl_8h_a548d7a5d565a9e0e9bd45c49f8c95701}{S\-S\-L\-\_\-\-C\-I\-P\-H\-E\-R} $\ast$b)
+int \hyperlink{ssl__locl_8h_a1ce2cd7604ea71cd352de46b6290408d}{ssl\-\_\-cipher\-\_\-id\-\_\-cmp} (const \hyperlink{ssl_8h_a548d7a5d565a9e0e9bd45c49f8c95701}{S\-S\-L\-\_\-\-C\-I\-P\-H\-E\-R} $\ast$a, const \hyperlink{ssl_8h_a548d7a5d565a9e0e9bd45c49f8c95701}{S\-S\-L\-\_\-\-C\-I\-P\-H\-E\-R} $\ast$b)
 \item 
 \hyperlink{ssl__locl_8h_afc250787d7522aa9f597258b31a58074}{D\-E\-C\-L\-A\-R\-E\-\_\-\-O\-B\-J\-\_\-\-B\-S\-E\-A\-R\-C\-H\-\_\-\-G\-L\-O\-B\-A\-L\-\_\-\-C\-M\-P\-\_\-\-F\-N} (\hyperlink{ssl_8h_a548d7a5d565a9e0e9bd45c49f8c95701}{S\-S\-L\-\_\-\-C\-I\-P\-H\-E\-R}, \hyperlink{ssl_8h_a548d7a5d565a9e0e9bd45c49f8c95701}{S\-S\-L\-\_\-\-C\-I\-P\-H\-E\-R}, ssl\-\_\-cipher\-\_\-id)
 \item 
@@ -476,7 +476,7 @@ int \hyperlink{ssl__locl_8h_ab2813237375e8673efd991d9b15a7426}{ssl3\-\_\-get\-\_
 \item 
 long \hyperlink{ssl__locl_8h_a115b65d8bf7a443a356c7a1a7c3f5136}{ssl3\-\_\-get\-\_\-message} (S\-S\-L $\ast$s, int st1, int stn, int mt, long max, int $\ast$ok)
 \item 
-int \hyperlink{ssl__locl_8h_a75cf708076313a5f88efe8bf44af8043}{ssl3\-\_\-send\-\_\-finished} (S\-S\-L $\ast$s, int \hyperlink{prf_8h_a90d7d8700543afd59f05013cdb654233}{a}, int b, const char $\ast$sender, int slen)
+int \hyperlink{ssl__locl_8h_a75cf708076313a5f88efe8bf44af8043}{ssl3\-\_\-send\-\_\-finished} (S\-S\-L $\ast$s, int a, int b, const char $\ast$sender, int slen)
 \item 
 int \hyperlink{ssl__locl_8h_a161c91c5587e9d57203e85f1780cfb40}{ssl3\-\_\-num\-\_\-ciphers} (void)
 \item 
@@ -590,9 +590,9 @@ int \hyperlink{ssl__locl_8h_a14223fcb294bfcbb69fa69d95ae187b6}{dtls1\-\_\-write\
 \item 
 int \hyperlink{ssl__locl_8h_a8e1c1bd52d9f8fd2e194107cdcdb6467}{dtls1\-\_\-write\-\_\-bytes} (S\-S\-L $\ast$s, int type, const void $\ast$buf, int len)
 \item 
-int \hyperlink{ssl__locl_8h_af42a860e0e0f0ad14821c64c2992e9c8}{dtls1\-\_\-send\-\_\-change\-\_\-cipher\-\_\-spec} (S\-S\-L $\ast$s, int \hyperlink{prf_8h_a90d7d8700543afd59f05013cdb654233}{a}, int b)
+int \hyperlink{ssl__locl_8h_af42a860e0e0f0ad14821c64c2992e9c8}{dtls1\-\_\-send\-\_\-change\-\_\-cipher\-\_\-spec} (S\-S\-L $\ast$s, int a, int b)
 \item 
-int \hyperlink{ssl__locl_8h_acf2b11df726a6b59e8009e770d6b3c31}{dtls1\-\_\-send\-\_\-finished} (S\-S\-L $\ast$s, int \hyperlink{prf_8h_a90d7d8700543afd59f05013cdb654233}{a}, int b, const char $\ast$sender, int slen)
+int \hyperlink{ssl__locl_8h_acf2b11df726a6b59e8009e770d6b3c31}{dtls1\-\_\-send\-\_\-finished} (S\-S\-L $\ast$s, int a, int b, const char $\ast$sender, int slen)
 \item 
 unsigned long \hyperlink{ssl__locl_8h_a22d8a55c85fbaadbfdcc495192e72bca}{dtls1\-\_\-output\-\_\-cert\-\_\-chain} (S\-S\-L $\ast$s, X509 $\ast$x)
 \item 
@@ -836,9 +836,9 @@ int \hyperlink{ssl__locl_8h_a9f965623013df5900494cbb6dc311603}{tls12\-\_\-get\-\
 \item 
 const E\-V\-P\-\_\-\-M\-D $\ast$ \hyperlink{ssl__locl_8h_a2e2ef9c2b24a0367a2ec0a9ddd1bb157}{tls12\-\_\-get\-\_\-hash} (unsigned char hash\-\_\-alg)
 \item 
-E\-V\-P\-\_\-\-M\-D\-\_\-\-C\-T\-X $\ast$ \hyperlink{ssl__locl_8h_a82b04c06d694546c511d9c60f9e090a0}{ssl\-\_\-replace\-\_\-hash} (E\-V\-P\-\_\-\-M\-D\-\_\-\-C\-T\-X $\ast$$\ast$hash, const E\-V\-P\-\_\-\-M\-D $\ast$md)
+E\-V\-P\-\_\-\-M\-D\-\_\-\-C\-T\-X $\ast$ \hyperlink{ssl__locl_8h_a82b04c06d694546c511d9c60f9e090a0}{ssl\-\_\-replace\-\_\-hash} (E\-V\-P\-\_\-\-M\-D\-\_\-\-C\-T\-X $\ast$$\ast$\hyperlink{prf_8h_a1e0cc15a5f933fcf1f3dd9017839ce1f}{hash}, const E\-V\-P\-\_\-\-M\-D $\ast$md)
 \item 
-void \hyperlink{ssl__locl_8h_adb933b8f0fa1a75681e3569f3f7ee4b3}{ssl\-\_\-clear\-\_\-hash\-\_\-ctx} (E\-V\-P\-\_\-\-M\-D\-\_\-\-C\-T\-X $\ast$$\ast$hash)
+void \hyperlink{ssl__locl_8h_adb933b8f0fa1a75681e3569f3f7ee4b3}{ssl\-\_\-clear\-\_\-hash\-\_\-ctx} (E\-V\-P\-\_\-\-M\-D\-\_\-\-C\-T\-X $\ast$$\ast$\hyperlink{prf_8h_a1e0cc15a5f933fcf1f3dd9017839ce1f}{hash})
 \item 
 int \hyperlink{ssl__locl_8h_ae3af5e3720a69161e209fe849c1c0853}{ssl\-\_\-add\-\_\-serverhello\-\_\-renegotiate\-\_\-ext} (S\-S\-L $\ast$s, unsigned char $\ast$\hyperlink{ssl__locl_8h_a4014c6f4a6fa0e565ca592bcaca0fa58}{p}, int $\ast$len, int maxlen)
 \item 
@@ -868,9 +868,9 @@ int \hyperlink{ssl__locl_8h_a715f02d7c0432db084a31734c12e8ef7}{ssl3\-\_\-cbc\-\_
 \item 
 int \hyperlink{ssl__locl_8h_a95aab6c702fde826974ef58bffc886cb}{tls1\-\_\-cbc\-\_\-remove\-\_\-padding} (const S\-S\-L $\ast$s, S\-S\-L3\-\_\-\-R\-E\-C\-O\-R\-D $\ast$rec, unsigned block\-\_\-size, unsigned mac\-\_\-size)
 \item 
-char \hyperlink{ssl__locl_8h_a79dcd8a371b91f4dd297d5f08a040e43}{ssl3\-\_\-cbc\-\_\-record\-\_\-digest\-\_\-supported} (const E\-V\-P\-\_\-\-M\-D\-\_\-\-C\-T\-X $\ast$ctx)
+char \hyperlink{ssl__locl_8h_a79dcd8a371b91f4dd297d5f08a040e43}{ssl3\-\_\-cbc\-\_\-record\-\_\-digest\-\_\-supported} (const E\-V\-P\-\_\-\-M\-D\-\_\-\-C\-T\-X $\ast$\hyperlink{client_8c_ad5433bcc8a463fb4df3ce5912bb11fe3}{ctx})
 \item 
-void \hyperlink{ssl__locl_8h_a5aeea69e0bf1feaf2513e15bf7692193}{ssl3\-\_\-cbc\-\_\-digest\-\_\-record} (const E\-V\-P\-\_\-\-M\-D\-\_\-\-C\-T\-X $\ast$ctx, unsigned char $\ast$md\-\_\-out, size\-\_\-t $\ast$md\-\_\-out\-\_\-size, const unsigned char header\mbox{[}13\mbox{]}, const unsigned char $\ast$data, size\-\_\-t data\-\_\-plus\-\_\-mac\-\_\-size, size\-\_\-t data\-\_\-plus\-\_\-mac\-\_\-plus\-\_\-padding\-\_\-size, const unsigned char $\ast$mac\-\_\-secret, unsigned mac\-\_\-secret\-\_\-length, char is\-\_\-sslv3)
+void \hyperlink{ssl__locl_8h_a5aeea69e0bf1feaf2513e15bf7692193}{ssl3\-\_\-cbc\-\_\-digest\-\_\-record} (const E\-V\-P\-\_\-\-M\-D\-\_\-\-C\-T\-X $\ast$\hyperlink{client_8c_ad5433bcc8a463fb4df3ce5912bb11fe3}{ctx}, unsigned char $\ast$md\-\_\-out, size\-\_\-t $\ast$md\-\_\-out\-\_\-size, const unsigned char header\mbox{[}13\mbox{]}, const unsigned char $\ast$data, size\-\_\-t data\-\_\-plus\-\_\-mac\-\_\-size, size\-\_\-t data\-\_\-plus\-\_\-mac\-\_\-plus\-\_\-padding\-\_\-size, const unsigned char $\ast$mac\-\_\-secret, unsigned mac\-\_\-secret\-\_\-length, char is\-\_\-sslv3)
 \item 
 void \hyperlink{ssl__locl_8h_ab3790dd63e3837667a8d32129112c3a3}{tls\-\_\-fips\-\_\-digest\-\_\-extra} (const E\-V\-P\-\_\-\-C\-I\-P\-H\-E\-R\-\_\-\-C\-T\-X $\ast$cipher\-\_\-ctx, E\-V\-P\-\_\-\-M\-D\-\_\-\-C\-T\-X $\ast$mac\-\_\-ctx, const unsigned char $\ast$data, size\-\_\-t data\-\_\-len, size\-\_\-t orig\-\_\-len)
 \item 
@@ -946,9 +946,9 @@ const char $\ast$ \hyperlink{ssl__locl_8h_a6286b7c3d0791fe3170c04f92553c90f}{rul
 \index{D\-E\-C32@{D\-E\-C32}!ssl_locl.h@{ssl\-\_\-locl.\-h}}
 \subsubsection[{D\-E\-C32}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\-E\-C32(
 \begin{DoxyParamCaption}
-\item[{}]{{\bf a}}
+\item[{}]{a}
 \end{DoxyParamCaption}
-)~(({\bf a})=(({\bf a})-\/1)\&0xffffffff\-L)}}\label{ssl__locl_8h_a51ceb0cdeb792bcf68ca917b55c8b2ac}
+)~((a)=((a)-\/1)\&0xffffffff\-L)}}\label{ssl__locl_8h_a51ceb0cdeb792bcf68ca917b55c8b2ac}
 \hypertarget{ssl__locl_8h_aafa76dceafff989d0c5503ac0cf68f61}{\index{ssl\-\_\-locl.\-h@{ssl\-\_\-locl.\-h}!E\-X\-P\-L\-I\-C\-I\-T\-\_\-\-C\-H\-A\-R2\-\_\-\-C\-U\-R\-V\-E\-\_\-\-T\-Y\-P\-E@{E\-X\-P\-L\-I\-C\-I\-T\-\_\-\-C\-H\-A\-R2\-\_\-\-C\-U\-R\-V\-E\-\_\-\-T\-Y\-P\-E}}
 \index{E\-X\-P\-L\-I\-C\-I\-T\-\_\-\-C\-H\-A\-R2\-\_\-\-C\-U\-R\-V\-E\-\_\-\-T\-Y\-P\-E@{E\-X\-P\-L\-I\-C\-I\-T\-\_\-\-C\-H\-A\-R2\-\_\-\-C\-U\-R\-V\-E\-\_\-\-T\-Y\-P\-E}!ssl_locl.h@{ssl\-\_\-locl.\-h}}
 \subsubsection[{E\-X\-P\-L\-I\-C\-I\-T\-\_\-\-C\-H\-A\-R2\-\_\-\-C\-U\-R\-V\-E\-\_\-\-T\-Y\-P\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define E\-X\-P\-L\-I\-C\-I\-T\-\_\-\-C\-H\-A\-R2\-\_\-\-C\-U\-R\-V\-E\-\_\-\-T\-Y\-P\-E~2}}\label{ssl__locl_8h_aafa76dceafff989d0c5503ac0cf68f61}
@@ -1013,9 +1013,9 @@ const char $\ast$ \hyperlink{ssl__locl_8h_a6286b7c3d0791fe3170c04f92553c90f}{rul
 \index{I\-N\-C32@{I\-N\-C32}!ssl_locl.h@{ssl\-\_\-locl.\-h}}
 \subsubsection[{I\-N\-C32}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\-N\-C32(
 \begin{DoxyParamCaption}
-\item[{}]{{\bf a}}
+\item[{}]{a}
 \end{DoxyParamCaption}
-)~(({\bf a})=(({\bf a})+1)\&0xffffffff\-L)}}\label{ssl__locl_8h_aefd8e49ea2c308a7fe815815eb035955}
+)~((a)=((a)+1)\&0xffffffff\-L)}}\label{ssl__locl_8h_aefd8e49ea2c308a7fe815815eb035955}
 \hypertarget{ssl__locl_8h_a4a1ab77c189b0f1f74c86a57efb430d4}{\index{ssl\-\_\-locl.\-h@{ssl\-\_\-locl.\-h}!l2c@{l2c}}
 \index{l2c@{l2c}!ssl_locl.h@{ssl\-\_\-locl.\-h}}
 \subsubsection[{l2c}]{\setlength{\rightskip}{0pt plus 5cm}\#define l2c(
@@ -1337,22 +1337,22 @@ const char $\ast$ \hyperlink{ssl__locl_8h_a6286b7c3d0791fe3170c04f92553c90f}{rul
 \index{S\-S\-L\-\_\-\-E\-X\-P\-O\-R\-T\-\_\-\-K\-E\-Y\-L\-E\-N\-G\-T\-H@{S\-S\-L\-\_\-\-E\-X\-P\-O\-R\-T\-\_\-\-K\-E\-Y\-L\-E\-N\-G\-T\-H}!ssl_locl.h@{ssl\-\_\-locl.\-h}}
 \subsubsection[{S\-S\-L\-\_\-\-E\-X\-P\-O\-R\-T\-\_\-\-K\-E\-Y\-L\-E\-N\-G\-T\-H}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\-S\-L\-\_\-\-E\-X\-P\-O\-R\-T\-\_\-\-K\-E\-Y\-L\-E\-N\-G\-T\-H(
 \begin{DoxyParamCaption}
-\item[{}]{{\bf a}, }
+\item[{}]{a, }
 \item[{}]{s}
 \end{DoxyParamCaption}
 )}}\label{ssl__locl_8h_ab0b98155ae41a9afb2a1b3d13458fdb8}
 {\bfseries Value\-:}
 \begin{DoxyCode}
 (\hyperlink{ssl__locl_8h_a158fa528eb382dc3bf594ddf86eb7865}{SSL\_IS\_EXPORT40}(s) ? 5 : \(\backslash\)
-                 (\hyperlink{prf_8h_a90d7d8700543afd59f05013cdb654233}{a}) == \hyperlink{ssl__locl_8h_a90d81206675e7a37c1c75547e844a767}{SSL\_DES} ? 8 : 7)
+                 (a) == \hyperlink{ssl__locl_8h_a90d81206675e7a37c1c75547e844a767}{SSL\_DES} ? 8 : 7)
 \end{DoxyCode}
 \hypertarget{ssl__locl_8h_a63a916d3df35e0db6be0090e803f5c59}{\index{ssl\-\_\-locl.\-h@{ssl\-\_\-locl.\-h}!S\-S\-L\-\_\-\-E\-X\-P\-O\-R\-T\-\_\-\-P\-K\-E\-Y\-L\-E\-N\-G\-T\-H@{S\-S\-L\-\_\-\-E\-X\-P\-O\-R\-T\-\_\-\-P\-K\-E\-Y\-L\-E\-N\-G\-T\-H}}
 \index{S\-S\-L\-\_\-\-E\-X\-P\-O\-R\-T\-\_\-\-P\-K\-E\-Y\-L\-E\-N\-G\-T\-H@{S\-S\-L\-\_\-\-E\-X\-P\-O\-R\-T\-\_\-\-P\-K\-E\-Y\-L\-E\-N\-G\-T\-H}!ssl_locl.h@{ssl\-\_\-locl.\-h}}
 \subsubsection[{S\-S\-L\-\_\-\-E\-X\-P\-O\-R\-T\-\_\-\-P\-K\-E\-Y\-L\-E\-N\-G\-T\-H}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\-S\-L\-\_\-\-E\-X\-P\-O\-R\-T\-\_\-\-P\-K\-E\-Y\-L\-E\-N\-G\-T\-H(
 \begin{DoxyParamCaption}
-\item[{}]{{\bf a}}
+\item[{}]{a}
 \end{DoxyParamCaption}
-)~({\bf S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T40}({\bf a}) ? 512 \-: 1024)}}\label{ssl__locl_8h_a63a916d3df35e0db6be0090e803f5c59}
+)~({\bf S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T40}(a) ? 512 \-: 1024)}}\label{ssl__locl_8h_a63a916d3df35e0db6be0090e803f5c59}
 \hypertarget{ssl__locl_8h_a6a1d0949b67424344222e28011d411fd}{\index{ssl\-\_\-locl.\-h@{ssl\-\_\-locl.\-h}!S\-S\-L\-\_\-\-F\-I\-P\-S@{S\-S\-L\-\_\-\-F\-I\-P\-S}}
 \index{S\-S\-L\-\_\-\-F\-I\-P\-S@{S\-S\-L\-\_\-\-F\-I\-P\-S}!ssl_locl.h@{ssl\-\_\-locl.\-h}}
 \subsubsection[{S\-S\-L\-\_\-\-F\-I\-P\-S}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\-S\-L\-\_\-\-F\-I\-P\-S~0x00000100\-L}}\label{ssl__locl_8h_a6a1d0949b67424344222e28011d411fd}
@@ -1405,23 +1405,23 @@ const char $\ast$ \hyperlink{ssl__locl_8h_a6286b7c3d0791fe3170c04f92553c90f}{rul
 \index{S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T@{S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T}!ssl_locl.h@{ssl\-\_\-locl.\-h}}
 \subsubsection[{S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T(
 \begin{DoxyParamCaption}
-\item[{}]{{\bf a}}
+\item[{}]{a}
 \end{DoxyParamCaption}
-)~(({\bf a})\&{\bf S\-S\-L\-\_\-\-E\-X\-P\-O\-R\-T})}}\label{ssl__locl_8h_a844e2cf5dcbb5f89cdbcba21691ee30e}
+)~((a)\&{\bf S\-S\-L\-\_\-\-E\-X\-P\-O\-R\-T})}}\label{ssl__locl_8h_a844e2cf5dcbb5f89cdbcba21691ee30e}
 \hypertarget{ssl__locl_8h_a158fa528eb382dc3bf594ddf86eb7865}{\index{ssl\-\_\-locl.\-h@{ssl\-\_\-locl.\-h}!S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T40@{S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T40}}
 \index{S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T40@{S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T40}!ssl_locl.h@{ssl\-\_\-locl.\-h}}
 \subsubsection[{S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T40}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T40(
 \begin{DoxyParamCaption}
-\item[{}]{{\bf a}}
+\item[{}]{a}
 \end{DoxyParamCaption}
-)~(({\bf a})\&{\bf S\-S\-L\-\_\-\-E\-X\-P40})}}\label{ssl__locl_8h_a158fa528eb382dc3bf594ddf86eb7865}
+)~((a)\&{\bf S\-S\-L\-\_\-\-E\-X\-P40})}}\label{ssl__locl_8h_a158fa528eb382dc3bf594ddf86eb7865}
 \hypertarget{ssl__locl_8h_a7bb7536e863f6f10395a7f872dcbd177}{\index{ssl\-\_\-locl.\-h@{ssl\-\_\-locl.\-h}!S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T56@{S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T56}}
 \index{S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T56@{S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T56}!ssl_locl.h@{ssl\-\_\-locl.\-h}}
 \subsubsection[{S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T56}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\-S\-L\-\_\-\-I\-S\-\_\-\-E\-X\-P\-O\-R\-T56(
 \begin{DoxyParamCaption}
-\item[{}]{{\bf a}}
+\item[{}]{a}
 \end{DoxyParamCaption}
-)~(({\bf a})\&{\bf S\-S\-L\-\_\-\-E\-X\-P56})}}\label{ssl__locl_8h_a7bb7536e863f6f10395a7f872dcbd177}
+)~((a)\&{\bf S\-S\-L\-\_\-\-E\-X\-P56})}}\label{ssl__locl_8h_a7bb7536e863f6f10395a7f872dcbd177}
 \hypertarget{ssl__locl_8h_a23ab63da9f7499338c293f9fc240aebb}{\index{ssl\-\_\-locl.\-h@{ssl\-\_\-locl.\-h}!S\-S\-L\-\_\-k\-D\-Hd@{S\-S\-L\-\_\-k\-D\-Hd}}
 \index{S\-S\-L\-\_\-k\-D\-Hd@{S\-S\-L\-\_\-k\-D\-Hd}!ssl_locl.h@{ssl\-\_\-locl.\-h}}
 \subsubsection[{S\-S\-L\-\_\-k\-D\-Hd}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\-S\-L\-\_\-k\-D\-Hd~0x00000004\-L /$\ast$ D\-H cert, D\-S\-A C\-A cert $\ast$/ /$\ast$ no such ciphersuite supported! $\ast$/}}\label{ssl__locl_8h_a23ab63da9f7499338c293f9fc240aebb}

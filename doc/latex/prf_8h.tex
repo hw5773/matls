@@ -13,6 +13,7 @@ This file is to define the attributes and functions for the pseudorandom functio
 {\ttfamily \#include $<$time.\-h$>$}\\*
 {\ttfamily \#include $<$openssl/ssl.\-h$>$}\\*
 {\ttfamily \#include $<$openssl/evp.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/bio.\-h$>$}\\*
 {\ttfamily \#include $<$openssl/hmac.\-h$>$}\\*
 {\ttfamily \#include $<$sys/time.\-h$>$}\\*
 Include dependency graph for prf.\-h\-:
@@ -41,14 +42,16 @@ typedef struct \hyperlink{structsecurity__parameters}{security\-\_\-parameters} 
 \subsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-int \hyperlink{prf_8h_a90d7d8700543afd59f05013cdb654233}{a} (int, unsigned char $\ast$)
-\item 
+unsigned char $\ast$ \hyperlink{prf_8h_a1e0cc15a5f933fcf1f3dd9017839ce1f}{hash} (\hyperlink{prf_8h_a2e4c9fad15fd913a2f3bc5557701fdc2}{S\-E\-C\-U\-R\-I\-T\-Y\-\_\-\-P\-A\-R\-A\-M\-S} $\ast$sp, unsigned char $\ast$msg, int mlen)
+\begin{DoxyCompactList}\small\item\em Hash. \end{DoxyCompactList}\item 
 unsigned char $\ast$ \hyperlink{prf_8h_a1e808a6ad372ec831d4aefa01212990b}{p\-\_\-hash} (\hyperlink{prf_8h_a2e4c9fad15fd913a2f3bc5557701fdc2}{S\-E\-C\-U\-R\-I\-T\-Y\-\_\-\-P\-A\-R\-A\-M\-S} $\ast$sp, unsigned char $\ast$key, int klen, unsigned char $\ast$seed, int slen, unsigned char $\ast$result, int rlen)
 \begin{DoxyCompactList}\small\item\em Perform p\-\_\-hash defined in R\-F\-C5246. \end{DoxyCompactList}\item 
 unsigned char $\ast$ \hyperlink{prf_8h_a42a24fb0a80685643e8ec4e991088b26}{prf} (\hyperlink{prf_8h_a2e4c9fad15fd913a2f3bc5557701fdc2}{S\-E\-C\-U\-R\-I\-T\-Y\-\_\-\-P\-A\-R\-A\-M\-S} $\ast$sp, unsigned char $\ast$key, int klen, unsigned char $\ast$label, int llen, unsigned char $\ast$seed, int slen, int $\ast$rlen)
 \begin{DoxyCompactList}\small\item\em Pseudorandom Function defined in R\-F\-C5246. \end{DoxyCompactList}\item 
 unsigned char $\ast$ \hyperlink{prf_8h_a51c7b3780ddd9293dfa9eeae775fabdd}{hmac\-\_\-hash} (\hyperlink{prf_8h_a2e4c9fad15fd913a2f3bc5557701fdc2}{S\-E\-C\-U\-R\-I\-T\-Y\-\_\-\-P\-A\-R\-A\-M\-S} $\ast$sp, unsigned char $\ast$key, int klen, unsigned char $\ast$msg, int mlen, unsigned char $\ast$result, int $\ast$rlen)
-\begin{DoxyCompactList}\small\item\em Perform H\-M\-A\-C. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Perform H\-M\-A\-C. \end{DoxyCompactList}\item 
+unsigned char $\ast$ \hyperlink{prf_8h_a9f21e2deb418a612dba02c59bee2592d}{generate\-\_\-global\-\_\-mac} (\hyperlink{prf_8h_a2e4c9fad15fd913a2f3bc5557701fdc2}{S\-E\-C\-U\-R\-I\-T\-Y\-\_\-\-P\-A\-R\-A\-M\-S} $\ast$sp, unsigned char $\ast$key, int klen, unsigned char $\ast$msg, int mlen, int $\ast$rlen)
+\end{DoxyCompactItemize}
 
 
 \subsection{Detailed Description}
@@ -86,14 +89,43 @@ Data structure for Constants.
 
 
 \subsection{Function Documentation}
-\hypertarget{prf_8h_a90d7d8700543afd59f05013cdb654233}{\index{prf.\-h@{prf.\-h}!a@{a}}
-\index{a@{a}!prf.h@{prf.\-h}}
-\subsubsection[{a}]{\setlength{\rightskip}{0pt plus 5cm}int a (
+\hypertarget{prf_8h_a9f21e2deb418a612dba02c59bee2592d}{\index{prf.\-h@{prf.\-h}!generate\-\_\-global\-\_\-mac@{generate\-\_\-global\-\_\-mac}}
+\index{generate\-\_\-global\-\_\-mac@{generate\-\_\-global\-\_\-mac}!prf.h@{prf.\-h}}
+\subsubsection[{generate\-\_\-global\-\_\-mac}]{\setlength{\rightskip}{0pt plus 5cm}unsigned char$\ast$ generate\-\_\-global\-\_\-mac (
 \begin{DoxyParamCaption}
-\item[{int}]{, }
-\item[{unsigned char $\ast$}]{}
+\item[{{\bf S\-E\-C\-U\-R\-I\-T\-Y\-\_\-\-P\-A\-R\-A\-M\-S} $\ast$}]{sp, }
+\item[{unsigned char $\ast$}]{key, }
+\item[{int}]{klen, }
+\item[{unsigned char $\ast$}]{msg, }
+\item[{int}]{mlen, }
+\item[{int $\ast$}]{rlen}
 \end{DoxyParamCaption}
-)}}\label{prf_8h_a90d7d8700543afd59f05013cdb654233}
+)}}\label{prf_8h_a9f21e2deb418a612dba02c59bee2592d}
+\hypertarget{prf_8h_a1e0cc15a5f933fcf1f3dd9017839ce1f}{\index{prf.\-h@{prf.\-h}!hash@{hash}}
+\index{hash@{hash}!prf.h@{prf.\-h}}
+\subsubsection[{hash}]{\setlength{\rightskip}{0pt plus 5cm}unsigned char$\ast$ hash (
+\begin{DoxyParamCaption}
+\item[{{\bf S\-E\-C\-U\-R\-I\-T\-Y\-\_\-\-P\-A\-R\-A\-M\-S} $\ast$}]{sp, }
+\item[{unsigned char $\ast$}]{msg, }
+\item[{int}]{mlen}
+\end{DoxyParamCaption}
+)}}\label{prf_8h_a1e0cc15a5f933fcf1f3dd9017839ce1f}
+
+
+Hash. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sp} & Security parameters \\
+\hline
+{\em msg} & Message \\
+\hline
+{\em mlen} & Length of Message \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Result (This must be freed outside) 
+\end{DoxyReturn}
 \hypertarget{prf_8h_a51c7b3780ddd9293dfa9eeae775fabdd}{\index{prf.\-h@{prf.\-h}!hmac\-\_\-hash@{hmac\-\_\-hash}}
 \index{hmac\-\_\-hash@{hmac\-\_\-hash}!prf.h@{prf.\-h}}
 \subsubsection[{hmac\-\_\-hash}]{\setlength{\rightskip}{0pt plus 5cm}unsigned char$\ast$ hmac\-\_\-hash (

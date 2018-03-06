@@ -20,6 +20,7 @@ var searchData=
   ['cipher',['cipher',['../structssl__session__st.html#ad28c676df9d108256549b35af21488ea',1,'ssl_session_st']]],
   ['cipher_5fid',['cipher_id',['../structssl__session__st.html#a8701f3c1016dda3c59248560eaaddeb6',1,'ssl_session_st']]],
   ['ciphers',['ciphers',['../structngx__http__ssl__srv__conf__t.html#ad88dded5e7dc5c9f27275e0874336387',1,'ngx_http_ssl_srv_conf_t']]],
+  ['client_2ec',['client.c',['../client_8c.html',1,'']]],
   ['client_5fcert_5fcb',['client_cert_cb',['../structssl__ctx__st.html#abb1883d320a908f6919b80e350d6c4f2',1,'ssl_ctx_st']]],
   ['client_5fcert_5fengine',['client_cert_engine',['../structssl__ctx__st.html#ae6bb617a63017d5c8e7eccc6f8030185',1,'ssl_ctx_st']]],
   ['client_5fcertificate',['client_certificate',['../structngx__http__ssl__srv__conf__t.html#aee2ecc677797ed3bee99896124f3dc0f',1,'ngx_http_ssl_srv_conf_t']]],
@@ -41,5 +42,5 @@ var searchData=
   ['count_2epy',['count.py',['../count_8py.html',1,'']]],
   ['crawler',['crawler',['../namespacedomain.html#af73c25cde0b0b73e0887324bbee697db',1,'domain.crawler()'],['../namespacetop.html#a4eea619bbfb4a64ada75e4ba9168e5b8',1,'top.crawler()']]],
   ['crl',['crl',['../structngx__http__ssl__srv__conf__t.html#a1898fe47f8b093c83b6ca0d81e4e830a',1,'ngx_http_ssl_srv_conf_t']]],
-  ['ctx',['ctx',['../structssl__st.html#a5a3ac76eff749d5d3c9ecf6b1a230497',1,'ssl_st']]]
+  ['ctx',['ctx',['../structssl__st.html#a5a3ac76eff749d5d3c9ecf6b1a230497',1,'ssl_st::ctx()'],['../client_8c.html#ad5433bcc8a463fb4df3ce5912bb11fe3',1,'ctx():&#160;client.c']]]
 ];

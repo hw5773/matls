@@ -13,6 +13,8 @@ Include dependency graph for prf.\-c\-:
 \subsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
+unsigned char $\ast$ \hyperlink{prf_8c_a1e0cc15a5f933fcf1f3dd9017839ce1f}{hash} (\hyperlink{prf_8h_a2e4c9fad15fd913a2f3bc5557701fdc2}{S\-E\-C\-U\-R\-I\-T\-Y\-\_\-\-P\-A\-R\-A\-M\-S} $\ast$sp, unsigned char $\ast$msg, int mlen)
+\begin{DoxyCompactList}\small\item\em Hash. \end{DoxyCompactList}\item 
 unsigned char $\ast$ \hyperlink{prf_8c_a51c7b3780ddd9293dfa9eeae775fabdd}{hmac\-\_\-hash} (\hyperlink{prf_8h_a2e4c9fad15fd913a2f3bc5557701fdc2}{S\-E\-C\-U\-R\-I\-T\-Y\-\_\-\-P\-A\-R\-A\-M\-S} $\ast$sp, unsigned char $\ast$key, int klen, unsigned char $\ast$msg, int mlen, unsigned char $\ast$result, int $\ast$rlen)
 \begin{DoxyCompactList}\small\item\em Perform H\-M\-A\-C. \end{DoxyCompactList}\item 
 unsigned char $\ast$ \hyperlink{prf_8c_a1e808a6ad372ec831d4aefa01212990b}{p\-\_\-hash} (\hyperlink{prf_8h_a2e4c9fad15fd913a2f3bc5557701fdc2}{S\-E\-C\-U\-R\-I\-T\-Y\-\_\-\-P\-A\-R\-A\-M\-S} $\ast$sp, unsigned char $\ast$key, int klen, unsigned char $\ast$seed, int slen, unsigned char $\ast$result, int rlen)
@@ -31,6 +33,31 @@ Hyunwoo Lee
 
 
 \subsection{Function Documentation}
+\hypertarget{prf_8c_a1e0cc15a5f933fcf1f3dd9017839ce1f}{\index{prf.\-c@{prf.\-c}!hash@{hash}}
+\index{hash@{hash}!prf.c@{prf.\-c}}
+\subsubsection[{hash}]{\setlength{\rightskip}{0pt plus 5cm}unsigned char$\ast$ hash (
+\begin{DoxyParamCaption}
+\item[{{\bf S\-E\-C\-U\-R\-I\-T\-Y\-\_\-\-P\-A\-R\-A\-M\-S} $\ast$}]{sp, }
+\item[{unsigned char $\ast$}]{msg, }
+\item[{int}]{mlen}
+\end{DoxyParamCaption}
+)}}\label{prf_8c_a1e0cc15a5f933fcf1f3dd9017839ce1f}
+
+
+Hash. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sp} & Security parameters \\
+\hline
+{\em msg} & Message \\
+\hline
+{\em mlen} & Length of Message \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Result (This must be freed outside) 
+\end{DoxyReturn}
 \hypertarget{prf_8c_a51c7b3780ddd9293dfa9eeae775fabdd}{\index{prf.\-c@{prf.\-c}!hmac\-\_\-hash@{hmac\-\_\-hash}}
 \index{hmac\-\_\-hash@{hmac\-\_\-hash}!prf.c@{prf.\-c}}
 \subsubsection[{hmac\-\_\-hash}]{\setlength{\rightskip}{0pt plus 5cm}unsigned char$\ast$ hmac\-\_\-hash (

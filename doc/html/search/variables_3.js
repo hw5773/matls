@@ -24,5 +24,5 @@ var searchData=
   ['compress',['compress',['../structssl__st.html#a62a49a9330502d045bbf6376c820225c',1,'ssl_st']]],
   ['compress_5fmeth',['compress_meth',['../structssl__session__st.html#a2da44d606e0a955ab8f930c2def1ba45',1,'ssl_session_st']]],
   ['crl',['crl',['../structngx__http__ssl__srv__conf__t.html#a1898fe47f8b093c83b6ca0d81e4e830a',1,'ngx_http_ssl_srv_conf_t']]],
-  ['ctx',['ctx',['../structssl__st.html#a5a3ac76eff749d5d3c9ecf6b1a230497',1,'ssl_st']]]
+  ['ctx',['ctx',['../structssl__st.html#a5a3ac76eff749d5d3c9ecf6b1a230497',1,'ssl_st::ctx()'],['../client_8c.html#ad5433bcc8a463fb4df3ce5912bb11fe3',1,'ctx():&#160;client.c']]]
 ];

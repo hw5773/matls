@@ -1,10 +1,9 @@
 var searchData=
 [
-  ['a',['A',['../structsrp__ctx__st.html#a65bcccab6ee5eb609c2304fd3a2a7c3f',1,'srp_ctx_st::A()'],['../structsrp__ctx__st.html#a5d063ec2dc87cc7351ced5b25de67e3f',1,'srp_ctx_st::a()'],['../prf_8h.html#a90d7d8700543afd59f05013cdb654233',1,'a():&#160;prf.h']]],
+  ['a',['A',['../structsrp__ctx__st.html#a65bcccab6ee5eb609c2304fd3a2a7c3f',1,'srp_ctx_st::A()'],['../structsrp__ctx__st.html#a5d063ec2dc87cc7351ced5b25de67e3f',1,'srp_ctx_st::a()']]],
   ['ack',['ack',['../structpair__entry.html#a5663beddd73df4484d031a1677a4e106',1,'pair_entry']]],
-  ['add_5fglobal_5fmac',['add_global_mac',['../record_8h.html#a5427ee390d0fbcf933ad289475a86630',1,'record.h']]],
+  ['add_5fglobal_5fmac',['add_global_mac',['../record_8c.html#a42fdfb5f9950f4a8a287b83099c62bf6',1,'add_global_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *id, int idlen, unsigned char *key, int klen, unsigned char *prev, int plen, unsigned char *next, int nlen):&#160;record.c'],['../record_8h.html#a42fdfb5f9950f4a8a287b83099c62bf6',1,'add_global_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *id, int idlen, unsigned char *key, int klen, unsigned char *prev, int plen, unsigned char *next, int nlen):&#160;record.c']]],
   ['add_5fpair_5fto_5ftable',['add_pair_to_table',['../pair__repo_8c.html#ae0d70af68951f21a5bbef1ed68a8c81e',1,'add_pair_to_table(struct pair_entry *tmp):&#160;pair_repo.c'],['../pair__repo_8h.html#ae0d70af68951f21a5bbef1ed68a8c81e',1,'add_pair_to_table(struct pair_entry *tmp):&#160;pair_repo.c']]],
-  ['add_5frecord',['add_record',['../record_8c.html#a2593b1a730045189aecf866f6370b530',1,'record.c']]],
   ['add_5fsource_5fmac',['add_source_mac',['../record_8c.html#a3d5bd635369e2190ee204e370458b577',1,'add_source_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *msg, int mlen, unsigned char *key, int klen):&#160;record.c'],['../record_8h.html#a3d5bd635369e2190ee204e370458b577',1,'add_source_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *msg, int mlen, unsigned char *key, int klen):&#160;record.c']]],
   ['alert_5fvalue',['alert_value',['../structssl3__enc__method.html#aad11cf6fc0fe09469b05f387f7a11a80',1,'ssl3_enc_method']]],
   ['alg_5fbits',['alg_bits',['../structssl__cipher__st.html#a451f084cd7c875897f5986a35a482628',1,'ssl_cipher_st']]],
@@ -23,10 +22,12 @@ var searchData=
   ['app_5flog1d',['APP_LOG1d',['../logs_8h.html#aa788ed9d9cfc82fedcac5ab1e155c881',1,'logs.h']]],
   ['app_5flog1lu',['APP_LOG1lu',['../logs_8h.html#a5fdba70896df2bb365ec63a8110095db',1,'logs.h']]],
   ['app_5flog1p',['APP_LOG1p',['../logs_8h.html#af99253a9750ed034b90345e588a6bdb3',1,'logs.h']]],
+  ['app_5flog1us',['APP_LOG1us',['../logs_8h.html#af69f322f76b412fe72e24c57886a4f4b',1,'logs.h']]],
   ['app_5flog2s',['APP_LOG2s',['../logs_8h.html#a2e8340d77ed5ca996cfa93a850b38f97',1,'logs.h']]],
   ['app_5fverify_5farg',['app_verify_arg',['../structssl__ctx__st.html#ac65736129c311f93009b7f3d67b95bcf',1,'ssl_ctx_st']]],
   ['app_5fverify_5fcallback',['app_verify_callback',['../structssl__ctx__st.html#a1f66a04c28f7896e13eb1fe8aa0f388e',1,'ssl_ctx_st']]],
   ['app_5fverify_5fcookie_5fcb',['app_verify_cookie_cb',['../structssl__ctx__st.html#a1db4843c271681af790f0eadf15c46d3',1,'ssl_ctx_st']]],
+  ['apps_5fssl_5finfo_5fcallback',['apps_ssl_info_callback',['../client_8c.html#a02476f5389aa2c06e290cbe9d7c00628',1,'apps_ssl_info_callback(const SSL *s, int where, int ret):&#160;client.c'],['../server_8c.html#a02476f5389aa2c06e290cbe9d7c00628',1,'apps_ssl_info_callback(const SSL *s, int where, int ret):&#160;server.c']]],
   ['assemble',['assemble',['../namespaceassemble.html',1,'assemble'],['../namespaceanalyze.html#a3516d0c6d65218119c786aba0e9c6111',1,'analyze.assemble()']]],
   ['assemble_2epy',['assemble.py',['../assemble_8py.html',1,'']]]
 ];

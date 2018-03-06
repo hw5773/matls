@@ -13,11 +13,13 @@ int main(int argc, char *argv[])
   MOD_RECORD *mr;
   unsigned char *msg1 = "test message";
   unsigned char *msg2 = "modified message";
+  unsigned char *msg3 = "final message";
   unsigned long start, end;
 
   int i, j;
   int mlen1 = strlen(msg1);
   int mlen2 = strlen(msg2);
+  int mlen3 = strlen(msg3);
 
   SECURITY_PARAMS sp;
   sp.mac_algorithm = EVP_sha256();
@@ -49,17 +51,31 @@ int main(int argc, char *argv[])
     printf("\n");
   }
 
+  APP_LOG("----- Initialize Modification Record -----");
+
   start = get_current_microseconds();
   init_record(&mr, sp.mac_length);
   end = get_current_microseconds();
 
   APP_LOG1us("Elapsed time for Initializing Modification Record", end - start);
 
+  APP_LOG("----- Add Source MAC -----");
   start = get_current_microseconds();
   add_source_mac(&sp, mr, msg1, mlen1, secret[0], sp.key_length);
   end = get_current_microseconds();
-
   APP_LOG1us("Elapsed time for Adding Source MAC", end - start);
+
+  APP_LOG("----- Add Global MAC -----");
+  start = get_current_microseconds();
+  add_global_mac(&sp, mr, id[3], sp.key_length, secret[3], sp.key_length, hash(&sp, msg1, mlen1), sp.key_length, msg2, mlen2);
+  end = get_current_microseconds();
+  APP_LOG1us("Elapsed time for Adding Global MAC", end - start);
+
+  APP_LOG("----- Add Global MAC -----");
+  start = get_current_microseconds();
+  add_global_mac(&sp, mr, id[7], sp.key_length, secret[7], sp.key_length, hash(&sp, msg2, mlen2), sp.key_length, msg3, mlen3);
+  end = get_current_microseconds();
+  APP_LOG1us("Elapsed time for Adding Global MAC", end - start);
 
   free_record(mr);
   return 0;

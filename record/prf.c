@@ -33,9 +33,10 @@ unsigned char *hash(SECURITY_PARAMS *sp, unsigned char *msg, int mlen)
     goto md_err;
 
   BIO_push(bio_md, bio_mem);
+
   bytes = BIO_write(bio_md, msg, mlen);
 
-  if (bytes != sp->mac_length)
+  if (bytes != mlen)
     goto mem_err;
 
   BIO_gets(bio_md, result, sp->mac_length);
@@ -96,7 +97,7 @@ unsigned char *p_hash(SECURITY_PARAMS *sp, unsigned char *key, int klen, unsigne
   a = seed;
   alen = slen;
 
-  APP_LOG("Start Hashing");
+  APP_LOG("Start hash");
   APP_LOG1d("Index", idx);
 
   for (i=0; i<num; i++)

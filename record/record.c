@@ -133,13 +133,22 @@ int add_source_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *msg, int 
   APP_LOG2s("Add data source MAC with the message", msg, mlen);
   APP_LOG2s("Key for source MAC", key, klen);
   int rlen;
+  unsigned char *tmp;
+  tmp = hash(sp, msg, mlen);
 
+  if (!tmp)
+    APP_LOG("No tmp");
+  else
+    APP_LOG("Yes tmp");
+
+  APP_LOG2s("Hash", tmp, sp->mac_length);
+  
   hmac_hash(sp, key, klen, msg, mlen, mr->source_mac, &rlen);
 
   if (rlen < sp->mac_length)
     goto err;
 
-  APP_LOG2s("mr->source_mac", mr->source_mac, sp->mac_length);
+  APP_LOG2s("Source MAC", mr->source_mac, sp->mac_length);
 
   return SUCCESS;
 err:
@@ -154,8 +163,8 @@ err:
  * @param idlen Length of ID
  * @param key MAC key
  * @param klen Length of Key
- * @param prev Previous Message
- * @param plen Length of Previous Message
+ * @param prev Hash of Previous Message
+ * @param plen Hash Length
  * @param next Next Message
  * @param nlen Length of Next Message
  * @return SUCCESS(0)/FAILURE(-1)
@@ -163,10 +172,6 @@ err:
 int add_global_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *id, int idlen, unsigned char *key, int klen, unsigned char *prev, int plen, unsigned char *next, int nlen)
 {
   APP_LOG("Add the global mac to the modification record");
-  APP_LOG2s("ID", id, idlen);
-  APP_LOG2s("Key", key, klen);
-  APP_LOG2s("Prev", prev, plen);
-  APP_LOG2s("Next", next, nlen);
 
   MR_ENTRY *tmp;
   unsigned char *mod;
@@ -192,6 +197,13 @@ int add_global_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *id, int i
   TAILQ_INSERT_TAIL(&(mr->global_macs_head), tmp, entries);
 
   free(mod);
+
+  APP_LOG("----- Add Global MAC -----");
+  APP_LOG2s("ID", tmp->writer, sp->mac_length);
+  APP_LOG2s("Prev", tmp->prior_msg_hash, sp->mac_length);
+  APP_LOG2s("Mod", tmp->modification_hash, sp->mac_length);
+  printf("\n");
+
   return SUCCESS;
 err:
   free(mod);

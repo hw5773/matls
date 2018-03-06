@@ -16,6 +16,7 @@
 #include <time.h>
 #include <openssl/ssl.h>
 #include <openssl/evp.h>
+#include <openssl/bio.h>
 #include <openssl/hmac.h>
 #include <sys/time.h>
 
@@ -34,7 +35,7 @@ typedef struct security_parameters
   int key_length;                   /**< The length of the mac key */
 } SECURITY_PARAMS;
 
-int a(int, unsigned char *);
+unsigned char *hash(SECURITY_PARAMS *sp, unsigned char *msg, int mlen);
 unsigned char *p_hash(SECURITY_PARAMS *sp, unsigned char *key, int klen, unsigned char *seed, int slen, unsigned char *result, int rlen);
 unsigned char *prf(SECURITY_PARAMS *sp, unsigned char *key, int klen, unsigned char *label, int llen, unsigned char *seed, int slen, int *rlen);
 unsigned char *hmac_hash(SECURITY_PARAMS *sp, unsigned char *key, int klen, unsigned char *msg, int mlen, unsigned char *result, int *rlen);

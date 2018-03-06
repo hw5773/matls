@@ -10,6 +10,50 @@
 #include "logs.h"
 
 /**
+ * @brief Hash
+ * @param sp Security parameters
+ * @param msg Message
+ * @param mlen Length of Message
+ * @return Result (This must be freed outside)
+ */
+unsigned char *hash(SECURITY_PARAMS *sp, unsigned char *msg, int mlen)
+{
+  BIO *bio_md = NULL;
+  BIO *bio_mem = NULL;
+  unsigned char *result = (unsigned char *)malloc(sp->mac_length);
+  int bytes;
+
+  if (!(bio_md = BIO_new(BIO_f_md())))
+    goto err;
+
+  if (!BIO_set_md(bio_md, sp->mac_algorithm))
+    goto md_err;
+
+  if (!(bio_mem = BIO_new(BIO_s_mem())))
+    goto md_err;
+
+  BIO_push(bio_md, bio_mem);
+  bytes = BIO_write(bio_md, msg, mlen);
+
+  if (bytes != sp->mac_length)
+    goto mem_err;
+
+  BIO_gets(bio_md, result, sp->mac_length);
+
+  BIO_free(bio_md);
+  BIO_free(bio_mem);
+
+  return result;
+
+mem_err:
+  BIO_free(bio_mem);
+md_err:
+  BIO_free(bio_md);
+err:
+  return NULL;
+}
+
+/**
  * @brief Perform HMAC
  * @param sp Security parameters
  * @param key Secret value
@@ -125,5 +169,3 @@ unsigned char *prf(SECURITY_PARAMS *sp, unsigned char *key, int klen, unsigned c
 
   return p_hash(sp, key, klen, s, llen + slen, result, bytes);
 }
-
-

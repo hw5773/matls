@@ -189,7 +189,7 @@ int add_global_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *id, int i
   if (rlen < sp->mac_length)
     goto err;
 
-  TAILQ_INSERT_TAIL(&(mr->global_mac_head), tmp, entries);
+  TAILQ_INSERT_TAIL(&(mr->global_macs_head), tmp, entries);
 
   free(mod);
   return SUCCESS;
@@ -199,6 +199,14 @@ mod_err:
   free_entry(tmp);
 entry_err:
   return FAILURE;
+}
+
+/**
+ * @brief Print the modification record
+ */
+int print_record(MOD_RECORD *mr)
+{
+  
 }
 
 int verify_record()

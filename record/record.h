@@ -48,7 +48,9 @@ int init_entry(MR_ENTRY **entry, int len);
 int free_entry(MR_ENTRY *entry);
 
 int add_source_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *msg, int mlen, unsigned char *key, int klen);
-int add_global_mac(unsigned char *record, int rec_len, unsigned char *id, int id_len, unsigned char *mac_key, int mk_len, unsigned char *prev, int prev_len, unsigned char *next, int next_len);
+int add_global_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *id, int idlen, unsigned char *key, int klen, unsigned char *prev, int plen, unsigned char *next, int nlen);
+
 int verify_record();
+int print_record(MOD_RECORD *mr);
 
 #endif /* __RECORD_H__ */

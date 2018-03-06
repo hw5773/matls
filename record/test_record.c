@@ -11,29 +11,42 @@
 int main(int argc, char *argv[])
 {
   MOD_RECORD *mr;
-  unsigned char *msg = "test message";
+  unsigned char *msg1 = "test message";
+  unsigned char *msg2 = "modified message";
   unsigned long start, end;
-  int mlen = strlen(msg);
-  int i;
 
-  APP_LOG1d("message length", mlen);
+  int i, j;
+  int mlen1 = strlen(msg1);
+  int mlen2 = strlen(msg2);
 
   SECURITY_PARAMS sp;
   sp.mac_algorithm = EVP_sha256();
   sp.mac_length = SHA256_DIGEST_LENGTH;
   sp.key_length = DEFAULT_KEY_LENGTH;
 
-  unsigned char secret1[sp.key_length];
-  unsigned char secret2[sp.key_length];
-  unsigned char secret3[sp.key_length];
-  unsigned char secret4[sp.key_length];
+  unsigned char id[10][sp.key_length];
+  unsigned char secret[10][sp.key_length];
 
-  for (i=0; i<sp.key_length; i++)
+  for (j=0; j<sp.key_length; j++)
   {
-    secret1[i] = i;
-    secret2[i] = sp.key_length - i;
-    secret3[i] = 3;
-    secret4[i] = 4;
+    secret[0][j] = j;
+    id[0][j] = sp.key_length - j;
+  }
+
+  APP_LOG2s("secret[0]", secret[0], sp.key_length);
+
+  for (i=1; i<10; i++)
+  {
+    memcpy(secret[i], hash(&sp, secret[i-1], sp.key_length), sp.key_length);
+    memcpy(id[i], hash(&sp, id[i-1], sp.key_length), sp.key_length);
+  }
+
+  for (i=0; i<10; i++)
+  {
+    printf("----- (%d) ID / Global MAC Key ------\n", i);
+    APP_LOG2s("id", id[i], sp.key_length);
+    APP_LOG2s("global MAC key", secret[i], sp.key_length);
+    printf("\n");
   }
 
   start = get_current_microseconds();
@@ -43,7 +56,7 @@ int main(int argc, char *argv[])
   APP_LOG1us("Elapsed time for Initializing Modification Record", end - start);
 
   start = get_current_microseconds();
-  add_source_mac(&sp, mr, msg, mlen, secret1, sp.key_length);
+  add_source_mac(&sp, mr, msg1, mlen1, secret[0], sp.key_length);
   end = get_current_microseconds();
 
   APP_LOG1us("Elapsed time for Adding Source MAC", end - start);

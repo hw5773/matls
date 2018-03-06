@@ -23,7 +23,7 @@
 unsigned char *hmac_hash(SECURITY_PARAMS *sp, unsigned char *key, int klen, unsigned char *msg, int mlen, unsigned char *result, int *rlen)
 {
   APP_LOG("Perform HMAC");
-  return HMAC(sp->hash_function, key, klen, msg, mlen, result, rlen);
+  return HMAC(sp->mac_algorithm, key, klen, msg, mlen, result, rlen);
 }
 
 /**
@@ -44,9 +44,9 @@ unsigned char *p_hash(SECURITY_PARAMS *sp, unsigned char *key, int klen, unsigne
   int i, num, alen, copy, index = 0;
   unsigned char *a;
 
-  num = rlen / (sp->hash_length);
+  num = rlen / (sp->mac_length);
 
-  if ((rlen % sp->hash_length) > 0)
+  if ((rlen % sp->mac_length) > 0)
     num += 1;
 
   a = seed;
@@ -125,3 +125,5 @@ unsigned char *prf(SECURITY_PARAMS *sp, unsigned char *key, int klen, unsigned c
 
   return p_hash(sp, key, klen, s, llen + slen, result, bytes);
 }
+
+

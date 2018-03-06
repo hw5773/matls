@@ -23,6 +23,8 @@ int idx;
   printf("[matls] %s: %s: %s\n", __func__, msg, arg1)
 #define APP_LOG1lu(msg, arg1) \
   printf("[matls] %s: %s: %lu\n", __func__, msg, arg1)
+#define APP_LOG1us(msg, arg1) \
+  printf("[matls] %s: %s: %lu us\n", __func__, msg, arg1)
 #define APP_LOG1p(msg, arg1) \
   printf("[matls] %s: %s: %p\n", __func__, msg, arg1)
 #define APP_LOG2s(msg, arg1, arg2) \
@@ -38,6 +40,7 @@ int idx;
 #define APP_LOG(msg)
 #define APP_LOG1d(msg, arg1)
 #define APP_LOG1lu(msg, arg1)
+#define APP_LOG1us(msg, arg1)
 #define APP_LOG1p(msg, arg1)
 #define APP_LOG2s(msg, arg1, arg2)
 #endif /* DEBUG */

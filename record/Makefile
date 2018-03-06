@@ -9,12 +9,12 @@ LDFLAGS=-L/usr/local/lib -lssl -lcrypto -ldl
 RECORD=test_record
 PRF=test_prf
 SRC=test_record.c record.c logs.c
-ROBJ=test_record.o record.o logs.o
+ROBJ=test_record.o record.o logs.o prf.o
 POBJ=test_prf.o prf.o logs.o
 
 all: record prf
 
-record: test_record.o record.o logs.o
+record: test_record.o record.o logs.o prf.o
 	$(CC) -o $(RECORD) $(ROBJ) $(LDFLAGS)
 
 prf: test_prf.o prf.o logs.o

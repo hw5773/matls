@@ -19,9 +19,8 @@ int main(int argc, char *argv[])
 
   APP_LOG("Start test prf application");
 
-  sp.hash_function = EVP_sha256();
-  sp.hash_length = SHA256_DIGEST_LENGTH;
-  sp.mac_length = DEFAULT_MAC_LENGTH;
+  sp.mac_algorithm = EVP_sha256();
+  sp.mac_length = SHA256_DIGEST_LENGTH;
   sp.key_length = DEFAULT_KEY_LENGTH;
 
   unsigned char secret[sp.key_length];

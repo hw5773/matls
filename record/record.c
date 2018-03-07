@@ -137,6 +137,9 @@ int add_source_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *msg, int 
 
   hmac_hash(sp, key, klen, hash(sp, msg, mlen), sp->mac_length, mr->source_mac, &rlen);
 
+  APP_LOG2s("Source Hash", hash(sp, msg, mlen), sp->mac_length);
+  APP_LOG2s("Source MAC", mr->source_mac, sp->mac_length);
+
   if (rlen < sp->mac_length)
     goto mac_err;
 
@@ -196,9 +199,8 @@ int add_global_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *id, int i
   APP_LOG2s("ID", tmp->writer, sp->mac_length);
   APP_LOG2s("Secret", key, sp->key_length);
   APP_LOG2s("Prev", tmp->prior_msg_hash, sp->mac_length);
-  APP_LOG2s("Next", next, sp->mac_length);
+  APP_LOG2s("Next", n, sp->mac_length);
   APP_LOG2s("Mod", tmp->modification_hash, sp->mac_length);
-  printf("\n");
 
   return SUCCESS;
 err:
@@ -303,11 +305,11 @@ err:
   return NULL;
 }
 
-int find_id(SECURITY_PARAMS *sp, unsigned char *x, unsigned char id[][sp->mac_length])
+int find_id(SECURITY_PARAMS *sp, unsigned char *x, unsigned char id[][sp->mac_length], int num_of_ids)
 {
   int i, ret = -1;
 
-  for (i=0; i<NUM_OF_IDS; i++)
+  for (i=0; i<=num_of_ids; i++)
   {
     if (strncmp(id[i], x, sp->mac_length) == 0)
     {
@@ -328,7 +330,7 @@ int find_id(SECURITY_PARAMS *sp, unsigned char *x, unsigned char id[][sp->mac_le
  * @param secret Global MAC keys
  * @return SUCCESS(0)/FAILURE(-1)
  */
-int verify_record(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *h, unsigned char id[][sp->mac_length], unsigned char secret[][sp->key_length])
+int verify_record(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *h, unsigned char id[][sp->mac_length], unsigned char secret[][sp->key_length], int num_of_ids)
 {
   MR_ENTRY *tmp;
   unsigned char *key, *mod, *gmac, *prev, *curr = h;
@@ -341,7 +343,7 @@ int verify_record(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *h, unsigne
 
   TAILQ_FOREACH(tmp, &(mr->global_macs_head), entries)
   {
-    index = find_id(sp, tmp->writer, id);
+    index = find_id(sp, tmp->writer, id, num_of_ids);
     APP_LOG1d("index", index);
     key = secret[index];
     prev = tmp->prior_msg_hash;
@@ -355,7 +357,6 @@ int verify_record(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *h, unsigne
     APP_LOG2s("Secret", secret[index], sp->key_length);
     APP_LOG2s("Prev", prev, sp->mac_length);
     APP_LOG2s("Next", curr, sp->mac_length);
-//    APP_LOG2s("Answer", tmp->modification_hash, sp->mac_length);
     APP_LOG2s("Generated", gmac, sp->mac_length);
 
     if (strncmp(gmac, tmp->modification_hash, sp->mac_length) == 0)
@@ -376,6 +377,7 @@ int verify_record(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *h, unsigne
     goto len_err;
 
   APP_LOG2s("Source MAC Key", secret[0], sp->key_length);
+  APP_LOG2s("Source Hash", curr, sp->mac_length);
   APP_LOG2s("Source MAC", mr->source_mac, sp->mac_length);
   APP_LOG2s("Generated MAC", gmac, sp->mac_length);
 
@@ -417,5 +419,4 @@ int print_record(SECURITY_PARAMS *sp, MOD_RECORD *mr)
     APP_LOG2s("  Mod", tmp->modification_hash, sp->mac_length);
     APP_LOG("----------------------");
   }
-  printf("\n");
 }

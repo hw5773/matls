@@ -3,7 +3,8 @@
 
 CC=gcc
 RM=rm
-CFLAGS=-DDEBUG -I/usr/local/include
+#CFLAGS=-DDEBUG -I/usr/local/include
+CFLAGS=-I/usr/local/include
 LDFLAGS=-L/usr/local/lib -lssl -lcrypto -ldl
 
 RECORD=test_record

@@ -65,7 +65,7 @@ int free_entry(MR_ENTRY *entry);
 int add_source_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *msg, int mlen, unsigned char *key, int klen);
 int add_global_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *id, int idlen, unsigned char *key, int klen, unsigned char *prev, int plen, unsigned char *next, int nlen);
 
-int verify_record(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *msg, unsigned char id[][sp->mac_length], unsigned char secret[][sp->key_length]);
+int verify_record(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *msg, unsigned char id[][sp->mac_length], unsigned char secret[][sp->key_length], int num_of_ids);
 
 unsigned char *serialize_record(SECURITY_PARAMS *sp, MOD_RECORD *mr, int *len);
 MOD_RECORD *deserialize_record(SECURITY_PARAMS *sp, unsigned char *str, int len);

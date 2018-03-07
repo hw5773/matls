@@ -24,21 +24,15 @@ int init_record(MOD_RECORD **mr, int len)
   if (!(*mr))
     goto mr_err;
 
-  (*mr)->source_mac = (unsigned char *)malloc(len);
-
-  if (!((*mr)->source_mac))
-    goto mac_err;
-
   TAILQ_INIT(&((*mr)->global_macs_head));
 
   // TODO: How to check whether the malloc works well?
 
+  (*mr)->num_of_global_macs = 0;
+
   APP_LOG("Modification Record Init Success!");
   return SUCCESS;
-mac_err:
-  free((*mr)->source_mac);
 mr_err:
-  free((*mr));
   return FAILURE;
 }
 
@@ -50,7 +44,9 @@ mr_err:
 int free_record(MOD_RECORD *mr)
 {
   APP_LOG("Free the Modification Record");
-  free(mr->source_mac);
+
+  if (mr->source_mac)
+    free(mr->source_mac);
 
   MR_ENTRY *tmp;
   TAILQ_FOREACH(tmp, &(mr->global_macs_head), entries)
@@ -133,24 +129,20 @@ int add_source_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *msg, int 
   APP_LOG2s("Add data source MAC with the message", msg, mlen);
   APP_LOG2s("Key for source MAC", key, klen);
   int rlen;
-  unsigned char *tmp;
-  tmp = hash(sp, msg, mlen);
 
-  if (!tmp)
-    APP_LOG("No tmp");
-  else
-    APP_LOG("Yes tmp");
+  mr->source_mac = (unsigned char *)malloc(sp->mac_length);
 
-  APP_LOG2s("Hash", tmp, sp->mac_length);
-  
-  hmac_hash(sp, key, klen, msg, mlen, mr->source_mac, &rlen);
-
-  if (rlen < sp->mac_length)
+  if (!(mr->source_mac))
     goto err;
 
-  APP_LOG2s("Source MAC", mr->source_mac, sp->mac_length);
+  hmac_hash(sp, key, klen, hash(sp, msg, mlen), sp->mac_length, mr->source_mac, &rlen);
+
+  if (rlen < sp->mac_length)
+    goto mac_err;
 
   return SUCCESS;
+mac_err:
+  free(mr->source_mac);
 err:
   return FAILURE;
 }
@@ -194,9 +186,10 @@ int add_global_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *id, int i
   if (rlen < sp->mac_length)
     goto err;
 
-  TAILQ_INSERT_TAIL(&(mr->global_macs_head), tmp, entries);
-
   free(mod);
+
+  TAILQ_INSERT_HEAD(&(mr->global_macs_head), tmp, entries);
+  mr->num_of_global_macs += 1;
 
   APP_LOG("----- Add Global MAC -----");
   APP_LOG2s("ID", tmp->writer, sp->mac_length);
@@ -214,14 +207,144 @@ entry_err:
 }
 
 /**
- * @brief Print the modification record
+ * @brief Serialize the data structure for the modification record
+ * @param sp Security parameters
+ * @param mr Data structure for modification record
+ * @detail | length (2 bytes) | modification record (length bytes) |
  */
-int print_record(MOD_RECORD *mr)
+unsigned char *serialize_record(SECURITY_PARAMS *sp, MOD_RECORD *mr, int *len)
 {
-  
+  unsigned char *ret, *p;
+  MR_ENTRY *tmp;
+
+  (*len) = (3 * mr->num_of_global_macs + 1) * sp->mac_length;
+
+  APP_LOG1d("Length", (*len));
+
+  ret = (unsigned char *)malloc((*len) + 2);
+  p = ret;
+  s2n((*len), p);
+
+  memcpy(p, mr->source_mac, sp->mac_length);
+  p += sp->mac_length;
+
+  TAILQ_FOREACH(tmp, &(mr->global_macs_head), entries)
+  {
+    memcpy(p, tmp->writer, sp->mac_length);
+    p += sp->mac_length;
+    memcpy(p, tmp->prior_msg_hash, sp->mac_length);
+    p += sp->mac_length;
+    memcpy(p, tmp->modification_hash, sp->mac_length);
+    p += sp->mac_length;
+  }
+
+  return ret;
 }
 
-int verify_record()
+/**
+ * @brief Deserialize the string into the data structure
+ * @param sp Security parameters
+ * @param str String to be constructed into the data structure
+ * @param len Length of the string
+ */
+MOD_RECORD *deserialize_record(SECURITY_PARAMS *sp, unsigned char *str, int len)
 {
+  MOD_RECORD *mr;
+  unsigned char *p = str;
+  int i, l;
+
+  n2s(p, l);
+
+  APP_LOG1d("Length", l);
+
+  // Length information is wrong
+  if (l != (len - 2))
+    goto err;
+
+  if (init_record(&mr, sp->mac_length) < 0)
+    goto err;
+
+  mr->source_mac = (unsigned char *)malloc(sp->mac_length);
+
+  if (!(mr->source_mac))
+    goto mr_err;
+
+  memcpy(mr->source_mac, p, sp->mac_length);
+  p += sp->mac_length;
+  l -= sp->mac_length;
+
+  mr->num_of_global_macs = (len - sp->mac_length) / 3;
+
+  APP_LOG1d("Num of Global MACs", mr->num_of_global_macs);
+
+  for (i=0; i<l; i+=(3 * sp->mac_length))
+  {
+    MR_ENTRY *tmp;
+    if (init_entry(&tmp, sp->mac_length) < 0)
+      goto entry_err;
+    memcpy(tmp->writer, p, sp->mac_length);
+    p += sp->mac_length;
+    memcpy(tmp->prior_msg_hash, p, sp->mac_length);
+    p += sp->mac_length;
+    memcpy(tmp->modification_hash, p, sp->mac_length);
+    p += sp->mac_length;
+    TAILQ_INSERT_TAIL(&(mr->global_macs_head), tmp, entries);
+  }
+
+  return mr;
+
+entry_err:
+mr_err:
+  free_record(mr);
+err:
+  return NULL;
+}
+
+int find_id(SECURITY_PARAMS *sp, unsigned char *x, unsigned char id[][sp->mac_length])
+{
+  int ret;
+
+  for 
+
+  return ret;
+}
+
+/**
+ * @brief Verify the modification record
+ * @param sp Security parameters
+ * @param mr Modification record
+ * @param msg Received final message
+ * @param id ID table
+ * @param secret Global MAC keys
+ * @return SUCCESS(0)/FAILURE(-1)
+ */
+int verify_record(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *h, unsigned char id[][sp->mac_length], unsigned char secret[][sp->key_length])
+{
+  
+
   return SUCCESS;
+}
+
+/**
+ * @brief Print the modification record
+ * @param sp Security parameters
+ * @param mr Modification record
+ */
+int print_record(SECURITY_PARAMS *sp, MOD_RECORD *mr)
+{
+  struct entry *tmp;
+
+  APP_LOG("Print Record");
+  APP_LOG("----- Source MAC -----");
+  APP_LOG2s("  MAC", mr->source_mac, sp->mac_length);
+
+  TAILQ_FOREACH(tmp, &(mr->global_macs_head), entries)
+  {
+    APP_LOG("----- Global MAC -----");
+    APP_LOG2s("  ID", tmp->writer, sp->mac_length);
+    APP_LOG2s("  Prev", tmp->prior_msg_hash, sp->mac_length);
+    APP_LOG2s("  Mod", tmp->modification_hash, sp->mac_length);
+    APP_LOG("----------------------");
+  }
+  printf("\n");
 }

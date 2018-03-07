@@ -1,5 +1,5 @@
 /**
- * @file file.h
+ * @file record.h
  * @author Hyunwoo Lee
  * @date 21 Feb 2018
  * @brief This file is to define the attributes and functions for the record
@@ -22,6 +22,18 @@
 #include "prf.h"
 
 /**
+ * @brief Decoding from c (string) to s (int)
+ */
+#define n2s(c,s)    ((s=(((unsigned int)((c)[0]))<< 8)| \
+                        (((unsigned int)((c)[1]))    )), c+=2)
+
+/**
+ * @brief Encoding from s (int) to c (string)
+ */
+#define s2n(s,c)    ((c[0]=(unsigned char)(((s)>> 8)&0xff), \
+                      c[1]=(unsigned char)(((s)    )&0xff)), c+=2)
+
+/**
  * @brief Data structure for global MAC
  */
 typedef struct entry
@@ -38,6 +50,7 @@ typedef struct entry
 typedef struct modification_record
 {
   unsigned char *source_mac;              /**< Endpoint MAC */
+  int num_of_global_macs;
   TAILQ_HEAD(,entry) global_macs_head;      /**< Modification Record, a series of global MACs */
 } MOD_RECORD;
 
@@ -50,7 +63,11 @@ int free_entry(MR_ENTRY *entry);
 int add_source_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *msg, int mlen, unsigned char *key, int klen);
 int add_global_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *id, int idlen, unsigned char *key, int klen, unsigned char *prev, int plen, unsigned char *next, int nlen);
 
-int verify_record();
-int print_record(MOD_RECORD *mr);
+int verify_record(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *msg, unsigned char id[][sp->mac_length], unsigned char secret[][sp->key_length]);
+
+unsigned char *serialize_record(SECURITY_PARAMS *sp, MOD_RECORD *mr, int *len);
+MOD_RECORD *deserialize_record(SECURITY_PARAMS *sp, unsigned char *str, int len);
+
+int print_record(SECURITY_PARAMS *sp, MOD_RECORD *mr);
 
 #endif /* __RECORD_H__ */

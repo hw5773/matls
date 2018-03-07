@@ -7,6 +7,7 @@
 
 #include "record.h"
 #include "logs.h"
+#include "errors.h"
 
 int main(int argc, char *argv[])
 {
@@ -16,7 +17,7 @@ int main(int argc, char *argv[])
   unsigned char *msg3 = "final message";
   unsigned long start, end;
 
-  int i, j;
+  int i, j, verified;
   int mlen1 = strlen(msg1);
   int mlen2 = strlen(msg2);
   int mlen3 = strlen(msg3);
@@ -42,7 +43,7 @@ int main(int argc, char *argv[])
     memcpy(secret[i], hash(&sp, secret[i-1], sp.key_length), sp.key_length);
     memcpy(id[i], hash(&sp, id[i-1], sp.key_length), sp.key_length);
   }
-
+/*
   for (i=0; i<10; i++)
   {
     printf("----- (%d) ID / Global MAC Key ------\n", i);
@@ -50,14 +51,14 @@ int main(int argc, char *argv[])
     APP_LOG2s("global MAC key", secret[i], sp.key_length);
     printf("\n");
   }
-
-  APP_LOG("----- Initialize Modification Record -----");
+*/
+//  APP_LOG("----- Initialize Modification Record -----");
 
   start = get_current_microseconds();
   init_record(&mr, sp.mac_length);
   end = get_current_microseconds();
 
-  APP_LOG1us("Elapsed time for Initializing Modification Record", end - start);
+//  APP_LOG1us("Elapsed time for Initializing Modification Record", end - start);
 
   APP_LOG("----- Add Source MAC -----");
   start = get_current_microseconds();
@@ -77,6 +78,29 @@ int main(int argc, char *argv[])
   end = get_current_microseconds();
   APP_LOG1us("Elapsed time for Adding Global MAC", end - start);
 
+  print_record(&sp, mr);
+
+  int l;
+  start = get_current_microseconds();
+  unsigned char *tmp = serialize_record(&sp, mr, &l);
+  end = get_current_microseconds();
+  APP_LOG2s("Serialized", tmp, l+2);
+  APP_LOG1us("Elapsed time for Serializing", end - start);
+
+  start = get_current_microseconds();
+  MOD_RECORD *m = deserialize_record(&sp, tmp, l+2);
+  end = get_current_microseconds();
+  print_record(&sp, m);
+  APP_LOG1us("Elapsed time for Deserializing", end - start);
+
+  verified = verify_record(&sp, m, hash(&sp, msg3, mlen3), id, secret);
+
+  if (verified == SUCCESS)
+    APP_LOG("Verify Success!");
+  else
+    APP_LOG("Verify Failed!");
+
   free_record(mr);
+  free_record(m);
   return 0;
 }

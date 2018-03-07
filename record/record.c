@@ -166,7 +166,7 @@ int add_global_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *id, int i
   APP_LOG("Add the global mac to the modification record");
 
   MR_ENTRY *tmp;
-  unsigned char *mod;
+  unsigned char *mod, *n;
   int rlen;
 
   if (init_entry(&tmp, sp->mac_length) < 0)
@@ -174,14 +174,15 @@ int add_global_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *id, int i
 
   memcpy(tmp->writer, id, idlen);
   memcpy(tmp->prior_msg_hash, prev, plen);
-  mod = (unsigned char *)malloc(plen + nlen);
+  n = hash(sp, next, nlen);
+  mod = (unsigned char *)malloc(2 * sp->mac_length);
 
   if (!mod)
     goto mod_err;
 
   memcpy(mod, prev, plen);
-  memcpy(mod + plen, next, nlen);
-  hmac_hash(sp, key, klen, mod, plen + nlen, tmp->modification_hash, &rlen);
+  memcpy(mod + plen, n, sp->mac_length);
+  hmac_hash(sp, key, klen, mod, plen + sp->mac_length, tmp->modification_hash, &rlen);
 
   if (rlen < sp->mac_length)
     goto err;
@@ -193,7 +194,9 @@ int add_global_mac(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *id, int i
 
   APP_LOG("----- Add Global MAC -----");
   APP_LOG2s("ID", tmp->writer, sp->mac_length);
+  APP_LOG2s("Secret", key, sp->key_length);
   APP_LOG2s("Prev", tmp->prior_msg_hash, sp->mac_length);
+  APP_LOG2s("Next", next, sp->mac_length);
   APP_LOG2s("Mod", tmp->modification_hash, sp->mac_length);
   printf("\n");
 
@@ -302,9 +305,16 @@ err:
 
 int find_id(SECURITY_PARAMS *sp, unsigned char *x, unsigned char id[][sp->mac_length])
 {
-  int ret;
+  int i, ret = -1;
 
-  for 
+  for (i=0; i<NUM_OF_IDS; i++)
+  {
+    if (strncmp(id[i], x, sp->mac_length) == 0)
+    {
+      ret = i;
+      break;
+    }
+  }
 
   return ret;
 }
@@ -320,9 +330,70 @@ int find_id(SECURITY_PARAMS *sp, unsigned char *x, unsigned char id[][sp->mac_le
  */
 int verify_record(SECURITY_PARAMS *sp, MOD_RECORD *mr, unsigned char *h, unsigned char id[][sp->mac_length], unsigned char secret[][sp->key_length])
 {
-  
+  MR_ENTRY *tmp;
+  unsigned char *key, *mod, *gmac, *prev, *curr = h;
+  int index, len;
+
+  mod = (unsigned char *)malloc(2 * sp->mac_length);
+
+  if (!mod)
+    goto err;
+
+  TAILQ_FOREACH(tmp, &(mr->global_macs_head), entries)
+  {
+    index = find_id(sp, tmp->writer, id);
+    APP_LOG1d("index", index);
+    key = secret[index];
+    prev = tmp->prior_msg_hash;
+    memcpy(mod, prev, sp->mac_length);
+    memcpy(mod + sp->mac_length, curr, sp->mac_length);
+    gmac = hmac_hash(sp, key, sp->key_length, mod, 2 * sp->mac_length, NULL, &len);
+
+    if (len != sp->mac_length)
+      goto len_err;
+
+    APP_LOG2s("Secret", secret[index], sp->key_length);
+    APP_LOG2s("Prev", prev, sp->mac_length);
+    APP_LOG2s("Next", curr, sp->mac_length);
+//    APP_LOG2s("Answer", tmp->modification_hash, sp->mac_length);
+    APP_LOG2s("Generated", gmac, sp->mac_length);
+
+    if (strncmp(gmac, tmp->modification_hash, sp->mac_length) == 0)
+    {
+      APP_LOG1d("Verified", index);
+    } 
+    else
+    {
+      APP_LOG1d("Failed", index);
+      goto verification_err;
+    }
+    memcpy(curr, prev, sp->mac_length);
+  }
+
+  APP_LOG("Verify Source MAC");
+  gmac = hmac_hash(sp, secret[0], sp->key_length, curr, sp->mac_length, NULL, &len);
+  if (len != sp->mac_length)
+    goto len_err;
+
+  APP_LOG2s("Source MAC Key", secret[0], sp->key_length);
+  APP_LOG2s("Source MAC", mr->source_mac, sp->mac_length);
+  APP_LOG2s("Generated MAC", gmac, sp->mac_length);
+
+  if (strncmp(gmac, mr->source_mac, sp->mac_length) == 0)
+    APP_LOG("Source Verified");
+  else
+  {
+    APP_LOG("Source Verification Failed");
+    goto verification_err;
+  }
 
   return SUCCESS;
+
+verification_err:
+len_err:
+  free(mod);
+err:
+  return FAILURE;
 }
 
 /**

@@ -27,8 +27,8 @@ int main(int argc, char *argv[])
   sp.mac_length = SHA256_DIGEST_LENGTH;
   sp.key_length = DEFAULT_KEY_LENGTH;
 
-  unsigned char id[10][sp.key_length];
-  unsigned char secret[10][sp.key_length];
+  unsigned char id[NUM_OF_IDS][sp.key_length];
+  unsigned char secret[NUM_OF_IDS][sp.key_length];
 
   for (j=0; j<sp.key_length; j++)
   {
@@ -38,13 +38,13 @@ int main(int argc, char *argv[])
 
   APP_LOG2s("secret[0]", secret[0], sp.key_length);
 
-  for (i=1; i<10; i++)
+  for (i=1; i<NUM_OF_IDS; i++)
   {
     memcpy(secret[i], hash(&sp, secret[i-1], sp.key_length), sp.key_length);
     memcpy(id[i], hash(&sp, id[i-1], sp.key_length), sp.key_length);
   }
 /*
-  for (i=0; i<10; i++)
+  for (i=0; i<NUM_OF_IDS; i++)
   {
     printf("----- (%d) ID / Global MAC Key ------\n", i);
     APP_LOG2s("id", id[i], sp.key_length);
@@ -68,29 +68,30 @@ int main(int argc, char *argv[])
 
   APP_LOG("----- Add Global MAC -----");
   start = get_current_microseconds();
-  add_global_mac(&sp, mr, id[3], sp.key_length, secret[3], sp.key_length, hash(&sp, msg1, mlen1), sp.key_length, msg2, mlen2);
+  add_global_mac(&sp, mr, id[3], sp.mac_length, secret[3], sp.key_length, hash(&sp, msg1, mlen1), sp.mac_length, msg2, mlen2);
   end = get_current_microseconds();
   APP_LOG1us("Elapsed time for Adding Global MAC", end - start);
+
 
   APP_LOG("----- Add Global MAC -----");
   start = get_current_microseconds();
-  add_global_mac(&sp, mr, id[7], sp.key_length, secret[7], sp.key_length, hash(&sp, msg2, mlen2), sp.key_length, msg3, mlen3);
+  add_global_mac(&sp, mr, id[7], sp.mac_length, secret[7], sp.key_length, hash(&sp, msg2, mlen2), sp.key_length, msg3, mlen3);
   end = get_current_microseconds();
   APP_LOG1us("Elapsed time for Adding Global MAC", end - start);
 
-  print_record(&sp, mr);
+//  print_record(&sp, mr);
 
   int l;
   start = get_current_microseconds();
   unsigned char *tmp = serialize_record(&sp, mr, &l);
   end = get_current_microseconds();
-  APP_LOG2s("Serialized", tmp, l+2);
+//  APP_LOG2s("Serialized", tmp, l+2);
   APP_LOG1us("Elapsed time for Serializing", end - start);
 
   start = get_current_microseconds();
   MOD_RECORD *m = deserialize_record(&sp, tmp, l+2);
   end = get_current_microseconds();
-  print_record(&sp, m);
+//  print_record(&sp, m);
   APP_LOG1us("Elapsed time for Deserializing", end - start);
 
   verified = verify_record(&sp, m, hash(&sp, msg3, mlen3), id, secret);

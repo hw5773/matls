@@ -21,6 +21,8 @@
 
 #include "prf.h"
 
+#define NUM_OF_IDS 16
+
 /**
  * @brief Decoding from c (string) to s (int)
  */

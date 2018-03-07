@@ -12,11 +12,16 @@
 int main(int argc, char *argv[])
 {
   int num_of_ids = NUM_OF_IDS;
+  int order;
+  FILE *fp = NULL;
 
-  if (argc == 2)
+  if (argc == 4)
+  {
     num_of_ids = atoi(argv[1]);
+    order = atoi(argv[2]);
+    fp = fopen(argv[3], "a");
+  }
 
-  printf("Number of IDs: %d\n", num_of_ids);
   APP_LOG1d("Number of IDs", num_of_ids);
 
   MOD_RECORD *mr;
@@ -102,6 +107,10 @@ int main(int argc, char *argv[])
   if (verified == SUCCESS)
   {
     printf("Verified: %d / Elapsed time with %d writers: %lu us\n", verified, num_of_ids, end - start);
+
+    if (fp)
+      fprintf(fp, "%d, %d, %lu\n", num_of_ids, order, end - start);
+
     APP_LOG("Verify Success!");
   }
   else

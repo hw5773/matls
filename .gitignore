@@ -51,5 +51,7 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-# Swap Files
+# Swap/Log Files
 *.swp
+*.log
+*.bak

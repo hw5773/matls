@@ -1,0 +1,64 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number:
+            d0:97:12:07:db:30:11:00
+    Signature Algorithm: sha256WithRSAEncryption
+        Issuer: C=KR, ST=Seoul, L=Seoul, O=Carol CDN Ltd., OU=Carol CDN Ltd., CN=Carol CDN Ltd./emailAddress=ca@ca_carol.com
+        Validity
+            Not Before: Apr 30 10:49:47 2017 GMT
+            Not After : Apr 30 10:49:47 2018 GMT
+        Subject: C=KR, ST=Seoul, L=Seoul, O=Carol CDN Inc., OU=CDN, CN=*.carol.com/emailAddress=edge@carol.com
+        Subject Public Key Info:
+            Public Key Algorithm: id-ecPublicKey
+                Public-Key: (256 bit)
+                pub:
+                    04:fb:c5:62:af:e8:f8:1b:b3:2f:3b:27:33:1a:87:
+                    27:5c:b3:eb:3f:0e:12:02:ce:3c:29:79:3c:43:49:
+                    ea:bb:c7:6b:8d:2a:5a:96:21:ac:08:c7:6b:7e:5e:
+                    f5:ea:d9:fa:70:89:05:6a:32:df:34:2d:ff:8d:03:
+                    c7:6a:07:89:a9
+                ASN1 OID: prime256v1
+                NIST CURVE: P-256
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            X509v3 Key Usage: 
+                Digital Signature, Key Encipherment
+            X509v3 Subject Alternative Name: 
+                DNS:*.alice.com, DNS:*.carol.com
+    Signature Algorithm: sha256WithRSAEncryption
+         20:33:75:97:73:9d:de:29:20:0e:05:9e:22:d5:fa:94:3d:14:
+         43:75:23:70:0e:67:b4:36:75:b1:0d:f3:6e:ce:a6:1c:28:52:
+         06:51:f0:91:c3:b3:8f:27:d3:c6:51:39:91:76:65:67:70:44:
+         ee:fa:f7:47:93:93:d8:c4:80:51:47:c4:56:77:73:ee:e1:a5:
+         52:e6:01:ae:81:6d:b2:0a:5c:39:78:8c:ef:2f:3e:88:69:89:
+         0d:47:67:de:49:4f:13:52:98:aa:7d:0b:49:ff:94:ff:08:53:
+         5c:cd:1d:70:70:be:64:bc:5d:f0:f3:32:7f:a0:89:79:0b:0f:
+         9e:b8:db:75:fb:c1:64:04:f8:fb:61:da:98:5f:cd:1c:39:eb:
+         7c:ee:cc:ff:1e:67:e5:05:d1:30:48:9e:b7:37:86:ab:d0:3f:
+         af:08:95:09:12:3f:60:b2:c8:d1:6a:fa:06:26:56:fc:a1:9c:
+         86:e4:cb:3f:53:c4:f6:85:59:b1:44:55:06:da:de:d0:5c:40:
+         7c:69:1a:65:27:41:02:78:64:fc:ba:2a:94:0a:bc:46:6a:af:
+         69:1d:96:87:7b:50:cd:f6:e6:94:9f:d3:61:57:7e:b7:51:c6:
+         db:37:b7:ed:ba:b1:0c:3a:a6:1d:c7:9b:f9:66:4c:96:f2:e6:
+         61:dd:83:90
+-----BEGIN CERTIFICATE-----
+MIIDGjCCAgKgAwIBAgIJANCXEgfbMBEAMA0GCSqGSIb3DQEBCwUAMIGYMQswCQYD
+VQQGEwJLUjEOMAwGA1UECAwFU2VvdWwxDjAMBgNVBAcMBVNlb3VsMRcwFQYDVQQK
+DA5DYXJvbCBDRE4gTHRkLjEXMBUGA1UECwwOQ2Fyb2wgQ0ROIEx0ZC4xFzAVBgNV
+BAMMDkNhcm9sIENETiBMdGQuMR4wHAYJKoZIhvcNAQkBFg9jYUBjYV9jYXJvbC5j
+b20wHhcNMTcwNDMwMTA0OTQ3WhcNMTgwNDMwMTA0OTQ3WjCBiTELMAkGA1UEBhMC
+S1IxDjAMBgNVBAgMBVNlb3VsMQ4wDAYDVQQHDAVTZW91bDEXMBUGA1UECgwOQ2Fy
+b2wgQ0ROIEluYy4xDDAKBgNVBAsMA0NETjEUMBIGA1UEAwwLKi5jYXJvbC5jb20x
+HTAbBgkqhkiG9w0BCQEWDmVkZ2VAY2Fyb2wuY29tMFkwEwYHKoZIzj0CAQYIKoZI
+zj0DAQcDQgAE+8Vir+j4G7MvOyczGocnXLPrPw4SAs48KXk8Q0nqu8drjSpaliGs
+CMdrfl716tn6cIkFajLfNC3/jQPHageJqaM/MD0wCQYDVR0TBAIwADALBgNVHQ8E
+BAMCBaAwIwYDVR0RBBwwGoILKi5hbGljZS5jb22CCyouY2Fyb2wuY29tMA0GCSqG
+SIb3DQEBCwUAA4IBAQAgM3WXc53eKSAOBZ4i1fqUPRRDdSNwDme0NnWxDfNuzqYc
+KFIGUfCRw7OPJ9PGUTmRdmVncETu+vdHk5PYxIBRR8RWd3Pu4aVS5gGugW2yClw5
+eIzvLz6IaYkNR2feSU8TUpiqfQtJ/5T/CFNczR1wcL5kvF3w8zJ/oIl5Cw+euNt1
++8FkBPj7YdqYX80cOet87sz/HmflBdEwSJ63N4ar0D+vCJUJEj9gssjRavoGJlb8
+oZyG5Ms/U8T2hVmxRFUG2t7QXEB8aRplJ0ECeGT8uiqUCrxGaq9pHZaHe1DN9uaU
+n9NhV363UcbbN7fturEMOqYdx5v5ZkyW8uZh3YOQ
+-----END CERTIFICATE-----

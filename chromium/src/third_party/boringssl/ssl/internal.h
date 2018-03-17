@@ -159,7 +159,8 @@
 #include <openssl/stack.h>
 
 #include "../crypto/internal.h"
-
+///// Add for MB /////
+#include "mb.h"
 
 #if defined(OPENSSL_WINDOWS)
 // Windows defines struct timeval in winsock2.h.
@@ -2186,7 +2187,8 @@ struct SSLConnection {
 
   ///// Add for MB /////
   unsigned mb_enabled:1;
-
+  uint8_t mac_table_len;
+  Array<MAC_TABLE_ENTRY> mac_table;
 };
 
 // From draft-ietf-tls-tls13-18, used in determining PSK modes.

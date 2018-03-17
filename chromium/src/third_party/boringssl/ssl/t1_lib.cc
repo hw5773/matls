@@ -127,6 +127,8 @@
 #include "internal.h"
 #include "../crypto/internal.h"
 
+///// Add for MB /////
+#include "mb.h"
 
 namespace bssl {
 
@@ -2522,7 +2524,7 @@ static int ext_mb_add_clienthello(SSL_HANDSHAKE *hs, CBB *out) {
   CBB contents, kse_bytes;
   if (!CBB_add_u16(out, TLSEXT_TYPE_mb) ||
       !CBB_add_u16_length_prefixed(out, &contents) ||
-      !CBB_add_u16_length_prefixed(out, &kse_bytes)) {
+      !CBB_add_u16_length_prefixed(&contents, &kse_bytes)) {
     printf("[MB] Error in ClientHello initializing\n");
     return 0;
   }
@@ -2532,6 +2534,7 @@ static int ext_mb_add_clienthello(SSL_HANDSHAKE *hs, CBB *out) {
     printf("[MB] Error on loading ECDHE grouplist\n");
     return 0;
   }
+
   uint16_t group_id = groups[0];
 
   hs->mb_key_share = SSLKeyShare::Create(group_id);
@@ -2598,9 +2601,9 @@ static int ext_mb_parse_serverhello(SSL_HANDSHAKE *hs, uint8_t *out_alert, CBS *
 
   uint8_t num_peer_keys = 0;
   while (CBS_len(contents) > 0) {
-    if (num_peer_keys >= peer_keys ||
+    if (num_peer_keys >= num_keys ||
         !CBS_get_u16_length_prefixed(contents, &peer_keys[num_peer_keys]) ||
-        CBS_len(&peer_key) == 0) {
+        CBS_len(&peer_keys[num_peer_keys]) == 0) {
       printf("[MB] Decode error on peer_key\n");
       return 0;
     }
@@ -2613,13 +2616,41 @@ static int ext_mb_parse_serverhello(SSL_HANDSHAKE *hs, uint8_t *out_alert, CBS *
     return 0;
   }
 
-  Array<uint8_t> *secret;
+  const EVP_MD *digest = EVP_sha256();
+  uint8_t *crandom = ssl->s3->client_random;
+  uint8_t *srandom = ssl->s3->server_random;
+
+  if (digest == NULL || crandom == NULL || srandom == NULL) {
+    printf("[MB] Error while loading digest, crandom, srandom\n");
+    return 0;
+  }
+
+  if(!ssl->mac_table.Init(num_keys)) {
+    printf("[MB] mac_table initialization failed\n");  
+    return 0;
+  }
+
+  Array<uint8_t> secret;
+  if(!secret.Init(SSL_MAX_MASTER_KEY_LENGTH)) {
+    printf("[MB] premaster secret initialization failed\n");
+    return 0;
+  }
+
   for (size_t i = 0; i < peer_keys.size(); i++) {
-    if (!hs->mb_key_share->Finish(secret, out_alert, peer_keys[i])) {
-      *out_alert = SSL_AD_INTERAL_ERROR;
+    if (!hs->mb_key_share->Finish(&secret, out_alert, peer_keys[i])) {
+      *out_alert = SSL_AD_INTERNAL_ERROR;
       return 0;
     }
-    // TODO: save |secret| to somewhere in SSL context;
+
+    if(!tls1_prf(digest, ssl->mac_table[i].data, SSL3_MASTER_SECRET_SIZE, secret.data(), secret.size(),
+                 TLS_MD_MB_MASTER_SECRET_CONST, TLS_MD_MB_MASTER_SECRET_CONST_SIZE,
+                 crandom, SSL3_RANDOM_SIZE, srandom, SSL3_RANDOM_SIZE)) {
+      printf("[MB] Error on tls1_prf\n");
+      return 0;
+    }
+
+    ssl->mac_table[i].len = SSL3_MASTER_SECRET_SIZE;
+    ssl->mac_table_len = num_keys;
   }
 
   hs->mb_key_share.reset();

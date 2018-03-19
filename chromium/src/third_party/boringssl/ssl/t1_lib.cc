@@ -2644,7 +2644,7 @@ static int ext_mb_parse_serverhello(SSL_HANDSHAKE *hs, uint8_t *out_alert, CBS *
 
     if(!tls1_prf(digest, ssl->mac_table[i].data, SSL3_MASTER_SECRET_SIZE, secret.data(), secret.size(),
                  TLS_MD_MB_MASTER_SECRET_CONST, TLS_MD_MB_MASTER_SECRET_CONST_SIZE,
-                 crandom, SSL3_RANDOM_SIZE, srandom, SSL3_RANDOM_SIZE)) {
+                 srandom, SSL3_RANDOM_SIZE, crandom, SSL3_RANDOM_SIZE)) {
       printf("[MB] Error on tls1_prf\n");
       return 0;
     }

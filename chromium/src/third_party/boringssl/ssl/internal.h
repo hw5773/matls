@@ -1095,6 +1095,13 @@ bool ssl_parse_cert_chain(uint8_t *out_alert,
                           uint8_t *out_leaf_sha256, CBS *cbs,
                           CRYPTO_BUFFER_POOL *pool);
 
+//// Add for MB ////
+bool ssl_parse_cert_chain_mb(uint8_t *out_alert,
+                             UniquePtr<STACK_OF(CRYPTO_BUFFER)> *out_chain,
+                             UniquePtr<EVP_PKEY> *out_pubkey,
+                             uint8_t *out_leaf_sha256, uint8_t *out_leaf_pubkey_sha256,
+                             CBS *cbs, CRYPTO_BUFFER_POOL *pool);
+
 // ssl_add_cert_chain adds |ssl|'s certificate chain to |cbb| in the format used
 // by a TLS Certificate message. If there is no certificate chain, it emits an
 // empty certificate list. It returns one on success and zero on error.
@@ -2187,8 +2194,9 @@ struct SSLConnection {
 
   ///// Add for MB /////
   unsigned mb_enabled:1;
-  uint8_t mac_table_len;
+  uint8_t num_keys;
   Array<MAC_TABLE_ENTRY> mac_table;
+  Array<ID_TABLE_ENTRY> id_table;
 };
 
 // From draft-ietf-tls-tls13-18, used in determining PSK modes.
@@ -2587,6 +2595,7 @@ struct ssl_x509_method_st {
   // from |sess->certs| and erases |sess->x509_chain_without_leaf|. It returns
   // one on success or zero on error.
   int (*session_cache_objects)(SSL_SESSION *session);
+
   // session_dup duplicates any needed fields from |session| to |new_session|.
   // It returns one on success or zero on error.
   int (*session_dup)(SSL_SESSION *new_session, const SSL_SESSION *session);
@@ -2618,6 +2627,11 @@ struct ssl_x509_method_st {
   void (*ssl_ctx_free)(SSL_CTX *ctx);
   // ssl_ctx_flush_cached_client_CA drops any cached |X509_NAME|s from |ctx|.
   void (*ssl_ctx_flush_cached_client_CA)(SSL_CTX *ssl);
+
+  ///// Add for MB /////
+  int (*session_cache_objects_mb)(SSL_SESSION *session, size_t idx); 
+  int (*session_verify_cert_chain_mb)(SSL_SESSION *session, SSL *ssl,
+                                   uint8_t *out_alert);
 };
 
 // ssl_st backs the public |SSL| type. It subclasses the true type so that

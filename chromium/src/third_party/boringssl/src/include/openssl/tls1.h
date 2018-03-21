@@ -620,9 +620,9 @@ extern "C" {
 #define TLS_MD_EXTENDED_MASTER_SECRET_CONST "extended master secret"
 #define TLS_MD_EXTENDED_MASTER_SECRET_CONST_SIZE 22
 
-///// ADD for MB /////
+///// Add for MB /////
 #define TLS_MD_MB_MASTER_SECRET_CONST "global mac key"
-#define TLS_MD_MB_MASTER_SECRET_CONST_SIZE 5
+#define TLS_MD_MB_MASTER_SECRET_CONST_SIZE 14
 
 #ifdef  __cplusplus
 }  // extern C

@@ -2650,9 +2650,9 @@ static int ext_mb_parse_serverhello(SSL_HANDSHAKE *hs, uint8_t *out_alert, CBS *
     }
 
     ssl->mac_table[i].len = SSL3_MASTER_SECRET_SIZE;
-    ssl->mac_table_len = num_keys;
   }
-
+  
+  ssl->num_keys = num_keys;
   hs->mb_key_share.reset();
 
   ssl->mb_enabled = 1;

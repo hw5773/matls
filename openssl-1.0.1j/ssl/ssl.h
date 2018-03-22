@@ -1013,11 +1013,19 @@ struct ssl_ctx_st
 
 #ifndef OPENSSL_NO_MB
 	unsigned char mb_enabled;
+    struct mb_st {
+        uint16_t group_id;
+        uint8_t num_keys;
+        uint8_t key_length[20];
+        unsigned char *mac_array;
+    } mb_info;
+
 #endif
 	};
 
 #endif
 
+#define MAX_KEY_SIZE             100 
 #define SSL_SESS_CACHE_OFF			0x0000
 #define SSL_SESS_CACHE_CLIENT			0x0001
 #define SSL_SESS_CACHE_SERVER			0x0002
@@ -1403,6 +1411,7 @@ struct ssl_st
 
 #ifndef OPENSSL_NO_MB
 	unsigned char mb_enabled;
+    
 #endif /* OPENSSL_NO_MB */
 	};
 
@@ -1780,19 +1789,7 @@ int SSL_CTX_confirm_load(SSL_CTX *ctx);
 
 unsigned char *SSL_get_cc(const SSL *s);
 int SSL_get_cc_len(const SSL *s);
-
-int SSL_enable_ttpa(SSL *s);
-int SSL_disable_ttpa(SSL *s);
-int SSL_CTX_enable_ttpa(SSL_CTX *ctx);
-int SSL_CTX_disable_ttpa(SSL_CTX *ctx);
 #endif /* OPENSSL_NO_TTPA */
-
-#ifndef OPENSSL_NO_MB
-int SSL_enable_mb(SSL *s);
-int SSL_disable_mb(SSL *s);
-int SSL_CTX_enable_mb(SSL_CTX *ctx);
-int SSL_CTX_disable_mb(SSL_CTX *ctx);
-#endif
 
 #ifndef OPENSSL_NO_STDIO
 int	SSL_use_RSAPrivateKey_file(SSL *ssl, const char *file, int type);
@@ -2257,8 +2254,6 @@ void ERR_load_SSL_strings(void);
 #define SSL_F_SSL_ADD_FILE_CERT_SUBJECTS_TO_STACK	 216
 #define SSL_F_SSL_ADD_SERVERHELLO_RENEGOTIATE_EXT	 299
 #define SSL_F_SSL_ADD_SERVERHELLO_TLSEXT		 278
-#define SSL_F_SSL_ADD_SERVERHELLO_TTPAEXT		 2788
-#define SSL_F_SSL_ADD_SERVERHELLO_MBEXT		 2789
 #define SSL_F_SSL_ADD_SERVERHELLO_USE_SRTP_EXT		 308
 #define SSL_F_SSL_BAD_METHOD				 160
 #define SSL_F_SSL_BYTES_TO_CIPHER_LIST			 161

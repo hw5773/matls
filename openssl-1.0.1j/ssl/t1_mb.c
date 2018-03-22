@@ -8,15 +8,18 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <openssl/objects.h>
 #include "ssl_locl.h"
+#include <openssl/evp.h>
+#include <openssl/ec.h>
+#include "KISA_SHA256.h"
 
 /* Add the client's mb */
 int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len,
                                         int maxlen)
 {
     printf("adding clienthello mb\n");
-	*len = 0;
     return 1;
 }
 
@@ -29,21 +32,72 @@ int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len,
 // Output: 1 for Success, 0 for Failure
 int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
 {
-    printf("PROCESSING: The Extension Length from ClientHello: %d\n", len);
-
-    // The value of the mb_len must be 0 for the intention
-    // If not, it must be error
+// SSL_F_SSL_PARSE_CLIENTHELLO_MB_EXT
 	
-    printf("PROGRESS: Check whether the mb_len is zero\n");
-    if (len != 0) {
-        *al = SSL_AD_HANDSHAKE_FAILURE;
+    unsigned int mb_len;
+    unsigned char *p;
+    unsigned int i;
+
+    printf("PROGRESS: Read the mb length from the extension packet\n");
+    /* Parse the length byte */
+	if(len < 1)
+		{
+            SSLerr(SSL_F_SSL_PARSE_CLIENTHEELO_MB_EXT, SSL_R_MB_ENCODING_ERR);
+            *al=SSL_AD_ILLEGAL_PARAMETER;
+            return 0;
+        }
+
+    /*
+    mb_len = *d;
+    d++;
+
+    printf("PROCESSING: The Extension Length from ClientHello: %d\n", mb_len);
+    */
+
+    p = d;
+
+    /* message: group_id(2bytes) + num_keys(1byte) + (key length(1byte) and key value) list */
+
+    /* Check group_id */
+    s->mb_info.group_id = *p;
+
+    if(s->mb_info.group_id != NID_X9_62_prime256v1) //SSL_CURVE_SECP256R1
+    {
+        SSLerr(SSL_F_SSL_PARSE_CLIENTHELLO_MB_EXT, SSL_R_MB_ENCODING_ERR);
+        *al = SSL_AD_ILLEGAL_PARAMETER;
         return 0;
     }
-    printf("PROCESSING: Confirm the mb_len is zero\n");
     
-    // From the intention, the server enable the mb mode
+
+    /* Check num_keys */
+    p += 2;
+    s->mb_info.num_keys = *p;
+
+    if(p[0] < 1)
+    {
+        SSLerr(SSL_F_SSL_PARSE_CLIENTHELLO_MB_EXT, SSL_R_MB_ENCODING_ERR);
+        *al = SSL_AD_ILLEGAL_PARAMETER;
+        return 0;
+    }
+
+	
+    /* Store hash of received keys (not yet) */
+    p++;
+    s->mb_info.mac_array = (unsigned char *)malloc(MAX_KEY_SIZE * s->mb_info.num_keys);
+
+    for(i=0; i<s->mb_info.num_keys; i--)
+    {
+        key_length[i] = *p;
+        p++;
+        memcpy(s->mb_info.mac_array[MAX_KEY_SIZE * i], p, key_length[i]);
+        p += key_length[i];
+    }
+
+
+
     s->mb_enabled = 1; // Enable the mb mode
 
+	
     printf("PROGRESS: MB Extension is enabled\n");
 
     return 1;
@@ -57,12 +111,12 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
 int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
                                         int maxlen)
 {
+
 	if (p) {
     }
 
     // The total length of WarrantInfo message is 
-    // mb_len (1 byte) + mb (mb_len bytes) + orig_cert (certificate chain bytes + length)
-    // Need to check how to find the bytes of the certificates
+    // group_id (2 bytes) + num_keys (1 byte) + mb_len (1 byte) + mb (mb_len bytes) 
 	printf("PROGRESS: Set the length for the extension\n");
     //*len =;
 	printf("PROGRESS: Complete Setting the length for the extension: %d\n", *len);

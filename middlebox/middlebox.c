@@ -67,40 +67,40 @@ int main(int argc, char *argv[])
     exit(EXIT_FAILURE);
   }
 
-repeat:
-  MB_LOG("listener: Waiting to recvfrom...");
-  numbytes = recvfrom(sock, recv, BUF_SIZE, 0, NULL, NULL);
-  MB_LOG1d("listener: got packet", numbytes);
+  while (1)
+  {
+    MB_LOG("listener: Waiting to recvfrom...");
+    numbytes = recvfrom(sock, recv, BUF_SIZE, 0, NULL, NULL);
+    MB_LOG1d("listener: got packet", numbytes);
 
-  // Check whether the transport layer protocol for the packet
-  MB_LOG("This is TCP segment");
-  struct tcphdr *tcph = (struct tcphdr *)(recv + iph->ihl * 4);
-  len = ntohs(iph->tot_len);
+    // Check whether the transport layer protocol for the packet
+    MB_LOG("This is TCP segment");
+    struct tcphdr *tcph = (struct tcphdr *)(recv + iph->ihl * 4);
+    len = ntohs(iph->tot_len);
 
-  if (check_checksum(recv, len) < 0) goto repeat;
-  struct pair_entry *tmp = (struct pair_entry *)malloc(sizeof(struct pair_entry));
-  if (parse_entry(tmp, recv, len) < 0) goto repeat;
+    if (check_checksum(recv, len) < 0) continue;
+    struct pair_entry *tmp = (struct pair_entry *)malloc(sizeof(struct pair_entry));
+    if (parse_entry(tmp, recv, len) < 0) continue;
 
-  MB_LOGip("Source IP", tmp->saddr);
-  MB_LOGip("Dest IP", tmp->daddr);
+    MB_LOGip("Source IP", tmp->saddr);
+    MB_LOGip("Dest IP", tmp->daddr);
 
-  int ipl = iph->ihl * 4;
-  int tl = len - ipl;
+    int ipl = iph->ihl * 4;
+    int tl = len - ipl;
 
-  if (add_pair_to_table(tmp) < 0) goto repeat;
-  if (process_packet(tmp, iph, ipl, tcph, tl, send, &len) < 0) goto repeat;
+    if (add_pair_to_table(tmp) < 0) continue;
+    if (process_packet(tmp, iph, ipl, tcph, tl, send, &len) < 0) continue;
 
-  struct sockaddr_in s;
-  s.sin_family = AF_INET;
-  s.sin_port = tcph->source;
-  s.sin_addr.s_addr = iph->saddr;
-  numbytes = sendto(sock, send, len, 0, (struct sockaddr *)&s, sizeof(s));
-  MB_LOG1d("listener: sent packet", numbytes);
-  tcph = (struct tcphdr *) (send + ipl);
-  MB_LOG1x("SYN packet?", tcph->syn);
-  MB_LOG1x("ACK packet?", tcph->ack);
-
-  goto repeat;
+    struct sockaddr_in s;
+    s.sin_family = AF_INET;
+    s.sin_port = tcph->source;
+    s.sin_addr.s_addr = iph->saddr;
+    numbytes = sendto(sock, send, len, 0, (struct sockaddr *)&s, sizeof(s));
+    MB_LOG1d("listener: sent packet", numbytes);
+    tcph = (struct tcphdr *) (send + ipl);
+    MB_LOG1x("SYN packet?", tcph->syn);
+    MB_LOG1x("ACK packet?", tcph->ack);
+  }
 
 done:
   close(sock);

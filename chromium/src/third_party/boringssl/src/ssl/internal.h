@@ -1453,7 +1453,8 @@ struct SSL_HANDSHAKE {
 
   ///// Add for MB /////
   UniquePtr<SSLKeyShare> mb_key_share;
-  
+  Array<UniquePtr<EVP_PKEY>> peer_pubkey_mb;
+ 
 };
 
 SSL_HANDSHAKE *ssl_handshake_new(SSL *ssl);
@@ -1568,6 +1569,8 @@ int ssl_parse_extensions(const CBS *cbs, uint8_t *out_alert,
 // ssl_verify_peer_cert verifies the peer certificate for |hs|.
 enum ssl_verify_result_t ssl_verify_peer_cert(SSL_HANDSHAKE *hs);
 
+///// Add for MB /////
+enum ssl_verify_result_t ssl_verify_peer_cert_mb(SSL_HANDSHAKE *hs);
 
 // SSLKEYLOGFILE functions.
 

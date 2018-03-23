@@ -382,6 +382,16 @@ static int ssl_crypto_x509_session_dup(SSL_SESSION *new_session,
     }
   }
 
+  ///// Add for MB /////
+  // TODO: might not work properly, should change this using up_ref?
+  if (!session->x509_peer_mb.empty()) {
+    new_session->x509_peer_mb = session->x509_peer_mb;
+  }
+
+  if (!session->x509_chain_mb.empty()) {
+    new_session->x509_chain_mb = session->x509_chain_mb;
+  }
+
   return 1;
 }
 
@@ -392,6 +402,20 @@ static void ssl_crypto_x509_session_clear(SSL_SESSION *session) {
   session->x509_chain = NULL;
   sk_X509_pop_free(session->x509_chain_without_leaf, X509_free);
   session->x509_chain_without_leaf = NULL;
+
+  ///// Add for MB /////
+  for (size_t i=0; i < session->x509_peer_mb.size(); i++) {
+    X509_free(session->x509_peer_mb[i]);
+    session->x509_peer_mb[i] = NULL;
+  }
+  for (size_t i=0; i < session->x509_chain_mb.size(); i++) {
+    sk_X509_pop_free(session->x509_chain_mb[i], X509_free);
+    session->x509_chain_mb[i] = NULL;
+  }
+  for (size_t i=0; i < session->x509_chain_without_leaf_mb.size(); i++) {
+    sk_X509_pop_free(session->x509_chain_without_leaf_mb[i], X509_free);
+    session->x509_chain_without_leaf_mb[i] = NULL;
+  }
 }
 
 static int ssl_verify_alarm_type(long type) {
@@ -684,6 +708,8 @@ const SSL_X509_METHOD ssl_crypto_x509_method = {
 
 using namespace bssl;
 
+///// Add for MB /////
+// Note : this function is only called in ssl_test, so left unfixed.
 X509 *SSL_get_peer_certificate(const SSL *ssl) {
   check_ssl_x509_method(ssl);
   if (ssl == NULL) {
@@ -697,6 +723,8 @@ X509 *SSL_get_peer_certificate(const SSL *ssl) {
   return session->x509_peer;
 }
 
+///// Add for MB /////
+// Note : this function is only called in ssl_test, so left unfixed.
 STACK_OF(X509) *SSL_get_peer_cert_chain(const SSL *ssl) {
   check_ssl_x509_method(ssl);
   if (ssl == NULL) {
@@ -734,6 +762,8 @@ STACK_OF(X509) *SSL_get_peer_cert_chain(const SSL *ssl) {
   return session->x509_chain_without_leaf;
 }
 
+///// Add for MB /////
+// Note : this function is only called in ssl_test, so left unfixed.
 STACK_OF(X509) *SSL_get_peer_full_cert_chain(const SSL *ssl) {
   check_ssl_x509_method(ssl);
   SSL_SESSION *session = SSL_get_session(ssl);

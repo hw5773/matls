@@ -930,6 +930,8 @@ uint64_t SSL_SESSION_get_time(const SSL_SESSION *session) {
 }
 
 X509 *SSL_SESSION_get0_peer(const SSL_SESSION *session) {
+  //// Add for MB /////
+  printf("[MB] SSL_SESSION_get0_peer called\n");
   return session->x509_peer;
 }
 

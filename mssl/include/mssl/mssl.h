@@ -1,0 +1,1 @@
+int mssl_init();

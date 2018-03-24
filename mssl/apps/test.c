@@ -2,9 +2,11 @@
 #include <mssl/mssl.h>
 #include <mssl/logs.h>
 
+#define MSSL_CONFIG_FILE "config/nat.conf"
+
 int main(int argc, char *argv[])
 {
-  if (mssl_init() < 0)
+  if (mssl_init(MSSL_CONFIG_FILE) < 0)
   {
     MA_LOG("Error in init");
     return -1;

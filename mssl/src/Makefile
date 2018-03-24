@@ -1,12 +1,18 @@
 CC = cc
 RM = rm
-CFLAGS=-O -DDEBUG -I/usr/local/include
+CFLAGS=-O -DDEBUG -I/usr/local/include -Wall
 
-OBJS = core.o \
-			 logs.o
+OBJS = logs.o \
+			 cpu.o \
+			 config.o \
+			 util.o \
+			 core.o
 
-SRCS = core.c \
-			 logs.c
+SRCS = logs.c \
+			 cpu.c \
+			 config.c \
+			 util.c \
+			 core.c
 
 default: $(OBJS)
 

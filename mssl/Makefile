@@ -17,7 +17,7 @@ APPDIR=apps
 LIBRPATH=$(INSTALLTOP)/$(LIBDIR)
 
 CC= cc
-CFLAGS=-O -DDEBUG -I/usr/local/include
+CFLAGS=-O -DDEBUG -I/usr/local/include -Wall
 LDFLAGS= -L/usr/local/lib -lssl -lcrypto -ldl
 
 ARFLAGS=
@@ -33,8 +33,11 @@ NAME= $(BASENAME)-$(VERSION)
 
 PCS=libmssl.pc
 
-OBJ = src/core.o \
-			src/logs.o
+OBJ = src/logs.o \
+			src/cpu.o \
+			src/config.o \
+			src/util.o \
+			src/core.o
 
 all: objs libmssl.a libmssl.pc
 

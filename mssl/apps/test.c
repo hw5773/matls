@@ -2,7 +2,7 @@
 #include <mssl/mssl.h>
 #include <mssl/logs.h>
 
-#define MSSL_CONFIG_FILE "config/nat.conf"
+#define MSSL_CONFIG_FILE "config/mos.conf"
 
 int main(int argc, char *argv[])
 {

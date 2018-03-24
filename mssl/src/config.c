@@ -13,12 +13,15 @@
 #include <ctype.h>
 #include <string.h>
 
+#include "include/mssl.h"
 #include "include/config.h"
 #include "include/logs.h"
 #include "include/tcp_in.h"
 #include "include/util.h"
 
-char *file;
+int8_t end_app_exists = 0;
+int8_t mon_app_exists = 0;
+char *file = NULL;
 
 #define MATCH_ITEM(name, item) \
   ((strncmp(#name, item, strlen(#name)) == 0) \
@@ -426,7 +429,6 @@ static void feed_netdev_conf_line(struct conf_block *blk, char *line, int len)
   }
 
   strncpy(ent->dev_name, word, wlen);
-  MA_LOG1s("word", word);
   ent->cpu_mask = cpu_mask;
   g_config.mos->cpu_mask |= cpu_mask;
 
@@ -961,6 +963,195 @@ init_config_err:
   exit(EXIT_FAILURE);
 }
 
+void print_conf(struct config *conf)
+{
+  struct conf_block *walk;
+  TAILQ_FOREACH(walk, &conf->app_blkh, link)
+  {
+    if (walk->print)
+      walk->print(walk);
+  }
+
+  TAILQ_FOREACH(walk, &conf->mos_blkh, link)
+  {
+    if (walk->print)
+      walk->print(walk);
+  }
+}
+
+static void check_conf_validity(struct config *conf)
+{
+  struct conf_block *walk;
+  TAILQ_FOREACH(walk, &conf->app_blkh, link)
+  {
+    if (!walk->isvalid || !walk->isvalid(walk))
+      goto __error;
+  }
+
+  TAILQ_FOREACH(walk, &conf->mos_blkh, link)
+  {
+    struct conf_block *child;
+
+    if (!walk->isvalid || !walk->isvalid(walk))
+      goto __error;
+
+    child = ((struct mos_conf *)walk->conf)->netdev;
+    if (!child->isvalid || !child->isvalid(child))
+      goto __error;
+
+    child = ((struct mos_conf *)walk->conf)->arp;
+    if (!child->isvalid || !child->isvalid(child))
+      goto __error;
+
+    child = ((struct mos_conf *)walk->conf)->route;
+    if (!child->isvalid || !child->isvalid(child))
+      goto __error;
+  }
+
+  return;
+
+__error:
+  MA_LOG("Configuration validity failure!");
+  if (walk && walk->print)
+    walk->print(walk);
+  exit(EXIT_FAILURE);
+}
+
+static struct conf_block *allocate_block(char *name, int len)
+{
+  struct conf_block *walk, *tmp;
+
+  for (walk = TAILQ_FIRST(&g_free_blkh); walk != NULL; walk = tmp)
+  {
+    tmp = TAILQ_NEXT(walk, link);
+
+    if (len == strlen(walk->name) && strncmp(walk->name, name, len) == 0)
+    {
+      TAILQ_REMOVE(&g_free_blkh, walk, link);
+      if (walk->list)
+        TAILQ_INSERT_TAIL(walk->list, walk, link);
+      return walk;
+    }
+  }
+
+  return NULL;
+}
+
+struct conf_block *detect_block(struct conf_block *blk, char *buf, int len)
+{
+  int depth = 0;
+  char *blkname = NULL, *end = &buf[len];
+  int blknamelen;
+  struct conf_block *nblk;
+
+  while (buf < end && isspace(*buf))
+    buf++;
+
+  if (detect_word(buf, len, &blkname, &blknamelen) < 0
+      || blkname != buf)
+    return NULL;
+
+  buf += blknamelen;
+
+  while (buf < end && isspace(*buf))
+    buf++;
+
+  if (buf >= end || *buf != '{')
+    return NULL;
+
+  buf++;
+
+  while (buf < end && isspace(*buf))
+    buf++;
+  depth++;
+
+  for (len = 0; &buf[len] < end; len++)
+  {
+    if (buf[len] == '{')
+      depth++;
+    else if (buf[len] == '}' && --depth == 0)
+      break;
+  }
+
+  if (depth != 0)
+    return NULL;
+
+  if (!(nblk = allocate_block(blkname, blknamelen)))
+    return NULL;
+
+  if (blk)
+  {
+    assert(blk->addchild);
+    blk->addchild(blk, nblk);
+  }
+
+  nblk->buf = buf;
+  nblk->len = len;
+
+  return nblk;
+}
+
+static void parse_block(struct conf_block *blk)
+{
+  char *line;
+  int llen;
+
+  LINE_FOREACH(line, llen, blk->buf, blk->len)
+  {
+    struct conf_block *nblk;
+
+    if ((nblk = detect_block(blk, line, blk->len - (line - blk->buf))))
+    {
+      parse_block(nblk);
+      line = &nblk->buf[nblk->len] + 1;
+      llen = 0;
+    }
+    else
+      blk->feed(blk, line, llen);
+  }
+}
+
+void patch_config(struct config *config)
+{
+  int i;
+  char *word, *str, *end;
+  int wlen;
+
+  g_config.mos->num_cores = num_cpus;
+  word = NULL;
+
+  i=0;
+  struct conf_block *bwalk;
+  TAILQ_FOREACH(bwalk, &g_config.app_blkh, link)
+  {
+    struct app_conf *app_conf = (struct app_conf *)bwalk->conf;
+    g_config.mos->forward = g_config.mos->forward && app_conf->ip_forward;
+
+    if (end_app_exists == 0 && !strcmp(app_conf->type, "end"))
+      end_app_exists = 1;
+    if (mon_app_exists == 0 && !strcmp(app_conf->type, "monitor"))
+      mon_app_exists = 1;
+    i++;
+  }
+
+  if (!end_app_exists && !mon_app_exists) mon_app_exists = 1;
+
+  str = g_config.mos->stat_print;
+  end = str + strlen(str);
+
+  while(detect_word(str, end - str, &word, &wlen) == 0)
+  {
+    for (i=0; i<g_config.mos->netdev_table->num; i++)
+    {
+      if (strncmp(g_config.mos->netdev_table->ent[i]->dev_name, word, wlen) == 0)
+      {
+        g_config.mos->netdev_table->ent[i]->stat_print = TRUE;
+      }
+    }
+    str = word + wlen;
+  }
+}
+
 /**
  * @brief Configure the mssl
  * @param File name
@@ -972,13 +1163,26 @@ int load_configuration_upper_half(const char *fname)
   int llen;
 
   raw = read_conf(fname);
-  MA_LOG1s("raw", raw);
   preprocessed = preprocess_conf(raw);
-  MA_LOG1s("preprocessed", preprocessed);
   int len = strlen(preprocessed);
-  MA_LOG1d("len", len);
 
   init_config(&g_config);
+
+  LINE_FOREACH(line, llen, preprocessed, len)
+  {
+    struct conf_block *nblk;
+
+    if ((nblk = detect_block(NULL, line, len - (line - preprocessed))))
+    {
+      parse_block(nblk);
+      line = &nblk->buf[nblk->len] + 1;
+      llen = 0;
+    }
+  }
+
+  check_conf_validity(&g_config);
+  patch_config(&g_config);
+  print_conf(&g_config);
 
   return 0;
 }

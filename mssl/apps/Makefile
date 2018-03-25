@@ -1,7 +1,7 @@
 CC = gcc
 LD = gcc
 CFLAGS=-O -DDEBUG -I/usr/local/include
-LDFLAGS=-L/usr/local/lib -lssl -lcrypto -ldl -lmssl
+LDFLAGS=-L/usr/local/lib -lssl -lcrypto -ldl -lmssl -lpthread -lrt
 
 TARGETS = test
 OBJS = test.o

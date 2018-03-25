@@ -184,47 +184,6 @@ struct mos_conf
   struct conf_block *nic_forward;
 };
 
-/*
-static char *read_conf(const char *fname);
-static char *preprocess_conf(char *raw);
-
-static int set_multi_process_support(char *multiprocess_details);
-static int detect_word(char *buf, int len, char **word, int *wlen);
-
-static void init_config(struct config *config);
-static void init_app_block(struct config *config, struct conf_block *blk);
-static void init_mos_block(struct config *config, struct conf_block *blk);
-static void init_netdev_block(struct config *config, struct conf_block *blk);
-static void init_route_block(struct config *config, struct conf_block *blk);
-static void init_arp_block(struct config *config, struct conf_block *blk);
-static void init_nic_forward_block(struct config *config, struct conf_block *blk);
-static void fetch_arp_kernel_entries(struct arp_conf * const config);
-static void fetch_route_kernel_entries(struct route_conf * const config);
-
-static void feed_app_conf_line(struct conf_block *blk, char *line, int len);
-static void feed_mos_conf_line(struct conf_block *blk, char *line, int len);
-static void feed_netdev_conf_line(struct conf_block *blk, char *line, int len);
-static void feed_arp_conf_line(struct conf_block *blk, char *line, int len);
-static void feed_route_conf_line(struct conf_block *blk, char *line, int len);
-static void feed_nicfwd_conf_line(struct conf_block *blk, char *line, int len);
-
-static void mos_conf_addchild(struct conf_block *blk, struct conf_block *child);
-
-static int app_conf_isvalid(struct conf_block *blk);
-static int mos_conf_isvalid(struct conf_block *blk);
-static int netdev_conf_isvalid(struct conf_block *blk);
-static int arp_conf_isvalid(struct conf_block *blk);
-static int route_conf_isvalid(struct conf_block *blk);
-static int nicfwd_conf_isvalid(struct conf_block *blk);
-
-static void netdev_conf_print(struct conf_block *blk);
-static void arp_conf_print(struct conf_block *blk);
-static void route_conf_print(struct conf_block *blk);
-static void nicfwd_conf_print(struct conf_block *blk);
-static void app_conf_print(struct conf_block *blk);
-static void mos_conf_print(struct conf_block *blk);
-*/
-
 TAILQ_HEAD(, conf_block) g_free_blkh;
 
 int num_cpus;

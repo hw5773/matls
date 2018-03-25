@@ -37,6 +37,7 @@ OBJ = src/logs.o \
 			src/cpu.o \
 			src/config.o \
 			src/util.o \
+			src/sock_module.o \
 			src/core.o
 
 all: objs libmssl.a libmssl.pc

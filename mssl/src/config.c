@@ -432,6 +432,8 @@ static void feed_netdev_conf_line(struct conf_block *blk, char *line, int len)
   ent->cpu_mask = cpu_mask;
   g_config.mos->cpu_mask |= cpu_mask;
 
+  MA_LOG1s("Found device name", ent->dev_name);
+
   strncpy(ent->ifr.ifr_name, ent->dev_name, IFNAMSIZ-1);
   ent->ifr.ifr_name[IFNAMSIZ-1] = '\0';
 
@@ -1153,7 +1155,7 @@ void patch_config(struct config *config)
 }
 
 /**
- * @brief Configure the mssl
+ * @brief Configure the mssl (the first half)
  * @param File name
  * @return Success/Failure
  */
@@ -1185,4 +1187,46 @@ int load_configuration_upper_half(const char *fname)
   print_conf(&g_config);
 
   return 0;
+}
+
+/**
+ * @brief Configure the mssl (the second half)
+ */
+void load_configuration_lower_half(void)
+{
+  struct route_conf *route_conf = g_config.mos->route_table;
+  struct netdev_conf *netdev_conf = g_config.mos->netdev_table;
+  struct nic_forward_conf *nicfwd_conf = g_config.mos->nic_forward_table;
+  struct route_entry *rwalk;
+  struct netdev_entry *nwalk;
+  struct nic_forward_entry *fwalk;
+  int nif_in = -1;
+  int nif_out = -1;
+
+  TAILQ_FOREACH(rwalk, &route_conf->list, link)
+  {
+    TAILQ_FOREACH(nwalk, &netdev_conf->list, link)
+    {
+      MA_LOG1s("rwalk->dev_name", rwalk->dev_name);
+      MA_LOG1s("nwalk->dev_name", nwalk->dev_name);
+
+      if (!strcmp(nwalk->dev_name, rwalk->dev_name))
+        break;
+    }
+
+    if (!nwalk)
+      continue;
+
+    MA_LOG1d("nwalk->ifindex", nwalk->ifindex);
+    MA_LOG1d("nif", current_iomodule_func->get_nif(&nwalk->ifr));
+
+    if (nwalk->ifindex < 0 &&
+        (nwalk->ifindex = current_iomodule_func->get_nif(&nwalk->ifr)) < 0)
+    {
+      MA_LOG1s("Interface Not Found", nwalk->dev_name);
+      exit(EXIT_FAILURE);
+    }
+
+    rwalk->nif = nwalk->ifindex;
+  }
 }

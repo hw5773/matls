@@ -25,70 +25,27 @@ int handle_parse_errors() {
 
 unsigned char *ecdh(unsigned char key_length, unsigned char *key_ptr)
 {
-    EVP_PKEY_CTX *pctx, *kctx; //parameters_context, key_generation_context
-    EVP_PKEY *pkey = NULL, *params = NULL;
-    /* NB: assumes pkey, peerkey have been already set up */
+    EC_KEY *key;
 
-    /* Create the context for parameter generation */
-    if(NULL == (pctx = EVP_PKEY_CTX_new_id(EVP_PKEY_EC, NULL)))
-        return handle_parse_errors();
+    if(NULL == (key = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1)))
+        handle_parse_errors();
 
-    /* Initialise the parameter generation */
-    if(1 != EVP_PKEY_paramgen_init(pctx)) 
-        return handle_parse_errors();
+    if(1 != EC_KEY_generate_key(key)) handle_parse_errors();
 
-    /* We're going to use the ANSI X9.62 Prime 256v1 curve */
-    if(1 != EVP_PKEY_CTX_set_ec_paramgen_curve_nid(pctx, NID_X9_62_prime256v1)) 
-        return handle_parse_errors();
+    BIGNUM *prv;
+    EC_POINT *pub;
 
-    /* Create the parameter object params */
-    if(!EVP_PKEY_paramgen(pctx, &params)) 
-        return handle_parse_errors();
+    /* Set up private key in prv */
+    /* Set up public key in pub */
 
-    /* Create the context for the key generation */
-    if(NULL == (kctx = EVP_PKEY_CTX_new(params, NULL))) 
-        return handle_parse_errors();
+    if(1 != EC_KEY_set_private_key(key, prv)) handle_parse_errors(); 
+    if(1 != EC_KEY_set_public_key(key, pub)) handle_parse_errors();
 
-    /* Generate the key */
-    if(1 != EVP_PKEY_keygen_init(kctx)) 
-        return handle_parse_errors();
-    if(1 != EVP_PKEY_keygen(kctx, &pkey)) 
-        return handle_parse_errors();
+    if(1 != EC_POINT_mul(curve, pub, prv, NULL, NULL, ctx))
+        handle_parse_errors();
 
-    /// not yet implemented. how to create peerkey?
-    
-    /* Get the peer's public key, and provide the peer with our public key -
-     * how this is done will be specific to your circumstances */
-    peerkey = get_peerkey(pkey);
-    
-    /* Create the context for the shared secret derivation */
-    if(NULL == (ctx = EVP_PKEY_CTX_new(pkey, NULL))) handleErrors();
 
-    /* Initialise */
-    if(1 != EVP_PKEY_derive_init(ctx)) handleErrors();
 
-    /* Provide the peer public key */
-    if(1 != EVP_PKEY_derive_set_peer(ctx, peerkey)) handleErrors();
-
-    /* Determine buffer length for shared secret */
-    if(1 != EVP_PKEY_derive(ctx, NULL, secret_len)) handleErrors();
-
-    /* Create the buffer */
-    if(NULL == (secret = OPENSSL_malloc(*secret_len))) handleErrors();
-
-    /* Derive the shared secret */
-    if(1 != (EVP_PKEY_derive(ctx, secret, secret_len))) handleErrors();
-
-    EVP_PKEY_CTX_free(ctx);
-    EVP_PKEY_free(peerkey);
-    EVP_PKEY_free(pkey);
-    EVP_PKEY_CTX_free(kctx);
-    EVP_PKEY_free(params);
-    EVP_PKEY_CTX_free(pctx);
-
-    /* Never use a derived secret directly. Typically it is passed
-     * through some hash function to produce a key */
-    return secret;
 }
 
 /* Add the client's mb */
@@ -194,12 +151,14 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
 int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
         int maxlen)
 {
-
+    // group_id (2 bytes) + num_keys (1 byte) + pubkey_len (1 byte) + pubkey (len bytes)
+    
+    uint16_t group_id = s->mb_info.group_id;
+    uint8_t num_keys = 1;
+    
     if (p) {
     }
 
-    // The total length of WarrantInfo message is 
-    // group_id (2 bytes) + num_keys (1 byte) + mb_len (1 byte) + mb (mb_len bytes) 
     printf("PROGRESS: Set the length for the extension\n");
     //*len =;
     printf("PROGRESS: Complete Setting the length for the extension: %d\n", *len);

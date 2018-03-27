@@ -12,8 +12,9 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <flex/list.h>
-#include <flex/hash_function.h>
+
+#include "list.h"
+#include "hash_function.h"
 
 #define BUCKET_BITLEN	32
 

@@ -1,5 +1,6 @@
-#include <flex/hash_function.h>
 #include <stdlib.h>
+#include <stdint.h>		/* Replace with <stdint.h> if appropriate */
+#include "hash_function.h"
 
 uint32_t __hash(const char *data, int len)
 {
@@ -49,4 +50,3 @@ uint32_t __hash(const char *data, int len)
 
 	return hash;
 }
-

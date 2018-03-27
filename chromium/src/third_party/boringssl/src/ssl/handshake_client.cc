@@ -875,9 +875,14 @@ static enum ssl_hs_wait_t do_read_server_certificate_mb(SSL_HANDSHAKE *hs) {
     return ssl_hs_error;
   }
 
+  if(!hs->peer_pubkey_mb.Init(num_keys)) {
+    printf("[MB] peer_pubkey array initialization failed\n");
+    return ssl_hs_error;
+  }
+
   for (size_t i=0; i<num_keys; i++) {
     UniquePtr<STACK_OF(CRYPTO_BUFFER)> chain;
-    if (!ssl_parse_cert_chain_mb(&alert, &chain, i==0 ? &hs->peer_pubkey : NULL,
+    if (!ssl_parse_cert_chain_mb(&alert, &chain, &hs->peer_pubkey_mb[i],
                                  NULL, ssl->id_table[i].data, &body, ssl->ctx->pool)) {
       printf("[MB] ssl_parse_cert_chain_mb failed\n");
       ssl3_send_alert(ssl, SSL3_AL_FATAL, alert);
@@ -905,10 +910,10 @@ static enum ssl_hs_wait_t do_read_server_certificate_mb(SSL_HANDSHAKE *hs) {
     }
   }
 
-  // Is this has to be applied to every chain? than peer_pubkey should be fixed too.
+  // checks last pubkey, certs chain which is first middlebox or server.
   if (!ssl_check_leaf_certificate(
-          hs, hs->peer_pubkey.get(),
-          sk_CRYPTO_BUFFER_value(hs->new_session->certs_mb[0], 0))) {
+          hs, hs->peer_pubkey_mb[num_keys-1].get(),
+          sk_CRYPTO_BUFFER_value(hs->new_session->certs_mb[num_keys-1], 0))) {
     ssl3_send_alert(ssl, SSL3_AL_FATAL, SSL_AD_ILLEGAL_PARAMETER);
     return ssl_hs_error;
   }
@@ -996,7 +1001,7 @@ static enum ssl_hs_wait_t do_verify_server_certificate_mb(SSL_HANDSHAKE *hs) {
     return ssl_hs_ok;
   }
 
-  switch (ssl_verify_peer_cert(hs)) {
+  switch (ssl_verify_peer_cert_mb(hs)) {
     case ssl_verify_ok:
       break;
     case ssl_verify_invalid:
@@ -1134,9 +1139,16 @@ static enum ssl_hs_wait_t do_read_server_key_exchange(SSL_HANDSHAKE *hs) {
       hs->new_session->peer_signature_algorithm = signature_algorithm;
     } else if (!tls1_get_legacy_signature_algorithm(&signature_algorithm,
                                                     hs->peer_pubkey.get())) {
+      ///// Add for MB /////
+      // Note: we only consider >= TLS1.2 so, this must not be executed
+      printf("[MB] ERROR: hanshake_client.cc - < TLS 1.2 is used\n");
       OPENSSL_PUT_ERROR(SSL, SSL_R_PEER_ERROR_UNSUPPORTED_CERTIFICATE_TYPE);
       ssl3_send_alert(ssl, SSL3_AL_FATAL, SSL_AD_UNSUPPORTED_CERTIFICATE);
       return ssl_hs_error;
+    } 
+    ///// Add for MB /////
+    else {
+      printf("[MB] ERROR: hanshake_client.cc - < TLS 1.2 is used\n");
     }
 
     // The last field in |server_key_exchange| is the signature.
@@ -1165,10 +1177,18 @@ static enum ssl_hs_wait_t do_read_server_key_exchange(SSL_HANDSHAKE *hs) {
       return ssl_hs_error;
     }
 
-    int sig_ok = ssl_public_key_verify(
-        ssl, CBS_data(&signature), CBS_len(&signature), signature_algorithm,
-        hs->peer_pubkey.get(), transcript_data, transcript_len);
-    OPENSSL_free(transcript_data);
+    ///// Add for MB /////
+//    int sig_ok = ssl_public_key_verify(
+//        ssl, CBS_data(&signature), CBS_len(&signature), signature_algorithm,
+//        hs->peer_pubkey.get(), transcript_data, transcript_len);
+
+      EVP_PKEY *pkey = (!ssl->mb_enabled) ? hs->peer_pubkey.get() :
+                                         hs->peer_pubkey_mb[ssl->num_keys].get();
+      int sig_ok = ssl_public_key_verify(
+          ssl, CBS_data(&signature), CBS_len(&signature), signature_algorithm,
+          pkey, transcript_data, transcript_len);
+      
+      OPENSSL_free(transcript_data);
 
 #if defined(BORINGSSL_UNSAFE_FUZZER_MODE)
     sig_ok = 1;
@@ -1400,7 +1420,10 @@ static enum ssl_hs_wait_t do_send_client_key_exchange(SSL_HANDSHAKE *hs) {
       return ssl_hs_error;
     }
 
-    RSA *rsa = EVP_PKEY_get0_RSA(hs->peer_pubkey.get());
+    ///// Add for MB /////
+//    RSA *rsa = EVP_PKEY_get0_RSA(hs->peer_pubkey.get());
+    RSA *rsa = EVP_PKEY_get0_RSA((!ssl->mb_enabled) ? hs->peer_pubkey.get() :
+                                    hs->peer_pubkey_mb[ssl->num_keys-1].get());
     if (rsa == NULL) {
       OPENSSL_PUT_ERROR(SSL, ERR_R_INTERNAL_ERROR);
       return ssl_hs_error;

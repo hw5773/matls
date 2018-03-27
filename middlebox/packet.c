@@ -1,6 +1,7 @@
 #include "mb_log.h"
 #include "packet.h"
 #include <arpa/inet.h>
+#include <linux/if_ether.h>
 #include <linux/tcp.h>
 #include <linux/ip.h>
 #include <stdlib.h>
@@ -141,8 +142,9 @@ int make_checksum(uint8_t *header, int len)
 
 int parse_entry(struct pair_entry *tmp, uint8_t *buf, int len)
 {
-  struct iphdr *iph = (struct iphdr *)buf;
-  struct tcphdr *tcph = (struct tcphdr *)(buf + iph->ihl * 4);
+  struct ethhdr *eh = (struct ethhdr *) buf;
+  struct iphdr *iph = (struct iphdr *) (buf + sizeof(struct ethhdr));
+  struct tcphdr *tcph = (struct tcphdr *)(iph + iph->ihl * 4);
 
   tmp->saddr = iph->saddr;
   tmp->daddr = iph->daddr;

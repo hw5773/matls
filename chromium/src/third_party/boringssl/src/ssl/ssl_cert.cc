@@ -916,6 +916,8 @@ STACK_OF(CRYPTO_BUFFER) *SSL_get0_peer_certificates(const SSL *ssl) {
   }
 
   return session->certs;
+  ///// Added for MB /////
+  // Note : only ssl_test calls this function, so left this not fixed
 }
 
 STACK_OF(CRYPTO_BUFFER) *SSL_get0_server_requested_CAs(const SSL *ssl) {

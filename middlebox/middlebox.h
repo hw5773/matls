@@ -11,7 +11,6 @@
 /* Packet related Headers */
 #include <arpa/inet.h>
 #include <linux/if_packet.h>
-#include <linux/if_ether.h>
 #include <linux/ip.h>
 #include <linux/udp.h>
 #include <linux/tcp.h>
@@ -21,6 +20,7 @@
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <net/if.h>
+#include <netinet/ether.h>
 #include <unistd.h>
 
 #define DEFAULT_IF  "eth0"

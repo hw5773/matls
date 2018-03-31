@@ -154,6 +154,7 @@
 #include "internal.h"
 #include "../crypto/internal.h"
 
+///// Add for MB /////
 
 namespace bssl {
 
@@ -291,6 +292,7 @@ static void ssl_crypto_x509_cert_dup(CERT *new_cert, const CERT *cert) {
 }
 
 static int ssl_crypto_x509_session_cache_objects(SSL_SESSION *sess) {
+  printf("[MB] CHECK\n");
   bssl::UniquePtr<STACK_OF(X509)> chain;
   if (sk_CRYPTO_BUFFER_num(sess->certs) > 0) {
     chain.reset(sk_X509_new_null());
@@ -330,7 +332,9 @@ static int ssl_crypto_x509_session_cache_objects(SSL_SESSION *sess) {
 }
 
 ///// Add for MB /////
+// Note: might be used future
 static int ssl_crypto_x509_session_cache_objects_mb(SSL_SESSION *sess, size_t idx) {
+
   bssl::UniquePtr<STACK_OF(X509)> chain;
   if (sk_CRYPTO_BUFFER_num(sess->certs_mb[idx]) > 0) {
     chain.reset(sk_X509_new_null());
@@ -339,6 +343,8 @@ static int ssl_crypto_x509_session_cache_objects_mb(SSL_SESSION *sess, size_t id
       return 0;
     }
   }
+
+  printf("[MB] done initializing\n");
 
   X509 *leaf = nullptr;
   for (CRYPTO_BUFFER *cert : sess->certs_mb[idx]) {
@@ -356,6 +362,7 @@ static int ssl_crypto_x509_session_cache_objects_mb(SSL_SESSION *sess, size_t id
     }
   }
 
+  printf("[MB] done inserting\n");
   sk_X509_pop_free(sess->x509_chain_mb[idx], X509_free);
   sess->x509_chain_mb[idx] = chain.release();
   sk_X509_pop_free(sess->x509_chain_without_leaf_mb[idx], X509_free);
@@ -384,12 +391,22 @@ static int ssl_crypto_x509_session_dup(SSL_SESSION *new_session,
 
   ///// Add for MB /////
   // TODO: might not work properly, should change this using up_ref?
-  if (!session->x509_peer_mb.empty()) {
-    new_session->x509_peer_mb = session->x509_peer_mb;
+  if (session->x509_peer_mb != NULL && session->num_keys) {
+    new_session->x509_peer_mb = (X509 **)malloc(session->num_keys * sizeof(X509 *));
+    for (size_t i = 0; i < session->num_keys; i++) {
+      X509_up_ref(session->x509_peer_mb[i]);
+      new_session->x509_peer_mb[i] = session->x509_peer;
+    }
   }
 
-  if (!session->x509_chain_mb.empty()) {
-    new_session->x509_chain_mb = session->x509_chain_mb;
+  if (session->x509_chain_mb != NULL && session->num_keys) {
+    new_session->x509_chain_mb = (STACK_OF(X509) **)malloc(session->num_keys * sizeof(STACK_OF(X509) *));
+    for (size_t i = 0; i < session->num_keys; i++) {
+      new_session->x509_chain_mb[i] = X509_chain_up_ref(session->x509_chain_mb[i]);
+      if (new_session->x509_chain_mb[i] == NULL) {
+        return 0;
+      }
+    }
   }
 
   return 1;
@@ -404,17 +421,19 @@ static void ssl_crypto_x509_session_clear(SSL_SESSION *session) {
   session->x509_chain_without_leaf = NULL;
 
   ///// Add for MB /////
-  for (size_t i=0; i < session->x509_peer_mb.size(); i++) {
-    X509_free(session->x509_peer_mb[i]);
-    session->x509_peer_mb[i] = NULL;
-  }
-  for (size_t i=0; i < session->x509_chain_mb.size(); i++) {
-    sk_X509_pop_free(session->x509_chain_mb[i], X509_free);
-    session->x509_chain_mb[i] = NULL;
-  }
-  for (size_t i=0; i < session->x509_chain_without_leaf_mb.size(); i++) {
-    sk_X509_pop_free(session->x509_chain_without_leaf_mb[i], X509_free);
-    session->x509_chain_without_leaf_mb[i] = NULL;
+  if (session->num_keys) {
+    for (size_t i=0; i < session->num_keys; i++) {
+      X509_free(session->x509_peer_mb[i]);
+      session->x509_peer_mb[i] = NULL;
+    }
+    for (size_t i=0; i < session->num_keys; i++) {
+      sk_X509_pop_free(session->x509_chain_mb[i], X509_free);
+      session->x509_chain_mb[i] = NULL;
+    }
+    for (size_t i=0; i < session->num_keys; i++) {
+      sk_X509_pop_free(session->x509_chain_without_leaf_mb[i], X509_free);
+      session->x509_chain_without_leaf_mb[i] = NULL;
+    }
   }
 }
 
@@ -587,7 +606,15 @@ static int ssl_crypto_x509_session_verify_cert_chain_mb(SSL_SESSION *session,
       verify_ret = X509_verify_cert(ctx.get());
     }
 
-    session->verify_result = ctx->error;
+    ///// Add for MB /////
+    // session->verify_result = ctx->error;
+    if (i > 0 && session->verify_result != X509_V_OK && ctx->error == X509_V_OK) {
+      printf("[MB] verify cert OK overwrite blocked\n");
+      // Note : because of ignoring this case,
+      // only one error is saved in verify_result.
+    } else {
+      session->verify_result = ctx->error;
+    }
 
     // If |SSL_VERIFY_NONE|, the error is non-fatal, but we keep the result.
     if (verify_ret <= 0 && ssl->verify_mode != SSL_VERIFY_NONE) {

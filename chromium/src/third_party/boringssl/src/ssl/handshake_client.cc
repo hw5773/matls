@@ -848,27 +848,35 @@ static enum ssl_hs_wait_t do_read_server_certificate_mb(SSL_HANDSHAKE *hs) {
 
   if (!CBS_get_u8(&body, &num_keys_body) ||
       num_keys_body != num_keys) {
+    printf("body: %d, nk: %d\n", num_keys_body, num_keys);
     printf("[MB] wrong num_keys from server\n");
     return ssl_hs_error;
   }
 
   // maybe better solution...?
+  /*
   std::vector<STACK_OF(CRYPTO_BUFFER) *> certs_mb(num_keys);
   std::vector<STACK_OF(X509) *> x509_chain_mb(num_keys);
   std::vector<STACK_OF(X509) *> x509_chain_without_leaf_mb(num_keys);
-  std::vector<X509 *> x509_peer_mb;
+  std::vector<X509 *> x509_peer_mb(num_keys);
  
   hs->new_session->certs_mb = MakeSpan(certs_mb);
   hs->new_session->x509_chain_mb = MakeSpan(x509_chain_mb);
   hs->new_session->x509_chain_without_leaf_mb = MakeSpan(x509_chain_without_leaf_mb);
   hs->new_session->x509_peer_mb = MakeSpan(x509_peer_mb);
-
-  /*
-  if (!hs->new_session->certs_mb.Init(num_keys)) {
-    printf("[MB] certs_mb array initialization failed\n");
-    return ssl_hs_error;
-  }
   */
+
+  hs->new_session->num_keys = num_keys;
+  hs->new_session->certs_mb = (STACK_OF(CRYPTO_BUFFER) **)malloc(num_keys * sizeof(STACK_OF(CRYPTO_BUFFER) *));
+  hs->new_session->x509_chain_mb = (STACK_OF(X509) **)malloc(num_keys * sizeof(STACK_OF(X509) *));
+  hs->new_session->x509_chain_without_leaf_mb =  (STACK_OF(X509) **)malloc(num_keys * sizeof(STACK_OF(X509) *));
+  hs->new_session->x509_peer_mb = (X509 **)malloc(num_keys * sizeof(X509 *));
+
+  for (size_t i = 0; i < num_keys; i++) {
+    hs->new_session->certs_mb[i] = sk_CRYPTO_BUFFER_new_null();
+    hs->new_session->x509_chain_mb[i] = sk_X509_new_null();
+    hs->new_session->x509_chain_without_leaf_mb[i] = sk_X509_new_null();
+  }
 
   if (!ssl->id_table.Init(num_keys)) {
     printf("[MB] id_table array initialization failed\n");
@@ -888,11 +896,11 @@ static enum ssl_hs_wait_t do_read_server_certificate_mb(SSL_HANDSHAKE *hs) {
       ssl3_send_alert(ssl, SSL3_AL_FATAL, alert);
       return ssl_hs_error;
     }
-
+    
     sk_CRYPTO_BUFFER_pop_free(hs->new_session->certs_mb[i], CRYPTO_BUFFER_free);
-    hs->new_session->certs_mb[i] = chain.release(); 
-  }
-  
+    hs->new_session->certs_mb[i] = chain.release();
+  } 
+
 
   if (CBS_len(&body) != 0) {
     printf("[MB] CBS_len != 0 on read_server_certificate\n");
@@ -901,11 +909,13 @@ static enum ssl_hs_wait_t do_read_server_certificate_mb(SSL_HANDSHAKE *hs) {
     return ssl_hs_error;
   }
 
+  // Note: this session_cache_object might not work properly on some different functions
   for (size_t i=0; i<num_keys; i++) {
     if (sk_CRYPTO_BUFFER_num(hs->new_session->certs_mb[i]) == 0 ||
-        !ssl->ctx->x509_method->session_cache_objects_mb(hs->new_session.get(), i)) {
+        !ssl->ctx->x509_method->session_cache_objects(hs->new_session.get())) {
       OPENSSL_PUT_ERROR(SSL, SSL_R_DECODE_ERROR); 
       ssl3_send_alert(ssl, SSL3_AL_FATAL, SSL_AD_DECODE_ERROR);
+      printf("[MB] caching object failed\n");
       return ssl_hs_error;
     }
   }
@@ -915,12 +925,14 @@ static enum ssl_hs_wait_t do_read_server_certificate_mb(SSL_HANDSHAKE *hs) {
           hs, hs->peer_pubkey_mb[num_keys-1].get(),
           sk_CRYPTO_BUFFER_value(hs->new_session->certs_mb[num_keys-1], 0))) {
     ssl3_send_alert(ssl, SSL3_AL_FATAL, SSL_AD_ILLEGAL_PARAMETER);
+    printf("[MB] checking last pubkey failed\n");
     return ssl_hs_error;
   }
 
   ssl->method->next_message(ssl);
 
   hs->state = state_read_certificate_status;
+  printf("[MB] read certificate done\n");
   return ssl_hs_ok;
 }
 
@@ -996,6 +1008,9 @@ static enum ssl_hs_wait_t do_verify_server_certificate(SSL_HANDSHAKE *hs) {
 
 ///// Add for MB /////
 static enum ssl_hs_wait_t do_verify_server_certificate_mb(SSL_HANDSHAKE *hs) {
+
+  printf("[MB] start verifying server cert\n");  
+
   if (!ssl_cipher_uses_certificate_auth(hs->new_cipher)) {
     hs->state = state_read_server_key_exchange;
     return ssl_hs_ok;
@@ -1012,6 +1027,7 @@ static enum ssl_hs_wait_t do_verify_server_certificate_mb(SSL_HANDSHAKE *hs) {
   }
 
   hs->state = state_read_server_key_exchange;
+  printf("[MB] done verifying server cert\n");  
   return ssl_hs_ok;
 }
 
@@ -1818,18 +1834,17 @@ static enum ssl_hs_wait_t do_finish_client_handshake(SSL_HANDSHAKE *hs) {
     if (ssl->s3->established_session == NULL) {
       return ssl_hs_error;
     }
+    
     // Renegotiations do not participate in session resumption.
     if (!ssl->s3->initial_handshake_complete) {
       ssl->s3->established_session->not_resumable = 0;
     }
-
     hs->new_session.reset();
   }
 
   hs->handshake_finalized = true;
   ssl->s3->initial_handshake_complete = true;
   ssl_update_cache(hs, SSL_SESS_CACHE_CLIENT);
-
   hs->state = state_done;
   return ssl_hs_ok;
 }
@@ -1910,6 +1925,7 @@ enum ssl_hs_wait_t ssl_client_handshake(SSL_HANDSHAKE *hs) {
         break;
       case state_done:
         ret = ssl_hs_ok;
+        printf("[MB] done handshake\n");
         break;
     }
 

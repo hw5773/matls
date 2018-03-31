@@ -2592,12 +2592,14 @@ static int ext_mb_parse_serverhello(SSL_HANDSHAKE *hs, uint8_t *out_alert, CBS *
     OPENSSL_PUT_ERROR(SSL, SSL_R_WRONG_CURVE);
     return 0;
   }
- 
+  /*
   Array<CBS> peer_keys;
   if(!peer_keys.Init(num_keys)) {
     printf("[MB] peer_keys array initialize failed\n");
     return 0;
   }
+  */
+  CBS peer_keys[5];
 
   uint8_t num_peer_keys = 0;
   while (CBS_len(contents) > 0) {
@@ -2631,23 +2633,47 @@ static int ext_mb_parse_serverhello(SSL_HANDSHAKE *hs, uint8_t *out_alert, CBS *
   }
 
   Array<uint8_t> secret;
-  if(!secret.Init(SSL_MAX_MASTER_KEY_LENGTH)) {
-    printf("[MB] premaster secret initialization failed\n");
-    return 0;
-  }
+//  if(!secret.Init(SSL_MAX_MASTER_KEY_LENGTH)) {
+//    printf("[MB] premaster secret initialization failed\n");
+//    return 0;
+//  }
 
-  for (size_t i = 0; i < peer_keys.size(); i++) {
+  for (size_t i = 0; i < 1/*peer_keys.size()*/; i++) {
     if (!hs->mb_key_share->Finish(&secret, out_alert, peer_keys[i])) {
       *out_alert = SSL_AD_INTERNAL_ERROR;
+      printf("[MB] Finish() error\n");
       return 0;
     }
 
-    if(!tls1_prf(digest, ssl->mac_table[i].data, SSL3_MASTER_SECRET_SIZE, secret.data(), secret.size(),
+    // Note: Logging, better be removed after tested
+    printf("[MB] PreMaster Secret Size : %zd\n", secret.size());
+    printf("[MB] Server Random: ");
+    for (size_t t = 0; t < SSL3_RANDOM_SIZE; t++) {
+      printf("%02X", srandom[t]);
+    }
+    printf("\n[MB] Client Random: ");
+    for (size_t t = 0; t < SSL3_RANDOM_SIZE; t++) {
+      printf("%02X", crandom[t]);
+    }
+
+    printf("\n[MB] PreMaster Secret: ");
+    for (size_t t = 0; t < secret.size(); t++) {
+      printf("%02X", secret[t]);
+    }
+
+
+    if(!tls1_prf(digest, ssl->mac_table[i].data, SSL3_MASTER_SECRET_SIZE_MB, secret.data(), secret.size(),
                  TLS_MD_MB_MASTER_SECRET_CONST, TLS_MD_MB_MASTER_SECRET_CONST_SIZE,
                  srandom, SSL3_RANDOM_SIZE, crandom, SSL3_RANDOM_SIZE)) {
       printf("[MB] Error on tls1_prf\n");
       return 0;
     }
+
+    printf("\n[MB] Master Secret: ");
+    for (size_t t = 0; t < SSL3_MASTER_SECRET_SIZE_MB; t++) {
+      printf("%02X", ssl->mac_table[i].data[t]);
+    }
+    printf("\n");
 
     ssl->mac_table[i].len = SSL3_MASTER_SECRET_SIZE;
   }

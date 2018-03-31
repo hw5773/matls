@@ -1472,6 +1472,15 @@ OPENSSL_EXPORT STACK_OF(X509) *SSL_get_peer_full_cert_chain(const SSL *ssl);
 OPENSSL_EXPORT STACK_OF(CRYPTO_BUFFER) *
     SSL_get0_peer_certificates(const SSL *ssl);
 
+///// Add for MB /////
+OPENSSL_EXPORT uint8_t SSL_get0_mb_enabled(const SSL *ssl);
+
+OPENSSL_EXPORT uint8_t SSL_get0_num_keys(const SSL *ssl);
+
+OPENSSL_EXPORT STACK_OF(CRYPTO_BUFFER) *
+    SSL_get0_peer_certificates_mb(const SSL *ssl, size_t idx);
+
+
 // SSL_get0_signed_cert_timestamp_list sets |*out| and |*out_len| to point to
 // |*out_len| bytes of SCT information from the server. This is only valid if
 // |ssl| is a client. The SCT information is a SignedCertificateTimestampList
@@ -4188,11 +4197,19 @@ struct ssl_session_st {
   // is_server is true if this session was created by a server.
   unsigned is_server:1;
 
-  ///// Add for MB ///// 
+  ///// Add for MB /////
+  /* 
   bssl::Span<STACK_OF(CRYPTO_BUFFER) *> certs_mb;
   bssl::Span<STACK_OF(X509) *> x509_chain_mb;
   bssl::Span<STACK_OF(X509) *> x509_chain_without_leaf_mb;
   bssl::Span<X509 *> x509_peer_mb;
+  */
+  uint8_t num_keys;
+  STACK_OF(CRYPTO_BUFFER) **certs_mb;
+  STACK_OF(X509) **x509_chain_mb;
+  STACK_OF(X509) **x509_chain_without_leaf_mb;
+  X509 **x509_peer_mb;
+
 };
 
 // ssl_cipher_preference_list_st contains a list of SSL_CIPHERs with

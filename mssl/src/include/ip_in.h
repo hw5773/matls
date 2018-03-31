@@ -6,7 +6,7 @@
 
 int process_in_ipv4_packet(mssl_manager_t mssl, struct pkt_ctx *pctx);
 
-static inline __sum16 ip_fast_csum(const void *iph, unsigned int ihl)
+static inline uint16_t ip_fast_csum(const void *iph, unsigned int ihl)
 {
   unsigned int sum;
 
@@ -30,7 +30,7 @@ static inline __sum16 ip_fast_csum(const void *iph, unsigned int ihl)
       : "=r" (sum), "=r"(iph), "=r" (ihl)
       : "1" (iph), "2" (ihl)
       : "memory");
-  return (__sum16)sum;
+  return (uint16_t)sum;
 }
 
 #endif /* __IP_IN_H__ */

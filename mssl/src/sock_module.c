@@ -32,7 +32,7 @@ struct sock_private_context
   char *dev_name[MAX_DEVICES];
   unsigned char snd_pktbuf[MAX_DEVICES][ETHERNET_FRAME_SIZE];
   unsigned char rcv_pktbuf[MAX_PKT_BURST][ETHERNET_FRAME_SIZE];
-  uint16_t rcv_pkt_len[MAX_PKT_BURST];
+  int16_t rcv_pkt_len[MAX_PKT_BURST];
   uint16_t snd_pkt_size[MAX_DEVICES];
   uint8_t dev_poll_flag[MAX_DEVICES];
   uint8_t idel_poll_count;
@@ -42,6 +42,7 @@ struct sock_private_context
 
 void sock_init_handle(struct mssl_thread_context *ctx)
 {
+  MA_LOG("Initialize the handler");
   ctx->io_private_context = &g_sock_ctx;
 }
 
@@ -57,9 +58,53 @@ int sock_get_nif(struct ifreq *ifr)
   return -1;
 }
 
+int sock_send_pkts(struct mssl_thread_context *ctx, int idx)
+{
+  int i, len, sent, trial = 0, max_trial = 3;
+  struct sock_private_context *spc = ctx->io_private_context;
+  struct sockaddr_ll dest;
+  len = spc->snd_pkt_size[idx];
+
+  if (len == 0)
+  {
+    MA_LOG("Packet length is 0");
+    return 0;
+  }
+
+#ifdef NETSTAT
+  mssl->nstat.tx_packets[idx]++;
+  mssl->nstat.tx_bytes[idx] += len + ETHER_OVR;
+#endif /* NETSTAT */
+
+  dest.sll_ifindex = spc->if_idx[idx];
+  dest.sll_halen = ETH_ALEN;
+  
+  for (i=0; i<ETH_ALEN; i++)
+    dest.sll_addr[i] = g_config.mos->netdev_table->ent[idx]->haddr[i];
+
+  MA_LOGmac("Destination MAC", dest.sll_addr);
+
+tx_again:
+  if (sent = (sendto(spc->fd[idx], spc->snd_pktbuf[idx], len, MSG_DONTWAIT, (struct sockaddr *)&dest, sizeof(struct sockaddr_ll))) != len)
+  {
+    MA_LOG1d("Send Failed, only sent", sent);
+    MA_LOG1d("Need to send", len);
+    MA_LOG("Retry to send");
+    trial += 1;
+    if (trial < max_trial)
+      goto tx_again;
+  }
+
+#ifdef NETSTAT
+  // mssl->nstat.rx_errors[idx]++;
+#endif /* NETSTAT */
+  spc->snd_pkt_size[idx] = 0;
+
+  return 1;
+}
+
 int sock_recv_pkts(struct mssl_thread_context *ctx, int ifidx)
 {
-  MA_LOG1d("Receiving from", ifidx);
   int i;
   if (ifidx < 0 || ifidx >= MAX_DEVICES)
     return -1;
@@ -68,26 +113,46 @@ int sock_recv_pkts(struct mssl_thread_context *ctx, int ifidx)
   
   for (i=0; i<MAX_PKT_BURST; i++)
   {
-    spc->rcv_pkt_len[i] = read(spc->fd[ifidx], spc->rcv_pktbuf[i], ETHERNET_FRAME_SIZE);
-    MA_LOG1d("Received", spc->rcv_pkt_len[i]);
+    spc->rcv_pkt_len[i] = recvfrom(spc->fd[ifidx], spc->rcv_pktbuf[i], ETHERNET_FRAME_SIZE, MSG_DONTWAIT, NULL, NULL);
 
-    if (spc->rcv_pkt_len[i] <= 0)
+    if (spc->rcv_pkt_len[i] < 0)
       break;
+    else
+      MA_LOG1d("Received", spc->rcv_pkt_len[i]);
   }
 
-  MA_LOG1d("Num of Packets", i);
+  if (i > 0)
+  {
+    MA_LOG1s("Received from", spc->dev_name[ifidx]);
+    MA_LOG1d("Num of Packets", i);
+  }
 
   return i;
 }
 
 uint8_t *sock_get_rptr(struct mssl_thread_context *ctx, int ifidx, int index, uint16_t *len)
 {
+  MA_LOG1d("Getting packet pointer", index);
   struct sock_private_context *spc = ctx->io_private_context;
+  MA_LOG("Getting private_context success");
   if (spc->rcv_pkt_len[index] <= 0)
     return NULL;
 
   *len = spc->rcv_pkt_len[index];
+  MA_LOG1d("Length of packet", *len);
   return spc->rcv_pktbuf[index];
+}
+
+uint8_t *sock_get_wptr(struct mssl_thread_context *ctx, int idx, uint16_t len)
+{
+  MA_LOG1d("Getting write buffer pointer for the interface", idx);
+  struct sock_private_context *spc = ctx->io_private_context;
+  MA_LOG("Getting private context success");
+  if (spc->snd_pkt_size[idx] != 0)
+    sock_send_pkts(ctx, idx);
+  spc->snd_pkt_size[idx] = len;
+
+  return (uint8_t *)spc->snd_pktbuf[idx];
 }
 
 void sock_load_module_upper_half(void)

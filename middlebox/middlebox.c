@@ -41,6 +41,8 @@ int main(int argc, char *argv[])
   char if_name1[IFNAMSIZ];
   char if_name2[IFNAMSIZ];
   struct sockaddr_ll dest1, dest2;
+  struct arpreq arpreq;
+  unsigned char *ptr;
 
   if (argc == 3)
   {
@@ -151,6 +153,11 @@ int main(int argc, char *argv[])
       eh1->ether_type = htons(ETH_P_IP);
 
       memcpy(send2, recv1, numbytes);
+
+      ioctl(sock1, SIOCGARP, &arpreq);
+      ptr = &arpreq.arp_ha.sa_data[0];
+      printf("MAC1: %x:%x:%x:%x:%x:%x\n", *ptr, *(ptr+1), *(ptr+2), *(ptr+3), *(ptr+4), *(ptr+5));
+      printf("MAC2: %x:%x:%x:%x:%x:%x\n", DEST2_MAC0, DEST2_MAC1, DEST2_MAC2, DEST2_MAC3, DEST2_MAC4, DEST2_MAC5);
 
       dest2.sll_ifindex = if_idx2.ifr_ifindex;
       dest2.sll_halen = ETH_ALEN;

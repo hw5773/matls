@@ -14,7 +14,7 @@ typedef struct io_module_func
   void (*load_module_lower_half)(void);
   void (*init_handle)(struct mssl_thread_context *ctx);
   int32_t (*link_devices)(struct mssl_thread_context *ctx);
-  void (*release_pkt)(struct mssl_thread_context *ctx);
+  void (*release_pkt)(struct mssl_thread_context *ctx, int ifidx, unsigned char *pkt_data, int len);
   uint8_t *(*get_wptr)(struct mssl_thread_context *ctx, int ifidx, uint16_t len);
   void (*set_wptr)(struct mssl_thread_context *ctx, int out_ifidx, int in_ifidx, int idx);
   int32_t (*send_pkts)(struct mssl_thread_context *ctx, int nif);

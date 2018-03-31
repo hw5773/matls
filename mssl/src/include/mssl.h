@@ -27,7 +27,43 @@
 #define MAX_CPUS 16
 #endif /* MAX_CPUS */
 
+#ifndef ETHER_CRC_LEN
+#define ETHER_CRC_LEN 4
+#endif
+#define ETHER_IFG 12
+#define ETHER_PREAMBLE  8
+#define ETHER_OVR       (ETHER_CRC_LEN + ETHER_PREAMBLE + ETHER_IFG)
+
+#ifndef ETH_ALEN
+#define ETH_ALEN 6
+#endif
+
+#define ETHERNET_HEADER_LEN 14
+#ifdef ENABLE_PCAP
+#define ETHERNET_FRAME_LEN 4096
+#else
+#define ETHERNET_FRAME_LEN 1514
+#endif
+#define IP_HEADER_LEN 20
+#define TCP_HEADER_LEN 20
+#define TOTAL_TCP_HEADER_LEN 54
+
+#define BACKLOG_SIZE (10*1024)
+#define MAX_PKT_SIZE (2*1024)
 #define ETH_NUM 16
+#define LOGFLD_NAME_LEN 1024
+#define APP_NAME_LEN 40
+#define MOS_APP 20
+
+#define TCP_OPT_TIMESTAMP_ENABLED TRUE
+#define TCP_OPT_SACK_ENABLED FALSE
+
+#ifndef TAILQ_FOREACH_SAFE
+#define TAILQ_FOREACH_SAFE(var, head, field, tvar) \
+  for ((var) = TAILQ_FIRST((head));\
+      (var) && ((tvar) = TAILQ_NEXT((var), field), 1); \
+      (var) = (tvar))
+#endif
 
 struct timer;
 

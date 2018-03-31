@@ -114,7 +114,6 @@ static void run_main_loop(struct mssl_thread_context *ctx)
 
     for (rx_inf = 0; rx_inf < g_config.mos->netdev_table->num; rx_inf++)
     {
-      MA_LOG1d("Read packets from the interface", rx_inf);
       recv_cnt = mssl->iom->recv_pkts(ctx, rx_inf);
 
       // STAT_COUNT(mssl->runstat.rounds_rx_try);
@@ -123,7 +122,7 @@ static void run_main_loop(struct mssl_thread_context *ctx)
       {
         uint16_t len;
         uint8_t *pktbuf;
-        pktbuf = mssl->iom->get_rptr(mssl->ctx, rx_inf, i, &len);
+        pktbuf = mssl->iom->get_rptr(ctx, rx_inf, i, &len);
         process_packet(mssl, rx_inf, i, ts, pktbuf, len);
       }
     }
@@ -132,12 +131,12 @@ static void run_main_loop(struct mssl_thread_context *ctx)
 
 static mssl_manager_t initialize_mssl_manager(struct mssl_thread_context *ctx)
 {
-/*
+
   mssl_manager_t mssl;
   char log_name[MAX_FILE_NAME];
   int i;
 
-  // posix_seq_srand((unsigned) 
+  // posix_seq_srand((unsigned) pthread_self());
   
   mssl = (mssl_manager_t)calloc(1, sizeof(struct mssl_manager));
 
@@ -149,7 +148,7 @@ static mssl_manager_t initialize_mssl_manager(struct mssl_thread_context *ctx)
   }
 
   g_mssl[ctx->cpu] = mssl;
-
+/*
   mssl->tcp_flow_table = create_hash_table();
 
   if (!mssl->tcp_flow_table)
@@ -158,14 +157,26 @@ static mssl_manager_t initialize_mssl_manager(struct mssl_thread_context *ctx)
     return NULL;
   }
 
+#ifdef HUGEPAGE
+#define IS_HUGEPAGE 1
+#else
+#define IS_HUGEPAGE 0
+#endif 
+
+
   if (mon_app_exists)
   {
     init_event(mssl);
   }
+
+
+  if (!(mssl->bufseg_pool = mp_create(sizeof(tcpbufseg_t),
+          sizeof(tcpbufseg_t) * g_config.mos->max_concurrency *
+          ((g_config.mos->rmem_size - 1) / UNITBUFSIZE + 1), 0)))
 */
-  
-  mssl_manager_t mssl;
-  mssl = (mssl_manager_t)calloc(1, sizeof(struct mssl_manager));
+
+  mssl->ctx = ctx;
+//  mssl->ep = NULL;
   return mssl;
 }
 

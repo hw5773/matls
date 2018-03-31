@@ -9,7 +9,7 @@
 #include <netinet/ip.h>
 #include <sys/queue.h>
 
-#include "mtcp.h"
+#include "mssl.h"
 #include "socket.h"
 #include "memory_mgt.h"
 #include "tcp_rb.h"
@@ -33,7 +33,7 @@ struct sockent {
 #define SOCKQ_INSERT_TAIL(head, socket) \
 do { \
 	struct sockent *__s = \
-			(struct sockent *)MPAllocateChunk(mtcp->sockent_pool); \
+			(struct sockent *)MPAllocateChunk(mssl->sockent_pool); \
 	if (__s) { \
 		__s->sock = (socket); \
 		TAILQ_INSERT_TAIL(head, __s, link); \
@@ -48,7 +48,7 @@ do { \
 	} \
 	if (__walk) { \
 		TAILQ_REMOVE(head, __walk, link); \
-		MPFreeChunk(mtcp->sockent_pool, __walk); \
+		MPFreeChunk(mssl->sockent_pool, __walk); \
 	} \
 } while (0)
 #define SOCKQ_FOREACH_START(var, head) \
@@ -286,43 +286,43 @@ extern inline char *
 tcp_state_to_string(const tcp_stream *cur_stream);
 
 extern inline int 
-add_epoll_event(struct mtcp_epoll *ep, 
+add_epoll_event(struct mssl_epoll *ep, 
 		int queue_type, socket_map_t socket, uint32_t event);
 
 extern inline void 
-raise_read_event(mtcp_manager_t mtcp, tcp_stream *stream);
+raise_read_event(mssl_manager_t mssl, tcp_stream *stream);
 
 extern inline void 
-raise_write_event(mtcp_manager_t mtcp, tcp_stream *stream);
+raise_write_event(mssl_manager_t mssl, tcp_stream *stream);
 
 extern inline void 
-raise_close_event(mtcp_manager_t mtcp, tcp_stream *stream);
+raise_close_event(mssl_manager_t mssl, tcp_stream *stream);
 
 extern inline int
-raise_error_event(mtcp_manager_t mtcp, tcp_stream *stream);
+raise_error_event(mssl_manager_t mssl, tcp_stream *stream);
 
 tcp_stream *
-create_tcp_stream(mtcp_manager_t mtcp, socket_map_t socket, int type, 
+create_tcp_stream(mssl_manager_t mssl, socket_map_t socket, int type, 
 		uint32_t saddr, uint16_t sport, uint32_t daddr, uint16_t dport,
 		unsigned int *hash);
 
 extern inline tcp_stream *
-create_dual_tcp_stream(mtcp_manager_t mtcp, socket_map_t socket, int type, uint32_t saddr, 
+create_dual_tcp_stream(mssl_manager_t mssl, socket_map_t socket, int type, uint32_t saddr, 
 		    uint16_t sport, uint32_t daddr, uint16_t dport, unsigned int *hash);
 
 extern inline tcp_stream *
-create_client_tcp_stream(mtcp_manager_t mtcp, socket_map_t socket, int type,
+create_client_tcp_stream(mssl_manager_t mssl, socket_map_t socket, int type,
 			uint32_t saddr, uint16_t sport, uint32_t daddr, uint16_t dport, unsigned int *hash);
 
 extern inline tcp_stream *
-attach_server_tcp_stream(mtcp_manager_t mtcp, tcp_stream *cs, int type,
+attach_server_tcp_stream(mssl_manager_t mssl, tcp_stream *cs, int type,
 			uint32_t saddr, uint16_t sport, uint32_t daddr, uint16_t dport);
 
 void
-destroy_tcp_stream(mtcp_manager_t mtcp, tcp_stream *stream);
+destroy_tcp_stream(mssl_manager_t mssl, tcp_stream *stream);
 
 void 
-dump_stream(mtcp_manager_t mtcp, tcp_stream *stream);
+dump_stream(mssl_manager_t mssl, tcp_stream *stream);
 
 int
 get_frag_info(socket_map_t sock, int side, void *optval, socklen_t *optlen);

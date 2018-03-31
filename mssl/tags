@@ -1,0 +1,598 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ADDCHILD	src/include/config.h	/^typedef void (*ADDCHILD)(struct conf_block *blk, struct conf_block *child);$/;"	t
+APPDIR	Makefile	/^APPDIR=apps$/;"	m
+APP_BLOCK_NAME	src/include/config.h	24;"	d
+APP_NAME_LEN	include/mssl/mssl.h	26;"	d
+AR	Makefile	/^AR=ar $(ARFLAGS) r$/;"	m
+ARFLAGS	Makefile	/^ARFLAGS=$/;"	m
+ARP_BLOCK_NAME	src/include/config.h	27;"	d
+BASENAME	Makefile	/^BASENAME= mssl$/;"	m
+CC	Makefile	/^CC= cc$/;"	m
+CC	apps/Makefile	/^CC = gcc$/;"	m
+CC	src/Makefile	/^CC = cc$/;"	m
+CFLAGS	Makefile	/^CFLAGS=-O -DDEBUG -I\/usr\/local\/include -Wall$/;"	m
+CFLAGS	apps/Makefile	/^CFLAGS=-O -DDEBUG -I\/usr\/local\/include$/;"	m
+CFLAGS	src/Makefile	/^CFLAGS=-O -DDEBUG -I\/usr\/local\/include -Wall$/;"	m
+DESTDIR	Makefile	/^DESTDIR=$/;"	m
+DPDK_PREFIX	src/config.c	186;"	d	file:
+DPDK_PREFIX	src/config.c	254;"	d	file:
+DPDK_PREFIX_LEN	src/config.c	187;"	d	file:
+DPDK_PREFIX_LEN	src/config.c	255;"	d	file:
+DPDK_STR	src/include/io_module.h	37;"	d
+DRV_NAME	src/include/io_module.h	44;"	d
+ENTRY_LEN	src/config.c	189;"	d	file:
+ERROR	src/include/mssl.h	23;"	d
+ETHERNET_FRAME_SIZE	src/sock_module.c	17;"	d	file:
+ETH_ALEN	src/include/config.h	22;"	d
+ETH_NUM	src/include/mssl.h	30;"	d
+EXTRA_BUFS	src/sock_module.c	19;"	d	file:
+FALSE	src/include/mssl.h	19;"	d
+FEED	src/include/config.h	/^typedef void (*FEED)(struct conf_block *blk, char *line, int len);$/;"	t
+FORWARD_BLOCK_NAME	src/include/config.h	29;"	d
+HAS_STREAM_TYPE	src/include/tcp_stream.h	19;"	d
+HZ	src/include/tcp_in.h	4;"	d
+IDLE_POLL_COUNT	src/sock_module.c	21;"	d	file:
+IDLE_POLL_WAIT	src/sock_module.c	20;"	d	file:
+INPORT_ANY	include/mssl/mssl.h	13;"	d
+INSTALLTOP	Makefile	/^INSTALLTOP=\/usr\/local$/;"	m
+INSTALL_LIBS	Makefile	/^INSTALL_LIBS=libmssl.a$/;"	m
+ISVALID	src/include/config.h	/^typedef int (*ISVALID)(struct conf_block *blk);$/;"	t
+IS_STREAM_TYPE	src/include/tcp_stream.h	20;"	d
+LD	apps/Makefile	/^LD = gcc$/;"	m
+LDFLAGS	Makefile	/^LDFLAGS= -L\/usr\/local\/lib -lssl -lcrypto -ldl$/;"	m
+LDFLAGS	apps/Makefile	/^LDFLAGS=-L\/usr\/local\/lib -lssl -lcrypto -ldl -lmssl -lpthread -lrt$/;"	m
+LIBDIR	Makefile	/^LIBDIR=lib$/;"	m
+LIBRPATH	Makefile	/^LIBRPATH=$(INSTALLTOP)\/$(LIBDIR)$/;"	m
+LIBS	Makefile	/^LIBS=libmssl.a$/;"	m
+LINE_FOREACH	src/config.c	47;"	d	file:
+LINE_LEN	src/config.c	188;"	d	file:
+MATCH_ITEM	src/config.c	26;"	d	file:
+MAX_APP_BLOCK	src/include/config.h	16;"	d
+MAX_ARP_ENTRY	src/include/config.h	18;"	d
+MAX_CORES	apps/test.c	5;"	d	file:
+MAX_CPUS	src/include/mssl.h	27;"	d
+MAX_DEVICES	src/include/io_module.h	36;"	d
+MAX_ETH_ENTRY	src/include/config.h	19;"	d
+MAX_FILE_NAME	src/cpu.c	16;"	d	file:
+MAX_FORWARD_ENTRY	src/include/config.h	20;"	d
+MAX_IFNAMELEN	src/sock_module.c	18;"	d	file:
+MAX_MOS_BLOCK	src/include/config.h	17;"	d
+MAX_PKT_BURST	src/sock_module.c	16;"	d	file:
+MAX_ROUTE_ENTRY	src/include/config.h	21;"	d
+MAX_SACK_ENTRY	src/include/tcp_stream.h	130;"	d
+MA_LOG	include/mssl/logs.h	19;"	d
+MA_LOG	include/mssl/logs.h	45;"	d
+MA_LOG	src/include/logs.h	19;"	d
+MA_LOG	src/include/logs.h	45;"	d
+MA_LOG1d	include/mssl/logs.h	21;"	d
+MA_LOG1d	include/mssl/logs.h	46;"	d
+MA_LOG1d	src/include/logs.h	21;"	d
+MA_LOG1d	src/include/logs.h	46;"	d
+MA_LOG1lu	include/mssl/logs.h	27;"	d
+MA_LOG1lu	include/mssl/logs.h	49;"	d
+MA_LOG1lu	src/include/logs.h	27;"	d
+MA_LOG1lu	src/include/logs.h	49;"	d
+MA_LOG1s	include/mssl/logs.h	25;"	d
+MA_LOG1s	include/mssl/logs.h	48;"	d
+MA_LOG1s	src/include/logs.h	25;"	d
+MA_LOG1s	src/include/logs.h	48;"	d
+MA_LOG1x	include/mssl/logs.h	23;"	d
+MA_LOG1x	include/mssl/logs.h	47;"	d
+MA_LOG1x	src/include/logs.h	23;"	d
+MA_LOG1x	src/include/logs.h	47;"	d
+MA_LOG2s	include/mssl/logs.h	35;"	d
+MA_LOG2s	include/mssl/logs.h	51;"	d
+MA_LOG2s	src/include/logs.h	35;"	d
+MA_LOG2s	src/include/logs.h	51;"	d
+MA_LOGip	include/mssl/logs.h	29;"	d
+MA_LOGip	include/mssl/logs.h	50;"	d
+MA_LOGip	src/include/logs.h	29;"	d
+MA_LOGip	src/include/logs.h	50;"	d
+MOS_APP	include/mssl/mssl.h	27;"	d
+MOS_APP_ARGC	include/mssl/mssl.h	42;"	d
+MOS_APP_ARGC	src/include/config.h	15;"	d
+MOS_BLOCK_NAME	src/include/config.h	25;"	d
+MSEC_TO_TS	src/include/tcp_in.h	12;"	d
+MSEC_TO_USEC	src/include/tcp_in.h	16;"	d
+MSSL_CONFIG_FILE	apps/test.c	6;"	d	file:
+NAME	Makefile	/^NAME= $(BASENAME)-$(VERSION)$/;"	m
+NETDEV_BLOCK_NAME	src/include/config.h	26;"	d
+NETMAP_STR	src/include/io_module.h	39;"	d
+OBJ	Makefile	/^OBJ = src\/logs.o \\$/;"	m
+OBJS	apps/Makefile	/^OBJS = test.o$/;"	m
+OBJS	src/Makefile	/^OBJS = logs.o \\$/;"	m
+PCAP_STR	src/include/io_module.h	38;"	d
+PCS	Makefile	/^PCS=libmssl.pc$/;"	m
+PKT_RX_RSS	src/include/io_module.h	43;"	d
+PKT_TX_IP_CSUM	src/include/io_module.h	41;"	d
+PKT_TX_TCP_CSUM	src/include/io_module.h	42;"	d
+PLATFORM	Makefile	/^PLATFORM=dist$/;"	m
+PRINT	src/include/config.h	/^typedef void (*PRINT)(struct conf_block *blk);$/;"	t
+RANLIB	Makefile	/^RANLIB=ranlib$/;"	m
+RM	Makefile	/^RM= rm -f$/;"	m
+RM	src/Makefile	/^RM = rm$/;"	m
+RMDIR	Makefile	/^RMDIR= rmdir$/;"	m
+ROUTE_BLOCK_NAME	src/include/config.h	28;"	d
+SEC_TO_MSEC	src/include/tcp_in.h	15;"	d
+SEC_TO_USEC	src/include/tcp_in.h	14;"	d
+SHLIB_MAJOR	Makefile	/^SHLIB_MAJOR=1$/;"	m
+SHLIB_MONOR	Makefile	/^SHLIB_MONOR=0$/;"	m
+SHLIB_VERSION_NUMBER	Makefile	/^SHLIB_VERSION_NUMBER=1.0$/;"	m
+SOCKQ_FOREACH_END	src/include/tcp_stream.h	68;"	d
+SOCKQ_FOREACH_REVERSE	src/include/tcp_stream.h	61;"	d
+SOCKQ_FOREACH_START	src/include/tcp_stream.h	54;"	d
+SOCKQ_HEAD	src/include/tcp_stream.h	31;"	d
+SOCKQ_INIT	src/include/tcp_stream.h	32;"	d
+SOCKQ_INSERT_TAIL	src/include/tcp_stream.h	33;"	d
+SOCKQ_REMOVE	src/include/tcp_stream.h	42;"	d
+SQ_LOCK	src/include/tcp_stream_queue.h	16;"	d
+SQ_LOCK	src/include/tcp_stream_queue.h	25;"	d
+SQ_LOCK	src/include/tcp_stream_queue.h	32;"	d
+SQ_LOCK_DESTROY	src/include/tcp_stream_queue.h	15;"	d
+SQ_LOCK_DESTROY	src/include/tcp_stream_queue.h	24;"	d
+SQ_LOCK_DESTROY	src/include/tcp_stream_queue.h	31;"	d
+SQ_LOCK_INIT	src/include/tcp_stream_queue.h	10;"	d
+SQ_LOCK_INIT	src/include/tcp_stream_queue.h	19;"	d
+SQ_LOCK_INIT	src/include/tcp_stream_queue.h	30;"	d
+SQ_UNLOCK	src/include/tcp_stream_queue.h	17;"	d
+SQ_UNLOCK	src/include/tcp_stream_queue.h	26;"	d
+SQ_UNLOCK	src/include/tcp_stream_queue.h	33;"	d
+SRCDIR	Makefile	/^SRCDIR=`pwd`$/;"	m
+SRCS	apps/Makefile	/^SRCS = test.c$/;"	m
+SRCS	src/Makefile	/^SRCS = logs.c \\$/;"	m
+SRE_MAX	src/include/tcp_stream.h	92;"	d
+STREAM_TYPE	src/include/tcp_stream.h	21;"	d
+STR_LEN	src/include/config.h	14;"	d
+TARGETS	apps/Makefile	/^TARGETS = test$/;"	m
+TCP_FIN_RTO	src/include/tcp_in.h	21;"	d
+TCP_INITIAL_RTO	src/include/tcp_in.h	20;"	d
+TCP_MAX_BACKOFF	src/include/tcp_in.h	26;"	d
+TCP_MAX_RTX	src/include/tcp_in.h	24;"	d
+TCP_MAX_SEQ	src/include/tcp_stream.h	17;"	d
+TCP_MAX_SYN_RETRY	src/include/tcp_in.h	25;"	d
+TCP_TIMEOUT	src/include/tcp_in.h	22;"	d
+TCP_TIMEWAIT	src/include/tcp_in.h	19;"	d
+TIMEVAL_TO_TS	src/include/tcp_in.h	6;"	d
+TIME_TICK	src/include/tcp_in.h	5;"	d
+TRUE	src/include/mssl.h	15;"	d
+TRY_ASSIGN_NUM	src/config.c	30;"	d	file:
+TRY_ASSIGN_STR	src/config.c	41;"	d	file:
+TS_TO_MSEC	src/include/tcp_in.h	9;"	d
+TS_TO_USEC	src/include/tcp_in.h	8;"	d
+UNUSED	include/mssl/mssl.h	9;"	d
+USEC_TO_SEC	src/include/tcp_in.h	17;"	d
+USEC_TO_TS	src/include/tcp_in.h	11;"	d
+VERSION	Makefile	/^VERSION=1.0$/;"	m
+WORD_LEN	src/include/config.h	13;"	d
+_GNU_SOURCE	src/cpu.c	2;"	d	file:
+_PATH_PROCNET_ARP	src/config.c	185;"	d	file:
+_PATH_PROCNET_ROUTE	src/config.c	253;"	d	file:
+__CONFIG_H__	src/include/config.h	2;"	d
+__CPU_H__	src/include/cpu.h	2;"	d
+__IO_MODULE_H__	src/include/io_module.h	2;"	d
+__LOG_H__	include/mssl/logs.h	9;"	d
+__LOG_H__	src/include/logs.h	9;"	d
+__MSSL_API_H__	include/mssl/mssl.h	2;"	d
+__MSSL_H__	src/include/mssl.h	2;"	d
+__MSSL_MANAGER__	src/include/mssl.h	120;"	d
+__TCP_IN_H__	src/include/tcp_in.h	2;"	d
+__TCP_STREAM_H_	src/include/tcp_stream.h	2;"	d
+__TCP_STREAM_QUEUE_	src/include/tcp_stream_queue.h	2;"	d
+__UTIL_H__	src/include/util.h	2;"	d
+_arp_entry	src/include/config.h	/^struct _arp_entry$/;"	s
+ack_cnt	src/include/tcp_stream.h	/^			ack_cnt:6;			\/* number of acks to send. max 64 *\/$/;"	m	struct:tcp_send_vars
+ack_link	src/include/tcp_stream.h	/^	TAILQ_ENTRY(tcp_stream) ack_link;$/;"	m	struct:tcp_send_vars
+ack_upd_bytes	src/include/tcp_stream.h	/^	uint32_t ack_upd_bytes;$/;"	m	struct:rtm_stat
+ack_upd_cnt	src/include/tcp_stream.h	/^	uint32_t ack_upd_cnt;$/;"	m	struct:rtm_stat
+ackq	src/include/mssl.h	/^  stream_queue_t ackq;$/;"	m	struct:mssl_manager
+ackq_lock	src/include/mssl.h	/^  pthread_mutex_t ackq_lock;$/;"	m	struct:mssl_thread_context
+ackq_lock	src/include/mssl.h	/^  pthread_spinlock_t ackq_lock;$/;"	m	struct:mssl_thread_context
+actions	src/include/tcp_stream.h	/^	uint32_t actions;$/;"	m	struct:tcp_stream
+addchild	src/include/config.h	/^  ADDCHILD addchild;$/;"	m	struct:conf_block
+allocate_block	src/config.c	/^static struct conf_block *allocate_block(char *name, int len)$/;"	f	file:
+allow_pkt_modification	src/include/tcp_stream.h	/^		allow_pkt_modification:1;$/;"	m	struct:tcp_stream
+app_argc	include/mssl/mssl.h	/^  int app_argc[MOS_APP];$/;"	m	struct:mssl_conf
+app_argc	src/include/config.h	/^  int app_argc;$/;"	m	struct:app_conf
+app_argv	include/mssl/mssl.h	/^  char *app_argv[MOS_APP][MOS_APP_ARGC];$/;"	m	struct:mssl_conf
+app_argv	src/include/config.h	/^  char *app_argv[MOS_APP_ARGC];$/;"	m	struct:app_conf
+app_blkh	src/include/config.h	/^  TAILQ_HEAD(, conf_block) app_blkh;$/;"	m	struct:config
+app_conf	src/include/config.h	/^struct app_conf$/;"	s
+app_conf_isvalid	src/config.c	/^static int app_conf_isvalid(struct conf_block *blk)$/;"	f	file:
+app_conf_print	src/config.c	/^static void app_conf_print(struct conf_block *blk)$/;"	f	file:
+app_context	include/mssl/mssl.h	/^struct app_context$/;"	s
+app_cpu_mask	include/mssl/mssl.h	/^  uint64_t app_cpu_mask[MOS_APP];$/;"	m	struct:mssl_conf
+arp	src/include/config.h	/^  struct conf_block *arp;$/;"	m	struct:mos_conf	typeref:struct:mos_conf::conf_block
+arp_conf	src/include/config.h	/^struct arp_conf$/;"	s
+arp_conf_isvalid	src/config.c	/^static int arp_conf_isvalid(struct conf_block *blk)$/;"	f	file:
+arp_conf_print	src/config.c	/^static void arp_conf_print(struct conf_block *blk)$/;"	f	file:
+arp_table	src/include/config.h	/^  struct arp_conf *arp_table;$/;"	m	struct:mos_conf	typeref:struct:mos_conf::arp_conf
+array	src/include/tcp_stream_queue.h	/^	struct tcp_stream **array;$/;"	m	struct:stream_queue_int	typeref:struct:stream_queue_int::tcp_stream
+attach_device	src/core.c	/^static int attach_device(struct mssl_thread_context *ctx)$/;"	f	file:
+buf	src/include/config.h	/^  char *buf;$/;"	m	struct:conf_block
+buffer_mgmt	src/include/tcp_stream.h	/^		buffer_mgmt:2,$/;"	m	struct:tcp_stream
+cb_events	src/include/tcp_stream.h	/^	uint64_t cb_events;$/;"	m	struct:tcp_stream
+cf	include/mssl/mssl.h	/^  struct conn_filter *cf;$/;"	m	struct:app_context	typeref:struct:app_context::conn_filter
+check_conf_validity	src/config.c	/^static void check_conf_validity(struct config *conf)$/;"	f	file:
+clnt_rcvbuf_size	include/mssl/mssl.h	/^  int clnt_rcvbuf_size;$/;"	m	struct:mssl_conf
+clnt_rmem_size	src/include/config.h	/^  int clnt_rmem_size;$/;"	m	struct:mos_conf
+clnt_sndbuf_size	include/mssl/mssl.h	/^  int clnt_sndbuf_size;$/;"	m	struct:mssl_conf
+clnt_wmem_size	src/include/config.h	/^  int clnt_wmem_size;$/;"	m	struct:mos_conf
+close_lock	src/include/mssl.h	/^  pthread_mutex_t close_lock;$/;"	m	struct:mssl_thread_context
+close_lock	src/include/mssl.h	/^  pthread_spinlock_t close_lock;$/;"	m	struct:mssl_thread_context
+close_reason	src/include/tcp_stream.h	/^	uint8_t close_reason;	\/* close reason *\/$/;"	m	struct:tcp_stream
+closed	src/include/tcp_stream.h	/^	uint8_t closed;$/;"	m	struct:tcp_stream
+closeq	src/include/mssl.h	/^  stream_queue_t closeq;$/;"	m	struct:mssl_manager
+closeq_int	src/include/mssl.h	/^  stream_queue_int *closeq_int;$/;"	m	struct:mssl_manager
+conf	src/include/config.h	/^  void *conf;$/;"	m	struct:conf_block
+conf_block	src/include/config.h	/^struct conf_block$/;"	s
+config	src/include/config.h	/^struct config $/;"	s
+connect_lock	src/include/mssl.h	/^  pthread_mutex_t connect_lock;$/;"	m	struct:mssl_thread_context
+connect_lock	src/include/mssl.h	/^  pthread_spinlock_t connect_lock;$/;"	m	struct:mssl_thread_context
+connectq	src/include/mssl.h	/^  stream_queue_t connectq;$/;"	m	struct:mssl_manager
+control_link	src/include/tcp_stream.h	/^	TAILQ_ENTRY(tcp_stream) control_link;$/;"	m	struct:tcp_send_vars
+control_list_waiting	src/include/tcp_stream.h	/^		control_list_waiting:1, $/;"	m	struct:tcp_stream
+count	src/include/tcp_stream_queue.h	/^	int count;$/;"	m	struct:stream_queue_int
+cpu	include/mssl/mssl.h	/^  int cpu;$/;"	m	struct:mssl_context
+cpu	src/include/mssl.h	/^  int cpu;$/;"	m	struct:mssl_thread_context
+cpu_mask	include/mssl/mssl.h	/^  uint64_t cpu_mask;$/;"	m	struct:mssl_conf
+cpu_mask	src/include/config.h	/^  uint64_t cpu_mask;$/;"	m	struct:app_conf
+cpu_mask	src/include/config.h	/^  uint64_t cpu_mask;$/;"	m	struct:mos_conf
+cpu_mask	src/include/config.h	/^  uint64_t cpu_mask;$/;"	m	struct:netdev_entry
+ctx	src/include/mssl.h	/^  struct mssl_thread_context *ctx;$/;"	m	struct:mssl_manager	typeref:struct:mssl_manager::mssl_thread_context
+current_iomodule_func	src/include/io_module.h	/^io_module_func *current_iomodule_func;$/;"	v
+cwnd	src/include/tcp_stream.h	/^	uint32_t cwnd;				\/* congestion window *\/$/;"	m	struct:tcp_send_vars
+d_haddr	src/include/tcp_stream.h	/^	unsigned char *d_haddr;	\/* cached destination MAC address *\/$/;"	m	struct:tcp_send_vars
+daddr	src/include/tcp_stream.h	/^	uint32_t daddr;			\/* in network order *\/$/;"	m	struct:tcp_stream
+destroy_handle	src/include/io_module.h	/^  void (*destroy_handle)(struct mssl_thread_context *ctx);$/;"	m	struct:io_module_func
+destroyq	src/include/mssl.h	/^  stream_queue_t destroyq;$/;"	m	struct:mssl_manager
+destroyq_lock	src/include/mssl.h	/^  pthread_mutex_t destroyq_lock;$/;"	m	struct:mssl_thread_context
+destroyq_lock	src/include/mssl.h	/^  pthread_spinlock_t destroyq_lock;$/;"	m	struct:mssl_thread_context
+detect_block	src/config.c	/^struct conf_block *detect_block(struct conf_block *blk, char *buf, int len)$/;"	f
+detect_word	src/config.c	/^static int detect_word(char *buf, int len, char **word, int *wlen)$/;"	f	file:
+dev_ioctl	src/include/io_module.h	/^  int32_t (*dev_ioctl)(struct mssl_thread_context *ctx, int nif, int cmd, void *argp);$/;"	m	struct:io_module_func
+dev_name	src/include/config.h	/^  char dev_name[WORD_LEN];$/;"	m	struct:netdev_entry
+dev_name	src/include/config.h	/^  char dev_name[WORD_LEN];$/;"	m	struct:route_entry
+dev_name	src/sock_module.c	/^  char *dev_name[MAX_DEVICES];$/;"	m	struct:sock_private_context	file:
+dev_poll_flag	src/sock_module.c	/^  uint8_t dev_poll_flag[MAX_DEVICES];$/;"	m	struct:sock_private_context	file:
+devices_attached	src/include/config.h	/^int devices_attached[MAX_DEVICES];$/;"	v
+do_mkdir_p	util/mkdir-p.pl	/^sub do_mkdir_p {$/;"	s
+done	src/include/mssl.h	/^  uint8_t done:1,$/;"	m	struct:mssl_thread_context
+dport	src/include/tcp_stream.h	/^	uint16_t dport;			\/* in network order *\/$/;"	m	struct:tcp_stream
+dup_acks	src/include/tcp_stream.h	/^	uint8_t dup_acks;		\/* number of duplicated acks *\/$/;"	m	struct:tcp_recv_vars
+eff_mss	src/include/tcp_stream.h	/^	uint16_t eff_mss;		\/* effective segment size (excluding tcp option) *\/$/;"	m	struct:tcp_send_vars
+end_app_exists	src/config.c	/^int8_t end_app_exists = 0;$/;"	v
+ent	src/include/config.h	/^  struct _arp_entry *ent[MAX_ARP_ENTRY];$/;"	m	struct:arp_conf	typeref:struct:arp_conf::_arp_entry
+ent	src/include/config.h	/^  struct netdev_entry *ent[MAX_ETH_ENTRY];$/;"	m	struct:netdev_conf	typeref:struct:netdev_conf::netdev_entry
+ent	src/include/config.h	/^  struct nic_forward_entry *ent[MAX_FORWARD_ENTRY];$/;"	m	struct:nic_forward_conf	typeref:struct:nic_forward_conf::nic_forward_entry
+ent	src/include/config.h	/^  struct route_entry *ent[MAX_ROUTE_ENTRY];$/;"	m	struct:route_conf	typeref:struct:route_conf::route_entry
+ep_id	include/mssl/mssl.h	/^  int ep_id;$/;"	m	struct:app_context
+exit	src/include/mssl.h	/^          exit:1,$/;"	m	struct:mssl_thread_context
+expire	src/include/tcp_stream.h	/^	uint32_t expire;$/;"	m	struct:sack_entry
+fd	src/sock_module.c	/^  int fd[MAX_DEVICES];$/;"	m	struct:sock_private_context	file:
+feed	src/include/config.h	/^  FEED feed;$/;"	m	struct:conf_block
+feed_app_conf_line	src/config.c	/^static void feed_app_conf_line(struct conf_block *blk, char *line, int len)$/;"	f	file:
+feed_arp_conf_line	src/config.c	/^static void feed_arp_conf_line(struct conf_block *blk, char *line, int len)$/;"	f	file:
+feed_mos_conf_line	src/config.c	/^static void feed_mos_conf_line(struct conf_block *blk, char *line, int len)$/;"	f	file:
+feed_netdev_conf_line	src/config.c	/^static void feed_netdev_conf_line(struct conf_block *blk, char *line, int len)$/;"	f	file:
+feed_nicfwd_conf_line	src/config.c	/^static void feed_nicfwd_conf_line(struct conf_block *blk, char *line, int len)$/;"	f	file:
+feed_route_conf_line	src/config.c	/^static void feed_route_conf_line(struct conf_block *blk, char *line, int len)$/;"	f	file:
+fetch_arp_kernel_entries	src/config.c	/^static void fetch_arp_kernel_entries(struct arp_conf * const config)$/;"	f	file:
+fetch_route_kernel_entries	src/config.c	/^static void fetch_route_kernel_entries(struct route_conf * const config)$/;"	f	file:
+file	src/config.c	/^char *file = NULL;$/;"	v
+first	src/include/tcp_stream_queue.h	/^	int first;$/;"	m	struct:stream_queue_int
+flow_cnt	src/include/mssl.h	/^  uint32_t flow_cnt;$/;"	m	struct:mssl_manager
+flow_pool_lock	src/include/mssl.h	/^  pthread_mutex_t flow_pool_lock;$/;"	m	struct:mssl_thread_context
+forward	src/include/config.h	/^  int forward;$/;"	m	struct:mos_conf
+fss	src/include/tcp_stream.h	/^	uint32_t fss;			\/* final sending sequence *\/$/;"	m	struct:tcp_send_vars
+g_config	src/include/config.h	/^} g_config;$/;"	v	typeref:struct:config
+g_core_limit	apps/test.c	/^static int g_core_limit = 1;$/;"	v	file:
+g_ctx	src/include/mssl.h	/^struct mssl_context *g_ctx[MAX_CPUS];$/;"	v	typeref:struct:mssl_context
+g_done_sem	src/core.c	/^static sem_t g_done_sem[MAX_CPUS];$/;"	v	file:
+g_id	src/include/mssl.h	/^  uint32_t g_id;$/;"	m	struct:mssl_manager
+g_init_sem	src/core.c	/^static sem_t g_init_sem[MAX_CPUS];$/;"	v	file:
+g_mssl	src/include/mssl.h	/^struct mssl_manager *g_mssl[MAX_CPUS];$/;"	v	typeref:struct:mssl_manager
+g_pctx	src/core.c	/^struct mssl_thread_context *g_pctx[MAX_CPUS] = {0};$/;"	v	typeref:struct:mssl_thread_context
+g_sender	src/include/mssl.h	/^  struct mssl_sender *g_sender;$/;"	m	struct:mssl_manager	typeref:struct:mssl_manager::mssl_sender
+g_thread	src/core.c	/^static pthread_t g_thread[MAX_CPUS] = {0};$/;"	v	file:
+gateway	src/include/config.h	/^  uint32_t gateway;$/;"	m	struct:netdev_entry
+get_current_microseconds	src/logs.c	/^unsigned long get_current_microseconds()$/;"	f
+get_nif	src/include/io_module.h	/^  int (*get_nif)(struct ifreq *ifr);$/;"	m	struct:io_module_func
+get_num_cpus	src/cpu.c	/^int get_num_cpus()$/;"	f
+get_rptr	src/include/io_module.h	/^  uint8_t * (*get_rptr)(struct mssl_thread_context *ctx, int ifidx, int index, uint16_t *len);$/;"	m	struct:io_module_func
+get_wptr	src/include/io_module.h	/^  uint8_t *(*get_wptr)(struct mssl_thread_context *ctx, int ifidx, uint16_t len);$/;"	m	struct:io_module_func
+haddr	src/include/config.h	/^  uint8_t haddr[ETH_ALEN];$/;"	m	struct:_arp_entry
+haddr	src/include/config.h	/^  unsigned char haddr[ETH_ALEN];$/;"	m	struct:netdev_entry
+hash_value	src/include/io_module.h	/^  uint32_t hash_value;$/;"	m	struct:__anon1
+have_reset	src/include/tcp_stream.h	/^		have_reset:1,$/;"	m	struct:tcp_stream
+he_link	src/include/tcp_stream.h	/^	TAILQ_ENTRY(tcp_stream) he_link;	\/* hash table entry link *\/$/;"	m	struct:tcp_recv_vars
+he_mybucket	src/include/tcp_stream.h	/^	struct hash_bucket_head *he_mybucket;$/;"	m	struct:tcp_recv_vars	typeref:struct:tcp_recv_vars::hash_bucket_head
+ht_idx	src/include/tcp_stream.h	/^	uint8_t ht_idx;$/;"	m	struct:tcp_stream
+id	src/include/tcp_stream.h	/^	uint32_t id;$/;"	m	struct:tcp_stream
+idel_poll_count	src/sock_module.c	/^  uint8_t idel_poll_count;$/;"	m	struct:sock_private_context	file:
+ifindex	src/include/config.h	/^  int ifindex;$/;"	m	struct:netdev_entry
+ifr	src/include/config.h	/^  struct ifreq ifr;$/;"	m	struct:netdev_entry	typeref:struct:netdev_entry::ifreq
+init_app_block	src/config.c	/^static void init_app_block(struct config *config, struct conf_block *blk)$/;"	f	file:
+init_arp_block	src/config.c	/^static void init_arp_block(struct config *config, struct conf_block *blk)$/;"	f	file:
+init_config	src/config.c	/^static void init_config(struct config *config)$/;"	f	file:
+init_handle	src/include/io_module.h	/^  void (*init_handle)(struct mssl_thread_context *ctx);$/;"	m	struct:io_module_func
+init_mos_block	src/config.c	/^static void init_mos_block(struct config *config, struct conf_block *blk)$/;"	f	file:
+init_netdev_block	src/config.c	/^static void init_netdev_block(struct config *config, struct conf_block *blk)$/;"	f	file:
+init_nic_forward_block	src/config.c	/^static void init_nic_forward_block(struct config *config, struct conf_block *blk)$/;"	f	file:
+init_route_block	src/config.c	/^static void init_route_block(struct config *config, struct conf_block *blk)$/;"	f	file:
+initialize_mssl_manager	src/core.c	/^static mssl_manager_t initialize_mssl_manager(struct mssl_thread_context *ctx)$/;"	f	file:
+interrupt	src/include/mssl.h	/^          interrupt:1;$/;"	m	struct:mssl_thread_context
+io_module_func	src/include/io_module.h	/^typedef struct io_module_func$/;"	s
+io_module_func	src/include/io_module.h	/^} io_module_func __attribute__((aligned(__WORDSIZE)));$/;"	t	typeref:struct:io_module_func
+io_private_context	src/include/mssl.h	/^  void *io_private_context;$/;"	m	struct:mssl_thread_context
+iom	src/include/mssl.h	/^  struct io_module_func *iom;$/;"	m	struct:mssl_manager	typeref:struct:mssl_manager::io_module_func
+ip	src/include/config.h	/^  uint32_t ip;$/;"	m	struct:_arp_entry
+ip	src/include/config.h	/^  uint32_t ip;$/;"	m	struct:route_entry
+ip_addr	src/include/config.h	/^  uint32_t ip_addr;$/;"	m	struct:netdev_entry
+ip_forward	src/include/config.h	/^  int ip_forward;$/;"	m	struct:app_conf
+ip_id	src/include/tcp_stream.h	/^	uint16_t ip_id;$/;"	m	struct:tcp_send_vars
+ipb	include/mssl/logs.h	/^unsigned char ipb[4];$/;"	v
+ipb	src/include/logs.h	/^unsigned char ipb[4];$/;"	v
+irs	src/include/tcp_stream.h	/^	uint32_t irs;			\/* initial receiving sequence *\/$/;"	m	struct:tcp_recv_vars
+is_bound_addr	src/include/tcp_stream.h	/^	uint8_t is_bound_addr;$/;"	m	struct:tcp_stream
+is_fin_ackd	src/include/tcp_stream.h	/^			is_fin_ackd:1;$/;"	m	struct:tcp_send_vars
+is_fin_sent	src/include/tcp_stream.h	/^			is_fin_sent:1, $/;"	m	struct:tcp_send_vars
+is_wack	src/include/tcp_stream.h	/^	uint8_t is_wack:1, 			\/* is ack for window adertisement? *\/$/;"	m	struct:tcp_send_vars
+iss	src/include/tcp_stream.h	/^	uint32_t iss;			\/* initial sending sequence *\/$/;"	m	struct:tcp_send_vars
+isvalid	src/include/config.h	/^  ISVALID isvalid;$/;"	m	struct:conf_block
+last	src/include/tcp_stream_queue.h	/^	int last;$/;"	m	struct:stream_queue_int
+last_ack_seq	src/include/tcp_stream.h	/^	uint32_t last_ack_seq;	\/* highest ackd seq *\/$/;"	m	struct:tcp_recv_vars
+last_active_ts	src/include/tcp_stream.h	/^	uint32_t last_active_ts;		\/* ts_last_ack_sent or ts_last_ts_upd *\/$/;"	m	struct:tcp_stream
+last_pctx	src/include/tcp_stream.h	/^	struct pkt_ctx last_pctx;$/;"	m	struct:tcp_stream	typeref:struct:tcp_stream::pkt_ctx
+last_pkt_data	src/include/tcp_stream.h	/^	unsigned char  last_pkt_data[ETHERNET_FRAME_LEN];$/;"	m	struct:tcp_stream
+left_edge	src/include/tcp_stream.h	/^	uint32_t left_edge;$/;"	m	struct:sack_entry
+len	src/include/config.h	/^  int len;$/;"	m	struct:conf_block
+link	src/include/config.h	/^  TAILQ_ENTRY(_arp_entry) link;$/;"	m	struct:_arp_entry
+link	src/include/config.h	/^  TAILQ_ENTRY(conf_block) link;$/;"	m	struct:conf_block
+link	src/include/config.h	/^  TAILQ_ENTRY(netdev_entry) link;$/;"	m	struct:netdev_entry
+link	src/include/config.h	/^  TAILQ_ENTRY(nic_forward_entry) link;$/;"	m	struct:nic_forward_entry
+link	src/include/config.h	/^  TAILQ_ENTRY(route_entry) link;$/;"	m	struct:route_entry
+link	src/include/tcp_stream.h	/^	TAILQ_ENTRY(sockent) link;$/;"	m	struct:sockent
+link_devices	src/include/io_module.h	/^  int32_t (*link_devices)(struct mssl_thread_context *ctx);$/;"	m	struct:io_module_func
+list	src/include/config.h	/^  TAILQ_HEAD(, _arp_entry) list;$/;"	m	struct:arp_conf
+list	src/include/config.h	/^  TAILQ_HEAD(, conf_block) *list;$/;"	m	struct:conf_block
+list	src/include/config.h	/^  TAILQ_HEAD(, netdev_entry) list;$/;"	m	struct:netdev_conf
+list	src/include/config.h	/^  TAILQ_HEAD(, nic_forward_entry) list;$/;"	m	struct:nic_forward_conf
+list	src/include/config.h	/^  TAILQ_HEAD(, route_entry) list;$/;"	m	struct:route_conf
+listener	src/include/mssl.h	/^  struct tcp_listener *listener;$/;"	m	struct:mssl_manager	typeref:struct:mssl_manager::tcp_listener
+load_configuration_lower_half	src/config.c	/^void load_configuration_lower_half(void)$/;"	f
+load_configuration_upper_half	src/config.c	/^int load_configuration_upper_half(const char *fname)$/;"	f
+load_module_lower_half	src/include/io_module.h	/^  void (*load_module_lower_half)(void);$/;"	m	struct:io_module_func
+load_module_upper_half	src/include/io_module.h	/^  void (*load_module_upper_half)(void);$/;"	m	struct:io_module_func
+log_idx	include/mssl/logs.h	/^int log_idx;$/;"	v
+log_idx	src/include/logs.h	/^int log_idx;$/;"	v
+main	apps/test.c	/^int main(int argc, char *argv[])$/;"	f
+mask	src/include/config.h	/^  uint32_t mask;$/;"	m	struct:_arp_entry
+mask	src/include/config.h	/^  uint32_t mask;$/;"	m	struct:route_entry
+masked_ip	src/include/config.h	/^  uint32_t masked_ip;$/;"	m	struct:_arp_entry
+masked_ip	src/include/config.h	/^  uint32_t masked_ip;$/;"	m	struct:route_entry
+max_concurrency	include/mssl/mssl.h	/^  int max_concurrency;$/;"	m	struct:mssl_conf
+max_concurrency	src/include/config.h	/^  int max_concurrency;$/;"	m	struct:mos_conf
+max_nrtx	src/include/tcp_stream.h	/^	uint8_t max_nrtx;		\/* max number of retransmission *\/$/;"	m	struct:tcp_send_vars
+max_num_buffers	include/mssl/mssl.h	/^  int max_num_buffers;$/;"	m	struct:mssl_conf
+mctx	include/mssl/mssl.h	/^  mctx_t mctx;$/;"	m	struct:app_context
+mctx_t	include/mssl/mssl.h	/^typedef struct mssl_context *mctx_t;$/;"	t	typeref:struct:mssl_context
+mdev	src/include/tcp_stream.h	/^	uint32_t mdev;			\/* medium deviation *\/$/;"	m	struct:tcp_recv_vars
+mdev_max	src/include/tcp_stream.h	/^	uint32_t mdev_max;		\/* maximal mdev ffor the last rtt period *\/$/;"	m	struct:tcp_recv_vars
+mon_app_exists	src/config.c	/^int8_t mon_app_exists = 0;$/;"	v
+monitors	src/include/mssl.h	/^  TAILQ_HEAD(, mon_listener) monitors;$/;"	m	struct:mssl_manager
+mos	src/include/config.h	/^  struct mos_conf *mos;$/;"	m	struct:config	typeref:struct:config::mos_conf
+mos_blkh	src/include/config.h	/^  TAILQ_HEAD(, conf_block) mos_blkh;$/;"	m	struct:config
+mos_conf	src/include/config.h	/^struct mos_conf$/;"	s
+mos_conf_addchild	src/config.c	/^static void mos_conf_addchild(struct conf_block *blk, struct conf_block *child)$/;"	f	file:
+mos_conf_isvalid	src/config.c	/^static int mos_conf_isvalid(struct conf_block *blk)$/;"	f	file:
+mos_conf_print	src/config.c	/^static void mos_conf_print(struct conf_block *blk)$/;"	f	file:
+mos_log	src/include/config.h	/^  char mos_log[STR_LEN];$/;"	m	struct:mos_conf
+msocks	src/include/tcp_stream.h	/^	SOCKQ_HEAD(mlist) msocks;        \/* in case monitoring is enabled *\/$/;"	m	struct:tcp_stream
+mss	src/include/tcp_stream.h	/^	uint16_t mss;			\/* maximum segment size *\/$/;"	m	struct:tcp_send_vars
+mssl_conf	include/mssl/mssl.h	/^struct mssl_conf$/;"	s
+mssl_context	include/mssl/mssl.h	/^struct mssl_context$/;"	s
+mssl_create_context	src/core.c	/^mctx_t mssl_create_context(int cpu)$/;"	f
+mssl_init	src/core.c	/^int mssl_init(const char *config_file)$/;"	f
+mssl_manager	src/include/mssl.h	/^  struct mssl_manager *mssl_manager;$/;"	m	struct:mssl_thread_context	typeref:struct:mssl_thread_context::mssl_manager
+mssl_manager	src/include/mssl.h	/^struct mssl_manager$/;"	s
+mssl_manager_t	src/include/mssl.h	/^  typedef struct mssl_manager *mssl_manager_t;$/;"	t	typeref:struct:mssl_manager
+mssl_run_thread	src/core.c	/^static void *mssl_run_thread(void *arg)$/;"	f	file:
+mssl_sighandler_t	include/mssl/mssl.h	/^typedef void (*mssl_sighandler_t)(int);$/;"	t
+mssl_thread_context	src/include/mssl.h	/^struct mssl_thread_context$/;"	s
+mssl_thread_context_t	src/include/mssl.h	/^typedef struct mssl_thread_context *mssl_thread_context_t;$/;"	t	typeref:struct:mssl_thread_context
+multiprocess	src/include/config.h	/^  int multiprocess;$/;"	m	struct:mos_conf
+multiprocess_curr_core	src/include/config.h	/^  int multiprocess_curr_core;$/;"	m	struct:mos_conf
+multiprocess_is_master	src/include/config.h	/^  int multiprocess_is_master;$/;"	m	struct:mos_conf
+mystrtol	src/util.c	/^int mystrtol(const char *nptr, int base)$/;"	f
+n_sender	src/include/mssl.h	/^  struct mssl_sender *n_sender[ETH_NUM];$/;"	m	struct:mssl_manager	typeref:struct:mssl_manager::mssl_sender
+name	src/include/config.h	/^  char *name;$/;"	m	struct:conf_block
+nb_mem_channels	src/include/config.h	/^  int nb_mem_channels;$/;"	m	struct:mos_conf
+need_wnd_adv	src/include/tcp_stream.h	/^	uint8_t need_wnd_adv;$/;"	m	struct:tcp_stream
+netdev	src/include/config.h	/^  struct conf_block *netdev;$/;"	m	struct:mos_conf	typeref:struct:mos_conf::conf_block
+netdev_conf	src/include/config.h	/^struct netdev_conf$/;"	s
+netdev_conf_isvalid	src/config.c	/^static int netdev_conf_isvalid(struct conf_block *blk)$/;"	f	file:
+netdev_conf_print	src/config.c	/^static void netdev_conf_print(struct conf_block *blk)$/;"	f	file:
+netdev_entry	src/include/config.h	/^struct netdev_entry$/;"	s
+netdev_table	src/include/config.h	/^  struct netdev_conf *netdev_table;$/;"	m	struct:mos_conf	typeref:struct:mos_conf::netdev_conf
+netmask	src/include/config.h	/^  uint32_t netmask;$/;"	m	struct:netdev_entry
+nic_forward	src/include/config.h	/^  struct conf_block *nic_forward;$/;"	m	struct:mos_conf	typeref:struct:mos_conf::conf_block
+nic_forward_conf	src/include/config.h	/^struct nic_forward_conf$/;"	s
+nic_forward_entry	src/include/config.h	/^struct nic_forward_entry$/;"	s
+nic_forward_table	src/include/config.h	/^  struct nic_forward_conf *nic_forward_table;$/;"	m	struct:mos_conf	typeref:struct:mos_conf::nic_forward_conf
+nic_fwd_table	src/include/config.h	/^  int nic_fwd_table[MAX_FORWARD_ENTRY];$/;"	m	struct:nic_forward_conf
+nicfwd_conf_isvalid	src/config.c	/^static int nicfwd_conf_isvalid(struct conf_block *blk)$/;"	f	file:
+nicfwd_conf_print	src/config.c	/^static void nicfwd_conf_print(struct conf_block *blk)$/;"	f	file:
+nif	src/include/config.h	/^  int nif;$/;"	m	struct:route_entry
+nif_in	src/include/config.h	/^  char nif_in[WORD_LEN];$/;"	m	struct:nic_forward_entry
+nif_out	src/include/config.h	/^  char nif_out[WORD_LEN];$/;"	m	struct:nic_forward_entry
+nif_out	src/include/tcp_stream.h	/^	int8_t nif_out;			\/* cached output network interface *\/$/;"	m	struct:tcp_send_vars
+no_ring_buffers	src/include/config.h	/^  int no_ring_buffers;$/;"	m	struct:mos_conf
+nrtx	src/include/tcp_stream.h	/^	uint8_t nrtx;			\/* number of retransmission *\/$/;"	m	struct:tcp_send_vars
+num	src/include/config.h	/^  int num;$/;"	m	struct:arp_conf
+num	src/include/config.h	/^  int num;$/;"	m	struct:netdev_conf
+num	src/include/config.h	/^  int num;$/;"	m	struct:nic_forward_conf
+num	src/include/config.h	/^  int num;$/;"	m	struct:route_conf
+num_app	include/mssl/mssl.h	/^  int num_app;$/;"	m	struct:mssl_conf
+num_cores	include/mssl/mssl.h	/^  int num_cores;$/;"	m	struct:mssl_conf
+num_cores	src/include/config.h	/^  int num_cores;$/;"	m	struct:mos_conf
+num_cpus	src/include/config.h	/^int num_cpus;$/;"	v
+num_devices	src/include/config.h	/^int num_devices;$/;"	v
+num_devices_attached	src/include/config.h	/^int num_devices_attached;$/;"	v
+num_esp	src/include/mssl.h	/^  uint32_t num_esp;$/;"	m	struct:mssl_manager
+num_msp	src/include/mssl.h	/^  uint32_t num_msp;$/;"	m	struct:mssl_manager
+num_queues	src/include/config.h	/^int num_queues;$/;"	v
+on_ack_list	src/include/tcp_stream.h	/^	uint8_t on_ack_list;$/;"	m	struct:tcp_send_vars
+on_ackq	src/include/tcp_stream.h	/^	uint8_t on_ackq;$/;"	m	struct:tcp_send_vars
+on_closeq	src/include/tcp_stream.h	/^	uint8_t on_closeq;$/;"	m	struct:tcp_send_vars
+on_closeq_int	src/include/tcp_stream.h	/^	uint8_t on_closeq_int:1, $/;"	m	struct:tcp_send_vars
+on_control_list	src/include/tcp_stream.h	/^	uint8_t on_control_list;$/;"	m	struct:tcp_send_vars
+on_hash_table	src/include/tcp_stream.h	/^	uint8_t on_hash_table;$/;"	m	struct:tcp_stream
+on_rcv_br_list	src/include/tcp_stream.h	/^		on_rcv_br_list:1, $/;"	m	struct:tcp_stream
+on_resetq	src/include/tcp_stream.h	/^	uint8_t on_resetq;$/;"	m	struct:tcp_send_vars
+on_resetq_int	src/include/tcp_stream.h	/^			on_resetq_int:1, $/;"	m	struct:tcp_send_vars
+on_rto_idx	src/include/tcp_stream.h	/^	int16_t on_rto_idx;$/;"	m	struct:tcp_stream
+on_send_list	src/include/tcp_stream.h	/^	uint8_t on_send_list;$/;"	m	struct:tcp_send_vars
+on_sendq	src/include/tcp_stream.h	/^	uint8_t on_sendq;$/;"	m	struct:tcp_send_vars
+on_snd_br_list	src/include/tcp_stream.h	/^		on_snd_br_list:1, $/;"	m	struct:tcp_stream
+on_timeout_list	src/include/tcp_stream.h	/^	uint16_t on_timeout_list:1, $/;"	m	struct:tcp_stream
+on_timewait_list	src/include/tcp_stream.h	/^	uint8_t on_timewait_list;$/;"	m	struct:tcp_stream
+pair_stream	src/include/tcp_stream.h	/^	struct tcp_stream *pair_stream; \/* pair stream in case of monitor \/ proxy socket *\/$/;"	m	struct:tcp_stream	typeref:struct:tcp_stream::tcp_stream
+parse_block	src/config.c	/^static void parse_block(struct conf_block *blk)$/;"	f	file:
+patch_config	src/config.c	/^void patch_config(struct config *config)$/;"	f
+pctx	src/include/mssl.h	/^  struct pkt_ctx *pctx;$/;"	m	struct:mssl_manager	typeref:struct:mssl_manager::pkt_ctx
+peer_wnd	src/include/tcp_stream.h	/^	uint32_t peer_wnd;		\/* client window size *\/$/;"	m	struct:tcp_send_vars
+pktidx	src/include/io_module.h	/^  int8_t pktidx;$/;"	m	struct:__anon1
+port	src/include/config.h	/^  char port[STR_LEN];$/;"	m	struct:mos_conf
+prefix	src/include/config.h	/^  int prefix;$/;"	m	struct:route_entry
+prefix	src/include/config.h	/^  int8_t prefix;$/;"	m	struct:_arp_entry
+preprocess_conf	src/config.c	/^static char *preprocess_conf(char *raw)$/;"	f	file:
+print	src/include/config.h	/^  PRINT print;$/;"	m	struct:conf_block
+print_conf	src/config.c	/^void print_conf(struct config *conf)$/;"	f
+rcv_nxt	src/include/tcp_stream.h	/^	uint32_t rcv_nxt;		\/* receive next *\/$/;"	m	struct:tcp_stream
+rcv_pkt_len	src/sock_module.c	/^  uint16_t rcv_pkt_len[MAX_PKT_BURST];$/;"	m	struct:sock_private_context	file:
+rcv_pktbuf	src/sock_module.c	/^  unsigned char *rcv_pktbuf[MAX_PKT_BURST];$/;"	m	struct:sock_private_context	file:
+rcv_wnd	src/include/tcp_stream.h	/^	uint32_t rcv_wnd;		\/* receive window (unscaled) *\/$/;"	m	struct:tcp_recv_vars
+rcvbuf	src/include/tcp_stream.h	/^	tcprb_t *rcvbuf;$/;"	m	struct:tcp_recv_vars
+rcvvar	src/include/tcp_stream.h	/^	struct tcp_recv_vars *rcvvar;$/;"	m	struct:tcp_stream	typeref:struct:tcp_stream::tcp_recv_vars
+read_conf	src/config.c	/^static char *read_conf(const char *fname)$/;"	f	file:
+read_item_value	src/config.c	/^static int read_item_value(char *line, int llen, char *item, int ilen, char *value, int vlen)$/;"	f	file:
+read_lock	src/include/tcp_stream.h	/^	pthread_mutex_t read_lock;$/;"	m	struct:tcp_recv_vars
+read_lock	src/include/tcp_stream.h	/^	pthread_spinlock_t read_lock;$/;"	m	struct:tcp_recv_vars
+recv_pkts	src/include/io_module.h	/^  int32_t (*recv_pkts)(struct mssl_thread_context *ctx, int ifidx);$/;"	m	struct:io_module_func
+release_pkt	src/include/io_module.h	/^  void (*release_pkt)(struct mssl_thread_context *ctx);$/;"	m	struct:io_module_func
+reset_lock	src/include/mssl.h	/^  pthread_mutex_t reset_lock;$/;"	m	struct:mssl_thread_context
+reset_lock	src/include/mssl.h	/^  pthread_spinlock_t reset_lock;$/;"	m	struct:mssl_thread_context
+resetq	src/include/mssl.h	/^  stream_queue_t resetq;$/;"	m	struct:mssl_manager
+resetq_int	src/include/mssl.h	/^  stream_queue_int *resetq_int;$/;"	m	struct:mssl_manager
+right_edge	src/include/tcp_stream.h	/^	uint32_t right_edge;$/;"	m	struct:sack_entry
+route	src/include/config.h	/^  struct conf_block *route;$/;"	m	struct:mos_conf	typeref:struct:mos_conf::conf_block
+route_conf	src/include/config.h	/^struct route_conf$/;"	s
+route_conf_isvalid	src/config.c	/^static int route_conf_isvalid(struct conf_block *blk)$/;"	f	file:
+route_conf_print	src/config.c	/^static void route_conf_print(struct conf_block *blk)$/;"	f	file:
+route_entry	src/include/config.h	/^struct route_entry$/;"	s
+route_table	src/include/config.h	/^  struct route_conf *route_table;$/;"	m	struct:mos_conf	typeref:struct:mos_conf::route_conf
+rss_info	src/include/io_module.h	/^} rss_info;$/;"	t	typeref:struct:__anon1
+rstat	src/include/tcp_stream.h	/^	struct rtm_stat rstat;			\/* retransmission statistics *\/$/;"	m	struct:tcp_send_vars	typeref:struct:tcp_send_vars::rtm_stat
+rtm_stat	src/include/tcp_stream.h	/^struct rtm_stat$/;"	s
+rto	src/include/tcp_stream.h	/^	uint32_t rto;			\/* retransmission timeout *\/$/;"	m	struct:tcp_send_vars
+rto_bytes	src/include/tcp_stream.h	/^	uint32_t rto_bytes;$/;"	m	struct:rtm_stat
+rto_cnt	src/include/tcp_stream.h	/^	uint32_t rto_cnt;$/;"	m	struct:rtm_stat
+rtt_seq	src/include/tcp_stream.h	/^	uint32_t rtt_seq;		\/* sequence number to update rttvar *\/$/;"	m	struct:tcp_recv_vars
+rttvar	src/include/tcp_stream.h	/^	uint32_t rttvar;		\/* smoothed mdev_max *\/$/;"	m	struct:tcp_recv_vars
+run	src/include/config.h	/^  char run[STR_LEN];$/;"	m	struct:app_conf
+run_main_loop	src/core.c	/^static void run_main_loop(struct mssl_thread_context *ctx)$/;"	f	file:
+running	src/core.c	/^static int running[MAX_CPUS] = {0};$/;"	v	file:
+s_index	src/include/mssl.h	/^  uint32_t s_index;$/;"	m	struct:mssl_manager
+sack_bytes	src/include/tcp_stream.h	/^	uint32_t sack_bytes;$/;"	m	struct:rtm_stat
+sack_cnt	src/include/tcp_stream.h	/^	uint32_t sack_cnt;$/;"	m	struct:rtm_stat
+sack_entry	src/include/tcp_stream.h	/^struct sack_entry$/;"	s
+sack_permit	src/include/tcp_stream.h	/^		sack_permit:1,		\/* whether peer permits SACK *\/$/;"	m	struct:tcp_stream
+sack_table	src/include/tcp_stream.h	/^	struct sack_entry sack_table[MAX_SACK_ENTRY];$/;"	m	struct:tcp_recv_vars	typeref:struct:tcp_recv_vars::sack_entry
+sacks	src/include/tcp_stream.h	/^	uint8_t sacks:3;$/;"	m	struct:tcp_recv_vars
+saddr	src/include/tcp_stream.h	/^	uint32_t saddr;			\/* in network order *\/$/;"	m	struct:tcp_stream
+saw_timestamp	src/include/tcp_stream.h	/^		saw_timestamp:1,	\/* whether peer sends timestamp *\/$/;"	m	struct:tcp_stream
+select	src/include/io_module.h	/^  int32_t (*select)(struct mssl_thread_context *ctx);$/;"	m	struct:io_module_func
+send_link	src/include/tcp_stream.h	/^	TAILQ_ENTRY(tcp_stream) send_link;$/;"	m	struct:tcp_send_vars
+send_pkts	src/include/io_module.h	/^  int32_t (*send_pkts)(struct mssl_thread_context *ctx, int nif);$/;"	m	struct:io_module_func
+sendq	src/include/mssl.h	/^  stream_queue_t sendq;$/;"	m	struct:mssl_manager
+sendq_lock	src/include/mssl.h	/^  pthread_mutex_t sendq_lock;$/;"	m	struct:mssl_thread_context
+sendq_lock	src/include/mssl.h	/^  pthread_spinlock_t sendq_lock;$/;"	m	struct:mssl_thread_context
+seq_base	src/include/tcp_stream.h	/^	uint32_t seq_base;$/;"	m	struct:seq_remap_entry
+seq_off	src/include/tcp_stream.h	/^	uint32_t seq_off;$/;"	m	struct:seq_remap_entry
+seq_remap_entry	src/include/tcp_stream.h	/^typedef struct seq_remap_entry {$/;"	s
+seq_remap_entry	src/include/tcp_stream.h	/^} seq_remap_entry;$/;"	t	typeref:struct:seq_remap_entry
+serv_rcvbuf_size	include/mssl/mssl.h	/^  int serv_rcvbuf_size;$/;"	m	struct:mssl_conf
+serv_rmem_size	src/include/config.h	/^  int serv_rmem_size;$/;"	m	struct:mos_conf
+serv_sndbuf_size	include/mssl/mssl.h	/^  int serv_sndbuf_size;$/;"	m	struct:mssl_conf
+serv_wmem_size	src/include/config.h	/^  int serv_wmem_size;$/;"	m	struct:mos_conf
+set_multi_process_support	src/config.c	/^static int set_multi_process_support(char *multiprocess_details)$/;"	f	file:
+set_promisc	src/sock_module.c	/^static void set_promisc(char *ifname)$/;"	f	file:
+set_wptr	src/include/io_module.h	/^  void (*set_wptr)(struct mssl_thread_context *ctx, int out_ifidx, int in_ifidx, int idx);$/;"	m	struct:io_module_func
+side	src/include/tcp_stream.h	/^		side:2,$/;"	m	struct:tcp_stream
+sigint_cnt	src/core.c	/^static int sigint_cnt[MAX_CPUS] = {0};$/;"	v	file:
+size	src/include/tcp_stream_queue.h	/^	int size;$/;"	m	struct:stream_queue_int
+snd_nxt	src/include/tcp_stream.h	/^	uint32_t snd_nxt;		\/* send next *\/$/;"	m	struct:tcp_stream
+snd_pkt_size	src/sock_module.c	/^  uint16_t snd_pkt_size[MAX_DEVICES];$/;"	m	struct:sock_private_context	file:
+snd_pktbuf	src/sock_module.c	/^  unsigned char snd_pktbuf[MAX_DEVICES][ETHERNET_FRAME_SIZE];$/;"	m	struct:sock_private_context	file:
+snd_una	src/include/tcp_stream.h	/^	uint32_t snd_una;		\/* send unacknoledged *\/$/;"	m	struct:tcp_send_vars
+snd_wl1	src/include/tcp_stream.h	/^	uint32_t snd_wl1;		\/* segment seq number for last window update *\/$/;"	m	struct:tcp_recv_vars
+snd_wl2	src/include/tcp_stream.h	/^	uint32_t snd_wl2;		\/* segment ack number for last window update *\/$/;"	m	struct:tcp_recv_vars
+snd_wnd	src/include/tcp_stream.h	/^	uint32_t snd_wnd;		\/* send window (unscaled) *\/$/;"	m	struct:tcp_send_vars
+sndbuf	src/include/tcp_stream.h	/^	struct tcp_send_buffer *sndbuf;$/;"	m	struct:tcp_send_vars	typeref:struct:tcp_send_vars::tcp_send_buffer
+sndvar	src/include/tcp_stream.h	/^	struct tcp_send_vars *sndvar;$/;"	m	struct:tcp_stream	typeref:struct:tcp_stream::tcp_send_vars
+sock	src/include/tcp_stream.h	/^	struct socket_map *sock;$/;"	m	struct:sockent	typeref:struct:sockent::socket_map
+sock_get_nif	src/sock_module.c	/^int sock_get_nif(struct ifreq *ifr)$/;"	f
+sock_load_module_lower_half	src/sock_module.c	/^void sock_load_module_lower_half(void)$/;"	f
+sock_load_module_upper_half	src/sock_module.c	/^void sock_load_module_upper_half(void)$/;"	f
+sock_module_func	src/sock_module.c	/^io_module_func sock_module_func = $/;"	v
+sock_private_context	src/sock_module.c	/^struct sock_private_context$/;"	s	file:
+sockent	src/include/tcp_stream.h	/^struct sockent {$/;"	s
+socket	src/include/tcp_stream.h	/^	socket_map_t socket;		\/* relating to MOS_SOCK_STREAM *\/$/;"	m	struct:tcp_stream
+socket_id	include/mssl/mssl.h	/^  int socket_id;$/;"	m	struct:app_context
+socket_pool_lock	src/include/mssl.h	/^  pthread_mutex_t socket_pool_lock;$/;"	m	struct:mssl_thread_context
+sport	src/include/tcp_stream.h	/^	uint16_t sport;			\/* in network order *\/$/;"	m	struct:tcp_stream
+sre	src/include/tcp_stream.h	/^	struct seq_remap_entry sre[SRE_MAX];	\/* seq # translation table *\/$/;"	m	struct:tcp_send_vars	typeref:struct:tcp_send_vars::seq_remap_entry
+sre_index	src/include/tcp_stream.h	/^	uint8_t sre_index;			\/* seq # translation index *\/$/;"	m	struct:tcp_send_vars
+srtt	src/include/tcp_stream.h	/^	uint32_t srtt;			\/* smoothed round trip time << 3 (scaled) *\/$/;"	m	struct:tcp_recv_vars
+ssthresh	src/include/tcp_stream.h	/^	uint32_t ssthresh;			\/* slow start threshold *\/$/;"	m	struct:tcp_send_vars
+stat_print	src/include/config.h	/^  char stat_print[STR_LEN];$/;"	m	struct:mos_conf
+stat_print	src/include/config.h	/^  int stat_print;$/;"	m	struct:netdev_entry
+state	src/include/tcp_stream.h	/^	uint8_t state;			\/* tcp state *\/$/;"	m	struct:tcp_stream
+status_mgmt	src/include/tcp_stream.h	/^		status_mgmt:1,$/;"	m	struct:tcp_stream
+str_to_args	src/util.c	/^int str_to_args(char *str, int *argc, char **argv, int max_argc)$/;"	f
+stream_queue_int	src/include/tcp_stream_queue.h	/^typedef struct stream_queue_int$/;"	s
+stream_queue_int	src/include/tcp_stream_queue.h	/^} stream_queue_int;$/;"	t	typeref:struct:stream_queue_int
+stream_queue_t	src/include/tcp_stream_queue.h	/^typedef struct stream_queue* stream_queue_t;$/;"	t	typeref:struct:stream_queue
+stream_type	src/include/tcp_stream.h	/^	uint32_t stream_type;		\/* to identify sock_stream\/mon_stream *\/$/;"	m	struct:tcp_stream
+tcp_recv_vars	src/include/tcp_stream.h	/^struct tcp_recv_vars$/;"	s
+tcp_send_vars	src/include/tcp_stream.h	/^struct tcp_send_vars$/;"	s
+tcp_stream	src/include/tcp_stream.h	/^typedef struct tcp_stream$/;"	s
+tcp_stream	src/include/tcp_stream.h	/^} tcp_stream;$/;"	t	typeref:struct:tcp_stream
+tcp_timeout	include/mssl/mssl.h	/^  int tcp_timeout;$/;"	m	struct:mssl_conf
+tcp_timeout	src/include/config.h	/^  int tcp_timeout;$/;"	m	struct:mos_conf
+tcp_timewait	include/mssl/mssl.h	/^  int tcp_timewait;$/;"	m	struct:mssl_conf
+tcp_tw_interval	src/include/config.h	/^  int tcp_tw_interval;$/;"	m	struct:mos_conf
+tdp_ack_bytes	src/include/tcp_stream.h	/^	uint32_t tdp_ack_bytes;$/;"	m	struct:rtm_stat
+tdp_ack_cnt	src/include/tcp_stream.h	/^	uint32_t tdp_ack_cnt;$/;"	m	struct:rtm_stat
+tdp_sack_bytes	src/include/tcp_stream.h	/^	uint32_t tdp_sack_bytes;$/;"	m	struct:rtm_stat
+tdp_sack_cnt	src/include/tcp_stream.h	/^	uint32_t tdp_sack_cnt;$/;"	m	struct:rtm_stat
+thread	src/include/mssl.h	/^  pthread_t thread;$/;"	m	struct:mssl_thread_context
+timeout_link	src/include/tcp_stream.h	/^	TAILQ_ENTRY(tcp_stream) timeout_link;	\/* connection timeout link *\/$/;"	m	struct:tcp_send_vars
+timer_link	src/include/tcp_stream.h	/^	TAILQ_ENTRY(tcp_stream) timer_link;		\/* timer link (rto list, tw list) *\/$/;"	m	struct:tcp_send_vars
+tls_flow_table	src/include/mssl.h	/^  struct hashtable *tls_flow_table;$/;"	m	struct:mssl_manager	typeref:struct:mssl_manager::hashtable
+ts_last_ts_upd	src/include/tcp_stream.h	/^	uint32_t ts_last_ts_upd;	\/* last peer ts update time *\/$/;"	m	struct:tcp_recv_vars
+ts_lastack_rcvd	src/include/tcp_stream.h	/^	uint32_t ts_lastack_rcvd;	\/* last ack rcvd time *\/$/;"	m	struct:tcp_recv_vars
+ts_lastack_sent	src/include/tcp_stream.h	/^	uint32_t ts_lastack_sent;	\/* last ack sent time *\/$/;"	m	struct:tcp_send_vars
+ts_recent	src/include/tcp_stream.h	/^	uint32_t ts_recent;			\/* recent peer timestamp *\/$/;"	m	struct:tcp_recv_vars
+ts_rto	src/include/tcp_stream.h	/^	uint32_t ts_rto;		\/* timestamp for retransmission timeout *\/$/;"	m	struct:tcp_send_vars
+ts_tw_expire	src/include/tcp_stream.h	/^	uint32_t ts_tw_expire;	\/\/ timestamp for timewait expire$/;"	m	struct:tcp_recv_vars
+type	src/include/config.h	/^  char type[WORD_LEN];$/;"	m	struct:app_conf
+write_lock	src/include/tcp_stream.h	/^	pthread_mutex_t write_lock;$/;"	m	struct:tcp_send_vars
+write_lock	src/include/tcp_stream.h	/^	pthread_spinlock_t write_lock;$/;"	m	struct:tcp_send_vars
+wscale_mine	src/include/tcp_stream.h	/^	uint8_t wscale_mine;		\/* my window scale (advertising window) *\/$/;"	m	struct:tcp_send_vars
+wscale_peer	src/include/tcp_stream.h	/^	uint8_t wscale_peer;		\/* peer's window scale (advertised window) *\/$/;"	m	struct:tcp_send_vars

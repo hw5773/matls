@@ -7,6 +7,7 @@ OBJS = logs.o \
 			 config.o \
 			 util.o \
 			 sock_module.o \
+			 eth_in.o \
 			 core.o
 
 SRCS = logs.c \
@@ -14,6 +15,7 @@ SRCS = logs.c \
 			 config.c \
 			 util.c \
 			 sock_module.c \
+			 eth_in.c \
 			 core.c
 
 default: $(OBJS)

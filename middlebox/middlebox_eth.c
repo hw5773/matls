@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
       dest2.sll_addr[4] = DEST2_MAC4;
       dest2.sll_addr[5] = DEST2_MAC5;
 
-      if (numbytes = (sendto(sock2, send2, numbytes, MSG_DONTWAIT, (struct sockaddr *)&dest2, sizeof(struct sockaddr_ll))) < 0)
+      if (numbytes = (sendto(sock2, send2, numbytes, 0, (struct sockaddr *)&dest2, sizeof(struct sockaddr_ll))) < 0)
         perror("Failed to send");
       printf("Send from sock1 to sock2: %d\n", numbytes);
     }
@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
       dest1.sll_addr[4] = DEST1_MAC4;
       dest1.sll_addr[5] = DEST1_MAC5;
 
-      if (numbytes = (sendto(sock1, send1, numbytes, MSG_DONTWAIT, (struct sockaddr *)&dest1, sizeof(struct sockaddr_ll))) < 0)
+      if (numbytes = (sendto(sock1, send1, numbytes, 0, (struct sockaddr *)&dest1, sizeof(struct sockaddr_ll))) < 0)
         perror("Failed to send");
       printf("Send from sock2 to sock1: %d\n", numbytes);
     }

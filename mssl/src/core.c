@@ -8,6 +8,10 @@
 #include "include/config.h"
 #include "include/cpu.h"
 #include "include/mssl.h"
+#include "include/tcp_in.h"
+
+#define LOG_FILE_NAME "log"
+#define MAX_FILE_NAME 1024
 
 struct mssl_thread_context *g_pctx[MAX_CPUS] = {0};
 static pthread_t g_thread[MAX_CPUS] = {0};
@@ -51,12 +55,11 @@ int mssl_init(const char *config_file)
   if (current_iomodule_func->load_module_upper_half)
     current_iomodule_func->load_module_upper_half();
   
-  load_configuration_lower_half();
-
   // TODO: address pool
   // TODO: initialize arp table
   // TODO: signal handler
   
+  MA_LOG("Load module lower half");
   if (current_iomodule_func->load_module_lower_half)
     current_iomodule_func->load_module_lower_half();
 
@@ -94,6 +97,7 @@ static void run_main_loop(struct mssl_thread_context *ctx)
   gettimeofday(&cur_ts, NULL);
 
   MA_LOG1d("mssl thread running", ctx->cpu);
+  MA_LOG1d("number of interfaces", g_config.mos->netdev_table->num);
 
   ts = ts_prev = 0;
 
@@ -112,6 +116,7 @@ static void run_main_loop(struct mssl_thread_context *ctx)
     {
       MA_LOG1d("Read packets from the interface", rx_inf);
       recv_cnt = mssl->iom->recv_pkts(ctx, rx_inf);
+
       // STAT_COUNT(mssl->runstat.rounds_rx_try);
       
       for (i=0; i<recv_cnt; i++)
@@ -127,6 +132,41 @@ static void run_main_loop(struct mssl_thread_context *ctx)
 
 static mssl_manager_t initialize_mssl_manager(struct mssl_thread_context *ctx)
 {
+/*
+  mssl_manager_t mssl;
+  char log_name[MAX_FILE_NAME];
+  int i;
+
+  // posix_seq_srand((unsigned) 
+  
+  mssl = (mssl_manager_t)calloc(1, sizeof(struct mssl_manager));
+
+  if (!mssl)
+  {
+    perror("malloc");
+    MA_LOG("Failed to allocate mssl_manager");
+    return NULL;
+  }
+
+  g_mssl[ctx->cpu] = mssl;
+
+  mssl->tcp_flow_table = create_hash_table();
+
+  if (!mssl->tcp_flow_table)
+  {
+    MA_LOG("Failed to allocate tcp flow table");
+    return NULL;
+  }
+
+  if (mon_app_exists)
+  {
+    init_event(mssl);
+  }
+*/
+  
+  mssl_manager_t mssl;
+  mssl = (mssl_manager_t)calloc(1, sizeof(struct mssl_manager));
+  return mssl;
 }
 
 static void *mssl_run_thread(void *arg)

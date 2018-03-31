@@ -9,7 +9,7 @@
 #include <pthread.h>
 
 #include "tcp_stream_queue.h"
-#include "../../include/mssl/mssl.h"
+#include "mssl_api.h"
 
 #ifndef TRUE
 #define TRUE (1)
@@ -29,6 +29,30 @@
 
 #define ETH_NUM 16
 
+struct timer;
+
+struct route_table
+{
+  uint32_t daddr;
+  uint32_t mask;
+  uint32_t masked;
+  int prefix;
+  int nif;
+};
+/*
+struct mssl_sender
+{
+  int ifidx;
+
+  TAILQ_HEAD(control_head, tcp_stream) control_list;
+  TAILQ_HEAD(send_head, tcp_stream) send_list;
+  TAILQ_HEAD(ack_head, tcp_stream) ack_list;
+
+  int control_list_cnt;
+  int send_list_cnt;
+  int ack_list_cnt;
+};
+*/
 struct mssl_manager
 {
 /*

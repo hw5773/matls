@@ -220,6 +220,7 @@ extern "C" {
 #define SSL_MIN_RSA_MODULUS_LENGTH_IN_BYTES	(512/8)
 #define SSL_MAX_KEY_ARG_LENGTH			8
 #define SSL_MAX_MASTER_KEY_LENGTH		48
+#define SSL_MAX_GLOBAL_MAC_KEY_LENGTH        48
 
 
 /* These are used to specify which ciphers to use and not to use */
@@ -785,6 +786,15 @@ struct ssl_comp_st
 DECLARE_STACK_OF(SSL_COMP)
 DECLARE_LHASH_OF(SSL_SESSION);
 
+
+#ifndef OPENSSL_NO_MB
+struct keypair
+{
+    BIGNUM *pri;
+    EC_POINT *pub;
+};
+#endif
+
 struct ssl_ctx_st
 	{
 	const SSL_METHOD *method;
@@ -1016,8 +1026,9 @@ struct ssl_ctx_st
     struct mb_st {
         uint16_t group_id;
         uint8_t num_keys;
-        uint8_t key_length[20];
+        uint8_t key_length[100]; //ECDH key length
         unsigned char *mac_array;
+        struct keypair serv_keypair;
     } mb_info;
 
 #endif

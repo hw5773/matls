@@ -1,4 +1,4 @@
-#include <flex/hash_table.h>
+#include "hash_table.h"
 
 /* insert_hash_table()
  * @h: &struct hash_table hash table to insert hash_entry into

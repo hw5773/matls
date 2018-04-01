@@ -183,8 +183,8 @@ static char *preprocess_conf(char *raw)
 static void fetch_arp_kernel_entries(struct arp_conf * const config)
 {
 #define _PATH_PROCNET_ARP "/proc/net/arp"
-#define IF_PREFIX       "ens"
-#define IF_PREFIX_LEN   3
+#define IF_PREFIX       "dpdk"
+#define IF_PREFIX_LEN   4
 #define LINE_LEN          200
 #define ENTRY_LEN         25
 
@@ -253,8 +253,8 @@ static void fetch_arp_kernel_entries(struct arp_conf * const config)
 static void fetch_route_kernel_entries(struct route_conf * const config)
 {
 #define	_PATH_PROCNET_ROUTE		"/proc/net/route"
-#define	IF_PREFIX			"ens"
-#define IF_PREFIX_LEN			3
+#define	IF_PREFIX			"dpdk"
+#define IF_PREFIX_LEN			4
 	
 	FILE *fp;
 	uint32_t gate;

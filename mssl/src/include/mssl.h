@@ -153,9 +153,9 @@ struct mssl_manager
   int rto_list_cnt;
   int timewait_list_cnt;
   int timeout_list_cnt;
-
+*/
   uint32_t cur_ts;
-
+/*
   int wakeup_flag;
   int is_sleeping;
 

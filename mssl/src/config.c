@@ -183,10 +183,12 @@ static char *preprocess_conf(char *raw)
 static void fetch_arp_kernel_entries(struct arp_conf * const config)
 {
 #define _PATH_PROCNET_ARP "/proc/net/arp"
-#define DPDK_PREFIX       "dpdk"
-#define DPDK_PREFIX_LEN   4
+#define IF_PREFIX       "ens"
+#define IF_PREFIX_LEN   3
 #define LINE_LEN          200
 #define ENTRY_LEN         25
+
+  MA_LOG("Fetch ARP Kernel Entries");
 
   FILE *fp;
   char ip[ENTRY_LEN];
@@ -214,7 +216,7 @@ static void fetch_arp_kernel_entries(struct arp_conf * const config)
       if (num < 6)
         break;
 
-      if (strncmp(dev, DPDK_PREFIX, DPDK_PREFIX_LEN))
+      if (strncmp(dev, IF_PREFIX, IF_PREFIX_LEN))
         continue;
 
       if (flags != 0x00) 
@@ -251,8 +253,8 @@ static void fetch_arp_kernel_entries(struct arp_conf * const config)
 static void fetch_route_kernel_entries(struct route_conf * const config)
 {
 #define	_PATH_PROCNET_ROUTE		"/proc/net/route"
-#define	DPDK_PREFIX			"dpdk"
-#define DPDK_PREFIX_LEN			4
+#define	IF_PREFIX			"ens"
+#define IF_PREFIX_LEN			3
 	
 	FILE *fp;
 	uint32_t gate;
@@ -306,9 +308,14 @@ static void fetch_route_kernel_entries(struct route_conf * const config)
 			ent->mask = mask;
 			ent->masked_ip = ent->mask & ent->ip;
 			strcpy(ent->dev_name, dev);
+
 			TAILQ_INSERT_TAIL(&config->list, ent, link);
 			config->ent[config->num] = ent;
 			config->num++;
+
+      MA_LOGip("Route Table IP", ent->masked_ip);
+      MA_LOG1s("Output Device", ent->dev_name);
+      MA_LOG1d("NIF", ent->nif);
 		}
 	}
 	
@@ -1194,6 +1201,7 @@ int load_configuration_upper_half(const char *fname)
  */
 void load_configuration_lower_half(void)
 {
+  MA_LOG("Progress lower half configuration");
   struct route_conf *route_conf = g_config.mos->route_table;
   struct netdev_conf *netdev_conf = g_config.mos->netdev_table;
   struct nic_forward_conf *nicfwd_conf = g_config.mos->nic_forward_table;
@@ -1217,9 +1225,6 @@ void load_configuration_lower_half(void)
     if (!nwalk)
       continue;
 
-    MA_LOG1d("nwalk->ifindex", nwalk->ifindex);
-    MA_LOG1d("nif", current_iomodule_func->get_nif(&nwalk->ifr));
-
     if (nwalk->ifindex < 0 &&
         (nwalk->ifindex = current_iomodule_func->get_nif(&nwalk->ifr)) < 0)
     {
@@ -1228,5 +1233,7 @@ void load_configuration_lower_half(void)
     }
 
     rwalk->nif = nwalk->ifindex;
+    MA_LOGip("IP addr", rwalk->masked_ip);
+    MA_LOG1s("is set to", g_config.mos->netdev_table->ent[rwalk->nif]->dev_name);
   }
 }

@@ -60,6 +60,7 @@ int sock_get_nif(struct ifreq *ifr)
 
 int sock_send_pkts(struct mssl_thread_context *ctx, int idx)
 {
+  MA_LOG1s("Sending the packet to", g_config.mos->route_table->ent[idx]->dev_name);
   int i, len, sent, trial = 0, max_trial = 3;
   struct sock_private_context *spc = ctx->io_private_context;
   struct sockaddr_ll dest;
@@ -80,7 +81,7 @@ int sock_send_pkts(struct mssl_thread_context *ctx, int idx)
   dest.sll_halen = ETH_ALEN;
   
   for (i=0; i<ETH_ALEN; i++)
-    dest.sll_addr[i] = g_config.mos->netdev_table->ent[idx]->haddr[i];
+    dest.sll_addr[i] = spc->snd_pktbuf[idx][i];
 
   MA_LOGmac("Destination MAC", dest.sll_addr);
 
@@ -151,6 +152,8 @@ uint8_t *sock_get_wptr(struct mssl_thread_context *ctx, int idx, uint16_t len)
   if (spc->snd_pkt_size[idx] != 0)
     sock_send_pkts(ctx, idx);
   spc->snd_pkt_size[idx] = len;
+
+  MA_LOG("Getting socket success!");
 
   return (uint8_t *)spc->snd_pktbuf[idx];
 }
@@ -279,8 +282,8 @@ io_module_func sock_module_func =
   .init_handle = sock_init_handle,
   .link_devices = NULL,
   .release_pkt = NULL,
-  .send_pkts = NULL,
-  .get_wptr = NULL,
+  .send_pkts = sock_send_pkts,
+  .get_wptr = sock_get_wptr,
   .set_wptr = NULL,
   .recv_pkts = sock_recv_pkts,
   .get_rptr = sock_get_rptr,

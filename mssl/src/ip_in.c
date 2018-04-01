@@ -91,6 +91,7 @@ __return:
   if (release && mssl->iom->release_pkt)
     mssl->iom->release_pkt(mssl->ctx, pctx->p.in_ifidx, 
         (unsigned char *)pctx->p.ethh, pctx->p.eth_len);
+  MA_LOG("Process IPv4 Packet success");
   return ret;
 }
 

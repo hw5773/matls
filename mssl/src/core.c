@@ -63,6 +63,13 @@ int mssl_init(const char *config_file)
   if (current_iomodule_func->load_module_lower_half)
     current_iomodule_func->load_module_lower_half();
 
+  load_configuration_lower_half();
+
+  // CreateAddressPool
+
+  print_arp_table();
+  init_arp_table();
+
   return 0;
 }
 

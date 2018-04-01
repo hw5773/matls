@@ -60,6 +60,10 @@ uint8_t *ethernet_output(mssl_manager_t mssl, struct pkt_ctx *pctx,
     uint16_t proto, int nif, unsigned char *dst_haddr, uint16_t iplen,
     uint32_t cur_ts)
 {
+  MA_LOG("Generate Ethernet Frame");
+  MA_LOGmac("Sending to", dst_haddr);
+  MA_LOGmac("By", g_config.mos->route_table->ent[nif]->dev_name);
+
   uint8_t *buf;
   struct ethhdr *ethh;
   int i;
@@ -90,6 +94,8 @@ uint8_t *ethernet_output(mssl_manager_t mssl, struct pkt_ctx *pctx,
     ethh->h_dest[i] = dst_haddr[i];
   }
   ethh->h_proto = htons(proto);
+
+  MA_LOG("Setting ethernet frame on wptr success");
 
   if (pctx)
     fillout_packet_eth_context(pctx, cur_ts, nif, ethh, iplen + ETHERNET_HEADER_LEN);

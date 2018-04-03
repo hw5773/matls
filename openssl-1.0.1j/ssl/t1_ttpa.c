@@ -37,8 +37,6 @@ int ssl_parse_clienthello_ttpa_ext(SSL *s, unsigned char *d, int len, int *al)
 	
     printf("PROGRESS: Check whether the cc_len is zero\n");
     if (len != 0) {
-        SSLerr(SSL_F_SSL_PARSE_CLIENTHELLO_TTPA_EXT,
-               SSL_R_CC_INVALID_VALUE);
         *al = SSL_AD_HANDSHAKE_FAILURE;
         return 0;
     }

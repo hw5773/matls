@@ -775,7 +775,7 @@ unsigned char *ssl_add_serverhello_tlsext(SSL *s, unsigned char *buf, unsigned c
 
 		if (!ssl_add_serverhello_ttpa_ext(s, 0, &el, 0))
 		{
-			SSLerr(SSL_F_SSL_ADD_SERVERHELLO_TTPAEXT, ERR_R_INTERNAL_ERROR);
+			SSLerr(SSL_F_SSL_ADD_SERVERHELLO_TTPA_EXT, ERR_R_INTERNAL_ERROR);
 			return NULL;
 		}
 
@@ -787,7 +787,7 @@ unsigned char *ssl_add_serverhello_tlsext(SSL *s, unsigned char *buf, unsigned c
 
 		if (!ssl_add_serverhello_ttpa_ext(s, ret, &el, el))
 		{
-			SSLerr(SSL_F_SSL_ADD_SERVERHELLO_TTPAEXT, ERR_R_INTERNAL_ERROR);
+			SSLerr(SSL_F_SSL_ADD_SERVERHELLO_TTPA_EXT, ERR_R_INTERNAL_ERROR);
 			return NULL;
 		}
 
@@ -805,7 +805,7 @@ unsigned char *ssl_add_serverhello_tlsext(SSL *s, unsigned char *buf, unsigned c
 
 		if (!ssl_add_serverhello_mb_ext(s, 0, &el, 0))
 		{
-			SSLerr(SSL_F_SSL_ADD_SERVERHELLO_MBEXT, ERR_R_INTERNAL_ERROR);
+			SSLerr(SSL_F_SSL_ADD_SERVERHELLO_MB_EXT, ERR_R_INTERNAL_ERROR);
 			return NULL;
 		}
 
@@ -817,7 +817,7 @@ unsigned char *ssl_add_serverhello_tlsext(SSL *s, unsigned char *buf, unsigned c
 
 		if (!ssl_add_serverhello_mb_ext(s, ret, &el, el))
 		{
-			SSLerr(SSL_F_SSL_ADD_SERVERHELLO_MBEXT, ERR_R_INTERNAL_ERROR);
+			SSLerr(SSL_F_SSL_ADD_SERVERHELLO_MB_EXT, ERR_R_INTERNAL_ERROR);
 			return NULL;
 		}
 

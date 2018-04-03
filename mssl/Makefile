@@ -37,7 +37,17 @@ OBJ = src/logs.o \
 			src/cpu.o \
 			src/config.o \
 			src/util.o \
+			src/fhash.o \
 			src/sock_module.o \
+			src/arp.o \
+			src/eth_in.o \
+			src/eth_out.o \
+			src/ip_in.o \
+			src/ip_out.o \
+			src/tcp.o \
+			src/tcp_in.o \
+			src/tcp_util.o \
+			src/tcp_rb.o \
 			src/core.o
 
 all: objs libmssl.a libmssl.pc

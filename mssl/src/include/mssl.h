@@ -9,7 +9,7 @@
 #include <pthread.h>
 
 #include "tcp_stream_queue.h"
-#include "../../include/mssl/mssl.h"
+#include "mssl_api.h"
 
 #ifndef TRUE
 #define TRUE (1)
@@ -27,8 +27,68 @@
 #define MAX_CPUS 16
 #endif /* MAX_CPUS */
 
-#define ETH_NUM 16
+#ifndef ETHER_CRC_LEN
+#define ETHER_CRC_LEN 4
+#endif
+#define ETHER_IFG 12
+#define ETHER_PREAMBLE  8
+#define ETHER_OVR       (ETHER_CRC_LEN + ETHER_PREAMBLE + ETHER_IFG)
 
+#ifndef ETH_ALEN
+#define ETH_ALEN 6
+#endif
+
+#define ETHERNET_HEADER_LEN 14
+#ifdef ENABLE_PCAP
+#define ETHERNET_FRAME_LEN 4096
+#else
+#define ETHERNET_FRAME_LEN 1514
+#endif
+#define IP_HEADER_LEN 20
+#define TCP_HEADER_LEN 20
+#define TOTAL_TCP_HEADER_LEN 54
+
+#define BACKLOG_SIZE (10*1024)
+#define MAX_PKT_SIZE (2*1024)
+#define ETH_NUM 16
+#define LOGFLD_NAME_LEN 1024
+#define APP_NAME_LEN 40
+#define MOS_APP 20
+
+#define TCP_OPT_TIMESTAMP_ENABLED TRUE
+#define TCP_OPT_SACK_ENABLED FALSE
+
+#ifndef TAILQ_FOREACH_SAFE
+#define TAILQ_FOREACH_SAFE(var, head, field, tvar) \
+  for ((var) = TAILQ_FIRST((head));\
+      (var) && ((tvar) = TAILQ_NEXT((var), field), 1); \
+      (var) = (tvar))
+#endif
+
+struct timer;
+
+struct route_table
+{
+  uint32_t daddr;
+  uint32_t mask;
+  uint32_t masked;
+  int prefix;
+  int nif;
+};
+/*
+struct mssl_sender
+{
+  int ifidx;
+
+  TAILQ_HEAD(control_head, tcp_stream) control_list;
+  TAILQ_HEAD(send_head, tcp_stream) send_list;
+  TAILQ_HEAD(ack_head, tcp_stream) ack_list;
+
+  int control_list_cnt;
+  int send_list_cnt;
+  int ack_list_cnt;
+};
+*/
 struct mssl_manager
 {
 /*
@@ -46,7 +106,7 @@ struct mssl_manager
   kvs_t *ev_store;
   sb_manager_t rbm_snd;
 */
-  struct hashtable *tls_flow_table;
+  struct hashtable *tcp_flow_table;
   uint32_t s_index;
 /*
   socket_map_t smap;
@@ -93,9 +153,9 @@ struct mssl_manager
   int rto_list_cnt;
   int timewait_list_cnt;
   int timeout_list_cnt;
-
+*/
   uint32_t cur_ts;
-
+/*
   int wakeup_flag;
   int is_sleeping;
 

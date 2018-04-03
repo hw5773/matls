@@ -365,6 +365,7 @@ enum ssl_verify_result_t ssl_verify_peer_cert_mb(SSL_HANDSHAKE *hs) {
   uint8_t alert = SSL_AD_CERTIFICATE_UNKNOWN;
   enum ssl_verify_result_t ret;
   if (ssl->custom_verify_callback != nullptr) {
+    printf("[MB] custom verify callback set\n");
     ret = ssl->custom_verify_callback(ssl, &alert);
     switch (ret) {
       case ssl_verify_ok:
@@ -377,12 +378,19 @@ enum ssl_verify_result_t ssl_verify_peer_cert_mb(SSL_HANDSHAKE *hs) {
         break;
     }
   } else {
+    printf("[MB] verifying chain using x509_method\n");
     ret = ssl->ctx->x509_method->session_verify_cert_chain_mb(
               hs->new_session.get(), ssl, &alert)
               ? ssl_verify_ok
               : ssl_verify_invalid;
   }
 
+  if (ret == ssl_verify_invalid) {
+    OPENSSL_PUT_ERROR(SSL, SSL_R_CERTIFICATE_VERIFY_FAILED);
+    ssl3_send_alert(ssl, SSL3_AL_FATAL, alert);
+  }
+
+  printf("[MB] finished verifying cert chain\n");
   return ret;
 }
 

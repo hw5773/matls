@@ -24,7 +24,7 @@
 #include <unistd.h>
 
 #define DEFAULT_IF  "eth0"
-#define BUF_SIZE    2048
+#define BUF_SIZE    1514
 
 /**
  * @brief Packet structure

@@ -211,11 +211,13 @@ UniquePtr<SSL_SESSION> SSL_SESSION_dup(SSL_SESSION *session, int dup_flags) {
   if (session->certs != NULL) {
     new_session->certs = sk_CRYPTO_BUFFER_new_null();
     if (new_session->certs == NULL) {
+      printf("[MB] in session_dup: certs == NULL, returning nullptr, this will cause error\n");
       return nullptr;
     }
     for (size_t i = 0; i < sk_CRYPTO_BUFFER_num(session->certs); i++) {
       CRYPTO_BUFFER *buffer = sk_CRYPTO_BUFFER_value(session->certs, i);
       if (!sk_CRYPTO_BUFFER_push(new_session->certs, buffer)) {
+        printf("[MB] in session_dup: push failed, returning nullptr, this will cause error\n");
         return nullptr;
       }
       CRYPTO_BUFFER_up_ref(buffer);
@@ -223,11 +225,28 @@ UniquePtr<SSL_SESSION> SSL_SESSION_dup(SSL_SESSION *session, int dup_flags) {
   }
 
   ///// Add for MB /////
-  if (!session->certs_mb.empty()) {
-    // Note: its shallow copy, maybe deep copy needed?
-    new_session->certs_mb = session->certs_mb.subspan();
+  if (session->certs_mb != NULL && session->num_keys) {
+    new_session->num_keys = session->num_keys;
+    printf("[MB] certs_mb dup\n");
+    new_session->certs_mb = (STACK_OF(CRYPTO_BUFFER) **)malloc(session->num_keys * sizeof(STACK_OF(CRYPTO_BUFFER) *));
+    
+    for (size_t i = 0; i < session->num_keys; i++) {
+      new_session->certs_mb[i] = sk_CRYPTO_BUFFER_new_null();
+      if (new_session->certs_mb[i] == NULL) {
+        printf("[MB] in session_dup: certs_mb == NULL, returning nullptr, this will cause error\n");
+        return nullptr;
+      }
+      for (size_t j = 0; j < sk_CRYPTO_BUFFER_num(session->certs_mb[i]); j++) {
+        CRYPTO_BUFFER *buffer = sk_CRYPTO_BUFFER_value(session->certs_mb[i], j);
+        if (!sk_CRYPTO_BUFFER_push(new_session->certs_mb[i], buffer)) {
+          printf("[MB] in session_dup: push failed, returning nullptr, this will cause error\n");
+          return nullptr;
+        }
+        CRYPTO_BUFFER_up_ref(buffer);
+      }
+    }
   }
-
+  printf("[MB] dup done\n");
   if (!session->x509_method->session_dup(new_session.get(), session)) {
     return nullptr;
   }
@@ -896,9 +915,10 @@ void SSL_SESSION_free(SSL_SESSION *session) {
   OPENSSL_cleanse(session->session_id, sizeof(session->session_id));
   sk_CRYPTO_BUFFER_pop_free(session->certs, CRYPTO_BUFFER_free);
   ///// Add for MB /////
-  for (STACK_OF(CRYPTO_BUFFER) **it = session->certs_mb.begin();
-       it != session->certs_mb.end(); ++it) {
-    sk_CRYPTO_BUFFER_pop_free(*it, CRYPTO_BUFFER_free);
+  if (session->num_keys) {
+    for (size_t i = 0; i < session->num_keys; i++) {
+      sk_CRYPTO_BUFFER_pop_free(session->certs_mb[i], CRYPTO_BUFFER_free);
+    }
   }
   session->x509_method->session_clear(session);
   OPENSSL_free(session->tlsext_tick);

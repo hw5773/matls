@@ -478,6 +478,7 @@ bool ssl_parse_cert_chain_mb(uint8_t *out_alert,
         CBS_len(&certificate) == 0) {
       *out_alert = SSL_AD_DECODE_ERROR;
       OPENSSL_PUT_ERROR(SSL, SSL_R_CERT_LENGTH_MISMATCH);
+      printf("[MB] certificate parsing failed\n");
       return false;
     }
 
@@ -485,6 +486,7 @@ bool ssl_parse_cert_chain_mb(uint8_t *out_alert,
       pubkey = ssl_cert_parse_pubkey(&certificate);
       if (!pubkey) {
         *out_alert = SSL_AD_DECODE_ERROR;
+        printf("[MB] pubkey parsing failed\n");
         return false;
       }
 
@@ -512,11 +514,9 @@ bool ssl_parse_cert_chain_mb(uint8_t *out_alert,
   }
 
   *out_chain = std::move(chain);
-  // fixed ( pubkey can be null )
-  if (*out_pubkey != NULL) {
-    out_pubkey->reset();
-    *out_pubkey = std::move(pubkey);
-  }
+  out_pubkey->reset();
+  *out_pubkey = std::move(pubkey);
+  
   return true;
 }
 
@@ -916,8 +916,35 @@ STACK_OF(CRYPTO_BUFFER) *SSL_get0_peer_certificates(const SSL *ssl) {
   }
 
   return session->certs;
-  ///// Added for MB /////
-  // Note : only ssl_test calls this function, so left this not fixed
+}
+
+///// Add for MB /////
+// Note: this function if used for resolving forward declaration problem
+uint8_t SSL_get0_mb_enabled(const SSL *ssl) {
+  return ssl->mb_enabled;
+}
+
+///// Add for MB /////
+// Note: this function if used for resolving forward declaration problem
+uint8_t SSL_get0_num_keys(const SSL *ssl) {
+  SSL_SESSION *session = SSL_get_session(ssl);
+  if (session == NULL) {
+    printf("[MB] SSL_get0_peer_certificates_mb no session\n");
+    return 0;
+  }
+
+  return session->num_keys;
+}
+
+///// Add for MB /////
+STACK_OF(CRYPTO_BUFFER) *SSL_get0_peer_certificates_mb(const SSL *ssl, size_t idx) {
+  SSL_SESSION *session = SSL_get_session(ssl);
+  if (session == NULL) {
+    printf("[MB] SSL_get0_peer_certificates_mb no session\n");
+    return NULL;
+  }
+
+  return session->certs_mb[idx];
 }
 
 STACK_OF(CRYPTO_BUFFER) *SSL_get0_server_requested_CAs(const SSL *ssl) {

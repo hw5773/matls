@@ -220,7 +220,7 @@ extern "C" {
 #define SSL_MIN_RSA_MODULUS_LENGTH_IN_BYTES	(512/8)
 #define SSL_MAX_KEY_ARG_LENGTH			8
 #define SSL_MAX_MASTER_KEY_LENGTH		48
-#define SSL_MAX_GLOBAL_MAC_KEY_LENGTH        48
+#define SSL_MAX_GLOBAL_MAC_KEY_LENGTH   32
 
 
 /* These are used to specify which ciphers to use and not to use */
@@ -352,6 +352,7 @@ extern "C" {
 #ifdef  __cplusplus
 extern "C" {
 #endif
+
 
 #if (defined(OPENSSL_NO_RSA) || defined(OPENSSL_NO_MD5)) && !defined(OPENSSL_NO_SSL2)
 #define OPENSSL_NO_SSL2
@@ -793,7 +794,16 @@ struct keypair
     BIGNUM *pri;
     EC_POINT *pub;
 };
-#endif
+
+struct mb_st {
+    int group_id;
+    int num_keys;
+    int *key_length; //ECDH key length
+    unsigned char **secret;
+    unsigned char **mac_array;
+    struct keypair *serv_keypair;
+};
+#endif /* OPENSSL_NO_MB */
 
 struct ssl_ctx_st
 	{
@@ -1023,14 +1033,7 @@ struct ssl_ctx_st
 
 #ifndef OPENSSL_NO_MB
 	unsigned char mb_enabled;
-    struct mb_st {
-        uint16_t group_id;
-        uint8_t num_keys;
-        uint8_t key_length[100]; //ECDH key length
-        unsigned char *mac_array;
-        struct keypair serv_keypair;
-    } mb_info;
-
+    struct mb_st mb_info;
 #endif
 	};
 
@@ -1422,7 +1425,7 @@ struct ssl_st
 
 #ifndef OPENSSL_NO_MB
 	unsigned char mb_enabled;
-    
+    struct mb_st mb_info;
 #endif /* OPENSSL_NO_MB */
 	};
 
@@ -1982,6 +1985,16 @@ int SSL_renegotiate_abbreviated(SSL *s);
 int SSL_renegotiate_pending(SSL *s);
 int SSL_shutdown(SSL *s);
 
+#ifndef OPENSSL_NO_MB
+int SSL_enable_mb(SSL *s);
+int SSL_CTX_enable_mb(SSL_CTX *s);
+#endif
+
+#ifndef OPENSSL_NO_TTPA
+int SSL_enable_ttpa(SSL *s);
+int SSL_CTX_enable_ttpa(SSL_CTX *s);
+#endif
+
 const SSL_METHOD *SSL_get_ssl_method(SSL *s);
 int SSL_set_ssl_method(SSL *s, const SSL_METHOD *method);
 const char *SSL_alert_type_string_long(int value);
@@ -2287,15 +2300,19 @@ void ERR_load_SSL_strings(void);
 #define SSL_F_SSL_CTX_USE_ORIG_CERTIFICATE_FILE		1101
 #define SSL_F_SSL_CTX_USE_CC_FILE					1102
 #define SSL_F_SSL_ADD_CLIENTHELLO_TTPA_EXT			 303
-#define SSL_F_SSL_PARSE_CLIENTHELLO_TTPA_EXT		 304
+#define SSL_F_SSL_PARSE_CLIENTHELLO_TTPAEXT		     304
 #define SSL_F_SSL_ADD_SERVERHELLO_TTPA_EXT			 305
-#define SSL_F_SSL_PARSE_SERVERHELLO_TTPA_EXT		 306
+#define SSL_F_SSL_PARSE_SERVERHELLO_TTPA_EXT	     306
 #define SSL_F_SSL_USE_ORIG_CERTIFICATE				1000
 #define SSL_F_SSL_USE_ORIG_CERTIFICATE_FILE			1001
 #define SSL_F_SSL_USE_CC_FILE						1002
 #endif /* OPENSSL_NO_TTPA */
 
 #ifndef OPENSSL_NO_MB
+#define SSL_F_SSL_ADD_CLIENTHELLO_MB_EXT             701
+#define SSL_F_SSL_PARSE_CLIENTHELLO_MB_EXT           702
+#define SSL_F_SSL_ADD_SERVERHELLO_MB_EXT             703
+#define SSL_F_SSL_PARSE_SERVERHELLO_MB_EXT           704
 #endif /* OPENSSL_NO_MB */
 
 #define SSL_F_SSL_CTX_CHECK_PRIVATE_KEY			 168

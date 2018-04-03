@@ -31,13 +31,14 @@ inline int get_output_interface(uint32_t daddr)
   }
 
   MA_LOG1d("Found Number Interface", nif);
-  MA_LOG1s("Found Output Interface", g_config.mos->netdev_table->ent[nif]->dev_name);
 
   if (nif < 0)
   {
     MA_LOGip("No route to", daddr);
-    assert(0);
+    return nif;
   }
+
+  MA_LOG1s("Found Output Interface", g_config.mos->netdev_table->ent[nif]->dev_name);
 
   return nif;
 }
@@ -72,7 +73,6 @@ void forward_ip_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
   MA_LOG1s("Get output interface", g_config.mos->netdev_table->ent[pctx->out_ifidx]->dev_name);
 
   haddr = get_destination_hwaddr(daddr);
-  MA_LOGmac("Get MAC address", haddr);
 
   if (!haddr)
   {
@@ -83,8 +83,10 @@ void forward_ip_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
       MA_LOG("Request ARP");
       request_arp(mssl, daddr, pctx->out_ifidx, pctx->p.cur_ts);
     }
+    // ARP?
     return;
   }
+  MA_LOGmac("Get MAC address", haddr);
 
 #ifdef SHARE_IO_BUFFER
   if (!(mssl->iom->set_wptr))

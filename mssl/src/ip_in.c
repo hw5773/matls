@@ -50,7 +50,7 @@ inline int process_in_ipv4_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
   MA_LOG1d("Version of IP Packet", iph->version);
 
   fillin_packet_ip_context(pctx, iph, ip_len);
-
+/*
   if (mssl->num_msp == 0 && mssl->num_esp == 0)
   {
     MA_LOG("No sockets, forward");
@@ -60,7 +60,7 @@ inline int process_in_ipv4_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
     }
     return TRUE;
   }
-
+*/
   if (ip_fast_csum(iph, iph->ihl))
   {
     ret = ERROR;
@@ -71,7 +71,7 @@ inline int process_in_ipv4_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
   {
     case IPPROTO_TCP:
       MA_LOG("This is TCP Packet");
-      //return process_in_tcp_packet(mssl, pctx);
+      return process_in_tcp_packet(mssl, pctx);
       break;
     case IPPROTO_ICMP:
       MA_LOG("This is ICMP Packet");

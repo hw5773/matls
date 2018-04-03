@@ -2,8 +2,8 @@
 #include <assert.h>
 #include <semaphore.h>
 
-#include "../include/mssl/mssl.h"
-#include "../include/mssl/logs.h"
+#include "include/mssl.h"
+#include "include/logs.h"
 
 #include "include/config.h"
 #include "include/cpu.h"
@@ -141,7 +141,6 @@ static mssl_manager_t initialize_mssl_manager(struct mssl_thread_context *ctx)
 
   mssl_manager_t mssl;
   char log_name[MAX_FILE_NAME];
-  int i;
 
   // posix_seq_srand((unsigned) pthread_self());
   
@@ -155,7 +154,7 @@ static mssl_manager_t initialize_mssl_manager(struct mssl_thread_context *ctx)
   }
 
   g_mssl[ctx->cpu] = mssl;
-/*
+
   mssl->tcp_flow_table = create_hash_table();
 
   if (!mssl->tcp_flow_table)
@@ -170,7 +169,7 @@ static mssl_manager_t initialize_mssl_manager(struct mssl_thread_context *ctx)
 #define IS_HUGEPAGE 0
 #endif 
 
-
+/*
   if (mon_app_exists)
   {
     init_event(mssl);

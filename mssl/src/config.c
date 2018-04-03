@@ -389,10 +389,8 @@ static void feed_mos_conf_line(struct conf_block *blk, char *line, int len)
   if (TRY_ASSIGN_NUM(nb_mem_channels, conf, item, value));
   else if (TRY_ASSIGN_NUM(forward, conf, item, value));
   else if (TRY_ASSIGN_NUM(max_concurrency, conf, item, value));
-  else if (TRY_ASSIGN_NUM(clnt_rmem_size, conf, item, value));
-  else if (TRY_ASSIGN_NUM(clnt_wmem_size, conf, item, value));
-  else if (TRY_ASSIGN_NUM(serv_rmem_size, conf, item, value));
-  else if (TRY_ASSIGN_NUM(serv_wmem_size, conf, item, value));
+  else if (TRY_ASSIGN_NUM(rmem_size, conf, item, value));
+  else if (TRY_ASSIGN_NUM(wmem_size, conf, item, value));
   else if (TRY_ASSIGN_NUM(tcp_tw_interval, conf, item, value))
     g_config.mos->tcp_tw_interval = 
       SEC_TO_USEC(g_config.mos->tcp_tw_interval) / TIME_TICK;
@@ -728,10 +726,8 @@ static void mos_conf_print(struct conf_block *blk)
 	printf("| num_cores:       %d\n", conf->num_cores);
 	printf("| nb_mem_channels: %d\n", conf->nb_mem_channels);
 	printf("| max_concurrency: %d\n", conf->max_concurrency);
-	printf("| clnt_rmem_size:       %d\n", conf->clnt_rmem_size);
-	printf("| clnt_wmem_size:       %d\n", conf->clnt_wmem_size);
-	printf("| serv_rmem_size:       %d\n", conf->serv_rmem_size);
-	printf("| serv_wmem_size:       %d\n", conf->serv_wmem_size);
+	printf("| rmem_size:       %d\n", conf->rmem_size);
+	printf("| wmem_size:       %d\n", conf->wmem_size);
 	printf("| tcp_tw_interval: %d\n", conf->tcp_tw_interval);
 	printf("| tcp_timeout:     %d\n", conf->tcp_timeout);
 	printf("| multiprocess:    %s\n", conf->multiprocess ? "true" : "false");
@@ -797,10 +793,8 @@ static void init_mos_block(struct config *config, struct conf_block *blk)
   conf->max_concurrency = 100000;
   conf->no_ring_buffers = 0;
 
-  conf->clnt_rmem_size = 8192;
-  conf->clnt_wmem_size = 8192;
-  conf->serv_rmem_size = 8192;
-  conf->serv_wmem_size = 8192;
+  conf->rmem_size = 8192;
+  conf->wmem_size = 8192;
 
   conf->tcp_tw_interval = SEC_TO_USEC(TCP_TIMEWAIT) / TIME_TICK;
   conf->tcp_timeout = SEC_TO_USEC(TCP_TIMEOUT) / TIME_TICK;

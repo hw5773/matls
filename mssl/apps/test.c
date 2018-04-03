@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <mssl/mssl.h>
+#include <mssl/mssl_api.h>
 #include <mssl/logs.h>
 
 #define MAX_CORES 16

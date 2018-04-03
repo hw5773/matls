@@ -106,7 +106,7 @@ struct mssl_manager
   kvs_t *ev_store;
   sb_manager_t rbm_snd;
 */
-  struct hashtable *tls_flow_table;
+  struct hashtable *tcp_flow_table;
   uint32_t s_index;
 /*
   socket_map_t smap;

@@ -156,11 +156,14 @@ struct mos_conf
   int nb_mem_channels;
   int max_concurrency;
   int no_ring_buffers;
-
+/*
   int clnt_rmem_size;
   int clnt_wmem_size;
   int serv_rmem_size;
   int serv_wmem_size;
+*/
+  int rmem_size;
+  int wmem_size;
 
   int tcp_tw_interval;
   int tcp_timeout;

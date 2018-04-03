@@ -6,24 +6,34 @@ OBJS = logs.o \
 			 cpu.o \
 			 config.o \
 			 util.o \
+			 fhash.o \
 			 sock_module.o \
 			 arp.o \
 			 eth_in.o \
 			 eth_out.o \
 			 ip_in.o \
 			 ip_out.o \
+			 tcp.o \
+			 tcp_in.o \
+			 tcp_util.o \
+			 tcp_rb.o \
 			 core.o
 
 SRCS = logs.c \
 			 cpu.c \
 			 config.c \
 			 util.c \
+			 fhash.c \
 			 sock_module.c \
 			 arp.c \
 			 eth_in.c \
 			 eth_out.c \
 			 ip_in.c \
 			 ip_out.c \
+			 tcp.c \
+			 tcp_in.c \
+			 tcp_util.c \
+			 tcp_rb.c \
 			 core.c
 
 default: $(OBJS)

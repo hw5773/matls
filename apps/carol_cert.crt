@@ -1,0 +1,80 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number:
+            d0:97:12:07:db:30:10:ff
+    Signature Algorithm: sha256WithRSAEncryption
+        Issuer: C=KR, ST=Seoul, L=Seoul, O=Carol CDN Ltd., OU=Carol CDN Ltd., CN=Carol CDN Ltd./emailAddress=ca@ca_carol.com
+        Validity
+            Not Before: Apr 13 12:48:55 2017 GMT
+            Not After : Apr 13 12:48:55 2018 GMT
+        Subject: C=KR, ST=Seoul, L=Seoul, O=Carol Ltd., OU=Carol Ltd., CN=carol.com/emailAddress=info@carol.com
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+                Modulus:
+                    00:c1:38:c5:92:30:56:dc:dc:e8:9e:51:33:36:47:
+                    dc:fc:5e:25:ac:40:7c:71:9c:9a:51:09:2b:43:68:
+                    56:a8:35:a3:c6:0d:fe:d0:71:9e:fe:5d:8a:d6:ed:
+                    0b:55:27:47:cf:c6:f0:ea:da:0a:88:b4:ca:d4:4c:
+                    de:30:ee:32:f9:f9:05:7c:fb:c2:68:6b:1a:64:b5:
+                    46:1a:aa:09:71:7e:2c:2f:87:cd:91:36:e4:9b:ca:
+                    4f:4e:60:3e:92:ea:fe:d7:c7:2e:d7:01:c2:65:5c:
+                    6a:c7:e7:84:47:31:c0:ae:32:75:60:09:c9:32:4d:
+                    8e:1d:90:f6:c6:54:97:ac:b3:0a:2f:4d:25:c5:0c:
+                    f5:1c:59:42:32:34:17:6b:be:63:99:c0:3e:00:6b:
+                    cd:40:c5:2f:bc:17:65:33:20:7a:03:b1:f7:12:6b:
+                    09:9e:5c:c1:f2:a4:0d:94:47:36:73:00:d5:3c:67:
+                    45:f8:69:49:9e:38:60:21:ba:a1:d4:0e:37:1e:2a:
+                    2d:06:15:85:db:78:f4:35:9e:65:8e:82:40:5e:3e:
+                    0b:7d:4d:37:c3:96:49:c4:33:15:f6:ee:96:d0:21:
+                    64:3f:e8:f3:a3:df:ed:55:9b:49:f6:99:38:e2:41:
+                    db:f4:36:b9:5f:f6:47:c6:eb:4e:34:8e:67:1f:b8:
+                    00:f5
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            X509v3 Key Usage: 
+                Digital Signature, Key Encipherment
+            X509v3 Subject Alternative Name: 
+                DNS:*.alice.com, DNS:*.carol.com
+    Signature Algorithm: sha256WithRSAEncryption
+         26:8b:ce:0e:3f:e7:18:d9:63:ef:51:04:f9:59:07:3d:44:cc:
+         55:1d:21:97:b8:4a:cf:44:47:c9:11:34:f9:8a:6c:43:6f:18:
+         6e:8c:fb:d9:0d:c7:fd:49:a7:40:fe:bd:b8:4c:21:f1:db:94:
+         39:c8:37:48:8e:7f:8a:84:da:25:94:ef:55:47:cb:a4:f5:bd:
+         82:4d:19:67:46:2a:92:b9:a5:d6:e2:ef:b8:43:05:ab:d9:f6:
+         12:69:69:34:86:89:ad:00:44:7e:3e:6c:01:a0:42:b1:d1:96:
+         b4:df:5b:2b:d9:1c:37:8b:d2:49:6d:c6:49:bc:61:79:54:a0:
+         21:c9:28:7d:bd:b7:65:19:65:d8:b4:c1:58:b9:cf:ea:20:53:
+         e8:9e:eb:03:10:10:a3:24:1f:7e:a5:cf:a4:13:cc:d1:e1:de:
+         73:e3:4d:03:cb:df:19:c1:1a:56:8e:da:e7:77:da:03:a0:86:
+         e8:cb:ee:b4:38:b4:4f:83:83:ee:bb:4f:d7:3a:13:e6:6f:f9:
+         5f:9f:ff:56:8e:e0:9a:e1:fe:42:e1:04:2b:c3:89:62:b6:6a:
+         ba:e1:04:0a:eb:3f:20:15:ea:21:03:47:54:36:be:e3:65:45:
+         df:44:9e:99:de:05:b2:3a:72:36:0f:ff:c8:5f:7d:fb:25:a3:
+         bb:ee:a3:78
+-----BEGIN CERTIFICATE-----
+MIID5jCCAs6gAwIBAgIJANCXEgfbMBD/MA0GCSqGSIb3DQEBCwUAMIGYMQswCQYD
+VQQGEwJLUjEOMAwGA1UECAwFU2VvdWwxDjAMBgNVBAcMBVNlb3VsMRcwFQYDVQQK
+DA5DYXJvbCBDRE4gTHRkLjEXMBUGA1UECwwOQ2Fyb2wgQ0ROIEx0ZC4xFzAVBgNV
+BAMMDkNhcm9sIENETiBMdGQuMR4wHAYJKoZIhvcNAQkBFg9jYUBjYV9jYXJvbC5j
+b20wHhcNMTcwNDEzMTI0ODU1WhcNMTgwNDEzMTI0ODU1WjCBijELMAkGA1UEBhMC
+S1IxDjAMBgNVBAgMBVNlb3VsMQ4wDAYDVQQHDAVTZW91bDETMBEGA1UECgwKQ2Fy
+b2wgTHRkLjETMBEGA1UECwwKQ2Fyb2wgTHRkLjESMBAGA1UEAwwJY2Fyb2wuY29t
+MR0wGwYJKoZIhvcNAQkBFg5pbmZvQGNhcm9sLmNvbTCCASIwDQYJKoZIhvcNAQEB
+BQADggEPADCCAQoCggEBAME4xZIwVtzc6J5RMzZH3PxeJaxAfHGcmlEJK0NoVqg1
+o8YN/tBxnv5ditbtC1UnR8/G8OraCoi0ytRM3jDuMvn5BXz7wmhrGmS1RhqqCXF+
+LC+HzZE25JvKT05gPpLq/tfHLtcBwmVcasfnhEcxwK4ydWAJyTJNjh2Q9sZUl6yz
+Ci9NJcUM9RxZQjI0F2u+Y5nAPgBrzUDFL7wXZTMgegOx9xJrCZ5cwfKkDZRHNnMA
+1TxnRfhpSZ44YCG6odQONx4qLQYVhdt49DWeZY6CQF4+C31NN8OWScQzFfbultAh
+ZD/o86Pf7VWbSfaZOOJB2/Q2uV/2R8brTjSOZx+4APUCAwEAAaM/MD0wCQYDVR0T
+BAIwADALBgNVHQ8EBAMCBaAwIwYDVR0RBBwwGoILKi5hbGljZS5jb22CCyouY2Fy
+b2wuY29tMA0GCSqGSIb3DQEBCwUAA4IBAQAmi84OP+cY2WPvUQT5WQc9RMxVHSGX
+uErPREfJETT5imxDbxhujPvZDcf9SadA/r24TCHx25Q5yDdIjn+KhNollO9VR8uk
+9b2CTRlnRiqSuaXW4u+4QwWr2fYSaWk0homtAER+PmwBoEKx0Za031sr2Rw3i9JJ
+bcZJvGF5VKAhySh9vbdlGWXYtMFYuc/qIFPonusDEBCjJB9+pc+kE8zR4d5z400D
+y98ZwRpWjtrnd9oDoIboy+60OLRPg4Puu0/XOhPmb/lfn/9WjuCa4f5C4QQrw4li
+tmq64QQK6z8gFeohA0dUNr7jZUXfRJ6Z3gWyOnI2D//IX337JaO77qN4
+-----END CERTIFICATE-----

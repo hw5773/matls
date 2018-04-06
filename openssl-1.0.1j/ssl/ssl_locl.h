@@ -1094,6 +1094,11 @@ int tls1_alert_code(int code);
 int ssl3_alert_code(int code);
 int ssl_ok(SSL *s);
 
+int t1_prf(const void *seed1, int seed1_len,
+    const void *seed2, int seed2_len, const void *seed3, int seed3_len,
+    const void *seed4, int seed4_len, const void *seed5, int seed5_len,
+    const unsigned char *sec, int slen, unsigned char *out, int olen);
+
 #ifndef OPENSSL_NO_ECDH
 int ssl_check_srvr_ecc_cert_and_alg(X509 *x, SSL *s);
 #endif
@@ -1123,7 +1128,7 @@ int ssl_add_clienthello_ttpa_ext(SSL *s, unsigned char *p, int *len, int maxlen)
 int ssl_parse_clienthello_ttpa_ext(SSL *s, unsigned char *d, int len, int *al);
 
 CERT_PKEY *ssl_get_orig_server_send_pkey(const SSL *s);
-unsigned long ssl3_output_cert_chain(SSL *s, X509 *x);
+unsigned long ssl3_output_orig_cert_chain(SSL *s, X509 *x);
 #endif /* OPENSSL_NO_TTPA */
 
 #ifndef OPENSSL_NO_MB
@@ -1131,6 +1136,8 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len, int maxlen);
 int ssl_parse_serverhello_mb_ext(SSL *s, unsigned char *d, int len, int *al);
 int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len, int maxlen);
 int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al);
+int matls_send_server_certificate(SSL *s);
+unsigned long matls_output_cert_chain(SSL *s, X509 *x);
 #endif /* OPENSSL_NO_MB */
 
 #ifndef OPENSSL_NO_HEARTBEATS

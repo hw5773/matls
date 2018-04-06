@@ -22,6 +22,7 @@
 
 #define SSL_CURVE_SECP256R1 23
 #define SECP256r1_PUBKEY_LENGTH    64;
+#define SECRET_LENGTH 32
 
 int idx;
 
@@ -152,7 +153,7 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
     unsigned char *secret_str, *peer_str;
     struct keypair *serv_keypair;
     EC_GROUP *group;
-    
+    BIGNUM *x, *y;
     EC_POINT *secret, *peer_pub;
     BN_CTX *ctx;
 
@@ -200,6 +201,9 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
     }
 
     ctx = BN_CTX_new();
+    x = BN_new();
+    y = BN_new();
+
     make_keypair(&serv_keypair, group, ctx);
     s->mb_info.serv_keypair = serv_keypair;
 
@@ -216,8 +220,9 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
         peer_pub = EC_POINT_new(group);
         char_to_pub(peer_str, klen, peer_pub, group, ctx);
         EC_POINT_mul(group, secret, NULL, peer_pub, serv_keypair->pri, ctx);
-
-        pub_to_char(secret, &secret_str, &slen, group, ctx);
+        EC_POINT_get_affine_coordinates_GFp(group, secret, x, y, ctx);
+        secret_str = (unsigned char *)malloc((klen-1)/2);
+        BN_bn2bin(x, secret_str);
         s->mb_info.secret[i] = secret_str;
 
         free(peer_str);
@@ -283,7 +288,7 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
                 s->s3->server_random, SSL3_RANDOM_SIZE,
                 s->s3->client_random, SSL3_RANDOM_SIZE,
                 NULL, 0, NULL, 0,
-                tmp, 32,
+                s->mb_info.secret[i], SECRET_LENGTH,
                 s->mb_info.mac_array[i], SSL_MAX_GLOBAL_MAC_KEY_LENGTH); //LENGTH: 48
 
           printf("after t1_prf\n");

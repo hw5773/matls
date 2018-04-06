@@ -14,14 +14,11 @@ inline int get_output_interface(uint32_t daddr)
   int i;
   int prefix = -1;
 
-  MA_LOGip("Checking Routing Table for", daddr);
-
   for (i=0; i<g_config.mos->route_table->num; i++)
   {
     if ((daddr & g_config.mos->route_table->ent[i]->mask)
         == g_config.mos->route_table->ent[i]->masked_ip)
     {
-      MA_LOGip("Found LPM from Routing Table", g_config.mos->route_table->ent[i]->masked_ip);
       if (g_config.mos->route_table->ent[i]->prefix > prefix)
       {
         nif = g_config.mos->route_table->ent[i]->nif;
@@ -30,15 +27,11 @@ inline int get_output_interface(uint32_t daddr)
     }
   }
 
-  MA_LOG1d("Found Number Interface", nif);
-
   if (nif < 0)
   {
     MA_LOGip("No route to", daddr);
     return nif;
   }
-
-  MA_LOG1s("Found Output Interface", g_config.mos->netdev_table->ent[nif]->dev_name);
 
   return nif;
 }
@@ -86,7 +79,6 @@ void forward_ip_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
     // ARP?
     return;
   }
-  MA_LOGmac("Get MAC address", haddr);
 
 #ifdef SHARE_IO_BUFFER
   if (!(mssl->iom->set_wptr))

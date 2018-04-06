@@ -61,8 +61,6 @@ uint8_t *ethernet_output(mssl_manager_t mssl, struct pkt_ctx *pctx,
     uint32_t cur_ts)
 {
   MA_LOG("Generate Ethernet Frame");
-  MA_LOGmac("Sending to", dst_haddr);
-  MA_LOGmac("By", g_config.mos->route_table->ent[nif]->dev_name);
 
   uint8_t *buf;
   struct ethhdr *ethh;
@@ -70,7 +68,6 @@ uint8_t *ethernet_output(mssl_manager_t mssl, struct pkt_ctx *pctx,
 
   if (nif < 0)
   {
-    MA_LOG("No interface set!");
     return NULL;
   }
 

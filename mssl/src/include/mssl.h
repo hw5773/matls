@@ -3,13 +3,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <sys/time.h>
 #include <sys/queue.h>
 #include <pthread.h>
 
+#include "memory_mgt.h"
 #include "tcp_stream_queue.h"
+#include "socket.h"
 #include "mssl_api.h"
+#include "logs.h"
 
 #ifndef TRUE
 #define TRUE (1)
@@ -91,7 +93,6 @@ struct mssl_sender
 */
 struct mssl_manager
 {
-/*
   mem_pool_t bufseg_pool;
   mem_pool_t sockent_pool;
 #ifdef USE_TIMER_POOL
@@ -103,18 +104,18 @@ struct mssl_manager
   mem_pool_t sv_pool;
   mem_pool_t mv_pool;
 
-  kvs_t *ev_store;
-  sb_manager_t rbm_snd;
-*/
+//  kvs_t *ev_store;
+//  sb_manager_t rbm_snd;
+
   struct hashtable *tcp_flow_table;
   uint32_t s_index;
-/*
+
   socket_map_t smap;
   socket_map_t msmap;
   TAILQ_HEAD (, socket_map) free_smap;
   TAILQ_HEAD (, socket_map) free_msmap;
-  addr_pool_t ap;
-*/
+
+//  addr_pool_t ap;
 
   uint32_t g_id;
   uint32_t flow_cnt;
@@ -144,7 +145,6 @@ struct mssl_manager
   struct mssl_sender *g_sender;
   struct mssl_sender *n_sender[ETH_NUM];
 
-/*
   struct rto_hashstore *rto_store;
   TAILQ_HEAD (timewait_head, tcp_stream) timewait_list;
   TAILQ_HEAD (timeout_head, tcp_stream) timeout_list;
@@ -153,14 +153,14 @@ struct mssl_manager
   int rto_list_cnt;
   int timewait_list_cnt;
   int timeout_list_cnt;
-*/
+
   uint32_t cur_ts;
-/*
+
   int wakeup_flag;
   int is_sleeping;
 
-  struct bcast_stat bstat;
-  struct timeout_stat tstat;
+//  struct bcast_stat bstat;
+//  struct timeout_stat tstat;
 #ifdef NETSTAT
   struct net_stat nstat;
   struct net_stat p_nstat;
@@ -171,7 +171,6 @@ struct mssl_manager
 
   struct time_stat rtstat;
 #endif
-*/
 
   struct io_module_func *iom;
 

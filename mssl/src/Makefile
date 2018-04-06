@@ -3,6 +3,8 @@ RM = rm
 CFLAGS=-O -DDEBUG -I/usr/local/include -Wall
 
 OBJS = logs.o \
+			 api.o \
+			 socket.o \
 			 cpu.o \
 			 config.o \
 			 util.o \
@@ -17,9 +19,13 @@ OBJS = logs.o \
 			 tcp_in.o \
 			 tcp_util.o \
 			 tcp_rb.o \
+			 tcp_stream.o \
+			 memory_mgt.o \
 			 core.o
 
 SRCS = logs.c \
+			 api.c \
+			 socket.c \
 			 cpu.c \
 			 config.c \
 			 util.c \
@@ -34,6 +40,8 @@ SRCS = logs.c \
 			 tcp_in.c \
 			 tcp_util.c \
 			 tcp_rb.c \
+			 tcp_stream.c \
+			 memory_mgt.c \
 			 core.c
 
 default: $(OBJS)

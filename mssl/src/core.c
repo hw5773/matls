@@ -2,13 +2,29 @@
 #include <assert.h>
 #include <semaphore.h>
 
-#include "include/mssl.h"
 #include "include/logs.h"
 
-#include "include/config.h"
 #include "include/cpu.h"
-#include "include/mssl.h"
+#include "include/eth_in.h"
+#include "include/fhash.h"
+//#include "include/tcp_send_buffer.h"
+#include "include/tcp_ring_buffer.h"
+#include "include/socket.h"
+#include "include/eth_out.h"
+#include "include/tcp.h"
 #include "include/tcp_in.h"
+#include "include/tcp_out.h"
+#include "include/mssl_api.h"
+//#include "include/eventpoll.h"
+#include "include/logs.h"
+#include "include/config.h"
+#include "include/arp.h"
+#include "include/ip_out.h"
+#include "include/timer.h"
+//#include "include/event_callback.h"
+#include "include/tcp_rb.h"
+#include "include/tcp_stream.h"
+#include "include/io_module.h"
 
 #define LOG_FILE_NAME "log"
 #define MAX_FILE_NAME 1024
@@ -44,6 +60,7 @@ int mssl_init(const char *config_file)
   }
 
   ret = load_configuration_upper_half(config_file);
+  MA_LOG("After configuration upper half");
   if (ret)
   {
     MA_LOG("Error occured while loading configuration");
@@ -138,11 +155,12 @@ static void run_main_loop(struct mssl_thread_context *ctx)
 
 static mssl_manager_t initialize_mssl_manager(struct mssl_thread_context *ctx)
 {
-
+  MA_LOG("initialize mssl manager");
+  int i;
   mssl_manager_t mssl;
   char log_name[MAX_FILE_NAME];
 
-  // posix_seq_srand((unsigned) pthread_self());
+  posix_seq_srand((unsigned) pthread_self());
   
   mssl = (mssl_manager_t)calloc(1, sizeof(struct mssl_manager));
 
@@ -154,32 +172,135 @@ static mssl_manager_t initialize_mssl_manager(struct mssl_thread_context *ctx)
   }
 
   g_mssl[ctx->cpu] = mssl;
-
-  mssl->tcp_flow_table = create_hash_table();
+  create_hash_table(&mssl->tcp_flow_table);
 
   if (!mssl->tcp_flow_table)
   {
     MA_LOG("Failed to allocate tcp flow table");
     return NULL;
   }
-
+/*
 #ifdef HUGEPAGE
 #define IS_HUGEPAGE 1
 #else
+*/
 #define IS_HUGEPAGE 0
-#endif 
+//#endif 
 
-/*
+
   if (mon_app_exists)
   {
+/*
+#ifdef NEWEV
     init_event(mssl);
+#else
+    init_event(mssl, NUM_EV_TABLE);
+#endif
+*/
   }
-
 
   if (!(mssl->bufseg_pool = mp_create(sizeof(tcpbufseg_t),
           sizeof(tcpbufseg_t) * g_config.mos->max_concurrency *
           ((g_config.mos->rmem_size - 1) / UNITBUFSIZE + 1), 0)))
+  {
+    MA_LOG("Failed to allocate buf_seg pool");
+    exit(0);
+  }
+
+  if (!(mssl->sockent_pool = mp_create(sizeof(struct sockent),
+          sizeof(struct sockent) * g_config.mos->max_concurrency * 3, 0)))
+  {
+    MA_LOG("Failed to allocate sockent_pool");
+    exit(0);
+  }
+
+#ifdef USE_TIMER_POOL
+  if (!(mssl->timer_pool = mp_create(sizeof(struct timer),
+          sizeof(struct timer) * g_config.mos->max_concurrency * 10, 0)))
+  {
+    MA_LOG("Failed to allocate timer pool");
+    exit(0);
+  }
+#endif
+
+  mssl->flow_pool = mp_create(sizeof(tcp_stream), 
+      sizeof(tcp_stream) * g_config.mos->max_concurrency, IS_HUGEPAGE);
+
+  if (!mssl->flow_pool)
+  {
+    MA_LOG("Failed to allocate tcp flow pool");
+    return NULL;
+  }
+
+  mssl->rv_pool = mp_create(sizeof(struct tcp_recv_vars),
+      sizeof(struct tcp_recv_vars) * g_config.mos->max_concurrency, IS_HUGEPAGE);
+
+  if (!mssl->rv_pool)
+  {
+    MA_LOG("Failed to allocate tcp recv variable pool");
+    return NULL;
+  }
+
+  mssl->sv_pool = mp_create(sizeof(struct tcp_send_vars),
+      sizeof(struct tcp_send_vars) * g_config.mos->max_concurrency, IS_HUGEPAGE);
+
+  if (!mssl->sv_pool)
+  {
+    MA_LOG("Failed to allocate tcp send variable pool");
+    return NULL;
+  }
+/*
+  mssl->rbm_snd = sb_manager_create(g_config.mos->wmem_size, g_config.mos->no_ring_buffers,
+      g_config.mos->max_concurrency);
+  
+  if (!mssl->rbm_snd)
+  {
+    MA_LOG("Failed to create send ring buffer");
+    return NULL;
+  }
 */
+  mssl->smap = (socket_map_t)calloc(g_config.mos->max_concurrency, sizeof(struct socket_map));
+  if (!mssl->smap)
+  {
+    perror("calloc");
+    MA_LOG("Failed to allocate memory for stream map");
+    return NULL;
+  }
+
+  if (mon_app_exists)
+  {
+    mssl->msmap = (socket_map_t)calloc(g_config.mos->max_concurrency, sizeof(struct socket_map));
+    if (!mssl->msmap)
+    {
+      perror("calloc");
+      MA_LOG("Failed to allocate memory for monitor stream map");
+      return NULL;
+    }
+
+    for (i=0; i<g_config.mos->max_concurrency; i++)
+    {
+      mssl->msmap[i].monitor_stream = calloc(1, sizeof(struct mon_stream));
+      if (!mssl->msmap[i].monitor_stream)
+      {
+        perror("calloc");
+        MA_LOG("Failed to allocate memory for monitor stream map");
+        return NULL;
+      }
+    }
+  }
+
+  TAILQ_INIT(&mssl->timer_list);
+  TAILQ_INIT(&mssl->monitors);
+  TAILQ_INIT(&mssl->free_smap);
+
+  for (i=0; i<g_config.mos->max_concurrency; i++)
+  {
+    mssl->smap[i].id = i;
+    mssl->smap[i].socktype = MOS_SOCK_UNUSED;
+    memset(&mssl->smap[i].saddr, 0, sizeof(struct sockaddr_in));
+    mssl->smap[i].stream = NULL;
+    TAILQ_INSERT_TAIL(&mssl->free_smap, &mssl->smap[i], link);
+  }
 
   mssl->ctx = ctx;
 //  mssl->ep = NULL;
@@ -188,6 +309,7 @@ static mssl_manager_t initialize_mssl_manager(struct mssl_thread_context *ctx)
 
 static void *mssl_run_thread(void *arg)
 {
+  MA_LOG("mssl_run_thread");
   mctx_t mctx = (mctx_t)arg;
   int cpu = mctx->cpu;
   int working;
@@ -235,6 +357,7 @@ static void *mssl_run_thread(void *arg)
 
 mctx_t mssl_create_context(int cpu)
 {
+  MA_LOG("Create the context");
   mctx_t mctx;
   int ret;
 
@@ -267,7 +390,15 @@ mctx_t mssl_create_context(int cpu)
   mctx->cpu = cpu;
   g_ctx[cpu] = mctx;
 
-  mssl_run_thread(mctx);
+  if (pthread_create(&g_thread[cpu], NULL, mssl_run_thread, (void *)mctx) != 0)
+  {
+    MA_LOG("pthread_create of mssl thread failed");
+    return NULL;
+  }
+
+  sem_wait(&g_init_sem[cpu]);
+  sem_destroy(&g_init_sem[cpu]);
+
   running[cpu] = TRUE;
 
   return mctx;

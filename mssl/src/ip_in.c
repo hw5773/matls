@@ -32,12 +32,9 @@ inline int process_in_ipv4_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
 
   if (ip_len < sizeof(struct iphdr))
   {
-    MA_LOG1d("Wrong Length", ip_len);
     ret = ERROR;
     goto __return;
   }
-
-  MA_LOG1d("Length of IP Packet", ip_len);
 
   if (iph->version != 0x4)
   {
@@ -46,8 +43,6 @@ inline int process_in_ipv4_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
     ret = FALSE;
     goto __return;
   }
-
-  MA_LOG1d("Version of IP Packet", iph->version);
 
   fillin_packet_ip_context(pctx, iph, ip_len);
 /*
@@ -70,7 +65,6 @@ inline int process_in_ipv4_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
   switch (iph->protocol)
   {
     case IPPROTO_TCP:
-      MA_LOG("This is TCP Packet");
       return process_in_tcp_packet(mssl, pctx);
       break;
     case IPPROTO_ICMP:

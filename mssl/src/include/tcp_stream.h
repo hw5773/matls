@@ -6,8 +6,8 @@
 #else
 #include <linux/tcp.h>
 #endif
-#include <netinet/ip.h>
 #include <sys/queue.h>
+#include <netinet/ip.h>
 
 #include "mssl.h"
 #include "socket.h"
@@ -33,7 +33,7 @@ struct sockent {
 #define SOCKQ_INSERT_TAIL(head, socket) \
 do { \
 	struct sockent *__s = \
-			(struct sockent *)MPAllocateChunk(mssl->sockent_pool); \
+			(struct sockent *)mp_allocate_chunk(mssl->sockent_pool); \
 	if (__s) { \
 		__s->sock = (socket); \
 		TAILQ_INSERT_TAIL(head, __s, link); \
@@ -48,7 +48,7 @@ do { \
 	} \
 	if (__walk) { \
 		TAILQ_REMOVE(head, __walk, link); \
-		MPFreeChunk(mssl->sockent_pool, __walk); \
+		mp_free_chunk(mssl->sockent_pool, __walk); \
 	} \
 } while (0)
 #define SOCKQ_FOREACH_START(var, head) \

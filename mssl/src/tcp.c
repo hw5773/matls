@@ -27,32 +27,38 @@ static inline uint32_t detect_stream_type(mssl_manager_t mssl, struct pkt_ctx *p
   struct sockaddr_in *addr;
   int rc, cnt_match, socktype;
   struct mon_listener *walk;
-  //struct sfbpf_program fcode;
+  struct sfbpf_program fcode;
 
   cnt_match = 0;
   rc = 0;
 
+  MA_LOG1d("mssl->num_msp", mssl->num_msp);
   if (mssl->num_msp > 0)
   {
     TAILQ_FOREACH(walk, &mssl->monitors, link)
     {
       socktype = walk->socket->socktype;
-      if (socktype != MOS_SOCK_MONITOR_STREAM)
+      if (socktype != MOS_SOCK_SPLIT_TLS)
         continue;
-/*
+
       fcode = walk->stream_syn_fcode;
+    /*
       if (!(ISSET_BPFFILTER(fcode) && pctx &&
             EVAL_BPFFILTER(fcode, (uint8_t *)pctx->p.iph - sizeof(struct ethhdr),
               pctx->p.ip_len + sizeof(struct ethhdr)) == 0))
       {
-        walk->is_stream_syn_filter_hit = 1;
-        cnt_match++;
-      }
-*/
+      */
+      walk->is_stream_syn_filter_hit = 1;
+      cnt_match++;
+    //  }
+
     }
 
     if (cnt_match > 0)
-      rc = STREAM_TYPE(MOS_SOCK_MONITOR_STREAM_ACTIVE);
+    {
+      rc = STREAM_TYPE(MOS_SOCK_SPLIT_TLS);
+      MA_LOG1d("rc result", rc);
+    }
   }
 
   if (mssl->listener)
@@ -101,6 +107,7 @@ inline void fill_packet_context_tcp_info(struct pkt_ctx *pctx, struct tcphdr *tc
 static inline struct tcp_stream *create_stream(mssl_manager_t mssl, struct pkt_ctx *pctx,
     unsigned int *hash)
 {
+  MA_LOG("Create Stream");
   tcp_stream *cur_stream = NULL;
   uint32_t stream_type;
   const struct iphdr *iph = pctx->p.iph;
@@ -108,6 +115,7 @@ static inline struct tcp_stream *create_stream(mssl_manager_t mssl, struct pkt_c
 
   if (tcph->syn && !tcph->ack)
   {
+    /*
     stream_type = detect_stream_type(mssl, pctx, iph->daddr, tcph->dest);
     if (!stream_type)
     {
@@ -115,8 +123,9 @@ static inline struct tcp_stream *create_stream(mssl_manager_t mssl, struct pkt_c
       return NULL;
     }
 
-    if (stream_type & STREAM_TYPE(MOS_SOCK_MONITOR_STREAM_ACTIVE))
+    if (stream_type & STREAM_TYPE(MOS_SOCK_SPLIT_TLS))
     {
+    */
       cur_stream = create_client_tcp_stream(mssl, NULL, stream_type,
           pctx->p.iph->saddr, pctx->p.tcph->source,
           pctx->p.iph->daddr, pctx->p.tcph->dest, hash);
@@ -125,12 +134,12 @@ static inline struct tcp_stream *create_stream(mssl_manager_t mssl, struct pkt_c
       {
         MA_LOG("No available space in flow pool");
       }
-
+    /*
     }
     else
     {
     }
-
+    */
     return cur_stream;
 
   }
@@ -178,8 +187,6 @@ static void handle_monitor_stream(mssl_manager_t mssl, struct tcp_stream *sendsi
 int process_in_tcp_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
 {
   MA_LOG("");
-  MA_LOG("");
-  MA_LOG("");
   MA_LOG("process_in_tcp_packet");
   uint64_t events = 0;
   struct tcp_stream *cur_stream;
@@ -205,7 +212,6 @@ int process_in_tcp_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
       forward_ip_packet(mssl, pctx);
     return ERROR;
   }
-  MA_LOG("TCP Checksum success");
 
 #endif
   
@@ -222,12 +228,14 @@ int process_in_tcp_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
 
   if (!cur_stream)
   {
+    /*
     if (mssl->listener == NULL && mssl->num_msp == 0)
     {
       if (pctx->forward)
         forward_ip_packet(mssl, pctx);
       return TRUE;
     }
+    */
 
     cur_stream = create_stream(mssl, pctx, &hash);
 
@@ -242,8 +250,8 @@ int process_in_tcp_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
     if (cur_stream->rcvvar && cur_stream->rcvvar->rcvbuf)
       pctx->p.offset = (uint64_t)seq2loff(cur_stream->rcvvar->rcvbuf, pctx->p.seq, 
           cur_stream->rcvvar->irs + 1);
-
-    if (HAS_STREAM_TYPE(cur_stream, MOS_SOCK_MONITOR_STREAM_ACTIVE))
+/*
+    if (HAS_STREAM_TYPE(cur_stream, MOS_SOCK_SPLIT_TLS))
     {
       //handle_monitor_stream(mssl, cur_stream, cur_stream->pair_stream, pctx);
     }
@@ -251,6 +259,7 @@ int process_in_tcp_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
     {
       assert(0);
     }
+*/
   }
   else
   {

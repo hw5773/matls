@@ -95,19 +95,18 @@ hash_flow(const tcp_stream *flow)
 	(flow1->saddr == flow2->saddr && flow1->sport == flow2->sport && \
 	 flow1->daddr == flow2->daddr && flow1->dport == flow2->dport)
 /*---------------------------------------------------------------------------*/
-struct hashtable * 
-create_hash_table(void)            // equality
+void create_hash_table(struct hashtable **ht)            // equality
 {
 	int i;
-	struct hashtable* ht = calloc(1, sizeof(struct hashtable));
-	if (!ht){
+  (*ht) = (struct hashtable *)malloc(sizeof(struct hashtable));
+	if (!(*ht)){
+    MA_LOG("Failed to make hashtable");
 		return 0;
 	}
 
 	/* init the tables */
 	for (i = 0; i < NUM_BINS; i++)
-		TAILQ_INIT(&ht->ht_table[i]);
-	return ht;
+		TAILQ_INIT(&(*ht)->ht_table[i]);
 }
 /*----------------------------------------------------------------------------*/
 void
@@ -201,11 +200,13 @@ HTSearch(struct hashtable *ht, const tcp_stream *item, unsigned int *hash)
 	idx = hash_flow(item);
 	*hash = idx;
 
-	head = &ht->ht_table[idx];
+	head = (hash_bucket_head *)&ht->ht_table[idx];
 
 	TAILQ_FOREACH(walk, head, rcvvar->he_link) {
 		if (EQUAL_FLOW(walk, item)) 
+    {
 			return walk;
+    }
 	}
 
 	return NULL;

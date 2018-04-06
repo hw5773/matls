@@ -1,6 +1,8 @@
 #ifndef __MEMORY_MGT_H_
 #define __MEMORY_MGT_H_
 
+#define SYS_MALLOC
+
 struct mem_pool;
 typedef struct mem_pool* mem_pool_t;
 

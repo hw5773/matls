@@ -34,6 +34,8 @@ NAME= $(BASENAME)-$(VERSION)
 PCS=libmssl.pc
 
 OBJ = src/logs.o \
+			src/api.o \
+			src/socket.o \
 			src/cpu.o \
 			src/config.o \
 			src/util.o \
@@ -48,6 +50,8 @@ OBJ = src/logs.o \
 			src/tcp_in.o \
 			src/tcp_util.o \
 			src/tcp_rb.o \
+			src/tcp_stream.o \
+			src/memory_mgt.o \
 			src/core.o
 
 all: objs libmssl.a libmssl.pc

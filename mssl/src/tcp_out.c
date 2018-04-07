@@ -76,6 +76,91 @@ static inline uint16_t calculate_option_length(uint8_t flags)
   return optlen;
 }
 
+int send_tcp_packet_standalone(mssl_manager_t mssl, uint32_t saddr, uint16_t sport,
+    uint32_t daddr, uint16_t dport, uint32_t seq, uint32_t ack_seq, uint16_t window,
+    uint8_t flags, uint8_t *payload, uint16_t payloadlen, uint32_t cur_ts,
+    uint32_t echo_ts, uint16_t ip_id, int8_t in_ifidx)
+{
+  struct tcphdr *tcph;
+  uint8_t *tcpopt;
+  uint32_t *ts;
+  uint16_t optlen;
+  struct pkt_ctx pctx;
+  int rc = -1;
+
+  memset(&pctx, 0, sizeof(pctx));
+  pctx.p.in_ifidx = in_ifidx;
+  optlen = calculate_option_length(flags);
+  if (payloadlen > TCP_DEFAULT_MSS + optlen)
+  {
+    MA_LOG("payload size exceeds MSS");
+    assert(0);
+    return ERROR;
+  }
+
+  tcph = (struct tcphdr *)ip_output_standalone(mssl, htons(ip_id),
+      saddr, daddr, TCP_HEADER_LEN + optlen + payloadlen, &pctx, cur_ts);
+
+  if (!tcph)
+    return ERROR;
+
+  memset(tcph, 0, TCP_HEADER_LEN + optlen);
+
+  tcph->source = sport;
+  tcph->dest = dport;
+
+  if (flags & TCP_FLAG_SYN)
+    tcph->syn = TRUE;
+  if (flags & TCP_FLAG_FIN)
+    tcph->fin = TRUE;
+  if (flags & TCP_FLAG_RST)
+    tcph->rst = TRUE;
+  if (flags & TCP_FLAG_PSH)
+    tcph->psh = TRUE;
+
+  tcph->seq = htonl(seq);
+  if (flags & TCP_FLAG_ACK)
+  {
+    tcph->ack = TRUE;
+    tcph->ack_seq = htonl(ack_seq);
+  }
+
+  tcph->window = htons(MIN(window, TCP_MAX_WINDOW));
+
+  tcpopt = (uint8_t *)tcph + TCP_HEADER_LEN;
+  ts = (uint32_t *)(tcpopt + 4);
+
+  tcpopt[0] = TCP_OPT_NOP;
+  tcpopt[1] = TCP_OPT_NOP;
+  tcpopt[2] = TCP_OPT_TIMESTAMP;
+  tcpopt[3] = TCP_OPT_TIMESTAMP_LEN;
+  ts[0] = htonl(cur_ts);
+  ts[1] = htonl(echo_ts);
+
+  tcph->doff = (TCP_HEADER_LEN + optlen) >> 2;
+
+  if (payloadlen > 0)
+  {
+    memcpy((uint8_t *)tcph + TCP_HEADER_LEN + optlen, payload, payloadlen);
+  }
+
+#if TCP_CALCULATE_CHECKSUM
+  if (likely(mssl->iom->dev_ioctl != NULL))
+    rc = mssl->iom->dev_ioctl(mssl->ctx, pctx.out_ifidx, PKT_TX_TCP_CSUM, pctx.p.iph);
+
+  if (rc == -1)
+    tcph->check = tcp_calc_checksum((uint16_t *)tcph, TCP_HEADER_LEN + optlen + payloadlen,
+        saddr, daddr);
+#endif
+
+  if (tcph->syn || tcph->fin)
+  {
+    payloadlen++;
+  }
+
+  return payloadlen;
+}
+
 int send_tcp_packet(mssl_manager_t mssl, tcp_stream *cur_stream,
     uint32_t cur_ts, uint8_t flags, uint8_t *payload, uint16_t payloadlen)
 {

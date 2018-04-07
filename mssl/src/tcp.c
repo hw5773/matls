@@ -7,13 +7,14 @@
 #include "include/eth_out.h"
 #include "include/ip_out.h"
 #include "include/mos_api.h"
-//#include "include/tcp_util.h"
-//#include "include/tcp_in.h"
-//#include "include/tcp_out.h"
+#include "include/tls_split.h"
+#include "include/tcp_util.h"
+#include "include/tcp_in.h"
+#include "include/tcp_out.h"
 //#include "include/tcp_ring_buffer.h"
 //#include "include/eventpoll.h"
 #include "include/logs.h"
-//#include "include/timer.h"
+#include "include/timer.h"
 #include "include/ip_in.h"
 #include "include/config.h"
 
@@ -155,7 +156,7 @@ static inline struct tcp_stream *create_stream(mssl_manager_t mssl, struct pkt_c
   }
 }
 
-
+/*
 static inline struct tcp_stream *find_stream(mssl_manager_t mssl, tcp_stream *ret, struct pkt_ctx *pctx, 
     unsigned int *hash)
 {
@@ -170,6 +171,7 @@ static inline struct tcp_stream *find_stream(mssl_manager_t mssl, tcp_stream *re
   ret = HTSearch(mssl->tcp_flow_table, &temp_stream, hash);
   return ret;
 }
+*/
 
 /*
 static void handle_sock_stream(mssl_manager_t mssl, struct tcp_stream *cur_stream,
@@ -207,10 +209,29 @@ static void handle_monitor_stream(mssl_manager_t mssl, struct tcp_stream *sendsi
   update_monitor(mssl, sendside_stream, recvside_stream, pctx, true);
   recvside_stream = sendside_stream->pair_stream;
 
-  do_split_session(sendside_stream, recvside_stream, pctx);
+  if (pctx->p.tcph->syn)
+  {
+    MA_LOG("SYN packet. Now split the session");
+    do_split_session(sendside_stream, recvside_stream, pctx);
+  }
 }
+/*
+void do_split_session(struct tcp_stream *sendside_stream,
+    struct tcp_stream *recvside_stream, struct pkt_ctx *pctx)
+{
+  MA_LOG("do split session");
 
+  MA_LOGip("sendside source ip", sendside_stream->saddr);
+  MA_LOG1d("sendside source port", sendside_stream->sport);
+  MA_LOGip("sendside dest ip", sendside_stream->daddr);
+  MA_LOG1d("sendside dest port", sendside_stream->dport);
 
+  MA_LOGip("recvside source ip", recvside_stream->saddr);
+  MA_LOG1d("recvside source port", recvside_stream->sport);
+  MA_LOGip("recvside dest ip", recvside_stream->daddr);
+  MA_LOG1d("recvside dest port", recvside_stream->dport);
+}
+*/
 int process_in_tcp_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
 {
   MA_LOG("");

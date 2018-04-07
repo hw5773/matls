@@ -26,6 +26,7 @@
 #include "include/tcp_rb.h"
 #include "include/tcp_stream.h"
 #include "include/io_module.h"
+#include "include/tls_split.h"
 
 #define LOG_FILE_NAME "log"
 #define MAX_FILE_NAME 1024

@@ -235,9 +235,9 @@ tcp_stream *create_tcp_stream(mssl_manager_t mssl, socket_map_t socket, int type
 
   MA_LOG("Create new TCP stream");
   MA_LOGip("  Source IP", stream->saddr);
-  MA_LOG1d("  Source Port", stream->sport);
+  MA_LOG1d("  Source Port", ntohs(stream->sport));
   MA_LOGip("  Destination IP", stream->daddr);
-  MA_LOG1d("  Destination Port", stream->dport);
+  MA_LOG1d("  Destination Port", ntohs(stream->dport));
   MA_LOG1p("Stream Pointer", stream);
 
   return stream;
@@ -250,14 +250,14 @@ inline tcp_stream *create_dual_tcp_stream(mssl_manager_t mssl, socket_map_t sock
   tcp_stream *cur_stream, *paired_stream;
   struct socket_map *walk;
 
-  cur_stream = create_tcp_stream(mssl, socket, type, saddr, sport, daddr, dport, hash);
+  cur_stream = create_tcp_stream(mssl, socket, type, daddr, dport, saddr, sport, hash);
   if (!cur_stream)
   {
     MA_LOG("Cannot create tcp_stream");
     return NULL;
   }
 
-  paired_stream = create_tcp_stream(mssl, NULL, MOS_SOCK_UNUSED, daddr, dport, saddr, sport, hash);
+  paired_stream = create_tcp_stream(mssl, NULL, MOS_SOCK_UNUSED, saddr, sport, daddr, dport, hash);
   if (!paired_stream)
   {
     destroy_tcp_stream(mssl, cur_stream);
@@ -273,6 +273,9 @@ inline tcp_stream *create_dual_tcp_stream(mssl_manager_t mssl, socket_map_t sock
   }
   SOCKQ_FOREACH_END;
   paired_stream->stream_type = STREAM_TYPE(MOS_SOCK_SPLIT_TLS);
+
+  MA_LOG1s("cur_stream state", state_str[cur_stream->state]);
+  MA_LOG1s("paired_stream state", state_str[paired_stream->state]);
 
   return cur_stream;
 }

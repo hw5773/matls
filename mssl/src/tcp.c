@@ -126,7 +126,12 @@ static inline struct tcp_stream *create_stream(mssl_manager_t mssl, struct pkt_c
     if (stream_type & STREAM_TYPE(MOS_SOCK_SPLIT_TLS))
     {
     */
+    /*
       cur_stream = create_client_tcp_stream(mssl, NULL, stream_type,
+          pctx->p.iph->saddr, pctx->p.tcph->source,
+          pctx->p.iph->daddr, pctx->p.tcph->dest, hash);
+    */
+      cur_stream = create_dual_tcp_stream(mssl, NULL, MOS_SOCK_SPLIT_TLS,
           pctx->p.iph->saddr, pctx->p.tcph->source,
           pctx->p.iph->daddr, pctx->p.tcph->dest, hash);
 
@@ -202,10 +207,7 @@ static void handle_monitor_stream(mssl_manager_t mssl, struct tcp_stream *sendsi
   update_monitor(mssl, sendside_stream, recvside_stream, pctx, true);
   recvside_stream = sendside_stream->pair_stream;
 
-  if (!recvside_stream)
-    MA_LOG("no recvside stream");
-  else
-    MA_LOG("recvside stream");
+  do_split_session(sendside_stream, recvside_stream, pctx);
 }
 
 
@@ -276,8 +278,6 @@ int process_in_tcp_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
 
   if (cur_stream)
   {
-  MA_LOG1p("cur_stream->rcvvar", cur_stream->rcvvar);
-  MA_LOG1p("cur_stream->rcvvar->rcvbuf", cur_stream->rcvvar->rcvbuf);
     if (cur_stream->rcvvar && cur_stream->rcvvar->rcvbuf)
     {
       MA_LOG("current stream condition success");
@@ -285,7 +285,6 @@ int process_in_tcp_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
           cur_stream->rcvvar->irs + 1);
       MA_LOG("seq2loff success");
     }
-
     handle_monitor_stream(mssl, cur_stream, cur_stream->pair_stream, pctx);
   }
   else

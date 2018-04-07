@@ -68,7 +68,7 @@ int sock_get_nif(struct ifreq *ifr)
  */
 int sock_send_pkts(struct mssl_thread_context *ctx, int idx)
 {
-  MA_LOG1s("Sending the packet to", g_config.mos->route_table->ent[idx]->dev_name);
+  //MA_LOG1s("Sending the packet to", g_config.mos->route_table->ent[idx]->dev_name);
   int i, len, sent, trial = 0, max_trial = 3;
   struct sock_private_context *spc = ctx->io_private_context;
   struct sockaddr_ll dest;
@@ -76,10 +76,11 @@ int sock_send_pkts(struct mssl_thread_context *ctx, int idx)
 
   if (len == 0)
   {
-    MA_LOG("Packet length is 0");
+    //MA_LOG("Packet length is 0");
     return 0;
   }
 
+  MA_LOG1s("Sending the packet to", g_config.mos->route_table->ent[idx]->dev_name);
 #ifdef NETSTAT
   mssl->nstat.tx_packets[idx]++;
   mssl->nstat.tx_bytes[idx] += len + ETHER_OVR;

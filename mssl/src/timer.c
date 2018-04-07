@@ -449,7 +449,7 @@ void check_timewait_expire(mssl_manager_t mssl, uint32_t cur_ts, int thresh)
     }
   }
 
-  MA_LOG1d("checking timewait timeout", cnt);
+  //MA_LOG1d("checking timewait timeout", cnt);
 }
 
 void check_connection_timeout(mssl_manager_t mssl, uint32_t cur_ts, int thresh)

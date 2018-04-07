@@ -206,10 +206,7 @@ HTSearch(struct hashtable *ht, tcp_stream *ret, const tcp_stream *item, unsigned
 	TAILQ_FOREACH(walk, head, rcvvar->he_link) {
 		if (EQUAL_FLOW(walk, item)) 
     {
-      MA_LOG1p("stream pointer in HTSearch", walk);
-      MA_LOG1lu("size of pointer", sizeof(walk));
       ret = walk;
-      MA_LOG1p("stream return point in HTSearch", ret);
 			return walk;
     }
 	}

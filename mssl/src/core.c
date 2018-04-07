@@ -237,6 +237,32 @@ static void run_main_loop(struct mssl_thread_context *ctx)
 //  interrupt_application(mssl);
 }
 
+struct mssl_sender *create_mssl_sender(int ifidx)
+{
+  struct mssl_sender *sender;
+
+  sender = (struct mssl_sender *)calloc(1, sizeof(struct mssl_sender));
+  if (!sender)
+    return NULL;
+
+  sender->ifidx = ifidx;
+
+  TAILQ_INIT(&sender->control_list);
+  TAILQ_INIT(&sender->send_list);
+  TAILQ_INIT(&sender->ack_list);
+
+  sender->control_list_cnt = 0;
+  sender->send_list_cnt = 0;
+  sender->ack_list_cnt = 0;
+
+  return sender;
+}
+
+void destroy_mssl_sender(struct mssl_sender *sender)
+{
+  free(sender);
+}
+
 static mssl_manager_t initialize_mssl_manager(struct mssl_thread_context *ctx)
 {
   MA_LOG("initialize mssl manager");
@@ -391,6 +417,24 @@ static mssl_manager_t initialize_mssl_manager(struct mssl_thread_context *ctx)
 
 // Queue related commands
 
+  mssl->g_sender = create_mssl_sender(-1);
+  if (!mssl->g_sender)
+  {
+    MA_LOG("Failed to create mssl sender");
+    return NULL;
+  }
+
+  for (i=0; i<g_config.mos->netdev_table->num; i++)
+  {
+    mssl->n_sender[i] = create_mssl_sender(i);
+    if (!mssl->n_sender[i])
+    {
+      MA_LOG("failed to create mssl sender");
+      return NULL;
+    }
+  }
+
+  mssl->rto_store = init_rto_hashstore();
   TAILQ_INIT(&mssl->timewait_list);
   TAILQ_INIT(&mssl->timeout_list);
 

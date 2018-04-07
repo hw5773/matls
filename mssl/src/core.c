@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <unistd.h>
 #include <assert.h>
 #include <semaphore.h>
@@ -103,6 +104,31 @@ static int attach_device(struct mssl_thread_context *ctx)
   return working;
 }
 
+static inline void write_packets_to_chunks(mssl_manager_t mssl, uint32_t cur_ts)
+{
+  int thresh = g_config.mos->max_concurrency;
+  int i;
+
+  assert(mssl->g_sender != NULL);
+  if (mssl->g_sender->control_list_cnt)
+    write_tcp_control_list(mssl, mssl->g_sender, cur_ts, thresh);
+  if (mssl->g_sender->ack_list_cnt)
+    write_tcp_ack_list(mssl, mssl->g_sender, cur_ts, thresh);
+  if (mssl->g_sender->send_list_cnt)
+    write_tcp_data_list(mssl, mssl->g_sender, cur_ts, thresh);
+
+  for (i=0; i<g_config.mos->netdev_table->num; i++)
+  {
+    assert(mssl->n_sender[i] != NULL);
+    if (mssl->n_sender[i]->control_list_cnt)
+      write_tcp_control_list(mssl, mssl->n_sender[i], cur_ts, thresh);
+    if (mssl->n_sender[i]->ack_list_cnt)
+      write_tcp_ack_list(mssl, mssl->n_sender[i], cur_ts, thresh);
+    if (mssl->n_sender[i]->send_list_cnt)
+      write_tcp_data_list(mssl, mssl->n_sender[i], cur_ts, thresh);
+  }
+}
+
 static void run_main_loop(struct mssl_thread_context *ctx)
 {
   mssl_manager_t mssl = ctx->mssl_manager;
@@ -148,9 +174,67 @@ static void run_main_loop(struct mssl_thread_context *ctx)
         uint8_t *pktbuf;
         pktbuf = mssl->iom->get_rptr(ctx, rx_inf, i, &len);
         process_packet(mssl, rx_inf, i, ts, pktbuf, len);
+        MA_LOG("Process success in the core");
       }
     }
+  
+    if (mssl->flow_cnt > 0)
+    {
+      thresh = g_config.mos->max_concurrency;
+
+      if (thresh == -1)
+        thresh = g_config.mos->max_concurrency;
+
+      check_rtm_timeout(mssl, ts, thresh);
+      check_timewait_expire(mssl, ts, thresh);
+
+      if (g_config.mos->tcp_timeout > 0 && ts != ts_prev)
+      {
+        check_connection_timeout(mssl, ts, thresh);
+      }
+    }
+/*
+    if (mssl->num_msp > 0)
+      flush_monitor_read_events(mssl);
+*/
+/*
+    if (mssl->ep)
+    {
+      flush_buffered_read_events(mssl);
+      flush_epoll_events(mssl, ts);
+    }
+*/
+
+    write_packets_to_chunks(mssl, ts);
+
+    int num_dev = g_config.mos->netdev_table->num;
+    if (likely(mssl->iom->send_pkts != NULL))
+    {
+      for (tx_inf = 0; tx_inf < num_dev; tx_inf++)
+      {
+        mssl->iom->send_pkts(ctx, tx_inf);
+      }
+    }
+
+    if (ts != ts_prev)
+    {
+      ts_prev = ts;
+//    arp_timer(mssl, ts);
+    }
+
+    if (mssl->iom->select)
+    {
+      mssl->iom->select(ctx);
+    }
+
+    if (ctx->interrupt)
+    {
+//      interrupt_application(mssl);
+    }
   }
+
+//  destroy_remaining_flows(mssl);
+//  interrupt_application(mssl);
 }
 
 static mssl_manager_t initialize_mssl_manager(struct mssl_thread_context *ctx)
@@ -172,7 +256,7 @@ static mssl_manager_t initialize_mssl_manager(struct mssl_thread_context *ctx)
   }
 
   g_mssl[ctx->cpu] = mssl;
-  create_hash_table(&mssl->tcp_flow_table);
+  create_hashtable(&mssl->tcp_flow_table);
 
   if (!mssl->tcp_flow_table)
   {
@@ -304,6 +388,12 @@ static mssl_manager_t initialize_mssl_manager(struct mssl_thread_context *ctx)
 
   mssl->ctx = ctx;
 //  mssl->ep = NULL;
+
+// Queue related commands
+
+  TAILQ_INIT(&mssl->timewait_list);
+  TAILQ_INIT(&mssl->timeout_list);
+
   return mssl;
 }
 

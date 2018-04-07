@@ -155,6 +155,7 @@ tcp_stream *create_tcp_stream(mssl_manager_t mssl, socket_map_t socket, int type
   stream->daddr = daddr;
   stream->dport = dport;
 
+  MA_LOG1p("stream pointer before input", stream);
   ret = HTInsert(mssl->tcp_flow_table, stream, hash);
   if (ret < 0)
   {
@@ -237,6 +238,7 @@ tcp_stream *create_tcp_stream(mssl_manager_t mssl, socket_map_t socket, int type
   MA_LOG1d("  Source Port", stream->sport);
   MA_LOGip("  Destination IP", stream->daddr);
   MA_LOG1d("  Destination Port", stream->dport);
+  MA_LOG1p("Stream Pointer", stream);
 
   return stream;
 }

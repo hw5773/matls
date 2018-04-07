@@ -10,13 +10,14 @@
 #include "include/logs.h"
 #include "include/fhash.h"
 
-//#include "stdint.h" /* Replace with <stdint.h> if appropriate */
+#include <stdint.h> /* Replace with <stdint.h> if appropriate */
+/*
 #undef get16bits
 #if (defined(__GNUC__) && defined(__i386__)) || defined(__WATCOMC__) \
 	|| defined(_MSC_VER) || defined (__BORLANDC__) || defined (__TURBOC__)
 #define get16bits(d) (*((const uint16_t *) (d)))
 #endif
-
+*/
 #if !defined (get16bits)
 #define get16bits(d) ((((uint32_t)(((const uint8_t *)(d))[1])) << 8)\
 		+(uint32_t)(((const uint8_t *)(d))[0]) )
@@ -95,7 +96,7 @@ hash_flow(const tcp_stream *flow)
 	(flow1->saddr == flow2->saddr && flow1->sport == flow2->sport && \
 	 flow1->daddr == flow2->daddr && flow1->dport == flow2->dport)
 /*---------------------------------------------------------------------------*/
-void create_hash_table(struct hashtable **ht)            // equality
+void create_hashtable(struct hashtable **ht)            // equality
 {
 	int i;
   (*ht) = (struct hashtable *)malloc(sizeof(struct hashtable));
@@ -178,7 +179,7 @@ HTRemove(struct hashtable *ht, tcp_stream *item)
 }	
 /*----------------------------------------------------------------------------*/
 tcp_stream* 
-HTSearch(struct hashtable *ht, const tcp_stream *item, unsigned int *hash)
+HTSearch(struct hashtable *ht, tcp_stream *ret, const tcp_stream *item, unsigned int *hash)
 {
 	tcp_stream *walk;
 	hash_bucket_head *head;
@@ -205,6 +206,10 @@ HTSearch(struct hashtable *ht, const tcp_stream *item, unsigned int *hash)
 	TAILQ_FOREACH(walk, head, rcvvar->he_link) {
 		if (EQUAL_FLOW(walk, item)) 
     {
+      MA_LOG1p("stream pointer in HTSearch", walk);
+      MA_LOG1lu("size of pointer", sizeof(walk));
+      ret = walk;
+      MA_LOG1p("stream return point in HTSearch", ret);
 			return walk;
     }
 	}

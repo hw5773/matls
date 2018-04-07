@@ -8,10 +8,16 @@
 #include <pthread.h>
 
 #include "memory_mgt.h"
+//#include "tcp_ring_buffer.h"
+#include "tcp_send_buffer.h"
 #include "tcp_stream_queue.h"
 #include "socket.h"
 #include "mssl_api.h"
+//#include "eventpoll.h"
+//#include "addr_pool.h"
 #include "logs.h"
+#include "io_module.h"
+//#include "key_value_store.h"
 
 #ifndef TRUE
 #define TRUE (1)
@@ -24,6 +30,13 @@
 #ifndef ERROR
 #define ERROR (-1)
 #endif /* ERROR */
+
+#ifndef likely
+#define likely(x)       __builtin_expect((x), 1)
+#endif
+#ifndef unlikely
+#define unlikely(x)     __builtin_expect((x), 0)
+#endif
 
 #ifndef MAX_CPUS
 #define MAX_CPUS 16
@@ -60,6 +73,26 @@
 #define TCP_OPT_TIMESTAMP_ENABLED TRUE
 #define TCP_OPT_SACK_ENABLED FALSE
 
+#if USE_SPIN_LOCK
+#define SBUF_LOCK_INIT(lock, errmsg, action); \
+  if (pthread_spin_init(lock, PTHREAD_PROCESS_PRIVATE)) { \
+    perror("pthread_spin_init", errmsg); \
+    action; \
+  }
+#define SBUF_LOCK_DESTROY(lock) pthread_spin_destroy(lock)
+#define SBUF_LOCK(lock) pthread_spin_lock(lock)
+#define SBUF_UNLOCK(lock) pthread_spin_unlock(lock)
+#else
+#define SBUF_LOCK_INIT(lock, errmsg, action); \
+  if (pthread_mutex_init(lock, NULL)) { \
+    perror("pthread_mutex_init", errmsg); \
+    action; \
+  }
+#define SBUG_LOCK_DESTROY(lock) pthread_mutex_destroy(lock)
+#define SBUF_LOCK(lock) pthread_mutex_lock(lock)
+#define SBUF_UNLOCK(lock) pthread_mutex_unlock(lock)
+#endif /* USE_SPIN_LOCK */
+
 #ifndef TAILQ_FOREACH_SAFE
 #define TAILQ_FOREACH_SAFE(var, head, field, tvar) \
   for ((var) = TAILQ_FIRST((head));\
@@ -77,7 +110,7 @@ struct route_table
   int prefix;
   int nif;
 };
-/*
+
 struct mssl_sender
 {
   int ifidx;
@@ -90,7 +123,7 @@ struct mssl_sender
   int send_list_cnt;
   int ack_list_cnt;
 };
-*/
+
 struct mssl_manager
 {
   mem_pool_t bufseg_pool;

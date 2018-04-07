@@ -151,7 +151,7 @@ static inline struct tcp_stream *create_stream(mssl_manager_t mssl, struct pkt_c
 }
 
 
-static inline struct tcp_stream *find_stream(mssl_manager_t mssl, struct pkt_ctx *pctx, 
+static inline struct tcp_stream *find_stream(mssl_manager_t mssl, tcp_stream *ret, struct pkt_ctx *pctx, 
     unsigned int *hash)
 {
   struct tcp_stream temp_stream;
@@ -162,7 +162,8 @@ static inline struct tcp_stream *find_stream(mssl_manager_t mssl, struct pkt_ctx
   temp_stream.daddr = pctx->p.iph->saddr;
   temp_stream.dport = pctx->p.tcph->source;
 
-  return HTSearch(mssl->tcp_flow_table, &temp_stream, hash);
+  ret = HTSearch(mssl->tcp_flow_table, &temp_stream, hash);
+  return ret;
 }
 
 /*
@@ -172,17 +173,41 @@ static void handle_sock_stream(mssl_manager_t mssl, struct tcp_stream *cur_strea
   update_recv_tcp_context(mssl, cur_stream, pctx);
   do_action_end_tcp_packet(mssl, cur_stream, pctx);
 }
+*/
 
 void update_monitor(mssl_manager_t mssl, struct tcp_stream *sendside_stream,
     struct tcp_stream *recvside_stream, struct pkt_ctx *pctx, bool is_pkt_reception)
 {
+  MA_LOG("update monitor");
+  struct socket_map *walk;
+  assert(pctx);
+
+// clone_packet_ctx
+
+  if (sendside_stream->status_mgmt)
+  {
+    sendside_stream->cb_events = MOS_ON_PKT_IN;
+
+    if (is_pkt_reception)
+    {
+      MA_LOG("before update_passive_send_tcp_context");
+      update_passive_send_tcp_context(mssl, sendside_stream, pctx);
+    }
+  }
 }
 
 static void handle_monitor_stream(mssl_manager_t mssl, struct tcp_stream *sendside_stream,
     struct tcp_stream *recvside_stream, struct pkt_ctx *pctx)
 {
+  update_monitor(mssl, sendside_stream, recvside_stream, pctx, true);
+  recvside_stream = sendside_stream->pair_stream;
+
+  if (!recvside_stream)
+    MA_LOG("no recvside stream");
+  else
+    MA_LOG("recvside stream");
 }
-*/
+
 
 int process_in_tcp_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
 {
@@ -224,7 +249,13 @@ int process_in_tcp_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
 
   events |= MOS_ON_PKT_IN;
 
-  cur_stream = find_stream(mssl, pctx, &hash);
+
+  struct tcp_stream temp_stream;
+  temp_stream.saddr = pctx->p.iph->daddr;
+  temp_stream.sport = pctx->p.tcph->dest;
+  temp_stream.daddr = pctx->p.iph->saddr;
+  temp_stream.dport = pctx->p.tcph->source;
+  HTSearch(mssl->tcp_flow_table, cur_stream, &temp_stream, &hash);
 
   if (!cur_stream)
   {
@@ -245,21 +276,17 @@ int process_in_tcp_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
 
   if (cur_stream)
   {
-    cur_stream->cb_events = events;
-
+  MA_LOG1p("cur_stream->rcvvar", cur_stream->rcvvar);
+  MA_LOG1p("cur_stream->rcvvar->rcvbuf", cur_stream->rcvvar->rcvbuf);
     if (cur_stream->rcvvar && cur_stream->rcvvar->rcvbuf)
+    {
+      MA_LOG("current stream condition success");
       pctx->p.offset = (uint64_t)seq2loff(cur_stream->rcvvar->rcvbuf, pctx->p.seq, 
           cur_stream->rcvvar->irs + 1);
-/*
-    if (HAS_STREAM_TYPE(cur_stream, MOS_SOCK_SPLIT_TLS))
-    {
-      //handle_monitor_stream(mssl, cur_stream, cur_stream->pair_stream, pctx);
+      MA_LOG("seq2loff success");
     }
-    else
-    {
-      assert(0);
-    }
-*/
+
+    handle_monitor_stream(mssl, cur_stream, cur_stream->pair_stream, pctx);
   }
   else
   {

@@ -33,26 +33,10 @@ NAME= $(BASENAME)-$(VERSION)
 
 PCS=libmssl.pc
 
-OBJ = src/logs.o \
-			src/api.o \
-			src/socket.o \
-			src/cpu.o \
-			src/config.o \
-			src/util.o \
-			src/fhash.o \
-			src/sock_module.o \
-			src/arp.o \
-			src/eth_in.o \
-			src/eth_out.o \
-			src/ip_in.o \
-			src/ip_out.o \
-			src/tcp.o \
-			src/tcp_in.o \
-			src/tcp_util.o \
-			src/tcp_rb.o \
-			src/tcp_stream.o \
-			src/memory_mgt.o \
-			src/core.o
+OBJ=src/core.o src/tcp_stream.o src/config.o src/api.o src/socket.o \
+		src/tcp_util.o src/eth_in.o src/ip_in.o src/tcp.o src/tcp_in.o src/eth_out.o \
+		src/ip_out.o src/tcp_out.o src/logs.o src/arp.o src/timer.o src/cpu.o \
+		src/tcp_rb.o src/util.o src/fhash.o src/memory_mgt.o src/sock_module.o
 
 all: objs libmssl.a libmssl.pc
 

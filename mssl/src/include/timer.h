@@ -33,7 +33,7 @@ struct rto_hashstore
   TAILQ_HEAD(rto_head, tcp_stream) rto_list[RTO_HASH + 1];
 };
 
-struct rto_hashstore *init_rto_hashstore;
+struct rto_hashstore *init_rto_hashstore();
 extern inline void add_to_rto_list(mssl_manager_t mssl, tcp_stream *cur_stream);
 extern inline void remove_from_rto_list(mssl_manager_t mssl, tcp_stream *cur_stream);
 extern inline void add_to_timewait_list(mssl_manager_t mssl, tcp_stream *cur_stream, uint32_t cur_ts);

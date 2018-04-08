@@ -71,6 +71,8 @@ uint8_t *ethernet_output(mssl_manager_t mssl, struct pkt_ctx *pctx,
     return NULL;
   }
 
+  MA_LOG1s("send to", g_config.mos->netdev_table->ent[nif]->dev_name);
+
   if (!mssl->iom->get_wptr)
   {
     MA_LOG("get_wptr() in io_module is undefined");
@@ -85,6 +87,10 @@ uint8_t *ethernet_output(mssl_manager_t mssl, struct pkt_ctx *pctx,
   }
 
   ethh = (struct ethhdr *)buf;
+
+  MA_LOG1p("buf", buf);
+  MA_LOG1p("ethh", ethh);
+
   for (i=0; i<ETH_ALEN; i++)
   {
     ethh->h_source[i] = g_config.mos->netdev_table->ent[nif]->haddr[i];
@@ -97,6 +103,7 @@ uint8_t *ethernet_output(mssl_manager_t mssl, struct pkt_ctx *pctx,
   if (pctx)
     fillout_packet_eth_context(pctx, cur_ts, nif, ethh, iplen + ETHERNET_HEADER_LEN);
 
+  MA_LOG("after fill out ethernet context");
   return (uint8_t *)(ethh + 1);
 }
 

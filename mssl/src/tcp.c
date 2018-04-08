@@ -212,8 +212,9 @@ static void handle_monitor_stream(mssl_manager_t mssl, struct tcp_stream *sendsi
   if (pctx->p.tcph->syn)
   {
     MA_LOG("SYN packet. Now split the session");
-    do_split_session(sendside_stream, recvside_stream, pctx);
+    do_split_session(mssl, sendside_stream, recvside_stream, pctx);
   }
+  MA_LOG("after do split session");
 }
 /*
 void do_split_session(struct tcp_stream *sendside_stream,

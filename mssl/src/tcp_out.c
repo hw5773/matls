@@ -183,6 +183,8 @@ int send_tcp_packet(mssl_manager_t mssl, tcp_stream *cur_stream,
   tcph = (struct tcphdr *)ip_output(mssl, cur_stream, TCP_HEADER_LEN + optlen + payloadlen,
       &pctx, cur_ts);
 
+  MA_LOG("after ip output");
+
   if (!tcph)
     return -2;
 

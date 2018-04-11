@@ -414,6 +414,14 @@ int ssl3_accept(SSL *s)
 			if (!(s->s3->tmp.new_cipher->algorithm_auth & (SSL_aNULL|SSL_aKRB5|SSL_aSRP))
 				&& !(s->s3->tmp.new_cipher->algorithm_mkey & SSL_kPSK))
 				{
+#ifndef OPENSSL_NO_MB
+                if (s->mb_enabled)
+                {
+                  printf("[matls] invoke matls send server certificate\n");
+                  ret = matls_send_server_certificate(s);
+                }
+                else
+#endif /* OPENSSL_NO_MB */
 				ret=ssl3_send_server_certificate(s);
 				if (ret <= 0) goto end;
 #ifndef OPENSSL_NO_TLSEXT
@@ -3370,6 +3378,38 @@ int ssl3_send_server_certificate(SSL *s)
 	/* SSL3_ST_SW_CERT_B */
 	return(ssl3_do_write(s,SSL3_RT_HANDSHAKE));
 	}
+
+#ifndef OPENSSL_NO_MB
+int matls_send_server_certificate(SSL *s)
+	{
+    printf("[matls] %s: Send Certificate in maTLS\n", __func__);
+	unsigned long l;
+	X509 *x;
+
+	if (s->state == SSL3_ST_SW_CERT_A)
+		{
+		x=ssl_get_server_send_cert(s);
+		if (x == NULL)
+			{
+			/* VRS: allow null cert if auth == KRB5 */
+			if ((s->s3->tmp.new_cipher->algorithm_auth != SSL_aKRB5) ||
+			    (s->s3->tmp.new_cipher->algorithm_mkey & SSL_kKRB5))
+				{
+				SSLerr(SSL_F_SSL3_SEND_SERVER_CERTIFICATE,ERR_R_INTERNAL_ERROR);
+				return(0);
+				}
+			}
+
+		l=matls_output_cert_chain(s,x);
+		s->state=SSL3_ST_SW_CERT_B;
+		s->init_num=(int)l;
+		s->init_off=0;
+		}
+
+	/* SSL3_ST_SW_CERT_B */
+	return(ssl3_do_write(s,SSL3_RT_HANDSHAKE));
+	}
+#endif /* OPENSSL_NO_MB */
 
 #ifndef OPENSSL_NO_TLSEXT
 /* send a new session ticket (not necessarily for a new session) */

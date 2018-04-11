@@ -29,6 +29,8 @@
 #define FORWARD_BLOCK_NAME  "nic_forward_table"
 
 struct conf_block;
+extern int8_t end_app_exists;
+extern int8_t mon_app_exists;
 
 typedef void (*FEED)(struct conf_block *blk, char *line, int len);
 typedef void (*ADDCHILD)(struct conf_block *blk, struct conf_block *child);

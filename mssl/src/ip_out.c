@@ -14,14 +14,11 @@ inline int get_output_interface(uint32_t daddr)
   int i;
   int prefix = -1;
 
-  MA_LOGip("Checking Routing Table for", daddr);
-
   for (i=0; i<g_config.mos->route_table->num; i++)
   {
     if ((daddr & g_config.mos->route_table->ent[i]->mask)
         == g_config.mos->route_table->ent[i]->masked_ip)
     {
-      MA_LOGip("Found LPM from Routing Table", g_config.mos->route_table->ent[i]->masked_ip);
       if (g_config.mos->route_table->ent[i]->prefix > prefix)
       {
         nif = g_config.mos->route_table->ent[i]->nif;
@@ -30,15 +27,11 @@ inline int get_output_interface(uint32_t daddr)
     }
   }
 
-  MA_LOG1d("Found Number Interface", nif);
-
   if (nif < 0)
   {
     MA_LOGip("No route to", daddr);
     return nif;
   }
-
-  MA_LOG1s("Found Output Interface", g_config.mos->netdev_table->ent[nif]->dev_name);
 
   return nif;
 }
@@ -86,7 +79,6 @@ void forward_ip_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
     // ARP?
     return;
   }
-  MA_LOGmac("Get MAC address", haddr);
 
 #ifdef SHARE_IO_BUFFER
   if (!(mssl->iom->set_wptr))
@@ -117,6 +109,64 @@ inline void fillout_packet_ip_context(struct pkt_ctx *pctx, struct iphdr *iph, i
   pctx->p.ip_len = ip_len;
 
   return;
+}
+
+uint8_t *ip_output_standalone(mssl_manager_t mssl, uint16_t ip_id, uint32_t saddr, 
+    uint32_t daddr, uint16_t tcplen, struct pkt_ctx *pctx, uint32_t cur_ts)
+{
+  struct iphdr *iph;
+  int nif;
+  unsigned char *haddr;
+  int rc = -1;
+
+  nif = get_output_interface(daddr);
+  if (nif < 0)
+    return NULL;
+
+  haddr = get_destination_hwaddr(daddr);
+
+  if (!haddr)
+  {
+#ifdef RUN_ARP
+    if (!pctx->forward)
+      request_arp(mssl, daddr, nif, mssl->cur_ts);
+#else
+    MA_LOG("Destination IP is not in ARP table");
+#endif
+    return NULL;
+  }
+
+  iph = (struct iphdr *)ethernet_output(mssl, pctx, ETH_P_IP, nif, haddr, 
+      tcplen + IP_HEADER_LEN, cur_ts);
+
+  MA_LOG("after ethernet output");
+
+  if (!iph)
+    return NULL;
+
+  iph->ihl = IP_HEADER_LEN >> 2;
+  iph->version = 4;
+  iph->tos = 0;
+  iph->tot_len = htons(IP_HEADER_LEN + tcplen);
+  iph->id = htons(ip_id);
+  iph->frag_off = htons(0x4000);
+  iph->ttl = 64;
+  iph->protocol = IPPROTO_TCP;
+  iph->saddr = saddr;
+  iph->daddr = daddr;
+  iph->check = 0;
+
+  if (likely(mssl->iom->dev_ioctl != NULL))
+    rc = mssl->iom->dev_ioctl(mssl->ctx, nif, PKT_TX_IP_CSUM, iph);
+
+  MA_LOG("before ip checksum");
+  if (rc < 0)
+    iph->check = ip_fast_csum(iph, iph->ihl);
+
+  fillout_packet_ip_context(pctx, iph, tcplen + IP_HEADER_LEN);
+
+  MA_LOG("after fillout ip context");
+  return (uint8_t *)(iph + 1);
 }
 
 uint8_t *ip_output(mssl_manager_t mssl, tcp_stream *stream, uint16_t tcplen,
@@ -165,13 +215,14 @@ uint8_t *ip_output(mssl_manager_t mssl, tcp_stream *stream, uint16_t tcplen,
   iph->daddr = stream->daddr;
   iph->check = 0;
 
-  if (!(mssl->iom->dev_ioctl))
+  if (mssl->iom->dev_ioctl)
     rc = mssl->iom->dev_ioctl(mssl->ctx, nif, PKT_TX_IP_CSUM, iph);
 
   if (rc == -1)
     iph->check = ip_fast_csum(iph, iph->ihl);
 
   fillout_packet_ip_context(pctx, iph, tcplen + IP_HEADER_LEN);
+  MA_LOG("after fillout ip context");
 
   return (uint8_t *)(iph + 1);
 }

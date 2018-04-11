@@ -37,6 +37,7 @@ int process_packet(mssl_manager_t mssl, const int ifidx, const int index, uint32
   {
     MA_LOG("This is IPv4 packet");
     ret = process_in_ipv4_packet(mssl, &pctx);
+    MA_LOG("Process IPv4 packet success");
   }
   else
   {
@@ -61,5 +62,6 @@ int process_packet(mssl_manager_t mssl, const int ifidx, const int index, uint32
     }
   }
 
+  MA_LOG("Process success");
   return ret;
 }

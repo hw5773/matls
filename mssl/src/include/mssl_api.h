@@ -31,7 +31,8 @@ enum socket_type
   MOS_SOCK_MONITOR_STREAM,
   MOS_SOCK_STREAM,
   MOS_SOCK_PROXY,
-  MOS_SOCK_MONITOR_STREAM_ACTIVE,
+  MOS_SOCK_SPLIT_TLS,
+  MOS_SOCK_MATLS,
   MOS_SOCK_MONITOR_RAW,
   MOS_SOCK_EPOLL,
   MOS_SOCK_PIPE,
@@ -83,6 +84,8 @@ int mssl_getsockopt(mctx_t mctx, int sock, int level, int optname,
     void *optval, socklen_t *optlen);
 int mssl_setsockopt(mctx_t mctx, int sock, int level, int optname,
     const void *optval, socklen_t optlen);
+int mssl_ioctl(mctx_t mctx, int sock, int request, void *argp);
+int mssl_socket(mctx_t mctx, int domain, int type, int protocol);
 
 int get_num_cpus(void);
 #endif /* __MSSL_API_H__ */

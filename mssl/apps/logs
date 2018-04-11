@@ -1,0 +1,66 @@
+[matls] main: g_core_limit: 1
+[matls] mssl_init: num_cpus: 1
+[matls] fetch_arp_kernel_entries: Fetch ARP Kernel Entries
+[matls] fetch_route_kernel_entries: Route Table IP: 169.254.0.0
+[matls] fetch_route_kernel_entries: Output Device: dpdk1
+[matls] fetch_route_kernel_entries: NIF: 0
+[matls] fetch_route_kernel_entries: Route Table IP: 192.168.1.0
+[matls] fetch_route_kernel_entries: Output Device: dpdk0
+[matls] fetch_route_kernel_entries: NIF: 0
+[matls] fetch_route_kernel_entries: Route Table IP: 192.168.2.0
+[matls] fetch_route_kernel_entries: Output Device: dpdk1
+[matls] fetch_route_kernel_entries: NIF: 0
+[matls] feed_netdev_conf_line: Found device name: dpdk0
+[matls] feed_netdev_conf_line: MAC addr (6 bytes) 
+00 0C 29 CB 8D 25 
+[matls] feed_netdev_conf_line: Found device name: dpdk1
+[matls] feed_netdev_conf_line: MAC addr (6 bytes) 
+00 0C 29 CB 8D 2F 
+[matls] mssl_init: After configuration upper half
+[matls] sock_load_module_upper_half: Sock module initialize success
+[matls] mssl_init: Load module lower half
+[matls] load_configuration_lower_half: rwalk->dev_name: dpdk1
+[matls] load_configuration_lower_half: nwalk->dev_name: dpdk0
+[matls] load_configuration_lower_half: rwalk->dev_name: dpdk1
+[matls] load_configuration_lower_half: nwalk->dev_name: dpdk1
+[matls] load_configuration_lower_half: IP addr: 169.254.0.0
+[matls] load_configuration_lower_half: is set to: dpdk1
+[matls] load_configuration_lower_half: rwalk->dev_name: dpdk0
+[matls] load_configuration_lower_half: nwalk->dev_name: dpdk0
+[matls] load_configuration_lower_half: IP addr: 192.168.1.0
+[matls] load_configuration_lower_half: is set to: dpdk0
+[matls] load_configuration_lower_half: rwalk->dev_name: dpdk1
+[matls] load_configuration_lower_half: nwalk->dev_name: dpdk0
+[matls] load_configuration_lower_half: rwalk->dev_name: dpdk1
+[matls] load_configuration_lower_half: nwalk->dev_name: dpdk1
+[matls] load_configuration_lower_half: IP addr: 192.168.2.0
+[matls] load_configuration_lower_half: is set to: dpdk1
+[matls] print_arp_table: ARP Table:
+[matls] print_arp_table: IP addr: 192.168.1.1
+[matls] print_arp_table: MAC addr: 0 c 29 6c 78 16
+[matls] print_arp_table: IP addr: 192.168.2.1
+[matls] print_arp_table: MAC addr: 0 c 29 1d c4 78
+[matls] main: Init Success
+[matls] mssl_create_context: Create the context
+[matls] mssl_run_thread: mssl_run_thread
+[matls] initialize_mssl_manager: initialize mssl manager
+[matls] sock_init_handle: Initialize the handler
+[matls] run_main_loop: mssl thread running: 0
+[matls] run_main_loop: number of interfaces: 2
+[matls] process_packet: process_packet
+[matls] process_packet: This is IPv4 packet
+[matls] process_in_ipv4_packet: Processing IPv4 packet
+[matls] process_in_tcp_packet: 
+[matls] process_in_tcp_packet: process_in_tcp_packet
+[matls] create_stream: Create Stream
+[matls] create_client_tcp_stream: create client tcp stream
+[matls] create_tcp_stream: Create new TCP stream
+[matls] create_tcp_stream:   Source IP: 192.168.2.1
+[matls] create_tcp_stream:   Source Port: 47873
+[matls] create_tcp_stream:   Destination IP: 192.168.1.1
+[matls] create_tcp_stream:   Destination Port: 22691
+[matls] process_packet: process_packet
+[matls] process_packet: This is IPv4 packet
+[matls] process_in_ipv4_packet: Processing IPv4 packet
+[matls] process_in_tcp_packet: 
+[matls] process_in_tcp_packet: process_in_tcp_packet

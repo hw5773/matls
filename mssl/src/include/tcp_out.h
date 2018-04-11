@@ -17,7 +17,7 @@ int send_tcp_packet_standalone(mssl_manager_t mssl,
     uint8_t *payload, uint16_t payloadlen,
     uint32_t cur_ts, uint32_t echo_ts, uint16_t ip_id, int8_t in_ifidx);
 
-int send_tcp_packet(mssl_manager_t *mssl, tcp_stream *cur_stream,
+int send_tcp_packet(mssl_manager_t mssl, tcp_stream *cur_stream,
     uint32_t cur_ts, uint8_t flags, uint8_t *payload, uint16_t payloadlen);
 
 extern inline int write_tcp_control_list(mssl_manager_t mssl,

@@ -61,8 +61,6 @@ uint8_t *ethernet_output(mssl_manager_t mssl, struct pkt_ctx *pctx,
     uint32_t cur_ts)
 {
   MA_LOG("Generate Ethernet Frame");
-  MA_LOGmac("Sending to", dst_haddr);
-  MA_LOGmac("By", g_config.mos->route_table->ent[nif]->dev_name);
 
   uint8_t *buf;
   struct ethhdr *ethh;
@@ -70,9 +68,10 @@ uint8_t *ethernet_output(mssl_manager_t mssl, struct pkt_ctx *pctx,
 
   if (nif < 0)
   {
-    MA_LOG("No interface set!");
     return NULL;
   }
+
+  MA_LOG1s("send to", g_config.mos->netdev_table->ent[nif]->dev_name);
 
   if (!mssl->iom->get_wptr)
   {
@@ -88,6 +87,10 @@ uint8_t *ethernet_output(mssl_manager_t mssl, struct pkt_ctx *pctx,
   }
 
   ethh = (struct ethhdr *)buf;
+
+  MA_LOG1p("buf", buf);
+  MA_LOG1p("ethh", ethh);
+
   for (i=0; i<ETH_ALEN; i++)
   {
     ethh->h_source[i] = g_config.mos->netdev_table->ent[nif]->haddr[i];
@@ -100,6 +103,7 @@ uint8_t *ethernet_output(mssl_manager_t mssl, struct pkt_ctx *pctx,
   if (pctx)
     fillout_packet_eth_context(pctx, cur_ts, nif, ethh, iplen + ETHERNET_HEADER_LEN);
 
+  MA_LOG("after fill out ethernet context");
   return (uint8_t *)(ethh + 1);
 }
 

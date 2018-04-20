@@ -227,7 +227,7 @@ UniquePtr<SSL_SESSION> SSL_SESSION_dup(SSL_SESSION *session, int dup_flags) {
   ///// Add for MB /////
   if (session->certs_mb != NULL && session->num_keys) {
     new_session->num_keys = session->num_keys;
-    printf("[MB] certs_mb dup\n");
+    // printf("[MB] certs_mb dup\n");
     new_session->certs_mb = (STACK_OF(CRYPTO_BUFFER) **)malloc(session->num_keys * sizeof(STACK_OF(CRYPTO_BUFFER) *));
     
     for (size_t i = 0; i < session->num_keys; i++) {
@@ -246,7 +246,7 @@ UniquePtr<SSL_SESSION> SSL_SESSION_dup(SSL_SESSION *session, int dup_flags) {
       }
     }
   }
-  printf("[MB] dup done\n");
+  // printf("[MB] dup done\n");
   if (!session->x509_method->session_dup(new_session.get(), session)) {
     return nullptr;
   }

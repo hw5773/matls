@@ -2415,7 +2415,7 @@ static int ext_supported_groups_add_serverhello(SSL_HANDSHAKE *hs, CBB *out) {
 static int ext_ttpa_add_clienthello(SSL_HANDSHAKE *hs, CBB *out) {
   SSL *const ssl = hs->ssl;
   if (!ssl->ttpa_enabled) {
-    printf("[TTPA] TTPA is not enabled\n");
+    // printf("[TTPA] TTPA is not enabled\n");
     return 1;
   }
 
@@ -2501,7 +2501,7 @@ static int ext_ttpa_parse_clienthello(SSL_HANDSHAKE *hs, uint8_t *out_alert, CBS
 static int ext_ttpa_add_serverhello(SSL_HANDSHAKE *hs, CBB *out) {
   SSL *const ssl = hs->ssl;
   if (!ssl->ttpa_enabled) {
-    printf("[TTPA] TTPA is not enabled\n");
+    //printf("[TTPA] TTPA is not enabled\n");
     return 1;
   }
 
@@ -2514,12 +2514,12 @@ static int ext_ttpa_add_serverhello(SSL_HANDSHAKE *hs, CBB *out) {
 static int ext_mb_add_clienthello(SSL_HANDSHAKE *hs, CBB *out) {
   SSL *const ssl = hs->ssl;
   if (!ssl->mb_enabled) {
-    printf("[MB] TLS for MB is not enabled\n");
+    // printf("[MB] TLS for MB is not enabled\n");
     return 1;
   }
 
   ssl->mb_enabled = 0;
-  printf("[MB] ClientHello with MB\n");
+  // printf("[MB] ClientHello with MB\n");
   
   CBB contents, kse_bytes;
   if (!CBB_add_u16(out, TLSEXT_TYPE_mb) ||
@@ -2545,9 +2545,21 @@ static int ext_mb_add_clienthello(SSL_HANDSHAKE *hs, CBB *out) {
      !CBB_add_u16(&kse_bytes, group_id) ||
      !CBB_add_u8(&kse_bytes, num_keys) ||
      !CBB_add_u16_length_prefixed(&kse_bytes, &key_exchange) ||
-     !hs->mb_key_share->Offer(&key_exchange) ||
-     !CBB_flush(&kse_bytes)) {
+     !hs->mb_key_share->Offer(&key_exchange)) {
     printf("[MB] Error on composing extension message\n");
+    return 0;
+  }
+
+  size_t client_key_len = CBB_len(&key_exchange);
+  uint8_t* client_key = (uint8_t *)OPENSSL_malloc(client_key_len);
+  SHA256(client_key, client_key_len, ssl->client_id);
+  OPENSSL_free(client_key);
+
+  printf("client key: ");
+  for(int i = 0; i < 32; i++) printf("%02X", ssl->client_id[i]);
+  printf("\n");
+
+  if(!CBB_flush(&kse_bytes)) {
     return 0;
   }
 
@@ -2576,7 +2588,7 @@ static int ext_mb_parse_serverhello(SSL_HANDSHAKE *hs, uint8_t *out_alert, CBS *
   uint8_t num_keys;
 
   if (contents == NULL) {
-    printf("[MB] Content is NULL\n");
+    // printf("[MB] Content is NULL\n");
     return 1;
   }
 
@@ -2592,14 +2604,14 @@ static int ext_mb_parse_serverhello(SSL_HANDSHAKE *hs, uint8_t *out_alert, CBS *
     OPENSSL_PUT_ERROR(SSL, SSL_R_WRONG_CURVE);
     return 0;
   }
-  /*
+
   Array<CBS> peer_keys;
   if(!peer_keys.Init(num_keys)) {
     printf("[MB] peer_keys array initialize failed\n");
     return 0;
   }
-  */
-  CBS peer_keys[5];
+
+  // CBS peer_keys[5];
 
   uint8_t num_peer_keys = 0;
   while (CBS_len(contents) > 0) {
@@ -2633,34 +2645,17 @@ static int ext_mb_parse_serverhello(SSL_HANDSHAKE *hs, uint8_t *out_alert, CBS *
   }
 
   Array<uint8_t> secret;
-//  if(!secret.Init(SSL_MAX_MASTER_KEY_LENGTH)) {
-//    printf("[MB] premaster secret initialization failed\n");
-//    return 0;
-//  }
+  if(!secret.Init(SSL_MAX_MASTER_KEY_LENGTH)) {
+    printf("[MB] premaster secret initialization failed\n");
+    return 0;
+  }
 
-  for (size_t i = 0; i < 1/*peer_keys.size()*/; i++) {
+  for (size_t i = 0; i < num_keys; i++) {
     if (!hs->mb_key_share->Finish(&secret, out_alert, peer_keys[i])) {
       *out_alert = SSL_AD_INTERNAL_ERROR;
       printf("[MB] Finish() error\n");
       return 0;
     }
-
-    // Note: Logging, better be removed after tested
-    printf("[MB] PreMaster Secret Size : %zd\n", secret.size());
-    printf("[MB] Server Random: ");
-    for (size_t t = 0; t < SSL3_RANDOM_SIZE; t++) {
-      printf("%02X", srandom[t]);
-    }
-    printf("\n[MB] Client Random: ");
-    for (size_t t = 0; t < SSL3_RANDOM_SIZE; t++) {
-      printf("%02X", crandom[t]);
-    }
-
-    printf("\n[MB] PreMaster Secret: ");
-    for (size_t t = 0; t < secret.size(); t++) {
-      printf("%02X", secret[t]);
-    }
-
 
     if(!tls1_prf(digest, ssl->mac_table[i].data, SSL3_MASTER_SECRET_SIZE_MB, secret.data(), secret.size(),
                  TLS_MD_MB_MASTER_SECRET_CONST, TLS_MD_MB_MASTER_SECRET_CONST_SIZE,
@@ -2669,21 +2664,13 @@ static int ext_mb_parse_serverhello(SSL_HANDSHAKE *hs, uint8_t *out_alert, CBS *
       return 0;
     }
 
-    printf("\n[MB] Master Secret: ");
-    for (size_t t = 0; t < SSL3_MASTER_SECRET_SIZE_MB; t++) {
-      printf("%02X", ssl->mac_table[i].data[t]);
-    }
-    printf("\n");
-
-    ssl->mac_table[i].len = SSL3_MASTER_SECRET_SIZE;
+    ssl->mac_table[i].len = SSL3_MASTER_SECRET_SIZE_MB;
   }
   
   ssl->num_keys = num_keys;
   hs->mb_key_share.reset();
 
   ssl->mb_enabled = 1;
-  printf("[MB] MB is enabled: %u\n", ssl->mb_enabled);
-  printf("[MB] ServerHello parsing complete\n");
   return 1;
 }
 

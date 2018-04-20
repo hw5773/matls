@@ -2200,6 +2200,8 @@ struct SSLConnection {
   uint8_t num_keys;
   Array<MAC_TABLE_ENTRY> mac_table;
   Array<ID_TABLE_ENTRY> id_table;
+
+  uint8_t client_id[MODIFICATION_RECORD_HASH_SIZE];
 };
 
 // From draft-ietf-tls-tls13-18, used in determining PSK modes.
@@ -2311,6 +2313,8 @@ const struct ssl_cipher_preference_list_st *ssl_get_cipher_preferences(
 void ssl_update_cache(SSL_HANDSHAKE *hs, int mode);
 
 enum ssl_hs_wait_t ssl_get_finished(SSL_HANDSHAKE *hs);
+///// Add for MB /////
+enum ssl_hs_wait_t ssl_get_finished_mb(SSL_HANDSHAKE *hs);
 int ssl3_send_alert(SSL *ssl, int level, int desc);
 bool ssl3_get_message(SSL *ssl, SSLMessage *out);
 int ssl3_read_message(SSL *ssl);

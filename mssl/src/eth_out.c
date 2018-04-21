@@ -88,9 +88,6 @@ uint8_t *ethernet_output(mssl_manager_t mssl, struct pkt_ctx *pctx,
 
   ethh = (struct ethhdr *)buf;
 
-  MA_LOG1p("buf", buf);
-  MA_LOG1p("ethh", ethh);
-
   for (i=0; i<ETH_ALEN; i++)
   {
     ethh->h_source[i] = g_config.mos->netdev_table->ent[nif]->haddr[i];

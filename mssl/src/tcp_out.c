@@ -110,7 +110,10 @@ int send_tcp_packet_standalone(mssl_manager_t mssl, uint32_t saddr, uint16_t spo
   tcph->dest = dport;
 
   if (flags & TCP_FLAG_SYN)
+  {
+    MA_LOG("SYN is selected in the flag");
     tcph->syn = TRUE;
+  }
   if (flags & TCP_FLAG_FIN)
     tcph->fin = TRUE;
   if (flags & TCP_FLAG_RST)
@@ -854,6 +857,7 @@ inline void enqueue_ack(mssl_manager_t mssl, tcp_stream *cur_stream, uint32_t cu
 static inline void update_passive_send_tcp_synsent(struct tcp_stream *cur_stream, 
     struct pkt_ctx *pctx)
 {
+  MA_LOG("update_passive_send_tcp_synsent");
   assert(cur_stream);
   assert(pctx);
 
@@ -888,6 +892,8 @@ void update_passive_send_tcp_context(mssl_manager_t mssl, struct tcp_stream *cur
     return;
   }
 
+
+  MA_LOG("Received ACK");
   if (tcph->ack)
   {
     cur_stream->sndvar->ts_lastack_sent = pctx->p.cur_ts;
@@ -907,6 +913,7 @@ void update_passive_send_tcp_context(mssl_manager_t mssl, struct tcp_stream *cur
   switch (cur_stream->state)
   {
     case TCP_ST_SYN_SENT:
+      MA_LOG("TCP_ST_SYN_SENT");
 /*
       if (tcph->ack && TCP_SEQ_GT(pctx->p.seq, cur_stream->sndvar->iss))
       {
@@ -947,6 +954,7 @@ __handle_TCP_ST_ESTABLISHED:
         cur_stream->rcv_nxt = ntohl(tcph->ack-seq);
       }
 */
+      MA_LOG("TCP_ST_ESTABLISHED");
       if (tcph->fin)
       {
         cur_stream->state = TCP_ST_FIN_WAIT_1;

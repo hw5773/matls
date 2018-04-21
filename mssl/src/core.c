@@ -174,8 +174,8 @@ static void run_main_loop(struct mssl_thread_context *ctx)
         uint16_t len;
         uint8_t *pktbuf;
         pktbuf = mssl->iom->get_rptr(ctx, rx_inf, i, &len);
-        process_packet(mssl, rx_inf, i, ts, pktbuf, len);
-        MA_LOG("Process success in the core");
+        if (pktbuf)
+          process_packet(mssl, rx_inf, i, ts, pktbuf, len);
       }
     }
   

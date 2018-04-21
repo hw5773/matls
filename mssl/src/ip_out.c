@@ -38,7 +38,7 @@ inline int get_output_interface(uint32_t daddr)
 
 void forward_ip_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
 {
-  MA_LOG("Now Forward IP Packet");
+//  MA_LOG("Now Forward IP Packet");
   unsigned char *haddr;
   struct iphdr *iph;
   uint32_t daddr = 0;
@@ -62,8 +62,8 @@ void forward_ip_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
     if (pctx->out_ifidx < 0)
       return;
   }
-  MA_LOG1d("Get output interface number", pctx->out_ifidx);
-  MA_LOG1s("Get output interface", g_config.mos->netdev_table->ent[pctx->out_ifidx]->dev_name);
+//  MA_LOG1d("Get output interface number", pctx->out_ifidx);
+//  MA_LOG1s("Get output interface", g_config.mos->netdev_table->ent[pctx->out_ifidx]->dev_name);
 
   haddr = get_destination_hwaddr(daddr);
 

@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <assert.h>
 #include <semaphore.h>
+#include <time.h>
 
 #include "include/logs.h"
 
@@ -146,6 +147,7 @@ static void run_main_loop(struct mssl_thread_context *ctx)
   int thresh;
 
   gettimeofday(&cur_ts, NULL);
+  srand(time(NULL));
 
   MA_LOG1d("mssl thread running", ctx->cpu);
   MA_LOG1d("number of interfaces", g_config.mos->netdev_table->num);

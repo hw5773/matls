@@ -162,6 +162,7 @@ struct tcp_send_vars
 	uint32_t peer_wnd;		/* client window size */
 	//uint32_t snd_up;		/* send urgent pointer (not used) */
 	uint32_t iss;			/* initial sending sequence */
+  uint32_t iack;    /* initial ack sequence */
 	uint32_t fss;			/* final sending sequence */
 
 	/* retransmission timeout variables */
@@ -342,5 +343,7 @@ get_last_timestamp(struct tcp_stream *stream, uint32_t *usecs, socklen_t *sz);
 
 void
 posix_seq_srand(unsigned seed);
+
+int posix_seq_rand(void);
 
 #endif /* __TCP_STREAM_H_ */

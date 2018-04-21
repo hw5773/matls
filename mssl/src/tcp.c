@@ -18,8 +18,7 @@
 #include "include/ip_in.h"
 #include "include/config.h"
 
-extern struct pkt_info *clone_packet_ctx(struct pkt_info *to, unsigned char *frame, struct pkt_info *from);
-
+#define IP_MAX_ID 65535
 #define VERIFY_RX_CHECKSUM TRUE
 
 static inline uint32_t detect_stream_type(mssl_manager_t mssl, struct pkt_ctx *pctx,
@@ -108,46 +107,28 @@ inline void fill_packet_context_tcp_info(struct pkt_ctx *pctx, struct tcphdr *tc
 static inline struct tcp_stream *create_stream(mssl_manager_t mssl, struct pkt_ctx *pctx,
     unsigned int *hash)
 {
-  MA_LOG("Create Stream");
+//  MA_LOG("Create Stream");
   tcp_stream *cur_stream = NULL;
   uint32_t stream_type;
-  const struct iphdr *iph = pctx->p.iph;
+  //const struct iphdr *iph = pctx->p.iph;
   const struct tcphdr *tcph = pctx->p.tcph;
 
   if (tcph->syn && !tcph->ack)
   {
-    /*
-    stream_type = detect_stream_type(mssl, pctx, iph->daddr, tcph->dest);
-    if (!stream_type)
-    {
-      MA_LOG("Refusing SYN packet.");
-      return NULL;
-    }
-
-    if (stream_type & STREAM_TYPE(MOS_SOCK_SPLIT_TLS))
-    {
-    */
-    /*
-      cur_stream = create_client_tcp_stream(mssl, NULL, stream_type,
+    cur_stream = create_client_tcp_stream(mssl, NULL, stream_type,
           pctx->p.iph->saddr, pctx->p.tcph->source,
           pctx->p.iph->daddr, pctx->p.tcph->dest, hash);
-    */
+    /*
       cur_stream = create_dual_tcp_stream(mssl, NULL, MOS_SOCK_SPLIT_TLS,
           pctx->p.iph->saddr, pctx->p.tcph->source,
           pctx->p.iph->daddr, pctx->p.tcph->dest, hash);
-
-      if (!cur_stream)
-      {
-        MA_LOG("No available space in flow pool");
-      }
-    /*
-    }
-    else
-    {
-    }
     */
-    return cur_stream;
+    if (!cur_stream)
+    {
+      MA_LOG("No available space in flow pool");
+    }
 
+    return cur_stream;
   }
   else
   {
@@ -156,31 +137,27 @@ static inline struct tcp_stream *create_stream(mssl_manager_t mssl, struct pkt_c
   }
 }
 
-/*
-static inline struct tcp_stream *find_stream(mssl_manager_t mssl, tcp_stream *ret, struct pkt_ctx *pctx, 
-    unsigned int *hash)
+inline struct pkt_info *clone_packet_ctx(struct pkt_info *to, struct pkt_info *from)
 {
-  struct tcp_stream temp_stream;
+  assert(from);
+  assert(from->eth_len > 0);
+  assert(from->eth_len <= ETHERNET_FRAME_LEN);
+  memcpy(to, from, PKT_INFO_LEN);
 
-  // Exchange the source info. and the dest info.
-  temp_stream.saddr = pctx->p.iph->daddr;
-  temp_stream.sport = pctx->p.tcph->dest;
-  temp_stream.daddr = pctx->p.iph->saddr;
-  temp_stream.dport = pctx->p.tcph->source;
+  to->iph = from->iph;
 
-  ret = HTSearch(mssl->tcp_flow_table, &temp_stream, hash);
-  return ret;
+  if (to->iph)
+  {
+    to->tcph = from->tcph ?
+      (struct tcphdr *)(((uint8_t *)(to->iph)) + (to->iph->ihl<<2)) : NULL;
+
+    if (to->tcph)
+      to->payload = from->tcph ?
+        ((uint8_t *)(to->tcph) + (to->tcph->doff << 2)) : NULL;
+  }
+
+  return to;
 }
-*/
-
-/*
-static void handle_sock_stream(mssl_manager_t mssl, struct tcp_stream *cur_stream,
-    struct pkt_ctx *pctx)
-{
-  update_recv_tcp_context(mssl, cur_stream, pctx);
-  do_action_end_tcp_packet(mssl, cur_stream, pctx);
-}
-*/
 
 void update_monitor(mssl_manager_t mssl, struct tcp_stream *sendside_stream,
     struct tcp_stream *recvside_stream, struct pkt_ctx *pctx, bool is_pkt_reception)
@@ -189,7 +166,45 @@ void update_monitor(mssl_manager_t mssl, struct tcp_stream *sendside_stream,
   struct socket_map *walk;
   assert(pctx);
 
-// clone_packet_ctx
+  if (recvside_stream == NULL)
+  {
+    struct pkt_ctx nctx;
+    if ((recvside_stream = attach_server_tcp_stream(mssl, sendside_stream, 0,
+            pctx->p.iph->saddr, pctx->p.tcph->source,
+            pctx->p.iph->daddr, pctx->p.tcph->dest)) == NULL)
+    {
+      destroy_tcp_stream(mssl, sendside_stream);
+      return;
+    }
+
+    clone_packet_ctx(&nctx, pctx);
+
+    recvside_stream->sndvar->cwnd = 1;
+    recvside_stream->sndvar->ssthresh = recvside_stream->sndvar->mss * 10;
+    recvside_stream->sndvar->ip_id = htons(posix_seq_rand() % IP_MAX_ID);
+    recvside_stream->sndvar->iss = posix_seq_rand() % TCP_MAX_SEQ;
+    recvside_stream->snd_nxt = recvside_stream->sndvar->iss + 1;
+    recvside_stream->state = TCP_ST_SYN_SENT;
+    recvside_stream->last_active_ts = pctx->p.cur_ts;
+
+    nctx.p.tcph->seq = recvside_stream->sndvar->iss;
+    nctx.p.tcph->ack_seq = 0;
+    nctx.p.tcph->syn = 1;
+    
+    nctx.p.iph->check = 0;
+    nctx.p.iph->check = ip_fast_csum(nctx.p.iph, nctx.p.iph->ihl);
+    nctx.p.tcph->check = 0;
+    nctx.p.tcph->check = tcp_calc_checksum((uint16_t *)nctx.p.tcph, 
+          ntohs(nctx.p.iph->tot_len) - (nctx.p.iph->ihl << 2),
+          nctx.p.iph->saddr, nctx.p.iph->daddr);
+
+    MA_LOG("Send SYN");
+    MA_LOGip("  source IP", nctx.p.iph->saddr);
+    MA_LOGip("  dest IP", nctx.p.iph->daddr);
+
+    forward_ip_packet(mssl, &nctx);
+    // parse_tcp_options
+  }
 
   if (sendside_stream->status_mgmt)
   {
@@ -209,11 +224,23 @@ static void handle_monitor_stream(mssl_manager_t mssl, struct tcp_stream *sendsi
   update_monitor(mssl, sendside_stream, recvside_stream, pctx, true);
   recvside_stream = sendside_stream->pair_stream;
 
+  if (pctx->forward)
+    forward_ip_packet(mssl, pctx);
+
+  if (pctx->p.tcph->syn && pctx->p.tcph->ack)
+  {
+    MA_LOG("Send SYN/ACK");
+    MA_LOGip("From", pctx->p.iph->saddr);
+    MA_LOGip("To", pctx->p.iph->daddr);
+  }
+
+/*
   if (pctx->p.tcph->syn)
   {
     MA_LOG("SYN packet. Now split the session");
-    do_split_session(mssl, sendside_stream, recvside_stream, pctx);
+    do_split_tcp_session(mssl, sendside_stream, recvside_stream, pctx);
   }
+*/
   MA_LOG("after do split session");
 }
 
@@ -263,19 +290,10 @@ int process_in_tcp_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
   temp_stream.sport = pctx->p.tcph->dest;
   temp_stream.daddr = pctx->p.iph->saddr;
   temp_stream.dport = pctx->p.tcph->source;
-  HTSearch(mssl->tcp_flow_table, cur_stream, &temp_stream, &hash);
+  cur_stream = HTSearch(mssl->tcp_flow_table, cur_stream, &temp_stream, &hash);
 
   if (!cur_stream)
   {
-    /*
-    if (mssl->listener == NULL && mssl->num_msp == 0)
-    {
-      if (pctx->forward)
-        forward_ip_packet(mssl, pctx);
-      return TRUE;
-    }
-    */
-
     cur_stream = create_stream(mssl, pctx, &hash);
 
     if (!cur_stream)

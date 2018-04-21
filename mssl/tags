@@ -1612,7 +1612,7 @@ dir	src/include/bpf/gencode.h	/^    unsigned char dir;$/;"	m	struct:qual
 direction	include/mssl/mos_api.h	/^	int8_t        direction; \/**< where does this packet originate from? (ro)*\/$/;"	m	struct:pkt_ctx
 direction	src/include/mos_api.h	/^	int8_t        direction; \/**< where does this packet originate from? (ro)*\/$/;"	m	struct:pkt_ctx
 do_mkdir_p	util/mkdir-p.pl	/^sub do_mkdir_p {$/;"	s
-do_split_session	src/tls_split.c	/^void do_split_session(mssl_manager_t mssl, struct tcp_stream *sendside_stream,$/;"	f
+do_split_tcp_session	src/tls_split.c	/^void do_split_tcp_session(mssl_manager_t mssl, struct tcp_stream *sendside_stream,$/;"	f
 dom	src/include/bpf/gencode.h	/^    uset dom;$/;"	m	struct:block
 done	src/include/mssl.h	/^  uint8_t done:1,$/;"	m	struct:mssl_thread_context
 dontcare_evb	src/include/socket.h	/^	struct ev_base dontcare_evb;$/;"	m	struct:mon_listener	typeref:struct:mon_listener::ev_base

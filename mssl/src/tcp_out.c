@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "include/tcp_out.h"
 #include "include/mssl.h"
@@ -857,7 +858,16 @@ inline void enqueue_ack(mssl_manager_t mssl, tcp_stream *cur_stream, uint32_t cu
 static inline void update_passive_send_tcp_synsent(struct tcp_stream *cur_stream, 
     struct pkt_ctx *pctx)
 {
+  if (cur_stream->state >= TCP_ST_SYN_SENT)
+  {
+    MA_LOG("already sent syn/ack");
+    pctx->forward = 0;
+    return;
+  }
   MA_LOG("update_passive_send_tcp_synsent");
+
+  uint16_t saddr, daddr;
+
   assert(cur_stream);
   assert(pctx);
 
@@ -867,6 +877,7 @@ static inline void update_passive_send_tcp_synsent(struct tcp_stream *cur_stream
     cur_stream->cb_events |= MOS_ON_CONN_START;
   }
 
+  // sndvar is client's state
   cur_stream->sndvar->cwnd = 1;
   cur_stream->sndvar->ssthresh = cur_stream->sndvar->mss * 10;
   cur_stream->sndvar->ip_id = htons(pctx->p.iph->id);
@@ -874,6 +885,37 @@ static inline void update_passive_send_tcp_synsent(struct tcp_stream *cur_stream
   cur_stream->snd_nxt = pctx->p.seq + 1;
   cur_stream->state = TCP_ST_SYN_SENT;
   cur_stream->last_active_ts = pctx->p.cur_ts;
+}
+
+void generate_syn_ack_packet(struct tcp_stream *cur_stream, struct pkt_ctx *pctx)
+{
+  uint32_t saddr, daddr;
+  uint16_t sport, dport;
+
+  cur_stream->sndvar->iack = posix_seq_rand() % TCP_MAX_SEQ;
+  cur_stream->rcv_nxt = cur_stream->sndvar->iack + 1;
+
+  saddr = pctx->p.iph->saddr;
+  sport = pctx->p.tcph->source;
+  daddr = pctx->p.iph->daddr;
+  dport = pctx->p.tcph->dest;
+
+  pctx->p.iph->saddr = daddr;
+  pctx->p.tcph->source = dport;
+  pctx->p.iph->daddr = saddr;
+  pctx->p.tcph->dest = sport;
+
+  pctx->p.tcph->seq = htonl(cur_stream->sndvar->iack);
+  pctx->p.tcph->ack_seq = htonl(cur_stream->snd_nxt);
+  pctx->p.tcph->syn = 1;
+  pctx->p.tcph->ack = 1;
+
+  pctx->p.iph->check = 0;
+  pctx->p.iph->check = ip_fast_csum(pctx->p.iph, pctx->p.iph->ihl);
+  pctx->p.tcph->check = 0;
+  pctx->p.tcph->check = tcp_calc_checksum((uint16_t *)pctx->p.tcph,
+      ntohs(pctx->p.iph->tot_len) - (pctx->p.iph->ihl << 2), 
+      pctx->p.iph->saddr, pctx->p.iph->daddr);
 }
 
 void update_passive_send_tcp_context(mssl_manager_t mssl, struct tcp_stream *cur_stream, 
@@ -886,8 +928,8 @@ void update_passive_send_tcp_context(mssl_manager_t mssl, struct tcp_stream *cur
 
   if (tcph->syn && !tcph->ack && cur_stream->state <= TCP_ST_SYN_SENT)
   {
-    MA_LOG("update_passive_send_tcp_context SYN");
     update_passive_send_tcp_synsent(cur_stream, pctx);
+    generate_syn_ack_packet(cur_stream, pctx);
     add_to_timeout_list(mssl, cur_stream);
     return;
   }

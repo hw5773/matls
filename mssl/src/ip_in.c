@@ -23,7 +23,7 @@ inline void fillin_packet_ip_context(struct pkt_ctx *pctx, struct iphdr *iph, in
 
 inline int process_in_ipv4_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
 {
-  MA_LOG("Processing IPv4 packet");
+//  MA_LOG("Processing IPv4 packet");
   bool release = false;
   int ret;
 //  struct mon_listener *walk;
@@ -85,7 +85,7 @@ __return:
   if (release && mssl->iom->release_pkt)
     mssl->iom->release_pkt(mssl->ctx, pctx->p.in_ifidx, 
         (unsigned char *)pctx->p.ethh, pctx->p.eth_len);
-  MA_LOG("Process IPv4 Packet success");
+//  MA_LOG("Process IPv4 Packet success");
   return ret;
 }
 

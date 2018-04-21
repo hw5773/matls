@@ -45,7 +45,7 @@ char *close_reason_str[] =
 
 static __thread unsigned long next = 1;
 
-static int posix_seq_rand(void)
+int posix_seq_rand(void)
 {
   next = next * 1103515245 + 12345;
   return ((unsigned)(next/66536) % 32768);
@@ -155,7 +155,6 @@ tcp_stream *create_tcp_stream(mssl_manager_t mssl, socket_map_t socket, int type
   stream->daddr = daddr;
   stream->dport = dport;
 
-  MA_LOG1p("stream pointer before input", stream);
   ret = HTInsert(mssl->tcp_flow_table, stream, hash);
   if (ret < 0)
   {
@@ -302,6 +301,28 @@ inline tcp_stream *create_client_tcp_stream(mssl_manager_t mssl, socket_map_t so
    */
 
   return cs;
+}
+
+inline tcp_stream *attach_server_tcp_stream(mssl_manager_t mssl, 
+    tcp_stream *cs, int type, uint32_t saddr, uint16_t sport, uint32_t daddr, uint16_t dport)
+{
+  MA_LOG("attach server tcp stream");
+  tcp_stream *ss;
+  struct socket_map *w;
+
+  ss = create_tcp_stream(mssl, NULL, MOS_SOCK_SPLIT_TLS, saddr, sport, daddr, dport, NULL);
+
+  if (ss == NULL)
+  {
+    MA_LOG("Can't create tcp_stream");
+    return NULL;
+  }
+
+  ss->side = MOS_SIDE_SVR;
+  ss->socket = NULL;
+  ss->pair_stream = cs;
+  cs->pair_stream = ss;
+  ss->stream_type = STREAM_TYPE(MOS_SOCK_SPLIT_TLS);
 }
 
 static void destroy_single_tcp_stream(mssl_manager_t mssl, tcp_stream *stream)

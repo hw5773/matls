@@ -44,7 +44,7 @@ struct sock_private_context
  */
 void sock_init_handle(struct mssl_thread_context *ctx)
 {
-  MA_LOG("Initialize the handler");
+  //MA_LOG("Initialize the handler");
   ctx->io_private_context = &g_sock_ctx;
 }
 
@@ -80,7 +80,7 @@ int sock_send_pkts(struct mssl_thread_context *ctx, int idx)
     return 0;
   }
 
-  MA_LOG1s("Sending the packet to", g_config.mos->route_table->ent[idx]->dev_name);
+  //MA_LOG1s("Sending the packet to", g_config.mos->route_table->ent[idx]->dev_name);
 #ifdef NETSTAT
   mssl->nstat.tx_packets[idx]++;
   mssl->nstat.tx_bytes[idx] += len + ETHER_OVR;
@@ -92,12 +92,12 @@ int sock_send_pkts(struct mssl_thread_context *ctx, int idx)
   for (i=0; i<ETH_ALEN; i++)
     dest.sll_addr[i] = spc->snd_pktbuf[idx][i];
 
-  MA_LOGmac("Destination MAC", dest.sll_addr);
+  //MA_LOGmac("Destination MAC", dest.sll_addr);
 
 tx_again:
   if (sent = (sendto(spc->fd[idx], spc->snd_pktbuf[idx], len, MSG_DONTWAIT, (struct sockaddr *)&dest, sizeof(struct sockaddr_ll))) != len)
   {
-    MA_LOG1d("Send Failed, only sent", sent);
+    //MA_LOG1d("Send Failed, only sent", sent);
     trial += 1;
     if (trial < max_trial)
       goto tx_again;
@@ -163,7 +163,7 @@ uint8_t *sock_get_rptr(struct mssl_thread_context *ctx, int ifidx, int index, ui
  */
 uint8_t *sock_get_wptr(struct mssl_thread_context *ctx, int idx, uint16_t len)
 {
-  MA_LOG1d("Getting write buffer pointer for the interface", idx);
+  //MA_LOG1d("Getting write buffer pointer for the interface", idx);
   struct sock_private_context *spc = ctx->io_private_context;
   //MA_LOG("Getting private context success");
   if (spc->snd_pkt_size[idx] != 0)
@@ -228,7 +228,7 @@ void sock_load_module_upper_half(void)
 
     g_sock_ctx.if_idx[i] = if_idx.ifr_ifindex;
   }
-  MA_LOG("Sock module initialize success");
+  //MA_LOG("Sock module initialize success");
   return;
 err:
   for (i=0; i<num_dev; i++)

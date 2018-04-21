@@ -60,7 +60,7 @@ uint8_t *ethernet_output(mssl_manager_t mssl, struct pkt_ctx *pctx,
     uint16_t proto, int nif, unsigned char *dst_haddr, uint16_t iplen,
     uint32_t cur_ts)
 {
-  MA_LOG("Generate Ethernet Frame");
+//  MA_LOG("Generate Ethernet Frame");
 
   uint8_t *buf;
   struct ethhdr *ethh;
@@ -71,7 +71,7 @@ uint8_t *ethernet_output(mssl_manager_t mssl, struct pkt_ctx *pctx,
     return NULL;
   }
 
-  MA_LOG1s("send to", g_config.mos->netdev_table->ent[nif]->dev_name);
+//  MA_LOG1s("send to", g_config.mos->netdev_table->ent[nif]->dev_name);
 
   if (!mssl->iom->get_wptr)
   {
@@ -95,12 +95,12 @@ uint8_t *ethernet_output(mssl_manager_t mssl, struct pkt_ctx *pctx,
   }
   ethh->h_proto = htons(proto);
 
-  MA_LOG("Setting ethernet frame on wptr success");
+//  MA_LOG("Setting ethernet frame on wptr success");
 
   if (pctx)
     fillout_packet_eth_context(pctx, cur_ts, nif, ethh, iplen + ETHERNET_HEADER_LEN);
 
-  MA_LOG("after fill out ethernet context");
+//  MA_LOG("after fill out ethernet context");
   return (uint8_t *)(ethh + 1);
 }
 
@@ -111,8 +111,8 @@ void forward_ethernet_frame(mssl_manager_t mssl, struct pkt_ctx *pctx)
   if (g_config.mos->nic_forward_table != NULL)
   {
     pctx->out_ifidx = g_config.mos->nic_forward_table->nic_fwd_table[pctx->p.in_ifidx];
-    MA_LOG1d("In interface", pctx->p.in_ifidx);
-    MA_LOG1d("Out interface", pctx->out_ifidx);
+    //MA_LOG1d("In interface", pctx->p.in_ifidx);
+    //MA_LOG1d("Out interface", pctx->out_ifidx);
 
     if (pctx->out_ifidx < 0)
     {
@@ -138,6 +138,6 @@ void forward_ethernet_frame(mssl_manager_t mssl, struct pkt_ctx *pctx)
   }
   else
   {
-    MA_LOG("Ethernet forwarding table entry does not exist");
+    //MA_LOG("Ethernet forwarding table entry does not exist");
   }
 }

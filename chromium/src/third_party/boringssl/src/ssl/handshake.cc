@@ -119,6 +119,8 @@
 #include "../crypto/internal.h"
 #include "internal.h"
 
+///// Add for MB /////
+#include "mb.h"
 
 namespace bssl {
 
@@ -365,7 +367,7 @@ enum ssl_verify_result_t ssl_verify_peer_cert_mb(SSL_HANDSHAKE *hs) {
   uint8_t alert = SSL_AD_CERTIFICATE_UNKNOWN;
   enum ssl_verify_result_t ret;
   if (ssl->custom_verify_callback != nullptr) {
-    printf("[MB] custom verify callback set\n");
+    // printf("[MB] custom verify callback set\n");
     ret = ssl->custom_verify_callback(ssl, &alert);
     switch (ret) {
       case ssl_verify_ok:
@@ -378,7 +380,7 @@ enum ssl_verify_result_t ssl_verify_peer_cert_mb(SSL_HANDSHAKE *hs) {
         break;
     }
   } else {
-    printf("[MB] verifying chain using x509_method\n");
+    // printf("[MB] verifying chain using x509_method\n");
     ret = ssl->ctx->x509_method->session_verify_cert_chain_mb(
               hs->new_session.get(), ssl, &alert)
               ? ssl_verify_ok
@@ -390,7 +392,7 @@ enum ssl_verify_result_t ssl_verify_peer_cert_mb(SSL_HANDSHAKE *hs) {
     ssl3_send_alert(ssl, SSL3_AL_FATAL, alert);
   }
 
-  printf("[MB] finished verifying cert chain\n");
+  // printf("[MB] finished verifying cert chain\n");
   return ret;
 }
 
@@ -461,6 +463,230 @@ enum ssl_hs_wait_t ssl_get_finished(SSL_HANDSHAKE *hs) {
   ssl->method->next_message(ssl);
   return ssl_hs_ok;
 }
+
+///// Add for MB /////
+int verify_signature(unsigned char *msg, int msg_len, unsigned char *sig, uint16_t sig_len, EVP_PKEY *pub) {
+  int rc;
+  EVP_MD_CTX *ctx;
+
+  ctx = EVP_MD_CTX_create();
+  if (ctx == NULL) {
+    printf("ERROR: EVP_MD_CTX_create error\n");
+    return 0;
+  }
+
+  rc = EVP_DigestVerifyInit(ctx, NULL, EVP_sha256(), NULL, pub);
+  if (rc != 1) {
+    printf("ERROR: EVP_DigestVerifyInit error\n");
+    goto err;
+  }
+  
+  rc = EVP_DigestVerifyUpdate(ctx, msg, msg_len);
+  if (rc != 1) {
+    printf("ERROR: EVP_DigestVerifyUpdate error\n");
+    goto err;
+  }
+
+  rc = EVP_DigestVerifyFinal(ctx, sig, sig_len);
+  if (rc != 1) {
+    printf("ERROR: EVP_DigestVerifyFinal error\n");
+    goto err;
+  }
+
+  EVP_MD_CTX_free(ctx);
+  return 1;
+
+err:
+  EVP_MD_CTX_free(ctx);
+  return 0;
+}
+
+///// Add for MB /////
+enum ssl_hs_wait_t ssl_get_finished_mb(SSL_HANDSHAKE *hs) {
+  // printf("[MB] start get_finished\n");
+  SSL *const ssl = hs->ssl;
+  SSLMessage msg;
+  if (!ssl->method->get_message(ssl, &msg)) {
+    // printf("[MB] no message\n");
+    return ssl_hs_read_message;
+  }
+
+  if (!ssl_check_message_type(ssl, msg, SSL3_MT_FINISHED)) {
+    printf("[MB] wrong finished message type\n");
+    return ssl_hs_error;
+  }
+
+  // Snapshot the finished hash before incorporating the new message.
+  uint8_t verify_data[EVP_MAX_MD_SIZE];
+  size_t verify_data_len;
+  if (!hs->transcript.GetFinishedMAC(verify_data, &verify_data_len,
+                                     SSL_get_session(ssl), !ssl->server) ||
+      !ssl_hash_message(hs, msg)) {
+    return ssl_hs_error;
+  }
+
+  CBS server_finished = msg.body;
+  CBS server_verify_data;
+  if (!CBS_get_bytes(&server_finished, &server_verify_data, verify_data_len)) {
+    printf("[MB] decoded error while reading server_verify_data\n");
+  }
+
+  int finished_ok = CBS_mem_equal(&server_verify_data, verify_data, verify_data_len);
+
+#if defined(BORINGSSL_UNSAFE_FUZZER_MODE)
+  finished_ok = 1;
+#endif
+  if (!finished_ok) {
+    printf("[MB] wrong verify_data\n");
+    PRINTK("client", verify_data, (int)verify_data_len);
+    PRINTK("server", CBS_data(&server_verify_data), (int)verify_data_len);
+    ssl3_send_alert(ssl, SSL3_AL_FATAL, SSL_AD_DECRYPT_ERROR);
+    OPENSSL_PUT_ERROR(SSL, SSL_R_DIGEST_CHECK_FAILED);
+    return ssl_hs_error;
+  }
+
+  // Copy the Finished so we can use it for renegotiation checks.
+  if (ssl->version != SSL3_VERSION) {
+    if (verify_data_len > sizeof(ssl->s3->previous_client_finished) ||
+        verify_data_len > sizeof(ssl->s3->previous_server_finished)) {
+      OPENSSL_PUT_ERROR(SSL, ERR_R_INTERNAL_ERROR);
+      return ssl_hs_error;
+    }
+
+    if (ssl->server) {
+      OPENSSL_memcpy(ssl->s3->previous_client_finished, verify_data, verify_data_len);
+      ssl->s3->previous_client_finished_len = verify_data_len;
+    } else {
+      OPENSSL_memcpy(ssl->s3->previous_server_finished, verify_data, verify_data_len);
+      ssl->s3->previous_server_finished_len = verify_data_len;
+    }
+  }
+
+  // ExtendedFinish logic
+  uint8_t num_keys = ssl->num_keys;
+  uint8_t server_num_keys;
+
+  // CBS tmp;
+  // size_t tmp_size = 200;
+  // printf("len after verfiy data %zu\n", CBS_len(&server_finished));
+  // if (!CBS_get_bytes(&server_finished, &tmp, tmp_size)) {
+  //  printf("[MB] read error\n");
+  // }
+
+  // uint8_t *temp_data = (unsigned char *)CBS_data(&tmp);
+  // PRINTK("tmp", temp_data, (int)tmp_size);
+
+  // return ssl_hs_error;
+
+  if (!CBS_get_u8(&server_finished, &server_num_keys) ||
+      server_num_keys != num_keys) {
+    printf("[MB] decoded error while reading server_num_keys\n");
+    printf("num_keys = %d server_num_keys = %d\n", num_keys, server_num_keys);
+    return ssl_hs_error;
+  }
+
+  Array<uint8_t *> messages;
+  Array<size_t> messages_len;
+  Array<uint8_t *> hashes;
+  // Array<uint8_t *> signatures;
+  Array<CBS> signatures;
+
+  if (!messages.Init(num_keys) ||
+      !messages_len.Init(num_keys) ||
+      !hashes.Init(num_keys) ||
+      !signatures.Init(num_keys)) {
+    printf("[MB] error while initializing ExtendedFinished related arrays\n");
+    return ssl_hs_error;
+  }
+
+  // info about first middlebox message
+  messages_len[num_keys - 1] = 4 + verify_data_len;
+  messages[num_keys - 1] = (uint8_t *)malloc(messages_len[0]);
+
+  uint16_t version = SSL_version(ssl);
+  uint16_t cipher = (uint16_t)SSL_CIPHER_get_id(SSL_get_current_cipher(ssl));
+  
+  version = SWAP16(version);
+  cipher = SWAP16(cipher);
+
+  memcpy(messages[num_keys - 1], &version, 2);
+  memcpy(messages[num_keys - 1]+2, &cipher, 2);
+  memcpy(messages[num_keys - 1]+4, verify_data, verify_data_len);
+
+  // info about other middleboxes and server
+  CBS middlebox_data;
+  for (size_t i = 0; i < num_keys - 1; i++) {
+    if(!CBS_get_u8_length_prefixed(&server_finished, &middlebox_data) ||
+       CBS_len(&middlebox_data) == 0) {
+       printf("[MB] decode error while reading middlebox_data\n");
+       return ssl_hs_error;
+    }
+    messages_len[i] = CBS_len(&middlebox_data);
+    CBS_copy_bytes(&middlebox_data, messages[i], messages_len[i]);
+  }
+
+  // generate hashes from middlebox_info and global mac key table
+  uint8_t middlebox_before_hash_data[EXTENDED_FINISHED_MAX_BEFORE_HASH_SIZE];
+  for (int i = 0; i < num_keys; i++) {
+    size_t before_hash_len = 0;
+    memcpy(middlebox_before_hash_data, ssl->mac_table[i].data, ssl->mac_table[i].len);
+    before_hash_len += ssl->mac_table[i].len;
+    memcpy(middlebox_before_hash_data + before_hash_len, messages[i], messages_len[i]);
+    before_hash_len += messages_len[i];
+
+    // only servers hash does not contain prev middlebox's hash
+    if (i != 0) {
+      memcpy(middlebox_before_hash_data + before_hash_len, hashes[i - 1], EXTENDED_FINISHED_HASH_SIZE);
+      before_hash_len += EXTENDED_FINISHED_HASH_SIZE;
+    }
+    hashes[i] = (uint8_t *)malloc(EXTENDED_FINISHED_HASH_SIZE);
+    SHA256(middlebox_before_hash_data, before_hash_len, hashes[i]);
+  }
+
+  // check server sent hashes with generated hashes
+  CBS server_hash_cbs;
+  if (!CBS_get_bytes(&server_finished, &server_hash_cbs, EXTENDED_FINISHED_HASH_SIZE)) {
+    printf("[MB] decode error while reading server_hash\n");
+    return ssl_hs_error;
+  }
+  if (!CBS_mem_equal(&server_hash_cbs, hashes[num_keys - 1], EXTENDED_FINISHED_HASH_SIZE)) {
+    printf("[MB] extendedfinished hash different\n");
+    PRINTK("client hash", hashes[0], EXTENDED_FINISHED_HASH_SIZE);
+    uint8_t *server_hash = (unsigned char *)CBS_data(&server_hash_cbs);
+    PRINTK("server hash", server_hash, EXTENDED_FINISHED_HASH_SIZE);
+    return ssl_hs_error;
+  }
+
+  // reading signatures
+  for (size_t i = 0; i < num_keys; i++) {
+    if (!CBS_get_u16_length_prefixed(&server_finished, &signatures[i]) ||
+        CBS_len(&signatures[i]) == 0) {
+      printf("[MB] decode error while reading server signatures\n");
+      return ssl_hs_error;
+    }
+  }
+
+  if (CBS_len(&server_finished) != 0) {
+    printf("[MB] decoded error on server_finished : trailing data\n");
+    return ssl_hs_error;
+  }
+
+  for (size_t i = 0; i < num_keys; i++) {
+    if(!verify_signature(hashes[i], EXTENDED_FINISHED_HASH_SIZE,
+                         (unsigned char *)(CBS_data(&signatures[i])), CBS_len(&signatures[i]),
+                         hs->peer_pubkey_mb[i].get())) {
+      printf("[MB] error: cannot decrypt %zu'th signature\n", i);
+      unsigned char* sig = (unsigned char *)CBS_data(&signatures[i]);
+      PRINTK("failed signature", sig, (int)CBS_len(&signatures[i]));
+      return ssl_hs_error;
+    }
+  }
+
+  ssl->method->next_message(ssl);
+  // printf("[MB] done get_finished\n");
+  return ssl_hs_ok;
+}
+
 
 int ssl_run_handshake(SSL_HANDSHAKE *hs, bool *out_early_return) {
   SSL *const ssl = hs->ssl;

@@ -4,6 +4,26 @@
 #include <openssl/stack.h>
 #include <openssl/digest.h>
 #include <openssl/sha.h>
+#include <time.h>
+#include <sys/time.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+#define MODIFICATION_RECORD_HASH_SIZE 32
+#define EXTENDED_FINISHED_HASH_SIZE 32
+#define EXTENDED_FINISHED_MAX_BEFORE_HASH_SIZE (EVP_MAX_MD_SIZE + 4 + EVP_MAX_MD_SIZE + EXTENDED_FINISHED_HASH_SIZE) 
+
+#define SWAP16(s) (((((s)) << 8) | (((s) >> 8))))
+
+#define PRINTK(msg, arg1, arg2) \
+ printf("[matls] %s: %s (%d bytes) ", __func__, msg, arg2); \
+ for (int pk_idx=0;pk_idx<arg2;pk_idx++) \
+ { \
+ if (pk_idx % 10 == 0) \
+     printf("\n"); \
+   printf("%02X ", arg1[pk_idx]); \
+ } \
+ printf("\n");
 
 typedef struct mb_mac_table_entry_st {
   uint8_t data[EVP_MAX_MD_SIZE];

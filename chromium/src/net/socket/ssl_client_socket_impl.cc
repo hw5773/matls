@@ -345,7 +345,6 @@ class SSLClientSocketImpl::SSLContext {
 
   static ssl_verify_result_t CertVerifyCallback(SSL* ssl, uint8_t* out_alert) {
     // The certificate is verified after the handshake in DoVerifyCert.
-    printf("[MB] CertVerifyCallback\n");
     return ssl_verify_ok;
   }
 
@@ -1250,7 +1249,7 @@ int SSLClientSocketImpl::DoVerifyCertMB(int result) {
 
   for (size_t i = 0; i < num_keys; i++) {
     server_cert_ = x509_util::CreateX509CertificateFromBuffers(
-        SSL_get0_peer_certificates_mb(ssl_.get(), 0));
+        SSL_get0_peer_certificates_mb(ssl_.get(), i));
 
     // OpenSSL decoded the certificate, but the X509Certificate implementation
     // could not. This is treated as a fatal SSL-level protocol error rather than
@@ -1283,7 +1282,7 @@ int SSLClientSocketImpl::DoVerifyCertMB(int result) {
         reinterpret_cast<const char*>(ocsp_response_raw), ocsp_response_len);
 
     // Note: verify_result_ will be overwrote multiple time, so output cert_status does not represent all certs
-    printf("[MB] Verifying start\n");
+    // printf("[MB] Verifying start\n");
     int verify_result = cert_verifier_->Verify(
         CertVerifier::RequestParams(server_cert_, host_and_port_.host(),
                                     ssl_config_.GetCertVerifyFlags(),
@@ -1295,8 +1294,8 @@ int SSLClientSocketImpl::DoVerifyCertMB(int result) {
                    base::Unretained(this)),
         &cert_verifier_request_, net_log_);
 
-    if (verify_result != OK) {
-      printf("[MB] verification result overwrite on cert chain %zu : %d -> %d\n", i, ret, verify_result);
+    if (1 || verify_result != OK) {
+      // printf("[MB] verification result overwrite on cert chain %zu : %d -> %d\n", i, ret, verify_result);
       ret = verify_result;
     }
   }
@@ -1369,7 +1368,7 @@ int SSLClientSocketImpl::DoVerifyCertComplete(int result) {
   completed_connect_ = true;
   // Exit DoHandshakeLoop and return the result to the caller to Connect.
   DCHECK_EQ(STATE_NONE, next_handshake_state_);
-  printf("[MB] verify cert complete, result OK? %d\n", result == OK);
+  // printf("[MB] verify cert complete, result OK? %d\n", result == OK);
   return result;
 }
 
@@ -1417,7 +1416,7 @@ int SSLClientSocketImpl::DoHandshakeLoop(int last_io_result) {
       case STATE_VERIFY_CERT:
         DCHECK_EQ(OK, rv);
         if (SSL_get0_mb_enabled(ssl_.get())) {
-          printf("[MB] verifying cert using DoVerifyCertMB\n");
+          // printf("[MB] verifying cert using DoVerifyCertMB\n");
           rv = DoVerifyCertMB(rv);
         } else { 
           rv = DoVerifyCert(rv);

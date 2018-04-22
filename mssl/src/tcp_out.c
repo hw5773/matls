@@ -934,8 +934,6 @@ void update_passive_send_tcp_context(mssl_manager_t mssl, struct tcp_stream *cur
     return;
   }
 
-
-  MA_LOG("Received ACK");
   if (tcph->ack)
   {
     cur_stream->sndvar->ts_lastack_sent = pctx->p.cur_ts;
@@ -956,7 +954,7 @@ void update_passive_send_tcp_context(mssl_manager_t mssl, struct tcp_stream *cur
   {
     case TCP_ST_SYN_SENT:
       MA_LOG("TCP_ST_SYN_SENT");
-/*
+
       if (tcph->ack && TCP_SEQ_GT(pctx->p.seq, cur_stream->sndvar->iss))
       {
         cur_stream->state = TCP_ST_ESTABLISHED;
@@ -965,7 +963,7 @@ void update_passive_send_tcp_context(mssl_manager_t mssl, struct tcp_stream *cur
         cur_stream->rcv_nxt = pctx->p.ack_seq;
         goto __handle_TCP_ST_ESTABLISHED;
       }
-*/
+
       break;
     case TCP_ST_SYN_RCVD:
       if (!tcph->ack)
@@ -977,7 +975,7 @@ void update_passive_send_tcp_context(mssl_manager_t mssl, struct tcp_stream *cur
         cur_stream->sndvar->iss = pctx->p.seq;
         cur_stream->snd_nxt = cur_stream->sndvar->iss + 1;
       }
-/*
+
       else
       {
         cur_stream->state = TCP_ST_ESTABLISHED;
@@ -986,16 +984,16 @@ void update_passive_send_tcp_context(mssl_manager_t mssl, struct tcp_stream *cur
         cur_stream->rcv_nxt = pctx->p.ack_seq;
         goto __handle_TCP_ST_ESTABLISHED;
       }
-*/
+
       break;
     case TCP_ST_ESTABLISHED:
-/*
+
 __handle_TCP_ST_ESTABLISHED:
       if (tcph->ack && TCP_SEQ_GT(ntohl(tcph->ack_seq), cur_stream->rcv_nxt))
       {
-        cur_stream->rcv_nxt = ntohl(tcph->ack-seq);
+        cur_stream->rcv_nxt = ntohl(tcph->ack_seq);
       }
-*/
+
       MA_LOG("TCP_ST_ESTABLISHED");
       if (tcph->fin)
       {
@@ -1010,12 +1008,12 @@ __handle_TCP_ST_ESTABLISHED:
       }
       break;
     case TCP_ST_CLOSE_WAIT:
-/*
+
       if (tcph->ack && TCP_SEQ_GT(ntohl(tcph->ack_seq), cur_stream->rcv_nxt))
       {
         cur_stream->rcv_nxt = ntohl(tcph->ack_seq);
       }
-*/
+
       if (tcph->fin)
       {
         cur_stream->sndvar->fss = pctx->p.seq + pctx->p.payloadlen;

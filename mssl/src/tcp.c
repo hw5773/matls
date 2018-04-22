@@ -159,6 +159,13 @@ inline struct pkt_info *clone_packet_ctx(struct pkt_info *to, struct pkt_info *f
   return to;
 }
 
+static void handle_sock_stream(mssl_manager_t mssl, struct tcp_stream *cur_stream,
+    struct pkt_ctx *pctx)
+{
+  update_recv_tcp_context(mssl, cur_stream, pctx);
+  do_action_end_tcp_packet(mssl, cur_stream, pctx);
+}
+
 void update_monitor(mssl_manager_t mssl, struct tcp_stream *sendside_stream,
     struct tcp_stream *recvside_stream, struct pkt_ctx *pctx, bool is_pkt_reception)
 {
@@ -201,6 +208,7 @@ void update_monitor(mssl_manager_t mssl, struct tcp_stream *sendside_stream,
     MA_LOG("Send SYN");
     MA_LOGip("  source IP", nctx.p.iph->saddr);
     MA_LOGip("  dest IP", nctx.p.iph->daddr);
+    add_to_timeout_list(mssl, recvside_stream);
 
     forward_ip_packet(mssl, &nctx);
     // parse_tcp_options
@@ -226,7 +234,7 @@ static void handle_monitor_stream(mssl_manager_t mssl, struct tcp_stream *sendsi
 
   if (pctx->forward)
     forward_ip_packet(mssl, pctx);
-
+/*
   if (pctx->p.tcph->syn && pctx->p.tcph->ack)
   {
     MA_LOG("Send SYN/ACK");
@@ -234,14 +242,14 @@ static void handle_monitor_stream(mssl_manager_t mssl, struct tcp_stream *sendsi
     MA_LOGip("To", pctx->p.iph->daddr);
   }
 
-/*
   if (pctx->p.tcph->syn)
   {
     MA_LOG("SYN packet. Now split the session");
     do_split_tcp_session(mssl, sendside_stream, recvside_stream, pctx);
   }
-*/
+
   MA_LOG("after do split session");
+*/
 }
 
 int process_in_tcp_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
@@ -274,11 +282,13 @@ int process_in_tcp_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
   }
 
 #endif
-  
+ 
   if (ntohs(tcph->dest) != 443)
   {
+
     if (pctx->forward)
       forward_ip_packet(mssl, pctx);
+
     return TRUE;
   }
 
@@ -309,7 +319,8 @@ int process_in_tcp_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
           cur_stream->rcvvar->irs + 1);
       MA_LOG("seq2loff success");
     }
-    handle_monitor_stream(mssl, cur_stream, cur_stream->pair_stream, pctx);
+    handle_sock_stream(mssl, cur_stream, pctx);
+    //handle_monitor_stream(mssl, cur_stream, cur_stream->pair_stream, pctx);
   }
   else
   {

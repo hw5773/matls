@@ -103,6 +103,31 @@ fast_tx:
     MA_LOG("Failed to send packet");
 }
 
+void reverse_ip_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
+{
+  uint32_t saddr, daddr;
+  uint16_t sport, dport;
+
+  saddr = pctx->p.iph->daddr;
+  daddr = pctx->p.iph->saddr;
+  sport = pctx->p.tcph->dest;
+  dport = pctx->p.tcph->source;
+
+  pctx->p.iph->saddr = saddr;
+  pctx->p.iph->daddr = daddr;
+  pctx->p.tcph->source = sport;
+  pctx->p.tcph->dest = dport;
+
+  pctx->p.iph->check = 0;
+  pctx->p.iph->check = ip_fast_csum(pctx->p.iph, pctx->p.iph->ihl);
+  pctx->p.tcph->check = 0;
+  pctx->p.tcph->check = tcp_calc_checksum((uint16_t *)pctx->p.tcph,
+      ntohs(pctx->p.iph->tot_len) - (pctx->p.iph->ihl << 2),
+      pctx.p.iph->saddr, pctx->p.iph->daddr);
+
+  forward_ip_packet(mssl, pctx);
+}
+
 inline void fillout_packet_ip_context(struct pkt_ctx *pctx, struct iphdr *iph, int ip_len)
 {
   pctx->p.iph = iph;

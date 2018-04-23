@@ -19,7 +19,8 @@
 #include "include/config.h"
 
 #define IP_MAX_ID 65535
-#define VERIFY_RX_CHECKSUM TRUE
+//#define VERIFY_RX_CHECKSUM TRUE
+#define VERIFY_RX_CHECKSUM FALSE
 
 static inline uint32_t detect_stream_type(mssl_manager_t mssl, struct pkt_ctx *pctx,
     uint32_t ip, uint16_t port)
@@ -130,6 +131,24 @@ static inline struct tcp_stream *create_stream(mssl_manager_t mssl, struct pkt_c
 
     return cur_stream;
   }
+///// Add for MA_TLS /////
+  else if (tcph->syn && tcph->ack)
+  {
+    cur_stream = create_tcp_stream(mssl, NULL, stream_type,
+        pctx->p.iph->daddr, pctx->p.tcph->dest,
+        pctx->p.iph->saddr, pctx->p.tcph->source, hash);
+    cur_stream->state = TCP_ST_SYN_SENT;
+    cur_stream->sndvar->iss = ntohl(pctx->p.tcph->ack_seq) - 1;
+    cur_stream->snd_nxt = cur_stream->sndvar->iss + 1;
+    cur_stream->rcvvar->irs = ntohl(pctx->p.seq);
+    cur_stream->sndvar->peer_wnd = pctx->p.window;
+    cur_stream->rcv_nxt = cur_stream->rcvvar->irs;
+    cur_stream->sndvar->cwnd = 1;
+    parse_tcp_options(cur_stream, pctx->p.cur_ts, (uint8_t *)pctx->p.tcph + TCP_HEADER_LEN,
+        (pctx->p.tcph->doff << 2) - TCP_HEADER_LEN);
+    pctx->forward = 0;
+  }
+///// Add for MA_TLS /////
   else
   {
     MA_LOG("Weird packet comes");
@@ -283,7 +302,7 @@ int process_in_tcp_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
 
 #endif
  
-  if (ntohs(tcph->dest) != 443)
+  if (ntohs(tcph->dest) != 443 && ntohs(tcph->source) != 443)
   {
 
     if (pctx->forward)
@@ -294,6 +313,9 @@ int process_in_tcp_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
 
   events |= MOS_ON_PKT_IN;
 
+  MA_LOG("Search stream");
+  MA_LOGip("  dest ip", pctx->p.iph->daddr);
+  MA_LOG1d("  dest port", ntohs(pctx->p.tcph->dest));
 
   struct tcp_stream temp_stream;
   temp_stream.saddr = pctx->p.iph->daddr;
@@ -301,6 +323,7 @@ int process_in_tcp_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
   temp_stream.daddr = pctx->p.iph->saddr;
   temp_stream.dport = pctx->p.tcph->source;
   cur_stream = HTSearch(mssl->tcp_flow_table, cur_stream, &temp_stream, &hash);
+  MA_LOG1p("Found pointer", cur_stream);
 
   if (!cur_stream)
   {
@@ -312,12 +335,13 @@ int process_in_tcp_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
 
   if (cur_stream)
   {
+    if (pctx->p.tcph->syn == 1 && pctx->p.tcph->ack == 1)
+      MA_LOG("  This is SYN/ACK");
+
     if (cur_stream->rcvvar && cur_stream->rcvvar->rcvbuf)
     {
-      MA_LOG("current stream condition success");
       pctx->p.offset = (uint64_t)seq2loff(cur_stream->rcvvar->rcvbuf, pctx->p.seq, 
           cur_stream->rcvvar->irs + 1);
-      MA_LOG("seq2loff success");
     }
     handle_sock_stream(mssl, cur_stream, pctx);
     //handle_monitor_stream(mssl, cur_stream, cur_stream->pair_stream, pctx);

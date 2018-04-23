@@ -416,7 +416,7 @@ static mssl_manager_t initialize_mssl_manager(struct mssl_thread_context *ctx)
   }
 
   mssl->ctx = ctx;
-//  mssl->ep = NULL;
+  mssl->ep = NULL;
 
 // Queue related commands
 

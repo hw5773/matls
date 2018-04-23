@@ -1,5 +1,5 @@
-#ifndef __MTCP_EPOLL_H_
-#define __MTCP_EPOLL_H_
+#ifndef __mssl_EPOLL_H_
+#define __mssl_EPOLL_H_
 
 #include "mssl_api.h"
 
@@ -7,18 +7,18 @@
 extern "C" {
 #endif
 
-/** `mtcp_epoll_ctl()` operations */
-enum mtcp_epoll_op
+/** `mssl_epoll_ctl()` operations */
+enum mssl_epoll_op
 {
 	MOS_EPOLL_CTL_ADD = 1,
 	MOS_EPOLL_CTL_DEL = 2,
 	MOS_EPOLL_CTL_MOD = 3,
 };
 
-/** Event types for mtcp epoll */
+/** Event types for mssl epoll */
 enum epoll_event_type
 {
-	/* mtcp-defined epoll events */
+	/* mssl-defined epoll events */
 	MOS_EPOLLNONE		= (0x1<<0),
 	MOS_EPOLLIN			= (0x1<<1),
 	MOS_EPOLLPRI		= (0x1<<2),
@@ -32,16 +32,16 @@ enum epoll_event_type
 	MOS_EPOLLHUP		= (0x1<<10),
 	MOS_EPOLLRDHUP 		= (0x1<<11),
 
-	/* mtcp-defined epoll events */
+	/* mssl-defined epoll events */
 	MOS_EPOLLONESHOT	= (0x1 << 30),
 	MOS_EPOLLET			= (0x1 << 31)
 };
 
 /** Control messages from state update module to react module
  * XXX: Is this only for internal use? */
-enum mtcp_action
+enum mssl_action
 {
-	/* mtcp action */
+	/* mssl action */
 	MOS_ACT_SEND_DATA 	=	(0x01<<1),
 	MOS_ACT_SEND_ACK_NOW 	=	(0x01<<2),
 	MOS_ACT_SEND_ACK_AGG 	=	(0x01<<3),
@@ -54,33 +54,33 @@ enum mtcp_action
 };
 
 /** epoll data structure */
-typedef union mtcp_epoll_data
+typedef union mssl_epoll_data
 {
 	void *ptr;
 	int sock;
 	uint32_t u32;
 	uint64_t u64;
-} mtcp_epoll_data_t;
+} mssl_epoll_data_t;
 
 /** epoll data structure */
-struct mtcp_epoll_event
+struct mssl_epoll_event
 {
 	uint64_t events;
-	mtcp_epoll_data_t data;
+	mssl_epoll_data_t data;
 };
 
 /** Create new epoll descriptor.
- * @param [in] mctx: mtcp context
+ * @param [in] mctx: mssl context
  * @param [in] size: backlog size
  * @return new epoll descriptor on success, -1 on error
  *
  * Same with `epoll_create()`
  */
 int
-mtcp_epoll_create(mctx_t mctx, int size);
+mssl_epoll_create(mctx_t mctx, int size);
 
 /** Control epoll.
- * @param [in] mctx: mtcp context
+ * @param [in] mctx: mssl context
  * @param [in] epid: epoll descriptor
  * @param [in] op: operation
  *                 (MOS_EPOLL_CTL_ADD, MOS_EPOLL_CTL_DEL, MOS_EPOLL_CTL_MOD)
@@ -91,11 +91,11 @@ mtcp_epoll_create(mctx_t mctx, int size);
  * Same with `epoll_ctl()`
  */
 int
-mtcp_epoll_ctl(mctx_t mctx, int epid,
-		int op, int sock, struct mtcp_epoll_event *event);
+mssl_epoll_ctl(mctx_t mctx, int epid,
+		int op, int sock, struct mssl_epoll_event *event);
 
 /** Wait for events.
- * @param [in] mctx: mtcp context
+ * @param [in] mctx: mssl context
  * @param [in] epid: epoll descriptor
  * @param [in] events: occured events
  * @param [in] maxevents: maximum number of events to read
@@ -105,18 +105,17 @@ mtcp_epoll_ctl(mctx_t mctx, int epid,
  * Same with `epoll_wait()`
  */
 int
-mtcp_epoll_wait(mctx_t mctx, int epid,
-		struct mtcp_epoll_event *events, int maxevents, int timeout);
+mssl_epoll_wait(mctx_t mctx, int epid,
+		struct mssl_epoll_event *events, int maxevents, int timeout);
 
 /** Convert built-in event ID to string
  * @param [in] event: built-in event ID
  * @return string of the event name
  */
-char *
-EventToString(uint32_t event);
+char *event_to_string(uint32_t event);
 
 #ifdef __cplusplus
 };
 #endif
 
-#endif /* __MTCP_EPOLL_H_ */
+#endif /* __mssl_EPOLL_H_ */

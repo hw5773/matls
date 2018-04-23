@@ -8,10 +8,10 @@
 #include "include/tcp_in.h"
 #include "include/tcp_out.h"
 #include "include/tcp_ring_buffer.h"
-//#include "include/tcp_send_buffer.h"
-//#include "include/eventpoll.h"
+#include "include/tcp_send_buffer.h"
+#include "include/eventpoll.h"
 #include "include/ip_out.h"
-//#include "include/timer.h"
+#include "include/timer.h"
 #include "include/tcp_rb.h"
 
 char *state_str[] =
@@ -62,10 +62,52 @@ void posix_seq_srand(unsigned seed)
 // int get_last_timestamp
 // inline int get_tcp_state
 // inline char *tcp_state_to_string
-// inline void raise_read_event
-// inline void raise_write_event
-// inline void raise_close_event
-// inline void raise_error_event
+inline void raise_read_event(mssl_manager_t mssl, tcp_stream *stream)
+{
+  struct tcp_recv_vars *rcvvar;
+  rcvvar = stream->rcvvar;
+  add_epoll_event(mssl->ep, MOS_EVENT_QUEUE, stream->socket, MOS_EPOLLIN);
+
+  // MOS_SOCK_MONITOR_STREAM_ACTIVE
+}
+
+inline void raise_write_event(mssl_manager_t mssl, tcp_stream *stream)
+{
+  if (stream->socket)
+  {
+    if (stream->socket->epoll & MOS_EPOLLOUT)
+    {
+      add_epoll_event(mssl->ep, MOS_EVENT_QUEUE, stream->socket, MOS_EPOLLOUT);
+    }
+  }
+}
+
+inline void raise_close_event(mssl_manager_t mssl, tcp_stream *stream)
+{
+  if (stream->socket)
+  {
+    if (stream->socket->epoll & MOS_EPOLLRDHUP)
+    {
+      add_epoll_event(mssl->ep, MOS_EVENT_QUEUE, stream->socket, MOS_EPOLLRDHUP);
+    }
+    else if (stream->socket->epoll & MOS_EPOLLIN)
+    {
+      add_epoll_event(mssl->ep, MOS_EVENT_QUEUE, stream->socket, MOS_EPOLLIN);
+    }
+  }
+}
+
+inline int raise_error_event(mssl_manager_t mssl, tcp_stream *stream)
+{
+  if (stream->socket)
+  {
+    if (stream->socket->epoll & MOS_EPOLLERR)
+    {
+      return add_epoll_event(mssl->ep, MOS_EVENT_QUEUE, stream->socket, MOS_EPOLLERR);
+    }
+  }
+  return -1;
+}
 
 int add_monitor_stream_sockets(mssl_manager_t mssl, struct tcp_stream *stream)
 {
@@ -191,29 +233,29 @@ tcp_stream *create_tcp_stream(mssl_manager_t mssl, socket_map_t socket, int type
   stream->sndvar->wscale_mine = TCP_DEFAULT_WSCALE;
   stream->sndvar->wscale_peer = 0;
 
-  if (HAS_STREAM_TYPE(stream, MOS_SOCK_STREAM))
-  {
-    stream->sndvar->ip_id = 0;
-    stream->sndvar->nif_out = get_output_interface(stream->daddr);
+//  if (HAS_STREAM_TYPE(stream, MOS_SOCK_SPLIT_TLS))
+//  {
+  stream->sndvar->ip_id = 0;
+  stream->sndvar->nif_out = get_output_interface(stream->daddr);
 
-    stream->sndvar->iss = posix_seq_rand() % TCP_MAX_SEQ;
-    stream->snd_nxt = stream->sndvar->iss;
-    stream->sndvar->snd_una = stream->sndvar->iss;
-    stream->sndvar->snd_wnd = g_config.mos->wmem_size;
-    stream->sndvar->rto = TCP_INITIAL_RTO;
+  stream->sndvar->iss = posix_seq_rand() % TCP_MAX_SEQ;
+  stream->snd_nxt = stream->sndvar->iss;
+  stream->sndvar->snd_una = stream->sndvar->iss;
+  stream->sndvar->snd_wnd = g_config.mos->wmem_size;
+  stream->sndvar->rto = TCP_INITIAL_RTO;
 #if USE_SPIN_LOCK
-    if (pthread_spin_init(&stream->sndvar->write_lock, PTHREAD_PROCESS_PRIVATE))
-    {
+  if (pthread_spin_init(&stream->sndvar->write_lock, PTHREAD_PROCESS_PRIVATE))
+  {
 #else
-    if (pthread_mutex_init(&stream->sndvar->write_lock, NULL))
-    {
+  if (pthread_mutex_init(&stream->sndvar->write_lock, NULL))
+  {
 #endif
-      perror("pthread_mutex_init of write_lock");
-      pthread_mutex_destroy(&stream->rcvvar->read_lock);
+    perror("pthread_mutex_init of write_lock");
+    pthread_mutex_destroy(&stream->rcvvar->read_lock);
 
-      return NULL;
-    }
+    return NULL;
   }
+//  }
   stream->rcvvar->irs = 0;
   stream->rcv_nxt = 0;
   stream->rcvvar->rcv_wnd = TCP_INITIAL_WINDOW;

@@ -401,7 +401,7 @@ void check_rtm_timeout(mssl_manager_t mssl, uint32_t cur_ts, int thresh)
       }
     }
   }
-  MA_LOG1d("checking retransmission timeout", cnt);
+  //MA_LOG1d("checking retransmission timeout", cnt);
 }
 
 void check_timewait_expire(mssl_manager_t mssl, uint32_t cur_ts, int thresh)

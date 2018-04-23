@@ -18,8 +18,8 @@ typedef struct socket_map * socket_map_t;
 
 enum socket_opts
 {
-	MTCP_NONBLOCK		= 0x01,
-	MTCP_ADDR_BIND		= 0x02, 
+	mssl_NONBLOCK		= 0x01,
+	mssl_ADDR_BIND		= 0x02, 
 };
 
 struct tcp_listener
@@ -116,13 +116,13 @@ struct socket_map
 		struct tcp_listener *listener;
 		struct mon_listener *monitor_listener;
 		struct mon_stream *monitor_stream;
-		struct mtcp_epoll *ep;
+		struct mssl_epoll *ep;
 		struct pipe *pp;
 	};
 
 	uint64_t epoll;			/* registered events */
 	uint64_t events;		/* available events */
-	mtcp_epoll_data_t ep_data;
+	mssl_epoll_data_t ep_data;
 
 	TAILQ_ENTRY (socket_map) link;
 };

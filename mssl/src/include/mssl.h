@@ -8,16 +8,16 @@
 #include <pthread.h>
 
 #include "memory_mgt.h"
-//#include "tcp_ring_buffer.h"
+#include "tcp_ring_buffer.h"
 #include "tcp_send_buffer.h"
 #include "tcp_stream_queue.h"
 #include "socket.h"
 #include "mssl_api.h"
-//#include "eventpoll.h"
+#include "eventpoll.h"
 //#include "addr_pool.h"
 #include "logs.h"
 #include "io_module.h"
-//#include "key_value_store.h"
+#include "key_value_store.h"
 
 #ifndef TRUE
 #define TRUE (1)
@@ -137,8 +137,8 @@ struct mssl_manager
   mem_pool_t sv_pool;
   mem_pool_t mv_pool;
 
-//  kvs_t *ev_store;
-//  sb_manager_t rbm_snd;
+  kvs_t *ev_store;
+  sb_manager_t rbm_snd;
 
   struct hashtable *tcp_flow_table;
   uint32_t s_index;
@@ -156,7 +156,9 @@ struct mssl_manager
   struct mssl_thread_context *ctx;
 
   // TODO: log related variables
-  // TODO: event related variables
+  
+  struct mssl_epoll *ep;
+  uint32_t ts_last_event;
 
   struct tcp_listener *listener;
   TAILQ_HEAD(, mon_listener) monitors;

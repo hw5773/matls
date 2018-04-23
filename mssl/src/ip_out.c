@@ -123,7 +123,7 @@ void reverse_ip_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
   pctx->p.tcph->check = 0;
   pctx->p.tcph->check = tcp_calc_checksum((uint16_t *)pctx->p.tcph,
       ntohs(pctx->p.iph->tot_len) - (pctx->p.iph->ihl << 2),
-      pctx.p.iph->saddr, pctx->p.iph->daddr);
+      pctx->p.iph->saddr, pctx->p.iph->daddr);
 
   forward_ip_packet(mssl, pctx);
 }

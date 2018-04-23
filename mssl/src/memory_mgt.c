@@ -150,3 +150,24 @@ void mp_free_chunk(mem_pool_t mp, void *p)
 #endif
 }
 
+void mp_destroy(mem_pool_t mp)
+{
+#ifdef HUGETABLE
+  if (mp->mp_type == MEM_HUGEPAGE)
+  {
+    free_huge_pages(mp->mp_startptr);
+  }
+  else
+  {
+#endif
+    free(mp->mp_startptr);
+#ifdef HUGETABLE
+  }
+#endif
+  free(mp);
+}
+
+int mp_get_free_chunks(mem_pool_t mp)
+{
+  return mp->mp_free_chunks;
+}

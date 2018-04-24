@@ -38,7 +38,7 @@ OBJ=src/core.o src/tcp_stream.o src/config.o src/api.o src/socket.o \
 		src/ip_out.o src/tcp_out.o src/logs.o src/arp.o src/timer.o src/cpu.o \
 		src/tcp_rb.o src/util.o src/fhash.o src/memory_mgt.o src/sock_module.o src/tls_split.o \
 		src/tcp_send_buffer.o src/eventpoll.o src/tcp_sb_queue.o src/pipe.o \
-		src/tcp_stream_queue.o
+		src/tcp_stream_queue.o src/scalable_event.o
 
 all: objs libmssl.a libmssl.pc
 

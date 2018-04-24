@@ -18,7 +18,6 @@
 #include "include/ip_in.h"
 #include "include/config.h"
 
-#define IP_MAX_ID 65535
 //#define VERIFY_RX_CHECKSUM TRUE
 #define VERIFY_RX_CHECKSUM FALSE
 
@@ -131,6 +130,7 @@ static inline struct tcp_stream *create_stream(mssl_manager_t mssl, struct pkt_c
 
     return cur_stream;
   }
+/*
 ///// Add for MA_TLS /////
   else if (tcph->syn && tcph->ack)
   {
@@ -149,6 +149,7 @@ static inline struct tcp_stream *create_stream(mssl_manager_t mssl, struct pkt_c
     pctx->forward = 0;
   }
 ///// Add for MA_TLS /////
+*/
   else
   {
     MA_LOG("Weird packet comes");

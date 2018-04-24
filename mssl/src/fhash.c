@@ -157,6 +157,7 @@ HTInsert(struct hashtable *ht, tcp_stream *item, unsigned int *hash)
 void* 
 HTRemove(struct hashtable *ht, tcp_stream *item)
 {
+  int hash = 0;
 	hash_bucket_head *head;
 	//int idx = HashFlow(item);
 
@@ -169,7 +170,10 @@ HTRemove(struct hashtable *ht, tcp_stream *item)
 		//head = &ht->ht_table[idx];
 		head = item->rcvvar->he_mybucket;
 		assert(head);
-		TAILQ_REMOVE(head, item, rcvvar->he_link);	
+    MA_LOGip("source ip in item", item->saddr);
+    MA_LOG1d("source port in item", item->sport);
+
+  	TAILQ_REMOVE(head, item, rcvvar->he_link);	
 #if STATIC_TABLE
 	}
 #endif

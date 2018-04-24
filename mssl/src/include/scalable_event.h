@@ -64,11 +64,14 @@ stree_inc_ref(stree_t *stree);
 extern inline void
 stree_dec_ref(kvs_t *store, stree_t *stree);
 
-void glob_init_event(void);
+void
+glob_init_event(void);
 
-void init_event(mtcp_manager_t mtcp);
+void
+init_event(mtcp_manager_t mtcp);
 
-extern inline void handle_callback(mtcp_manager_t mtcp, uint32_t hook, 
+extern inline void
+handle_callback(mtcp_manager_t mtcp, uint32_t hook, 
 	       socket_map_t socket, int side, struct pkt_ctx *pctx, event_t events);
 /*----------------------------------------------------------------------------*/
 #endif

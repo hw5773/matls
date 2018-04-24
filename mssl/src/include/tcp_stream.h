@@ -15,6 +15,7 @@
 #include "tcp_rb.h"
 
 #define TCP_MAX_SEQ 		4294967295
+#define IP_MAX_ID       65535
 
 #define HAS_STREAM_TYPE(str, type)	(str->stream_type & (1 << type))
 #define IS_STREAM_TYPE(str, type)	(str->stream_type == (1 << type))

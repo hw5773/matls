@@ -83,6 +83,7 @@ static inline int filter_syn_packet(mssl_manager_t mssl, uint32_t ip, uint16_t p
 static inline int handle_active_open(mssl_manager_t mssl, tcp_stream *cur_stream,
     struct pkt_ctx *pctx)
 {
+  MA_LOG("handle_active_open");
   const struct tcphdr *tcph = pctx->p.tcph;
 
   cur_stream->rcvvar->irs = pctx->p.seq;
@@ -97,6 +98,11 @@ static inline int handle_active_open(mssl_manager_t mssl, tcp_stream *cur_stream
       (cur_stream->sndvar->mss * 2) : cur_stream->sndvar->mss);
   cur_stream->sndvar->ssthresh = cur_stream->sndvar->mss * 10;
   update_retransmission_timer(mssl, cur_stream, pctx->p.cur_ts);
+
+  ///// Add for matls /////
+  cur_stream->socket = allocate_socket(mssl->ctx, MOS_SOCK_SPLIT_TLS);
+  cur_stream->socket->stream = cur_stream;
+  /////////////////////////
 
   return TRUE;
 }
@@ -180,6 +186,7 @@ static inline int process_rst(mssl_manager_t mssl, tcp_stream *cur_stream,
   {
     if (pctx->p.seq == 0 || pctx->p.ack_seq == cur_stream->snd_nxt)
     {
+      MA_LOG("here?");
       cur_stream->state = TCP_ST_CLOSED_RSVD;
       cur_stream->cb_events |= MOS_ON_TCP_STATE_CHANGE;
       cur_stream->close_reason = TCP_RESET;
@@ -197,6 +204,7 @@ static inline int process_rst(mssl_manager_t mssl, tcp_stream *cur_stream,
       cur_stream->state == TCP_ST_CLOSING ||
       cur_stream->state == TCP_ST_TIME_WAIT)
   {
+      MA_LOG("here?");
     cur_stream->state = TCP_ST_CLOSED_RSVD;
     cur_stream->close_reason = TCP_ACTIVE_CLOSE;
     cur_stream->cb_events |= MOS_ON_TCP_STATE_CHANGE;
@@ -212,6 +220,7 @@ static inline int process_rst(mssl_manager_t mssl, tcp_stream *cur_stream,
   if (!(cur_stream->sndvar->on_closeq || cur_stream->sndvar->on_closeq_int ||
         cur_stream->sndvar->on_resetq || cur_stream->sndvar->on_resetq_int))
   {
+      MA_LOG("here?");
     cur_stream->state = TCP_ST_CLOSED_RSVD;
     cur_stream->cb_events |= MOS_ON_TCP_STATE_CHANGE;
     cur_stream->close_reason = TCP_RESET;
@@ -477,6 +486,7 @@ static inline int process_tcp_payload(mssl_manager_t mssl, tcp_stream *cur_strea
     rcvvar->rcvbuf = tcprb_new(mssl->bufseg_pool, g_config.mos->rmem_size, cur_stream->buffer_mgmt);
     if (!rcvvar->rcvbuf)
     {
+      MA_LOG("here?");
       cur_stream->state = TCP_ST_CLOSED_RSVD;
       cur_stream->close_reason = TCP_NO_MEM;
       cur_stream->cb_events |= MOS_ON_TCP_STATE_CHANGE;
@@ -573,11 +583,16 @@ static inline void handle_TCP_ST_SYN_SENT(mssl_manager_t mssl, tcp_stream *cur_s
     if (TCP_SEQ_LEQ(pctx->p.ack_seq, cur_stream->sndvar->iss)
         || TCP_SEQ_GT(pctx->p.ack_seq, cur_stream->snd_nxt))
     {
+      MA_LOG("Wrong sequence number for SYN/ACK");
       if (!tcph->rst)
       {
         cur_stream->actions |= MOS_ACT_SEND_RST;
       }
       return;
+    }
+    else
+    {
+      MA_LOG("Right sequence number for SYN/ACK");
     }
     cur_stream->sndvar->snd_una++;
   }
@@ -586,6 +601,7 @@ static inline void handle_TCP_ST_SYN_SENT(mssl_manager_t mssl, tcp_stream *cur_s
   {
     if (tcph->ack)
     {
+      MA_LOG("here?");
       cur_stream->state = TCP_ST_CLOSED_RSVD;
       cur_stream->close_reason = TCP_RESET;
       cur_stream->cb_events |= MOS_ON_TCP_STATE_CHANGE;
@@ -622,6 +638,7 @@ static inline void handle_TCP_ST_SYN_SENT(mssl_manager_t mssl, tcp_stream *cur_s
       cur_stream->actions |= MOS_ACT_SEND_RST;
       cur_stream->actions |= MOS_ACT_DESTROY;
     }
+    
     cur_stream->actions |= MOS_ACT_SEND_CONTROL;
 
     if (g_config.mos->tcp_timeout > 0)
@@ -790,6 +807,7 @@ static inline void handle_TCP_ST_LAST_ACK(mssl_manager_t mssl, tcp_stream *cur_s
     {
       cur_stream->sndvar->snd_una++;
       update_retransmission_timer(mssl, cur_stream, pctx->p.cur_ts);
+      MA_LOG("here?");
       cur_stream->state = TCP_ST_CLOSED_RSVD;
       cur_stream->close_reason = TCP_PASSIVE_CLOSE;
       cur_stream->cb_events |= MOS_ON_TCP_STATE_CHANGE;
@@ -976,6 +994,17 @@ static inline void do_split_tcp(mssl_manager_t mssl, tcp_stream *cur_stream,
   uint32_t stream_type;
   unsigned int hash = 0;
   stream_type = 0;
+
+  ///// Add for matls /////
+  uint16_t id;
+  uint32_t seq;
+  id = posix_seq_rand() % IP_MAX_ID;
+  seq = posix_seq_rand() % TCP_MAX_SEQ;
+  send_tcp_packet_standalone(mssl, pctx->p.iph->saddr, pctx->p.tcph->source,
+      pctx->p.iph->daddr, pctx->p.tcph->dest, seq, 0, 1, TCP_FLAG_SYN, 
+      pctx->p.payload, 0, pctx->p.cur_ts, 0, id, -1);
+  ////////////////////////
+  /*
   pair_stream = create_tcp_stream(mssl, NULL, MOS_SOCK_SPLIT_TLS,
       pctx->p.iph->saddr, pctx->p.tcph->source,
       pctx->p.iph->daddr, pctx->p.tcph->dest, &hash);
@@ -983,6 +1012,7 @@ static inline void do_split_tcp(mssl_manager_t mssl, tcp_stream *cur_stream,
   add_to_timewait_list(mssl, pair_stream, pctx->p.cur_ts);
   pair_stream->actions |= MOS_ACT_SEND_CONTROL;
   add_to_control_list(mssl, pair_stream, pctx->p.cur_ts);
+  */
   MA_LOG("SYN sent to the server");
 }
 
@@ -1042,7 +1072,7 @@ void update_recv_tcp_context(mssl_manager_t mssl, struct tcp_stream *cur_stream,
     case TCP_ST_LISTEN:
       handle_TCP_ST_LISTEN(mssl, cur_stream, pctx);
       ///// Add for MA_TLS /////
-      do_split_tcp(mssl, cur_stream, pctx);
+//      do_split_tcp(mssl, cur_stream, pctx);
       break;
 
     case TCP_ST_SYN_SENT:

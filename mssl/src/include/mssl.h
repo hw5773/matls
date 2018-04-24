@@ -126,6 +126,7 @@ struct mssl_sender
 
 struct mssl_manager
 {
+  void (*cb)(uint32_t saddr, uint16_t sport, uint32_t daddr, uint16_t dport, uint8_t *buf, int len);
   mem_pool_t bufseg_pool;
   mem_pool_t sockent_pool;
 #ifdef USE_TIMER_POOL

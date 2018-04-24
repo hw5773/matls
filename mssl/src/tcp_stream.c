@@ -328,6 +328,9 @@ inline tcp_stream *create_client_tcp_stream(mssl_manager_t mssl, socket_map_t so
   tcp_stream *cs;
   struct socket_map *w;
 
+  ///// Add for matls /////
+  socket = allocate_socket(mssl->ctx, MOS_SOCK_SPLIT_TLS);
+  /////////////////////////
   cs = create_tcp_stream(mssl, socket, type, daddr, dport, saddr, sport, hash);
   if (!cs)
   {
@@ -371,7 +374,7 @@ static void destroy_single_tcp_stream(mssl_manager_t mssl, tcp_stream *stream)
 {
   struct sockaddr_in addr;
   int bound_addr = FALSE;
-  int ret;
+  int ret, hash = 0;
   bool flow_lock = HAS_STREAM_TYPE(stream, MOS_SOCK_STREAM);
 
   struct socket_map *walk;
@@ -388,14 +391,17 @@ static void destroy_single_tcp_stream(mssl_manager_t mssl, tcp_stream *stream)
   if (flow_lock)
     pthread_mutex_lock(&mssl->ctx->flow_pool_lock);
 
-  HTRemove(mssl->tcp_flow_table, stream);
-  stream->on_hash_table = FALSE;
+  if (HTSearch(mssl->tcp_flow_table, stream, stream, &hash))
+  {
+    HTRemove(mssl->tcp_flow_table, stream);
+    stream->on_hash_table = FALSE;
 
-  mssl->flow_cnt--;
+    mssl->flow_cnt--;
 
-  mp_free_chunk(mssl->rv_pool, stream->rcvvar);
-  mp_free_chunk(mssl->sv_pool, stream->sndvar);
-  mp_free_chunk(mssl->flow_pool, stream);
+    mp_free_chunk(mssl->rv_pool, stream->rcvvar);
+    mp_free_chunk(mssl->sv_pool, stream->sndvar);
+    mp_free_chunk(mssl->flow_pool, stream);
+  }
 
   if (flow_lock)
     pthread_mutex_unlock(&mssl->ctx->flow_pool_lock);

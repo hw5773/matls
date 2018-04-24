@@ -461,7 +461,9 @@ static inline int send_control_packet(mssl_manager_t mssl, tcp_stream *cur_strea
     case TCP_ST_CLOSED_RSVD:
       if (sndvar->on_send_list || sndvar->on_ack_list)
         return -1;
+      MA_LOG("before send tcp packet in TCP_ST_CLOSED_RSVD");
       ret = send_tcp_packet(mssl, cur_stream, cur_ts, TCP_FLAG_RST, NULL, 0);
+      MA_LOG1d("after send tcp packet in TCP_ST_CLOSED_RSVD", ret);
       if (ret >= 0)
         destroy_tcp_stream(mssl, cur_stream);
       return ret;
@@ -470,6 +472,7 @@ static inline int send_control_packet(mssl_manager_t mssl, tcp_stream *cur_strea
       return 0;
   }
 
+  MA_LOG("send control packet before return");
   return send_tcp_packet(mssl, cur_stream, cur_ts, flag, NULL, 0);
 }
 

@@ -362,7 +362,7 @@ raise_pending_pipe_events(mctx_t mctx, int epid, int pipeid)
 }
 /*---------------------------------------------------------------------------*/
 int 
-PipeClose(mctx_t mctx, int pipeid)
+pipe_close(mctx_t mctx, int pipeid)
 {
 	mssl_manager_t mssl;
 	socket_map_t socket;

@@ -1,0 +1,170 @@
+[matls] core.c:mssl_init:191: num_cpus: 2
+[matls] config.c:fetch_arp_kernel_entries:192: Fetch ARP Kernel Entries
+[matls] config.c:fetch_route_kernel_entries:317: Route Table IP: 192.168.1.0
+[matls] config.c:fetch_route_kernel_entries:318: Output Device: dpdk0
+[matls] config.c:fetch_route_kernel_entries:319: NIF: 0
+[matls] config.c:fetch_route_kernel_entries:317: Route Table IP: 192.168.2.0
+[matls] config.c:fetch_route_kernel_entries:318: Output Device: dpdk1
+[matls] config.c:fetch_route_kernel_entries:319: NIF: 0
+[matls] config.c:feed_netdev_conf_line:440: Found device name: dpdk0
+[matls] config.c:feed_netdev_conf_line:474: MAC addr (6 bytes) 
+00 0C 29 CB 8D 25 
+[matls] config.c:feed_netdev_conf_line:440: Found device name: dpdk1
+[matls] config.c:feed_netdev_conf_line:474: MAC addr (6 bytes) 
+00 0C 29 CB 8D 2F 
+[matls] core.c:mssl_init:202: After configuration upper half
+[matls] core.c:mssl_init:211: load sock module
+[matls] core.c:mssl_init:214: before enter load module upper half
+[matls] sock_module.c:sock_load_module_upper_half:189: Before read num of devices
+[matls] sock_module.c:sock_load_module_upper_half:191: after read num of devices
+[matls] core.c:mssl_init:222: Load module lower half
+[matls] config.c:load_configuration_lower_half:1207: rwalk->dev_name: dpdk0
+[matls] config.c:load_configuration_lower_half:1208: nwalk->dev_name: dpdk0
+[matls] config.c:load_configuration_lower_half:1225: IP addr: 192.168.1.0
+[matls] config.c:load_configuration_lower_half:1226: is set to: dpdk0
+[matls] config.c:load_configuration_lower_half:1207: rwalk->dev_name: dpdk1
+[matls] config.c:load_configuration_lower_half:1208: nwalk->dev_name: dpdk0
+[matls] config.c:load_configuration_lower_half:1207: rwalk->dev_name: dpdk1
+[matls] config.c:load_configuration_lower_half:1208: nwalk->dev_name: dpdk1
+[matls] config.c:load_configuration_lower_half:1225: IP addr: 192.168.2.0
+[matls] config.c:load_configuration_lower_half:1226: is set to: dpdk1
+[matls] arp.c:print_arp_table:320: ARP Table:
+[matls] arp.c:print_arp_table:323: IP addr: 192.168.2.1
+[matls] arp.c:print_arp_table:324: MAC addr: 0 c 29 1d c4 78
+[matls] arp.c:print_arp_table:323: IP addr: 192.168.1.1
+[matls] arp.c:print_arp_table:324: MAC addr: 0 c 29 6c 78 16
+[matls] epserver.c:Runmssl:570: before create context
+[matls] core.c:mssl_create_context:734: Create the context
+[matls] core.c:mssl_run_thread:651: mssl_run_thread
+[matls] core.c:initialize_mssl_manager:416: initialize mssl manager
+[matls] core.c:initialize_mssl_manager:554: max_concurrency: 100000
+[matls] core.c:mssl_run_thread:674: Succeed to initialize mssl manager
+[matls] core.c:mssl_run_thread:693: Succeed to initialize mutex
+[matls] core.c:mssl_run_thread:702: Succeed to initialize locks
+[matls] core.c:mssl_run_thread:707: Before attach device
+[matls] core.c:mssl_run_thread:711: After attach device
+[matls] core.c:mssl_run_thread:719: Before sem post
+[matls] epserver.c:Runmssl:573: after create context: 0x7fde200008c0
+[matls] epserver.c:Runmssl:579: before run application
+[matls] epserver.c:RunApplication:554: before init server
+[matls] epserver.c:InitServer:406: init server
+[matls] epserver.c:InitServer:416: before create epoll
+[matls] socket.c:allocate_socket:67: Socket allocate success
+[matls] epserver.c:InitServer:419: after create epoll
+[matls] epserver.c:InitServer:424: before allocate server variables
+[matls] epserver.c:InitServer:428: MAX_FLOW_NUM: 1000
+[matls] epserver.c:InitServer:429: sizeof(struct server_vars): 1192
+[matls] epserver.c:InitServer:430: after allocate server variables
+[matls] epserver.c:InitServer:437: before create listening socket
+[matls] socket.c:allocate_socket:67: Socket allocate success
+[matls] epserver.c:InitServer:439: after create listening socket
+[matls] epserver.c:RunApplication:556: after init server
+[matls] epserver.c:RunApplication:557: before run server
+[matls] epserver.c:RunServer:452: run server
+[matls] core.c:mssl_run_thread:723: before run main loop
+[matls] core.c:run_main_loop:298: mssl thread running: 0
+[matls] core.c:run_main_loop:299: number of interfaces: 2
+[matls] tcp.c:process_in_tcp_packet:277: 
+[matls] tcp.c:process_in_tcp_packet:278: process_in_tcp_packet
+[matls] tcp.c:process_in_tcp_packet:317: Search stream
+[matls] tcp.c:process_in_tcp_packet:318:   dest ip: 192.168.1.2
+[matls] tcp.c:process_in_tcp_packet:319:   dest port: 7788
+[matls] tcp.c:process_in_tcp_packet:327: Found pointer: (nil)
+[matls] tcp_stream.c:create_client_tcp_stream:482: create client tcp stream
+[matls] socket.c:allocate_socket:67: Socket allocate success
+[matls] tcp_stream.c:create_tcp_stream:432: Create new TCP stream
+[matls] tcp_stream.c:create_tcp_stream:433:   Source IP: 192.168.1.2
+[matls] tcp_stream.c:create_tcp_stream:434:   Source Port: 7788
+[matls] tcp_stream.c:create_tcp_stream:435:   Destination IP: 192.168.1.1
+[matls] tcp_stream.c:create_tcp_stream:436:   Destination Port: 48230
+[matls] tcp_stream.c:create_tcp_stream:437: Stream Pointer: 0x7fde18dd88e0
+[matls] tcp_in.c:handle_TCP_ST_LISTEN:548: handle_TCP_ST_LISTEN
+[matls] tcp_in.c:handle_TCP_ST_LISTEN:553: received SYN packet
+[matls] tcp_in.c:do_action_end_tcp_packet:1141: do_action_end_tcp_packet
+[matls] tcp_in.c:do_action_end_tcp_packet:1160: before send control message
+[matls] tcp_in.c:do_action_end_tcp_packet:1162: after send control message
+[matls] tcp_out.c:send_control_packet:482: send control packet before return
+[matls] ip_out.c:ip_output:250: after fillout ip context
+[matls] tcp_out.c:send_tcp_packet:203: send syn
+[matls] tcp_out.c:send_tcp_packet:248: send ack
+[matls] tcp.c:process_in_tcp_packet:277: 
+[matls] tcp.c:process_in_tcp_packet:278: process_in_tcp_packet
+[matls] tcp.c:process_in_tcp_packet:317: Search stream
+[matls] tcp.c:process_in_tcp_packet:318:   dest ip: 192.168.1.2
+[matls] tcp.c:process_in_tcp_packet:319:   dest port: 7788
+[matls] tcp.c:process_in_tcp_packet:327: Found pointer: 0x7fde18dd88e0
+[matls] tcp_in.c:handle_TCP_ST_LISTEN:548: handle_TCP_ST_LISTEN
+[matls] tcp_in.c:handle_TCP_ST_LISTEN:553: received SYN packet
+[matls] tcp_in.c:do_action_end_tcp_packet:1141: do_action_end_tcp_packet
+[matls] tcp_in.c:do_action_end_tcp_packet:1160: before send control message
+[matls] tcp_in.c:do_action_end_tcp_packet:1162: after send control message
+[matls] tcp_out.c:send_control_packet:482: send control packet before return
+[matls] ip_out.c:ip_output:250: after fillout ip context
+[matls] tcp_out.c:send_tcp_packet:203: send syn
+[matls] tcp_out.c:send_tcp_packet:248: send ack
+[matls] tcp.c:process_in_tcp_packet:277: 
+[matls] tcp.c:process_in_tcp_packet:278: process_in_tcp_packet
+[matls] tcp.c:process_in_tcp_packet:317: Search stream
+[matls] tcp.c:process_in_tcp_packet:318:   dest ip: 192.168.1.2
+[matls] tcp.c:process_in_tcp_packet:319:   dest port: 7788
+[matls] tcp.c:process_in_tcp_packet:327: Found pointer: 0x7fde18dd88e0
+[matls] tcp_in.c:do_action_end_tcp_packet:1141: do_action_end_tcp_packet
+[matls] tcp.c:process_in_tcp_packet:277: 
+[matls] tcp.c:process_in_tcp_packet:278: process_in_tcp_packet
+[matls] tcp.c:process_in_tcp_packet:317: Search stream
+[matls] tcp.c:process_in_tcp_packet:318:   dest ip: 192.168.1.2
+[matls] tcp.c:process_in_tcp_packet:319:   dest port: 7788
+[matls] tcp.c:process_in_tcp_packet:327: Found pointer: 0x7fde18dd88e0
+[matls] tcp_in.c:do_action_end_tcp_packet:1141: do_action_end_tcp_packet
+[matls] tcp.c:process_in_tcp_packet:277: 
+[matls] tcp.c:process_in_tcp_packet:278: process_in_tcp_packet
+[matls] tcp.c:process_in_tcp_packet:317: Search stream
+[matls] tcp.c:process_in_tcp_packet:318:   dest ip: 192.168.1.2
+[matls] tcp.c:process_in_tcp_packet:319:   dest port: 7788
+[matls] tcp.c:process_in_tcp_packet:327: Found pointer: 0x7fde18dd88e0
+[matls] tcp_in.c:do_action_end_tcp_packet:1141: do_action_end_tcp_packet
+[matls] tcp.c:process_in_tcp_packet:277: 
+[matls] tcp.c:process_in_tcp_packet:278: process_in_tcp_packet
+[matls] tcp.c:process_in_tcp_packet:317: Search stream
+[matls] tcp.c:process_in_tcp_packet:318:   dest ip: 192.168.1.2
+[matls] tcp.c:process_in_tcp_packet:319:   dest port: 7788
+[matls] tcp.c:process_in_tcp_packet:327: Found pointer: 0x7fde18dd88e0
+[matls] tcp_in.c:do_action_end_tcp_packet:1141: do_action_end_tcp_packet
+[matls] timer.c:handle_rto:250: SYN/ACK retransmission: 5229
+[matls] tcp_out.c:send_control_packet:482: send control packet before return
+[matls] ip_out.c:ip_output:250: after fillout ip context
+[matls] tcp_out.c:send_tcp_packet:203: send syn
+[matls] tcp_out.c:send_tcp_packet:248: send ack
+[matls] tcp.c:process_in_tcp_packet:277: 
+[matls] tcp.c:process_in_tcp_packet:278: process_in_tcp_packet
+[matls] tcp.c:process_in_tcp_packet:317: Search stream
+[matls] tcp.c:process_in_tcp_packet:318:   dest ip: 192.168.1.2
+[matls] tcp.c:process_in_tcp_packet:319:   dest port: 7788
+[matls] tcp.c:process_in_tcp_packet:327: Found pointer: 0x7fde18dd88e0
+[matls] tcp_in.c:do_action_end_tcp_packet:1141: do_action_end_tcp_packet
+[matls] tcp.c:process_in_tcp_packet:277: 
+[matls] tcp.c:process_in_tcp_packet:278: process_in_tcp_packet
+[matls] tcp.c:process_in_tcp_packet:317: Search stream
+[matls] tcp.c:process_in_tcp_packet:318:   dest ip: 192.168.1.2
+[matls] tcp.c:process_in_tcp_packet:319:   dest port: 7788
+[matls] tcp.c:process_in_tcp_packet:327: Found pointer: 0x7fde18dd88e0
+[matls] tcp_in.c:do_action_end_tcp_packet:1141: do_action_end_tcp_packet
+[matls] timer.c:handle_rto:250: SYN/ACK retransmission: 5229
+[matls] tcp_out.c:send_control_packet:482: send control packet before return
+[matls] ip_out.c:ip_output:250: after fillout ip context
+[matls] tcp_out.c:send_tcp_packet:203: send syn
+[matls] tcp_out.c:send_tcp_packet:248: send ack
+[matls] tcp.c:process_in_tcp_packet:277: 
+[matls] tcp.c:process_in_tcp_packet:278: process_in_tcp_packet
+[matls] tcp.c:process_in_tcp_packet:317: Search stream
+[matls] tcp.c:process_in_tcp_packet:318:   dest ip: 192.168.1.2
+[matls] tcp.c:process_in_tcp_packet:319:   dest port: 7788
+[matls] tcp.c:process_in_tcp_packet:327: Found pointer: 0x7fde18dd88e0
+[matls] tcp_in.c:do_action_end_tcp_packet:1141: do_action_end_tcp_packet
+[matls] tcp.c:process_in_tcp_packet:277: 
+[matls] tcp.c:process_in_tcp_packet:278: process_in_tcp_packet
+[matls] tcp.c:process_in_tcp_packet:317: Search stream
+[matls] tcp.c:process_in_tcp_packet:318:   dest ip: 192.168.1.2
+[matls] tcp.c:process_in_tcp_packet:319:   dest port: 7788
+[matls] tcp.c:process_in_tcp_packet:327: Found pointer: 0x7fde18dd88e0
+[matls] tcp_in.c:do_action_end_tcp_packet:1141: do_action_end_tcp_packet

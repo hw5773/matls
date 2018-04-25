@@ -18,8 +18,8 @@ typedef struct socket_map * socket_map_t;
 
 enum socket_opts
 {
-	mssl_NONBLOCK		= 0x01,
-	mssl_ADDR_BIND		= 0x02, 
+	MSSL_NONBLOCK		= 0x01,
+	MSSL_ADDR_BIND		= 0x02, 
 };
 
 struct tcp_listener

@@ -186,7 +186,9 @@ void sock_load_module_upper_half(void)
   struct ifreq if_opts, if_mac, if_idx;
 
 
+  MA_LOG("Before read num of devices");
   num_dev = g_config.mos->netdev_table->num;
+  MA_LOG("after read num of devices");
 
   for (i=0; i<num_dev; i++)
   {

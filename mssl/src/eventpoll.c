@@ -147,6 +147,7 @@ mssl_epoll_create(mctx_t mctx, int size)
 		free(ep);
 		return -1;
 	}
+
 	if (pthread_cond_init(&ep->epoll_cond, NULL)) {
 		destroy_event_queue(ep->mssl_queue);
 		destroy_event_queue(ep->usr_shadow_queue);
@@ -323,6 +324,7 @@ int
 mssl_epoll_wait(mctx_t mctx, int epid, 
 		struct mssl_epoll_event *events, int maxevents, int timeout)
 {
+  MA_LOG("mssl_epoll_wait start");
 	mssl_manager_t mssl;
 	struct mssl_epoll *ep;
 	struct event_queue *eq;
@@ -360,18 +362,22 @@ mssl_epoll_wait(mctx_t mctx, int epid,
 
 	ep->stat.calls++;
 
+  MA_LOG("spin before sleep");
 #if SPIN_BEFORE_SLEEP
+  MA_LOG("spin sleep");
 	int spin = 0;
 	while (ep->num_events == 0 && spin < SPIN_THRESH) {
 		spin++;
 	}
 #endif /* SPIN_BEFORE_SLEEP */
 
+  MA_LOG("mutex lock");
 	if (pthread_mutex_lock(&ep->epoll_lock)) {
 		if (errno == EDEADLK)
 			perror("mssl_epoll_wait: epoll_lock blocked\n");
 		assert(0);
 	}
+  MA_LOG("mutex lock release");
 
 wait:
 	eq = ep->usr_queue;
@@ -379,6 +385,7 @@ wait:
 
 	/* wait until event occurs */
 	while (eq->num_events == 0 && eq_shadow->num_events == 0 && timeout != 0) {
+    MA_LOG("wait until event occurs");
 
 #if INTR_SLEEPING_mssl
 		/* signal to mssl thread if it is sleeping */

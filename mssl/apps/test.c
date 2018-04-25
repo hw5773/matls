@@ -9,33 +9,21 @@
 
 static int g_core_limit = 1;
 
-struct thread_context
-{
-  mctx_t mctx;
-  int listener;
-  int ep;
-};
-
 static void init_monitor(mctx_t mctx)
 {
   MA_LOG("Create mssl socket");
+  int ep;
   struct thread_context *ctx;
 
-  ctx = (struct thread_context *)calloc(1, sizeof(struct thread_context));
-  if (!ctx)
-  {
-    MA_LOG("Failed to create thread context!");
-    exit(EXIT_FAILURE);
-  }
-
-  ctx->mctx = mctx;
-
-  ctx->ep = mssl_epoll_create(mctx, MAX_EVENTS);
-  if (ctx->ep < 0)
+  MA_LOG("before create epoll");
+  ep = mssl_epoll_create(mctx, MAX_EVENTS);
+  MA_LOG("after create epoll");
+  if (ep < 0)
   {
     MA_LOG("Failed to create epoll descriptor!");
     exit(EXIT_FAILURE);
   }
+  MA_LOG("Succeed to create epoll");
 
   int sock = mssl_socket(mctx, AF_INET, MOS_SOCK_SPLIT_TLS, 0);
 
@@ -72,11 +60,11 @@ int main(int argc, char *argv[])
     MA_LOG("Succeed to create mssl context");
     init_monitor(mctx_list[i]);
   }
-/*
+
   for (i=0; i<g_core_limit; i++)
     mssl_app_join(mctx_list[i]);
 
   mssl_destroy();
-*/
+
   return 0;
 }

@@ -1,4 +1,3 @@
-#include "debug.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,8 +6,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/queue.h>
-#include "key_value_store.h"
-#include "scalable_event.h"
+#include "include/key_value_store.h"
+#include "include/scalable_event.h"
 
 /*----------------------------------------------------------------------------*/
 kvs_t * 

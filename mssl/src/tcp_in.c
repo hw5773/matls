@@ -486,17 +486,18 @@ static inline int process_tcp_payload(mssl_manager_t mssl, tcp_stream *cur_strea
     rcvvar->rcvbuf = tcprb_new(mssl->bufseg_pool, g_config.mos->rmem_size, cur_stream->buffer_mgmt);
     if (!rcvvar->rcvbuf)
     {
-      MA_LOG("here?");
       cur_stream->state = TCP_ST_CLOSED_RSVD;
       cur_stream->close_reason = TCP_NO_MEM;
       cur_stream->cb_events |= MOS_ON_TCP_STATE_CHANGE;
-      raise_error_event(mssl, cur_stream);
+
+      if (HAS_STREAM_TYPE(cur_stream, MOS_SOCK_STREAM))
+        raise_error_event(mssl, cur_stream);
 
       return ERROR;
     }
   }
 
-  read_lock = HAS_STREAM_TYPE(cur_stream, MOS_SOCK_SPLIT_TLS);
+  read_lock = HAS_STREAM_TYPE(cur_stream, MOS_SOCK_STREAM);
 
   if (read_lock && SBUF_LOCK(&rcvvar->read_lock))
   {
@@ -515,6 +516,9 @@ static inline int process_tcp_payload(mssl_manager_t mssl, tcp_stream *cur_strea
     // MOS_SOCK_MONITOR_STREAM_ACTIVE code
     ret = tcprb_pwrite(rb, pctx->p.payload, pctx->p.payloadlen, off);
   }
+
+  if (ret < 0 && cur_stream->buffer_mgmt && mssl->num_msp == 0)
+    MA_LOG("cannot merge payload");
 
   loff_t cftail = rb->pile + tcprb_cflen(rb);
   if (cur_stream->state == TCP_ST_FIN_WAIT_1 ||
@@ -537,7 +541,12 @@ static inline int process_tcp_payload(mssl_manager_t mssl, tcp_stream *cur_strea
     return FALSE;
 
   if (cur_stream->state == TCP_ST_ESTABLISHED)
+  {
+    MA_LOG("before raise read event");
     raise_read_event(mssl, cur_stream);
+  }
+
+  MA_LOG("finish process tcp payload");
 
   return TRUE;
 }
@@ -550,17 +559,20 @@ static inline void handle_TCP_ST_LISTEN(mssl_manager_t mssl, tcp_stream *cur_str
 
   if (tcph->syn)
   {
+    MA_LOG("received SYN packet");
     if (cur_stream->state == TCP_ST_LISTEN)
     {
-      cur_stream->rcvvar->irs = cur_stream->rcv_nxt = pctx->p.seq;
+//      cur_stream->rcvvar->irs = cur_stream->rcv_nxt = pctx->p.seq;
       cur_stream->rcv_nxt++;
     }
     cur_stream->state = TCP_ST_SYN_RCVD;
     cur_stream->cb_events |= MOS_ON_TCP_STATE_CHANGE | MOS_ON_CONN_START;
     cur_stream->actions |= MOS_ACT_SEND_CONTROL;
 
-    cur_stream->rcvvar->irs = pctx->p.seq;
-    cur_stream->rcv_nxt = pctx->p.seq + 1;
+    if (IS_STREAM_TYPE(cur_stream, MOS_SOCK_MONITOR_STREAM_ACTIVE))
+    {
+      cur_stream->rcvvar->irs = cur_stream->rcv_nxt = pctx->p.seq;
+    }
   }
   else
   {
@@ -601,7 +613,6 @@ static inline void handle_TCP_ST_SYN_SENT(mssl_manager_t mssl, tcp_stream *cur_s
   {
     if (tcph->ack)
     {
-      MA_LOG("here?");
       cur_stream->state = TCP_ST_CLOSED_RSVD;
       cur_stream->close_reason = TCP_RESET;
       cur_stream->cb_events |= MOS_ON_TCP_STATE_CHANGE;
@@ -634,6 +645,7 @@ static inline void handle_TCP_ST_SYN_SENT(mssl_manager_t mssl, tcp_stream *cur_s
     }
     else
     {
+      MA_LOG("set rst");
       cur_stream->close_reason = TCP_ACTIVE_CLOSE;
       cur_stream->actions |= MOS_ACT_SEND_RST;
       cur_stream->actions |= MOS_ACT_DESTROY;
@@ -1156,9 +1168,12 @@ void do_action_end_tcp_packet(mssl_manager_t mssl, struct tcp_stream *cur_stream
           enqueue_ack(mssl, cur_stream, pctx->p.cur_ts, ACK_OPT_AGGREGATE);
           break;
         case MOS_ACT_SEND_CONTROL:
+          MA_LOG("before send control message");
           add_to_control_list(mssl, cur_stream, pctx->p.cur_ts);
+          MA_LOG("after send control message");
           break;
         case MOS_ACT_SEND_RST:
+          MA_LOG("before mos act send rst");
           if (cur_stream->state <= TCP_ST_SYN_SENT)
             send_tcp_packet_standalone(mssl,
                 pctx->p.iph->daddr, pctx->p.tcph->dest,
@@ -1171,6 +1186,7 @@ void do_action_end_tcp_packet(mssl_manager_t mssl, struct tcp_stream *cur_stream
                 pctx->p.iph->saddr, pctx->p.tcph->source,
                 pctx->p.ack_seq, 0, 0, TCP_FLAG_RST | TCP_FLAG_ACK,
                 NULL, 0, pctx->p.cur_ts, 0, 0, -1);
+          MA_LOG("after mos act send rst");
           break;
         case MOS_ACT_DESTROY:
           destroy_tcp_stream(mssl, cur_stream);

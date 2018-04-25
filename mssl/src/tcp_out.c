@@ -118,7 +118,10 @@ int send_tcp_packet_standalone(mssl_manager_t mssl, uint32_t saddr, uint16_t spo
   if (flags & TCP_FLAG_FIN)
     tcph->fin = TRUE;
   if (flags & TCP_FLAG_RST)
+  {
+    MA_LOG("rst is set");
     tcph->rst = TRUE;
+  }
   if (flags & TCP_FLAG_PSH)
     tcph->psh = TRUE;
 
@@ -187,8 +190,6 @@ int send_tcp_packet(mssl_manager_t mssl, tcp_stream *cur_stream,
   tcph = (struct tcphdr *)ip_output(mssl, cur_stream, TCP_HEADER_LEN + optlen + payloadlen,
       &pctx, cur_ts);
 
-  MA_LOG("after ip output");
-
   if (!tcph)
     return -2;
 
@@ -199,6 +200,7 @@ int send_tcp_packet(mssl_manager_t mssl, tcp_stream *cur_stream,
 
   if (flags & TCP_FLAG_SYN)
   {
+    MA_LOG("send syn");
     tcph->syn = TRUE;
 
     if (cur_stream->snd_nxt != cur_stream->sndvar->iss)
@@ -209,20 +211,24 @@ int send_tcp_packet(mssl_manager_t mssl, tcp_stream *cur_stream,
 
   if (flags & TCP_FLAG_RST)
   {
+    MA_LOG("send rst");
     tcph->rst = TRUE;
   }
 
   if (flags & TCP_FLAG_PSH)
   {
+    MA_LOG("send psh");
     tcph->psh = TRUE;
   }
 
   if (flags & TCP_FLAG_WACK)
   {
+    MA_LOG("send wack");
     tcph->seq = htonl(cur_stream->snd_nxt - 1);
   }
   else if (flags & TCP_FLAG_FIN)
   {
+    MA_LOG("send fin");
     tcph->fin = TRUE;
 
     if (cur_stream->sndvar->fss == 0)
@@ -239,6 +245,7 @@ int send_tcp_packet(mssl_manager_t mssl, tcp_stream *cur_stream,
 
   if (flags & TCP_FLAG_ACK)
   {
+    MA_LOG("send ack");
     tcph->ack = TRUE;
     tcph->ack_seq = htonl(cur_stream->rcv_nxt);
     cur_stream->sndvar->ts_lastack_sent = cur_ts;
@@ -423,6 +430,7 @@ out:
 
 static inline int send_control_packet(mssl_manager_t mssl, tcp_stream *cur_stream, uint32_t cur_ts)
 {
+  MA_LOG("send control packet");
   struct tcp_send_vars *sndvar = cur_stream->sndvar;
   int ret = 0;
   int flag = 0;
@@ -479,6 +487,7 @@ static inline int send_control_packet(mssl_manager_t mssl, tcp_stream *cur_strea
 inline int write_tcp_control_list(mssl_manager_t mssl, 
     struct mssl_sender *sender, uint32_t cur_ts, int thresh)
 {
+  MA_LOG("write_tcp_control_list");
   tcp_stream *cur_stream;
   tcp_stream *next, *last;
   int cnt = 0;
@@ -503,7 +512,9 @@ inline int write_tcp_control_list(mssl_manager_t mssl,
     if (cur_stream->sndvar->on_control_list)
     {
       cur_stream->sndvar->on_control_list = FALSE;
+      MA_LOG("before send control packet");
       ret = send_control_packet(mssl, cur_stream, cur_ts);
+      MA_LOG("after send control packet");
 
       if (ret < 0)
       {
@@ -737,7 +748,7 @@ inline struct mssl_sender *get_sender(mssl_manager_t mssl, tcp_stream *cur_strea
 
 inline void add_to_control_list(mssl_manager_t mssl, tcp_stream *cur_stream, uint32_t cur_ts)
 {
-/*
+
   int ret;
   struct mssl_sender *sender = get_sender(mssl, cur_stream);
   assert(sender != NULL);
@@ -745,17 +756,17 @@ inline void add_to_control_list(mssl_manager_t mssl, tcp_stream *cur_stream, uin
   ret = send_control_packet(mssl, cur_stream, cur_ts);
   if (ret < 0)
   {
-*/
-  if (!cur_stream->sndvar->on_control_list)
-  {
-    struct mssl_sender *sender = get_sender(mssl, cur_stream);
-    assert(sender != NULL);
 
-    cur_stream->sndvar->on_control_list = TRUE;
-    TAILQ_INSERT_TAIL(&sender->control_list, cur_stream, sndvar->control_link);
-    sender->control_list_cnt++;
-  }
-/*
+    if (!cur_stream->sndvar->on_control_list)
+    {
+      struct mssl_sender *sender = get_sender(mssl, cur_stream);
+      assert(sender != NULL);
+
+      cur_stream->sndvar->on_control_list = TRUE;
+      TAILQ_INSERT_TAIL(&sender->control_list, cur_stream, sndvar->control_link);
+      sender->control_list_cnt++;
+    }
+
   } 
   else
   {
@@ -766,7 +777,6 @@ inline void add_to_control_list(mssl_manager_t mssl, tcp_stream *cur_stream, uin
       sender->control_list_cnt--;
     }
   }
-*/
 }
 
 inline void add_to_send_list(mssl_manager_t mssl, tcp_stream *cur_stream)

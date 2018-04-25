@@ -15,8 +15,8 @@
 #include "mssl_epoll.h"
 #include <stdbool.h>
 
-#ifndef __MSSL_MANAGER
-#define __MSSL_MANAGER
+#ifndef __mssl_MANAGER
+#define __mssl_MANAGER
 typedef struct mssl_manager * mssl_manager_t;
 #endif
 #ifndef __SOCKET_MAP
@@ -90,7 +90,7 @@ enum mos_event_type
 	MOS_ON_DEBUG_MESSAGE  = (0x1<<11),
 };
 
-#if 0
+#if 1
 /* This may go away in future revisions */
 typedef union event_data {
 	uint32_t u32;

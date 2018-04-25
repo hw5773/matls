@@ -37,8 +37,8 @@ struct ev_table {
 struct ev_pointer {
 	uint64_t cb_map;      /**< map of registered callback */
 	uint64_t ft_map;      /**< map of registered fltrs. Automatically updated by
-							   `mtcp_register_callback()` or
-							   `mtcp_unregister_callback()` */
+							   `mssl_register_callback()` or
+							   `mssl_unregister_callback()` */
 
 	struct ev_table *evt; /**< pointer to `struct ev_table` in
 							   `struct ev_base` */
@@ -57,17 +57,17 @@ struct ev_base {
 /* Event's global initialization (only one CPU core should run this) */
 void glob_init_event(void);
 
-void init_event(mssl_manager_t mtcp, int num_evt);
+void init_event(mssl_manager_t mssl, int num_evt);
 
 void init_evp(struct ev_pointer *evp, struct ev_base *evb);
 
 void cleanup_evp(struct ev_pointer *evp);
 
-void init_evb(mssl_manager_t mtcp, struct ev_base *evb);
+void init_evb(mssl_manager_t mssl, struct ev_base *evb);
 
-void cleanup_evb(mssl_manager_t mtcp, struct ev_base *evb);
+void cleanup_evb(mssl_manager_t mssl, struct ev_base *evb);
 
-extern inline void handle_callback(mssl_manager_t mtcp, uint32_t hook,
+extern inline void handle_callback(mssl_manager_t mssl, uint32_t hook,
 		socket_map_t socket, int side, struct pkt_ctx *pctx, event_t events);
 
 #endif

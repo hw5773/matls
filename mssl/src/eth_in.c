@@ -31,6 +31,8 @@ int process_packet(mssl_manager_t mssl, const int ifidx, const int index, uint32
   int ret = -1;
   uint16_t proto = ntohs(ethh->h_proto);
 
+  memset(&pctx, 0, sizeof(pctx));
+
   fillin_packet_eth_context(&pctx, cur_ts, ifidx, index, ethh, len);
 
   if (proto == ETH_P_IP)

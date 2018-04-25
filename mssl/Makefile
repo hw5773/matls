@@ -33,12 +33,21 @@ NAME= $(BASENAME)-$(VERSION)
 
 PCS=libmssl.pc
 
-OBJ=src/core.o src/tcp_stream.o src/config.o src/api.o src/socket.o \
-		src/tcp_util.o src/eth_in.o src/ip_in.o src/tcp.o src/tcp_in.o src/eth_out.o \
+OBJ=src/core.o src/tcp_stream.o src/config.o src/api.o src/mos_api.o src/eventpoll.o \
+		src/socket.o src/pipe.o src/tcp_util.o src/eth_in.o src/ip_in.o src/tcp.o src/tcp_in.o \
+		src/eth_out.o src/ip_out.o src/tcp_out.o src/arp.o src/timer.o src/cpu.o src/util.o \
+		src/addr_pool.o src/fhash.o src/memory_mgt.o src/logs.o \
+		src/tcp_rb_frag_queue.o src/tcp_send_buffer.o src/tcp_sb_queue.o src/tcp_stream_queue.o \
+		src/bpf/sf_bpf_filter.o src/bpf/sfbpf-int.o src/bpf/sf_gencode.o src/bpf/sf_grammar.o \
+		src/bpf/sf_nametoaddr.o src/bpf/sf_optimize.o src/bpf/sf_scanner.o \
+		src/event_callback.o src/tcp_rb.o src/icmp.o src/scalable_event.o src/key_value_store.o \
+		src/sock_module.o
+#		src/tcp_util.o src/eth_in.o src/ip_in.o src/tcp.o src/tcp_in.o src/eth_out.o \
 		src/ip_out.o src/tcp_out.o src/logs.o src/arp.o src/timer.o src/cpu.o \
 		src/tcp_rb.o src/util.o src/fhash.o src/memory_mgt.o src/sock_module.o src/tls_split.o \
 		src/tcp_send_buffer.o src/eventpoll.o src/tcp_sb_queue.o src/pipe.o \
-		src/tcp_stream_queue.o src/scalable_event.o
+		src/mos_api.o \
+		src/tcp_stream_queue.o src/scalable_event.o src/addr_pool.o src/event_callback.o
 
 all: objs libmssl.a libmssl.pc
 

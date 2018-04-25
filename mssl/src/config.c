@@ -21,6 +21,7 @@
 
 int8_t end_app_exists = 0;
 int8_t mon_app_exists = 0;
+addr_pool_t ap[ETH_NUM] = {NULL};
 char *file = NULL;
 
 #define MATCH_ITEM(name, item) \
@@ -1224,4 +1225,18 @@ void load_configuration_lower_half(void)
     MA_LOGip("IP addr", rwalk->masked_ip);
     MA_LOG1s("is set to", g_config.mos->netdev_table->ent[rwalk->nif]->dev_name);
   }
+}
+
+void free_config_resources()
+{
+  if (file)
+  {
+    free(file);
+    file = NULL;
+  }
+}
+
+int fetch_endian_type()
+{
+  return 1;
 }

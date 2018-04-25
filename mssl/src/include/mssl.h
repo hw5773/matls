@@ -14,7 +14,7 @@
 #include "socket.h"
 #include "mssl_api.h"
 #include "eventpoll.h"
-//#include "addr_pool.h"
+#include "addr_pool.h"
 #include "logs.h"
 #include "io_module.h"
 #include "key_value_store.h"
@@ -149,7 +149,7 @@ struct mssl_manager
   TAILQ_HEAD (, socket_map) free_smap;
   TAILQ_HEAD (, socket_map) free_msmap;
 
-//  addr_pool_t ap;
+  addr_pool_t ap;
 
   uint32_t g_id;
   uint32_t flow_cnt;
@@ -256,5 +256,8 @@ typedef struct mssl_thread_context *mssl_thread_context_t;
 
 struct mssl_manager *g_mssl[MAX_CPUS];
 struct mssl_context *g_ctx[MAX_CPUS];
+extern addr_pool_t ap[ETH_NUM];
+
+void run_passive_loop(mssl_manager_t mssl);
 
 #endif /* __MSSL_H__ */

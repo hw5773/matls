@@ -26,7 +26,7 @@ inline int process_in_ipv4_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
 //  MA_LOG("Processing IPv4 packet");
   bool release = false;
   int ret;
-//  struct mon_listener *walk;
+  struct mon_listener *walk;
   struct iphdr *iph = (struct iphdr *)((char *)pctx->p.ethh + sizeof(struct ethhdr));
   int ip_len = ntohs(iph->tot_len);
 
@@ -45,7 +45,7 @@ inline int process_in_ipv4_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
   }
 
   fillin_packet_ip_context(pctx, iph, ip_len);
-/*
+
   if (mssl->num_msp == 0 && mssl->num_esp == 0)
   {
     MA_LOG("No sockets, forward");
@@ -55,7 +55,7 @@ inline int process_in_ipv4_packet(mssl_manager_t mssl, struct pkt_ctx *pctx)
     }
     return TRUE;
   }
-*/
+
   if (ip_fast_csum(iph, iph->ihl))
   {
     ret = ERROR;

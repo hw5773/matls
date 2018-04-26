@@ -5,15 +5,81 @@
  * @brief The server side middlebox's functions
  */
 
+#include <poll.h>
+#include <fcntl.h>
+#include <errno.h>
+
 #include "server_side_mb.h"
 #include "../common/logs.h"
 
-void print_unencrypted_data(char *buf, size_t len)
+int get_ssl_status(SSL *ssl, int n)
 {
-  printf("%.*s", (int)len, buf);
+  int err;
+  err = SSL_get_error(ssl, n);
+
+  switch(err)
+  {
+    case SSL_ERROR_NONE:
+      MA_LOG("SSL_ERROR_NONE");
+      break;
+    case SSL_ERROR_WANT_READ:
+      MA_LOG("SSL_ERROR_WANT_READ");
+      break;
+    case SSL_ERROR_WANT_WRITE:
+      MA_LOG("SSL_ERROR_WANT_WRITE");
+      break;
+    case SSL_ERROR_ZERO_RETURN:
+      MA_LOG("SSL_ERROR_ZERO_RETURN");
+      break;
+    case SSL_ERROR_SYSCALL:
+      MA_LOG("SSL_ERROR_SYSCALL");
+      break;
+    default:
+      MA_LOG("invalid status");
+  }
+
+  return err;
 }
 
-void ssl_init(char *cert, char *priv, char *capath)
+
+void msg_callback(int write, int version, int content_type, const void *buf, size_t len, SSL *ssl, void *arg)
+{
+  int i;
+  unsigned char *p;
+  p = (unsigned char *)buf;
+
+  printf("write operation? %d\n", write);
+  printf("version? 0x%x\n", version);
+  printf("content type? ");
+
+  switch(content_type)
+  {
+    case 20:
+      printf("change cipher spec\n");
+      break;
+    case 21:
+      printf("alert\n");
+      break;
+    case 22:
+      printf("handshake\n");
+      break;
+    case 23:
+      printf("application data\n");
+      break;
+    default:
+      printf("invalid\n");
+  }
+
+  for (i=0; i<len; i++)
+  {
+    printf("%02X ", p[i]);
+    if (i % 8 == 7)
+      printf("\n");
+  }
+  printf("\n");
+}
+
+int ssl_init(char *cert, char *priv, char *capath)
 {
   MA_LOG("Initialize SSL");
 
@@ -38,200 +104,194 @@ void ssl_init(char *cert, char *priv, char *capath)
   if (SSL_CTX_use_PrivateKey_file(ctx, priv, SSL_FILETYPE_PEM) <= 0) goto err;
   if (SSL_CTX_check_private_key(ctx) != 1) goto err;
 
+  SSL_CTX_set_msg_callback(ctx, msg_callback);
   SSL_CTX_set_options(ctx, SSL_OP_ALL | SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3);
-  return;
+  return SUCCESS;
 
 err:
-  ERR_print_errors_fp(stderr);
-  exit(EXIT_FAILURE);
+  return FAILURE;
 }
 
-void ssl_client_init(struct client_info *p)
+int ssl_client_init(struct pollfd *client, struct sockaddr *peer_addr, 
+    socklen_t peer_addr_len, struct client_info *p)
 {
   memset(p, 0, sizeof(struct client_info));
 
+  p->client = client;
+  p->ret = 0;
+  p->peer_addr = peer_addr;
+  p->peer_addr_len = peer_addr_len;
   p->rbio = BIO_new(BIO_s_mem());
   p->wbio = BIO_new(BIO_s_mem());
   p->ssl = SSL_new(ctx);
 
+  p->rbuf = (struct buf_mem *)malloc(sizeof(struct buf_mem));
+  p->rbuf->max = DEFAULT_BUF_SIZE;
+  p->rbuf->len = 0;
+  p->rbuf->mem = (unsigned char *)malloc(p->rbuf->max);
+
+  p->wbuf = (struct buf_mem *)malloc(sizeof(struct buf_mem));
+  p->wbuf->max = DEFAULT_BUF_SIZE;
+  p->wbuf->len = 0;
+  p->wbuf->mem = (unsigned char *)malloc(p->wbuf->max);
+
+  fcntl(p->client->fd, F_SETFL, O_NONBLOCK);
+
+  p->client->events = 0;
+  p->client->events = POLLIN | POLLOUT;
   SSL_set_accept_state(p->ssl);
   SSL_set_bio(p->ssl, p->rbio, p->wbio);
 
-  p->io_on_read = print_unencrypted_data;
+  p->ret = SSL_accept(p->ssl);
+
+  if (SSL_in_accept_init(p->ssl))
+  {
+    MA_LOG1d("Now in accept state and waiting for the handshake message", p->client->fd);
+  }
+  else
+  {
+    MA_LOG1d("ERROR: Not in accept state", p->client->fd);
+    ssl_client_cleanup(p);
+    goto err;
+  }
+
+
+
+  return SUCCESS;
+err:
+  return FAILURE;
 }
 
-void ssl_client_cleanup(struct client_info *p)
+int ssl_io_operation(struct client_info *p)
 {
-  SSL_free(p->ssl);
-  free(p->write_buf);
-  free(p->encrypt_buf);
-}
+  unsigned char buf[DEFAULT_BUF_SIZE];
+  ssize_t n;
+  int ret;
 
-int ssl_client_want_write(struct client_info *p)
-{
-  return (p->write_len > 0);
-}
+  ret = SSL_get_error(p->ssl, p->ret);
 
-static enum ssl_status get_ssl_status(SSL *ssl, int n)
-{
-  switch (SSL_get_error(ssl, n))
+  switch(ret)
   {
     case SSL_ERROR_NONE:
-      return SSL_STATUS_OK;
-    case SSL_ERROR_WANT_WRITE:
-    case SSL_ERROR_WANT_READ:
-      return SSL_STATUS_WANT_IO;
+      MA_LOG("I/O operation completed");
+      break;
     case SSL_ERROR_ZERO_RETURN:
+      MA_LOG("SSL_ERROR_ZERO_RETURN");
+      break;
     case SSL_ERROR_SYSCALL:
-    default:
-      return SSL_STATUS_FAIL;
-  }
-}
+      MA_LOG("SSL_ERROR_SYSCALL");
+      goto err;
+    case SSL_ERROR_SSL:
+      MA_LOG("SSL_ERROR_SSL");
+      break;
+    case SSL_ERROR_WANT_READ:
+      break;
+    case SSL_ERROR_WANT_WRITE:
+      MA_LOG("Wanting write operation");
 
-int do_sock_write(struct client_info *p)
-{
-  ssize_t n = write(p->fd, p->write_buf, p->write_len);
-  if (n > 0)
-  {
-    if ((size_t) n < p->write_len)
-      memmove(p->write_buf, p->write_buf + n, p->write_len - n);
-    p->write_len -= n;
-    p->write_buf = (char *)realloc(p->write_buf, p->write_len);
-    return 0;
+      n = BIO_read(p->wbio, p->wbuf->mem + p->wbuf->len, p->wbuf->max - p->wbuf->len);
+      p->wbuf->len += n;
+      p->ret = n;
+      MA_LOG1lu("Read from write buffer", n);
+
+      while (p->wbuf->len == p->wbuf->max)
+      {
+        p->wbuf->mem = (unsigned char *)realloc(p->wbuf->mem, p->wbuf->max + DEFAULT_BUF_SIZE);
+        p->wbuf->max += DEFAULT_BUF_SIZE;
+        n = BIO_read(p->wbio, p->wbuf->mem + p->wbuf->len, p->wbuf->max - p->wbuf->len);
+        p->wbuf->len += n;
+        MA_LOG1lu("Read from write buffer", n);
+      }
+      p->ret = n;
+
+      MA_LOG1d("In write buffer", p->wbuf->len);
+
+      break;
+    case SSL_ERROR_WANT_X509_LOOKUP:
+      MA_LOG("Wanting to look up X.509");
+      break;
+    case SSL_ERROR_WANT_CONNECT:
+    case SSL_ERROR_WANT_ACCEPT:
+      MA_LOG("Unwanted state");
+      break;
+    default:
+      MA_LOG("Invalid state");
+      goto err;
   }
-  return -1;
+
+  return SUCCESS;
+err:
+  MA_LOG("error happened");
+  ssl_client_cleanup(p);
+  return FAILURE;
 }
 
 int do_sock_read(struct client_info *p)
 {
-  char buf[DEFAULT_BUF_SIZE];
-  ssize_t n = read(p->fd, buf, sizeof(buf));
+  MA_LOG("do_sock_read");
+  ssize_t n; 
+  n = read(p->client->fd, p->rbuf->mem + p->rbuf->len, p->rbuf->max - p->rbuf->len);
+  p->rbuf->len += n;
+  MA_LOG1lu("Read from Socket", n);
 
-  if (n > 0)
-    return on_read_cb(p, buf, (size_t)n);
-  else
-    return -1;
-}
-
-void do_stdin_read(struct client_info *p)
-{
-  char buf[DEFAULT_BUF_SIZE];
-  ssize_t n = read(STDIN_FILENO, buf, sizeof(buf));
-  if (n > 0)
-    send_unencrypted_bytes(p, buf, (size_t)n);
-}
-
-int do_encrypt(struct client_info *p)
-{
-  int n;
-  char buf[DEFAULT_BUF_SIZE];
-  enum ssl_status status;
-
-  if (!SSL_is_init_finished(p->ssl))
-    return 0;
-
-  while (p->encrypt_len > 0)
+  while (p->rbuf->len >= p->rbuf->max)
   {
-    n = SSL_write(p->ssl, p->encrypt_buf, p->encrypt_len);
-    status = get_ssl_status(p->ssl, n);
+    p->rbuf->mem = (unsigned char *)realloc(p->rbuf->mem, p->rbuf->max + DEFAULT_BUF_SIZE);
+    n = read(p->client->fd, p->rbuf->mem + p->rbuf->len, p->rbuf->max - p->rbuf->len);
+    p->rbuf->len += n;
+    MA_LOG1lu("Read from Socket", n);
+  }
+  p->ret = n;
 
-    if (n > 0)
-    {
-      if ((size_t) n < p->encrypt_len)
-        memmove(p->encrypt_buf, p->encrypt_buf + n, p->encrypt_len - n);
-      p->encrypt_len -= n;
-      p->encrypt_buf = (char *)realloc(p->encrypt_buf, p->encrypt_len);
+  MA_LOG1d("In read buffer", p->rbuf->len);
 
-      do {
-        n = BIO_read(p->wbio, buf, sizeof(buf));
-        if (n > 0)
-          queue_encrypted_bytes(p, buf, n);
-        else if (!BIO_should_retry(p->wbio))
-          return -1;
-      } while (n > 0);
-    }
-
-    if (status == SSL_STATUS_FAIL)
-      return -1;
-
-    if (n == 0)
-      break;
+  n = 0;
+  while (p->rbuf->len > 0)
+  {
+    n = BIO_write(p->rbio, p->rbuf->mem + n, p->rbuf->len);
+    p->rbuf->len -= n;
   }
 
-  return 0;
+  MA_LOG1d("In read buffer after write", p->rbuf->len);
+
+  get_ssl_status(p->ssl, n);
+  p->ret = n;
+  return p->rbuf->len;
 }
 
-int on_read_cb(struct client_info *p, char *src, size_t len)
+int do_sock_write(struct client_info *p)
 {
-  char buf[DEFAULT_BUF_SIZE];
-  enum ssl_status status;
-  int n;
+  MA_LOG("do_sock_write");
+  ssize_t n = 0;
 
-  while (len > 0)
+  if (get_ssl_status(p->ssl, p->ret) == SSL_ERROR_WANT_WRITE || get_ssl_status(p->ssl, p->ret) == SSL_ERROR_NONE)
   {
-    n = BIO_write(p->rbio, src, len);
-
-    if (n <= 0)
-      return -1;
-
-    src += n;
-    len -= n;
-
-    if (!SSL_is_init_finished(p->ssl))
-    {
-      n = SSL_accept(p->ssl);
-      status = get_ssl_status(p->ssl, n);
-
-      if (status == SSL_STATUS_WANT_IO)
-        do {
-          n = BIO_read(p->wbio, buf, sizeof(buf));
-          if (n > 0)
-            queue_encrypted_bytes(p, buf, n);
-          else if (!BIO_should_retry(p->wbio))
-            return -1;
-        } while (n > 0);
-
-      if (status == SSL_STATUS_FAIL)
-        return -1;
-
-      if (!SSL_is_init_finished(p->ssl))
-        return 0;
-    }
-
     do {
-      n = SSL_read(p->ssl, buf, sizeof(buf));
+      n = BIO_read(p->wbio, p->wbuf->mem + p->wbuf->len, p->wbuf->max - p->wbuf->len);
+      MA_LOG1lu("read from wbio", n);
       if (n > 0)
-        p->io_on_read(buf, (size_t) n);
+      {
+        p->wbuf->len += n;
+        if (n >= p->wbuf->max - p->wbuf->len)
+        {
+          p->wbuf->mem = (unsigned char *)realloc(p->wbuf->mem, p->wbuf->max + DEFAULT_BUF_SIZE);
+        }
+      }
     } while (n > 0);
 
-    status = get_ssl_status(p->ssl, n);
-
-    if (status == SSL_STATUS_WANT_IO)
-      do {
-        n = BIO_read(p->wbio, buf, sizeof(buf));
-        if (n > 0)
-          queue_encrypted_bytes(p, buf, n);
-        else if (!BIO_should_retry(p->wbio))
-          return -1;
-      } while (n > 0);
-
-    if (status == SSL_STATUS_FAIL)
-      return -1;
+    while (p->wbuf->len > 0)
+    {
+      n = write(p->client->fd, p->wbuf->mem, p->wbuf->len);
+      p->wbuf->len -= n;
+      MA_LOG1lu("Write to Socket", n);
+    }
   }
-
-  return 0;
+  return n;
 }
 
-void send_unencrypted_bytes(struct client_info *p, const char *buf, size_t len)
+void ssl_client_cleanup(struct client_info *p)
 {
-  p->encrypt_buf = (char *)realloc(p->encrypt_buf, p->encrypt_len + len);
-  memcpy((p->encrypt_buf) + (p->encrypt_len), buf, len);
-  p->encrypt_len += len;
-}
-
-void queue_encrypted_bytes(struct client_info *p, const char *buf, size_t len)
-{
-  p->write_buf = (char *)realloc(p->write_buf, p->write_len + len);
-  memcpy(p->write_buf + p->write_len, buf, len);
-  p->write_len += len;
+  close(p->client->fd);
+  p->client->fd = -1;
+  SSL_free(p->ssl);
 }

@@ -7,6 +7,7 @@
 
 #include <arpa/inet.h>
 #include <poll.h>
+#include <fcntl.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -20,14 +21,15 @@
 
 int main(int argc, char *argv[])
 {
-  int port;
-  int client_side_sock, server_side_sock, client;
+  int port, i, n;
+  int client_side_sock, server_side_sock, fd, maxi;
   int nready, revents;
   struct sockaddr_in serv_addr, peer_addr;
-  struct pollfd fdset[2];
+  struct pollfd client[MAX_CLNT_SIDE];
+  struct client_info info[MAX_CLNT_SIDE];
   socklen_t peer_addr_len;
   char *cert, *priv, *capath;
-  char ip[INET_ADDRSTRLEN];
+  char buf[DEFAULT_BUF_SIZE];
 
   if (argc == 1)
   {
@@ -81,66 +83,90 @@ int main(int argc, char *argv[])
   }
 
   peer_addr_len = sizeof(peer_addr);
-  memset(&fdset, 0, sizeof(fdset));
+  client[0].fd = client_side_sock;
+  client[0].events = POLLIN;
 
-  fdset[0].fd = STDIN_FILENO;
-  fdset[0].events = POLLIN;
+  for (i=1; i<MAX_CLNT_SIDE; i++)
+  {
+    client[i].fd = -1;
+  }
+  maxi = 0;
 
-  ssl_init(cert, priv, capath);
+  if (ssl_init(cert, priv, capath) == FAILURE)
+  {
+    ERR_print_errors_fp(stderr);
+    exit(EXIT_FAILURE);
+  }
 
   while (1)
   {
     MA_LOG1d("Waiting for next connection on port", port);
 
-    client = accept(client_side_sock, (struct sockaddr *)&peer_addr, &peer_addr_len);
-    if (client < 0)
-      perror("client socket error");
+    nready = poll(client, maxi + i, 1000);
 
-    struct client_info info;
-    ssl_client_init(&info);
-    info.fd = client;
+    if (nready <= 0)
+      continue;
+    else
+      MA_LOG1d("nready", nready);
 
-    fdset[1].events = POLLERR | POLLHUP | POLLNVAL | POLLIN;
-#ifdef PULLRDHUP
-    fdset[i].events |= POLLRDHUP;
-#endif
-
-    while (1)
+    // accept TCP connection
+    if (client[0].revents & POLLIN)
     {
-      fdset[1].events &= ~POLLOUT;
-      fdset[1].events |= (ssl_client_want_write(&info) ? POLLOUT : 0);
+      fd = accept(client_side_sock, (struct sockaddr *)&peer_addr, &peer_addr_len);
+      if (fd < 0)
+      {
+        perror("client socket error");
+        exit(EXIT_FAILURE);
+      }
+      MA_LOG1d("client accpeted", fd);
 
-      nready = poll(&fdset[0], 2, -1);
+      for (i=1; i<MAX_CLNT_SIDE; i++)
+      {
+        if (client[i].fd < 0)
+        {
+          client[i].fd = fd;
+          break;
+        }
+      }
 
-      if (nready == 0)
+      if (i >= MAX_CLNT_SIDE)
+      {
+        close(fd);
+        perror("too many clients");
+      }
+
+      if (i > maxi)
+        maxi = i;
+
+      if (ssl_client_init(&(client[i]), (struct sockaddr *)&peer_addr, peer_addr_len, &(info[i])) == FAILURE)
         continue;
 
-      revents = fdset[1].revents;
-      if (revents & POLLIN)
-        if (do_sock_read(&info) == -1)
-          break;
-      if (revents & POLLOUT)
-        if (do_sock_write(&info) == -1)
-          break;
-      if (revents & (POLLERR | POLLHUP | POLLNVAL))
-        break;
-
-#ifdef POLLRDHUP
-      if (revents & POLLRDHUP)
-        break;
-#endif
-
-      if (fdset[0].revents & POLLIN)
-        do_stdin_read(&info);
-
-      if (info.encrypt_len > 0)
-        do_encrypt(&info);
+      if (--nready <= 0)
+        continue;
     }
 
-    close(fdset[1].fd);
-    ssl_client_cleanup(&info);
-  }
+    // polling and I/O operation
+    for (i=1; i<=maxi; i++)
+    {
+      if (client[i].fd < 0)
+        continue;
 
+      MA_LOG1d("socket", i);
+      if (client[i].revents & POLLIN)
+      {
+        MA_LOG("POLLIN");
+        do_sock_read(&info[i]);
+      }
+
+      if (client[i].revents & POLLOUT)
+      {
+        MA_LOG("POLLOUT");
+        do_sock_write(&info[i]);
+      }
+
+      //ssl_io_operation(&info[i]);
+    }
+  }
   return 0;
 }
       

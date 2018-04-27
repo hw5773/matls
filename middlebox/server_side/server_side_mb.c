@@ -21,6 +21,7 @@
 
 int main(int argc, char *argv[])
 {
+  char str[INET_ADDRSTRLEN];
   int port, i, n;
   int client_side_sock, server_side_sock, fd, maxi;
   int nready, revents;
@@ -83,6 +84,8 @@ int main(int argc, char *argv[])
   }
 
   peer_addr_len = sizeof(peer_addr);
+  memset(&client, 0, sizeof(client));
+
   client[0].fd = client_side_sock;
   client[0].events = POLLIN;
 
@@ -102,7 +105,7 @@ int main(int argc, char *argv[])
   {
     MA_LOG1d("Waiting for next connection on port", port);
 
-    nready = poll(client, maxi + i, 1000);
+    nready = poll(client, maxi + i, -1);
 
     if (nready <= 0)
       continue;
@@ -119,6 +122,8 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
       }
       MA_LOG1d("client accpeted", fd);
+      inet_ntop(peer_addr.sin_family, &peer_addr.sin_addr, str, INET_ADDRSTRLEN);
+      printf("new connection from %s:%d\n", str, ntohs(peer_addr.sin_port));
 
       for (i=1; i<MAX_CLNT_SIDE; i++)
       {
@@ -136,7 +141,10 @@ int main(int argc, char *argv[])
       }
 
       if (i > maxi)
+      {
         maxi = i;
+        MA_LOG1d("maxi", maxi)
+      }
 
       if (ssl_client_init(&(client[i]), (struct sockaddr *)&peer_addr, peer_addr_len, &(info[i])) == FAILURE)
         continue;
@@ -154,17 +162,22 @@ int main(int argc, char *argv[])
       MA_LOG1d("socket", i);
       if (client[i].revents & POLLIN)
       {
-        MA_LOG("POLLIN");
-        do_sock_read(&info[i]);
+        if (do_sock_read(&info[i]) < 0)
+          ssl_client_cleanup(&info[i]);
       }
 
       if (client[i].revents & POLLOUT)
       {
-        MA_LOG("POLLOUT");
-        do_sock_write(&info[i]);
+        if (info[i].wbuf->len > 0)
+          if (do_sock_write(&info[i]) < 0)
+            ssl_client_cleanup(&info[i]);
       }
 
-      //ssl_io_operation(&info[i]);
+      if (revents & (POLLERR | POLLHUP | POLLNVAL))
+      {
+        MA_LOG("Other events");
+        ssl_client_cleanup(&info[i]);
+      }
     }
   }
   return 0;

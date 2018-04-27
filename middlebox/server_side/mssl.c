@@ -115,6 +115,7 @@ err:
 int ssl_client_init(struct pollfd *client, struct sockaddr *peer_addr, 
     socklen_t peer_addr_len, struct client_info *p)
 {
+  ssize_t n;
   memset(p, 0, sizeof(struct client_info));
 
   p->client = client;
@@ -135,27 +136,13 @@ int ssl_client_init(struct pollfd *client, struct sockaddr *peer_addr,
   p->wbuf->len = 0;
   p->wbuf->mem = (unsigned char *)malloc(p->wbuf->max);
 
-  fcntl(p->client->fd, F_SETFL, O_NONBLOCK);
+//  fcntl(p->client->fd, F_SETFL, O_NONBLOCK);
+//  BIO_set_nbio(p->rbio, 1);
+//  BIO_set_nbio(p->wbio, 1);
 
-  p->client->events = 0;
-  p->client->events = POLLIN | POLLOUT;
+  p->client->events = POLLIN | POLLOUT | POLLERR | POLLHUP | POLLNVAL;
   SSL_set_accept_state(p->ssl);
   SSL_set_bio(p->ssl, p->rbio, p->wbio);
-
-  p->ret = SSL_accept(p->ssl);
-
-  if (SSL_in_accept_init(p->ssl))
-  {
-    MA_LOG1d("Now in accept state and waiting for the handshake message", p->client->fd);
-  }
-  else
-  {
-    MA_LOG1d("ERROR: Not in accept state", p->client->fd);
-    ssl_client_cleanup(p);
-    goto err;
-  }
-
-
 
   return SUCCESS;
 err:
@@ -226,9 +213,30 @@ err:
   return FAILURE;
 }
 
+int process_accept(struct client_info *p)
+{
+  ssize_t n;
+  int err;
+  n = SSL_accept(p->ssl);
+
+  err = get_ssl_status(p->ssl, n);
+
+  if (err == SSL_ERROR_WANT_WRITE)
+  {
+    do {
+      n = BIO_read(p->wbio, p->wbuf->mem, sizeof(p->wbuf->mem));
+      p->wbuf->len += n;
+    } while (n > 0);
+  }
+
+  if (!SSL_is_init_finished(p->ssl))
+    return 0;
+}
+
 int do_sock_read(struct client_info *p)
 {
   MA_LOG("do_sock_read");
+  int ret;
   ssize_t n; 
   n = read(p->client->fd, p->rbuf->mem + p->rbuf->len, p->rbuf->max - p->rbuf->len);
   p->rbuf->len += n;
@@ -241,7 +249,6 @@ int do_sock_read(struct client_info *p)
     p->rbuf->len += n;
     MA_LOG1lu("Read from Socket", n);
   }
-  p->ret = n;
 
   MA_LOG1d("In read buffer", p->rbuf->len);
 
@@ -254,8 +261,13 @@ int do_sock_read(struct client_info *p)
 
   MA_LOG1d("In read buffer after write", p->rbuf->len);
 
+  if (!SSL_is_init_finished(p->ssl))
+  {
+    ret = process_accept(p);
+    return ret;
+  }
+
   get_ssl_status(p->ssl, n);
-  p->ret = n;
   return p->rbuf->len;
 }
 
@@ -264,8 +276,9 @@ int do_sock_write(struct client_info *p)
   MA_LOG("do_sock_write");
   ssize_t n = 0;
 
-  if (get_ssl_status(p->ssl, p->ret) == SSL_ERROR_WANT_WRITE || get_ssl_status(p->ssl, p->ret) == SSL_ERROR_NONE)
+  if (get_ssl_status(p->ssl, p->ret) == SSL_ERROR_NONE)
   {
+/*
     do {
       n = BIO_read(p->wbio, p->wbuf->mem + p->wbuf->len, p->wbuf->max - p->wbuf->len);
       MA_LOG1lu("read from wbio", n);
@@ -278,7 +291,7 @@ int do_sock_write(struct client_info *p)
         }
       }
     } while (n > 0);
-
+*/
     while (p->wbuf->len > 0)
     {
       n = write(p->client->fd, p->wbuf->mem, p->wbuf->len);

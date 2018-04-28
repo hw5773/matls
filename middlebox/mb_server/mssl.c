@@ -204,6 +204,11 @@ int do_sock_write()
     return -1;
 }
 
+void sni_callback(unsigned char *buf, int len, SSL *ssl)
+{
+  printf("server name: %s\n", buf);
+}
+
 void msg_callback(int write, int version, int content_type, const void *buf, size_t len, SSL *ssl, void *arg)
 {
   int i;
@@ -279,7 +284,8 @@ void ssl_init(char *cert, char *priv) {
 
   /* Recommended to avoid SSLv2 & SSLv3 */
   SSL_CTX_set_options(ctx, SSL_OP_ALL|SSL_OP_NO_SSLv2|SSL_OP_NO_SSLv3);
-  SSL_CTX_set_msg_callback(ctx, msg_callback);
+  //SSL_CTX_set_msg_callback(ctx, msg_callback);
+  SSL_CTX_set_sni_callback(ctx, sni_callback);
 }
 
 

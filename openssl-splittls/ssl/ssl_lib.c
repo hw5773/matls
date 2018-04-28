@@ -340,6 +340,10 @@ SSL *SSL_new(SSL_CTX *ctx)
 	s->msg_callback=ctx->msg_callback;
 	s->msg_callback_arg=ctx->msg_callback_arg;
 	s->verify_mode=ctx->verify_mode;
+
+#ifndef OPENSSL_NO_SPLIT_TLS
+    s->sni_callback = ctx->sni_callback;
+#endif /* OPENSSL_NO_SPLIT_TLS */
 #if 0
 	s->verify_depth=ctx->verify_depth;
 #endif
@@ -1253,6 +1257,11 @@ long SSL_CTX_callback_ctrl(SSL_CTX *ctx, int cmd, void (*fp)(void))
 	case SSL_CTRL_SET_MSG_CALLBACK:
 		ctx->msg_callback = (void (*)(int write_p, int version, int content_type, const void *buf, size_t len, SSL *ssl, void *arg))(fp);
 		return 1;
+#ifndef OPENSSL_NO_SPLIT_TLS
+    case SSL_CTRL_SET_SNI_CALLBACK:
+        ctx->sni_callback = (void (*)(unsigned char *buf, int len, SSL *ssl))(fp);
+        return 1;
+#endif
 
 	default:
 		return(ctx->method->ssl_ctx_callback_ctrl(ctx,cmd,fp));
@@ -3448,6 +3457,19 @@ void SSL_set_msg_callback(SSL *ssl, void (*cb)(int write_p, int version, int con
 	{
 	SSL_callback_ctrl(ssl, SSL_CTRL_SET_MSG_CALLBACK, (void (*)(void))cb);
 	}
+
+#ifndef OPENSSL_NO_SPLIT_TLS
+void SSL_CTX_set_sni_callback(SSL_CTX *ctx, void (*cb)(unsigned char *buf, int len, SSL *ssl))
+{
+  printf("SSL_CTX_set_sni_callback\n");
+  SSL_CTX_callback_ctrl(ctx, SSL_CTRL_SET_SNI_CALLBACK, (void (*)(void))cb);
+}
+
+void SSL_set_sni_callback(SSL *ssl, void (*cb)(unsigned char *buf, int len, SSL *ssl))
+{
+  SSL_callback_ctrl(ssl, SSL_CTRL_SET_SNI_CALLBACK, (void (*)(void))cb);
+}
+#endif
 
 /* Allocates new EVP_MD_CTX and sets pointer to it into given pointer
  * vairable, freeing  EVP_MD_CTX previously stored in that variable, if

@@ -907,6 +907,10 @@ struct ssl_ctx_st
 	void (*msg_callback)(int write_p, int version, int content_type, const void *buf, size_t len, SSL *ssl, void *arg);
 	void *msg_callback_arg;
 
+#ifndef OPENSSL_NO_SPLIT_TLS
+    void (*sni_callback)(unsigned char *buf, int len, SSL *ssl);
+#endif /* OPENSSL_NO_SPLIT_TLS */
+
 	int verify_mode;
 	unsigned int sid_ctx_length;
 	unsigned char sid_ctx[SSL_MAX_SID_CTX_LENGTH];
@@ -1216,6 +1220,10 @@ struct ssl_st
 	/* callback that allows applications to peek at protocol messages */
 	void (*msg_callback)(int write_p, int version, int content_type, const void *buf, size_t len, SSL *ssl, void *arg);
 	void *msg_callback_arg;
+
+#ifndef OPENSSL_NO_SPLIT_TLS
+    void (*sni_callback)(unsigned char *buf, int len, SSL *ssl);
+#endif /* OPENSSL_NO_SPLIT_TLS */
 
 	int hit;		/* reusing a previous session */
 

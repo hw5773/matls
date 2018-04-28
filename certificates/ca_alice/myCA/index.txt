@@ -3,3 +3,4 @@ V	180413124225Z		D929CB9B45A3BB90	unknown	/C=US/ST=California/L=California/O=Ali
 V	180430104354Z		D929CB9B45A3BB91	unknown	/C=US/ST=California/L=California/O=Alice Ltd./OU=Alice Ltd./CN=*.alice.com/emailAddress=alice@alice.com
 V	180430104423Z		D929CB9B45A3BB92	unknown	/C=US/ST=California/L=California/O=Alice Ltd./OU=Alice Ltd./CN=*.alice.com/emailAddress=4096@alice.com
 V	180516105200Z		D929CB9B45A3BB93	unknown	/C=US/ST=California/L=California/O=Alice Origin/OU=Origin/CN=www.alice.com/emailAddress=origin@alice.com
+V	190425065432Z		D929CB9B45A3BB94	unknown	/C=KR/ST=Seoul/L=Seoul/O=Middlebox-aware TLS/OU=SNU/CN=matls@matls.com/emailAddress=matls@matls.com

@@ -14,7 +14,7 @@ LDFLAGS=-lssl -lcrypto -ldl -lpthread
 GDB=gdb
 
 HOST=127.0.0.1
-PORT=5678
+PORT=443
 NUM_OF_THREADS=1
 
 default: server

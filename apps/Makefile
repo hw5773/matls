@@ -1,4 +1,4 @@
-CERT_FILE=carol_cert.pem
+CERT_FILE=new_carol.crt
 CA_CERT_FILE=ca_carol.pem
 KEY_FILE=carol_priv.key
 
@@ -8,7 +8,7 @@ GCC=gcc
 CFLAGS=-o
 CLIENT_SRC=client.c
 SERVER_SRC=server.c
-FLAGS=-I/home/hwlee/openssl-mb-lib/include -L/home/hwlee/openssl-mb-lib/lib
+FLAGS=-I/home/jhlim/openssl-mb-lib/include -L/home/jhlim/openssl-mb-lib/lib
 #FLAGS=-I/home/hwlee/openssl_lib/include -L/home/hwlee/openssl_lib/lib
 #FLAGS=-I/usr/local/include -L/usr/local/lib
 LDFLAGS=-lssl -lcrypto -ldl -lpthread

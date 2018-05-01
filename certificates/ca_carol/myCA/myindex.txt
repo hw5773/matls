@@ -1,0 +1,1 @@
+V	190419075649Z		D0971207DB301103	unknown	/C=KR/ST=Seoul/L=Seoul/O=Carol CDN Inc./OU=CDN/CN=*.carol.com/emailAddress=edge@carol.com

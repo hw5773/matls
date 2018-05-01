@@ -68,7 +68,7 @@ int main(int count, char *strings[])
 		BIO_printf(outbio, "SSL_new() Success\n");
 		SSL_set_fd(ssl, client);      /* set connection socket to SSL state */
 		BIO_printf(outbio, "SSL_set_fd() Success\n");
-		SSL_enable_mb(ssl);
+		//SSL_enable_mb(ssl);
 
 		unsigned long hs_start, hs_end;
 		BIO_printf(outbio, "PROGRESS: TLS Handshake Start\n");

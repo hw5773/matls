@@ -1,3 +1,4 @@
+
 /*
  * Copyright 1995-2016 The OpenSSL Project Authors. All Rights Reserved.
  *
@@ -281,7 +282,6 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
 
         for (i=0; i<s->mb_info.num_keys; i++)
         {
-          printf("before t1_prf\n");
           memcpy(tmp, s->mb_info.secret[i] + 1, 32);
 
           t1_prf(TLS_MD_GLOBAL_MAC_KEY_CONST, TLS_MD_GLOBAL_MAC_KEY_CONST_SIZE,
@@ -289,9 +289,8 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
                 s->s3->client_random, SSL3_RANDOM_SIZE,
                 NULL, 0, NULL, 0,
                 s->mb_info.secret[i], SECRET_LENGTH,
-                s->mb_info.mac_array[i], SSL_MAX_GLOBAL_MAC_KEY_LENGTH); //LENGTH: 48
+                s->mb_info.mac_array[i], SSL_MAX_GLOBAL_MAC_KEY_LENGTH); //LENGTH: 32
 
-          printf("after t1_prf\n");
           PRINTK("Server Random", s->s3->server_random, SSL3_RANDOM_SIZE);
           PRINTK("Client Random", s->s3->client_random, SSL3_RANDOM_SIZE);
           PRINTK("Secret", tmp, 32);
@@ -299,7 +298,7 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
         }
     }
 
-    printf("PROGRESS: Set the length for the extension\n");
+    printf("PROGRESS: Set the length for the extension mbmb\n");
     *len = 5 + serv_length; 
     printf("PROGRESS: Complete Setting the length for the extension: %d\n", *len);
 

@@ -282,11 +282,15 @@ void *run(void *data)
 
   if ((ret = SSL_connect(ssl)) != 1)
   {
+    ERR_print_errors_fp(stderr);
     MA_LOG1s("Failed to connect to", ip);
     MA_LOG1d("SSL_connect()", ret);
     MA_LOG1d("SSL_get_error()", SSL_get_error(ssl, ret));
   }
-  MA_LOG1s("Succeed to connect to", ip);
+  else
+  {
+    MA_LOG1s("Succeed to connect to", ip);
+  }
 
   SSL_free(ssl);
   close(server);
@@ -303,7 +307,7 @@ void ssl_init(char *cert, char *priv) {
   ERR_load_crypto_strings();
 
   /* create the SSL server context */
-  ctx = SSL_CTX_new(SSLv23_server_method());
+  ctx = SSL_CTX_new(TLSv1_2_method());
   if (!ctx)
     die("SSL_CTX_new()");
 

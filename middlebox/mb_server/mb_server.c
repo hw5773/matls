@@ -7,12 +7,13 @@
 #include <unistd.h>
 
 #include "mssl.h"
+#include "table.h"
 
 int main(int argc, char **argv)
 {
   char str[INET_ADDRSTRLEN];
   int port, i;
-  char *cert, *priv, *capath;
+  char *cert, *priv, *capath, *forward_file;
 
   if (argc == 1)
   {
@@ -20,14 +21,19 @@ int main(int argc, char **argv)
     cert = DEFAULT_CERT;
     priv = DEFAULT_PRIV;
     capath = DEFAULT_CA_PATH;
+    forward_file = DEFAULT_FORWARD_FILE;
   }
-  else if (argc == 5)
+  else if (argc == 6)
   {
     port = atoi(argv[1]);
     cert = argv[2];
     priv = argv[3];
     capath = argv[4];
+    forward_file = argv[5];
   }
+
+  init_forward_table(forward_file);
+  init_thread_config();
 
   int servfd = socket(AF_INET, SOCK_STREAM, 0);
   if (servfd < 0)
@@ -107,6 +113,8 @@ int main(int argc, char **argv)
     close(fdset[1].fd);
     ssl_client_cleanup(&client);
   }
+
+  free_forward_table();
 
   return 0;
 }

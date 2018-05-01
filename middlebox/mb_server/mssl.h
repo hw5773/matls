@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #include <openssl/err.h>
 #include <openssl/ssl.h>
@@ -12,10 +13,12 @@
 
 #define DEFAULT_BUF_SIZE 1024
 #define MAX_CLNT_SIZE 10
+#define MAX_THREADS 100
 
 #define DEFAULT_CERT "matls_cert.crt"
 #define DEFAULT_PRIV "matls_priv.pem"
 #define DEFAULT_CA_PATH "/etc/ssl/certs"
+#define DEFAULT_FORWARD_FILE "forward.txt"
 
 SSL_CTX *ctx;
 
@@ -62,5 +65,20 @@ int do_sock_write();
 
 void msg_callback(int write, int version, int content_type, 
     const void *buf, size_t len, SSL *ssl, void *arg);
+
+// Thread related definitions.
+pthread_t threads[MAX_THREADS];
+pthread_attr_t attr;
+int complete[MAX_THREADS];
+
+void init_thread_config(void);
+int get_thread_index();
+
+// Forward related definitions.
+struct forward_info
+{
+  int index;
+};
+void *run(void *data);
 
 #endif /* __MB_SERVER_H__ */

@@ -1,4 +1,7 @@
 #include "mssl.h"
+#include "table.h"
+#include "common.h"
+#include "../common/logs.h"
 
 void handle_error(const char *file, int lineno, const char *msg) {
   fprintf(stderr, "** %s:%i %s\n", file, lineno, msg);
@@ -206,7 +209,21 @@ int do_sock_write()
 
 void sni_callback(unsigned char *buf, int len, SSL *ssl)
 {
+  int index, ilen, port, rc, tidx;
+  unsigned char *ip; 
+  void *status;
+  struct forward_info *args;
+  
   printf("server name: %s\n", buf);
+  index = find_by_name(buf, len);
+  ip = get_ip_by_index(index, &ilen);
+  port = get_port_by_index(index);
+  printf("forward to: %s:%d\n", ip, port);
+
+  args = (struct forward_info *)malloc(sizeof(struct forward_info));
+  args->index = index;
+  tidx = get_thread_index();
+  rc = pthread_create(&threads[tidx], &attr, run, args);
 }
 
 void msg_callback(int write, int version, int content_type, const void *buf, size_t len, SSL *ssl, void *arg)
@@ -244,6 +261,35 @@ void msg_callback(int write, int version, int content_type, const void *buf, siz
       printf("\n");
   }
   printf("\n");
+}
+
+void *run(void *data)
+{
+  struct forward_info *args;
+  unsigned char *ip;
+  int server, ilen, port, ret;
+  SSL *ssl;
+
+  args = (struct forward_info *)data;
+  ip = get_ip_by_index(args->index, &ilen);
+  port = get_port_by_index(args->index);
+
+  server = open_connection(ip, port);
+  ssl = SSL_new(ctx);
+  SSL_set_fd(ssl, server);
+
+  MA_LOG1s("Start SSL connections to", ip);
+
+  if ((ret = SSL_connect(ssl)) != 1)
+  {
+    MA_LOG1s("Failed to connect to", ip);
+    MA_LOG1d("SSL_connect()", ret);
+    MA_LOG1d("SSL_get_error()", SSL_get_error(ssl, ret));
+  }
+  MA_LOG1s("Succeed to connect to", ip);
+
+  SSL_free(ssl);
+  close(server);
 }
 
 void ssl_init(char *cert, char *priv) {
@@ -288,4 +334,22 @@ void ssl_init(char *cert, char *priv) {
   SSL_CTX_set_sni_callback(ctx, sni_callback);
 }
 
+void init_thread_config(void)
+{
+  pthread_attr_init(&attr);
+  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+}
 
+int get_thread_index(void)
+{
+  int i, ret = -1;
+
+  for (i=0; i<MAX_THREADS; i++)
+    if (!threads[i])
+    {
+      ret = i;
+      break;
+    }
+
+  return ret;
+}

@@ -1,2 +1,0 @@
-default:
-	gcc -Wall -O0 -g3 -std=c99 -I/home/hwlee/openssl-splittls-lib/include -L/home/hwlee/openssl-splittls-lib/lib -o server_nio ssl_server_nonblock.c -lssl -lcrypto -ldl

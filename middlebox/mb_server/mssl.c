@@ -1,4 +1,7 @@
 #include "mssl.h"
+#include "table.h"
+#include "common.h"
+#include "../common/logs.h"
 
 void handle_error(const char *file, int lineno, const char *msg) {
   fprintf(stderr, "** %s:%i %s\n", file, lineno, msg);
@@ -17,6 +20,22 @@ void print_unencrypted_data(char *buf, size_t len) {
   printf("%.*s", (int)len, buf);
 }
 
+int send_to_pair(SSL *ssl, char *buf, size_t len)
+{
+  MA_LOG("Send the following data to the pair");
+  int ret = 0;
+  printf("%.*s", (int)len, buf);
+
+  while (!ssl->pair) {}
+
+  do {
+    ret += SSL_write(ssl->pair, buf, len);
+  } while (ret < len);
+
+  MA_LOG1d("Sent bytes", ret);
+  return ret;
+}
+
 void ssl_client_init(struct ssl_client *p)
 {
   memset(p, 0, sizeof(struct ssl_client));
@@ -29,7 +48,7 @@ void ssl_client_init(struct ssl_client *p)
   SSL_set_accept_state(p->ssl); /* sets ssl to work in server mode. */
   SSL_set_bio(p->ssl, p->rbio, p->wbio);
 
-  p->io_on_read = print_unencrypted_data;
+  p->io_on_read = send_to_pair;
 }
 
 void ssl_client_cleanup(struct ssl_client *p)
@@ -121,7 +140,7 @@ int on_read_cb(char* src, size_t len)
       n = SSL_read(client.ssl, buf, sizeof(buf));
       printf("SSL_read bytes: %d\n", n);
       if (n > 0)
-        client.io_on_read(buf, (size_t)n);
+        client.io_on_read(client.ssl, buf, (size_t)n);
     } while (n > 0);
 
     status = get_sslstatus(client.ssl, n);
@@ -204,6 +223,26 @@ int do_sock_write()
     return -1;
 }
 
+void sni_callback(unsigned char *buf, int len, SSL *ssl)
+{
+  int index, ilen, port, rc, tidx;
+  unsigned char *ip; 
+  void *status;
+  struct forward_info *args;
+  
+  printf("server name: %s\n", buf);
+  index = find_by_name(buf, len);
+  ip = get_ip_by_index(index, &ilen);
+  port = get_port_by_index(index);
+  printf("forward to: %s:%d\n", ip, port);
+
+  args = (struct forward_info *)malloc(sizeof(struct forward_info));
+  args->index = index;
+  args->ssl = ssl;
+  tidx = get_thread_index();
+  rc = pthread_create(&threads[tidx], &attr, run, args);
+}
+
 void msg_callback(int write, int version, int content_type, const void *buf, size_t len, SSL *ssl, void *arg)
 {
   int i;
@@ -241,6 +280,76 @@ void msg_callback(int write, int version, int content_type, const void *buf, siz
   printf("\n");
 }
 
+void *run(void *data)
+{
+  struct forward_info *args;
+  struct timeval tv;
+  unsigned char *ip;
+  unsigned char buf[DEFAULT_BUF_SIZE];
+  int server, ilen, port, ret;
+  SSL *ssl, *pair;
+  fd_set reads, temps;
+
+  args = (struct forward_info *)data;
+  ip = get_ip_by_index(args->index, &ilen);
+  port = get_port_by_index(args->index);
+
+  server = open_connection(ip, port);
+  ssl = SSL_new(ctx);
+  SSL_set_fd(ssl, server);
+
+  MA_LOG1s("Start SSL connections to", ip);
+
+  if ((ret = SSL_connect(ssl)) != 1)
+  {
+    ERR_print_errors_fp(stderr);
+    MA_LOG1s("Failed to connect to", ip);
+    MA_LOG1d("SSL_connect()", ret);
+    MA_LOG1d("SSL_get_error()", SSL_get_error(ssl, ret));
+  }
+  else
+  {
+    MA_LOG1s("Succeed to connect to", ip);
+    ssl->pair = args->ssl;
+    args->ssl->pair = ssl;
+  }
+
+  FD_ZERO(&reads);
+  FD_SET(server, &reads);
+  tv.tv_sec = 10;
+  tv.tv_usec = 0;
+
+  while (1)
+  {
+    ret = select(server+1, &reads, 0, 0, &tv);
+    if (ret == -1)
+    {
+      MA_LOG("Error Happened");
+      break;
+    }
+
+    else if (ret == 0)
+    {
+      break;
+    }
+
+    else
+    {
+      if (FD_ISSET(server, &reads))
+      {
+        ret = SSL_read(ssl, buf, DEFAULT_BUF_SIZE);
+        MA_LOG1d("Read bytes", ret);
+        printf("%.*s\n", (int)ret, buf);
+        send_unencrypted_bytes(buf, ret);
+      }
+    }
+  }
+
+  MA_LOG("Close the session with the server");
+  SSL_free(ssl);
+  close(server);
+}
+
 void ssl_init(char *cert, char *priv) {
   printf("initialising SSL\n");
 
@@ -252,7 +361,7 @@ void ssl_init(char *cert, char *priv) {
   ERR_load_crypto_strings();
 
   /* create the SSL server context */
-  ctx = SSL_CTX_new(SSLv23_server_method());
+  ctx = SSL_CTX_new(TLSv1_2_method());
   if (!ctx)
     die("SSL_CTX_new()");
 
@@ -279,7 +388,26 @@ void ssl_init(char *cert, char *priv) {
 
   /* Recommended to avoid SSLv2 & SSLv3 */
   SSL_CTX_set_options(ctx, SSL_OP_ALL|SSL_OP_NO_SSLv2|SSL_OP_NO_SSLv3);
-  SSL_CTX_set_msg_callback(ctx, msg_callback);
+  //SSL_CTX_set_msg_callback(ctx, msg_callback);
+  SSL_CTX_set_sni_callback(ctx, sni_callback);
 }
 
+void init_thread_config(void)
+{
+  pthread_attr_init(&attr);
+  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+}
 
+int get_thread_index(void)
+{
+  int i, ret = -1;
+
+  for (i=0; i<MAX_THREADS; i++)
+    if (!threads[i])
+    {
+      ret = i;
+      break;
+    }
+
+  return ret;
+}

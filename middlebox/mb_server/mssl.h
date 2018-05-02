@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #include <openssl/err.h>
 #include <openssl/ssl.h>
@@ -12,10 +13,12 @@
 
 #define DEFAULT_BUF_SIZE 1024
 #define MAX_CLNT_SIZE 10
+#define MAX_THREADS 100
 
 #define DEFAULT_CERT "matls_cert.crt"
 #define DEFAULT_PRIV "matls_priv.pem"
 #define DEFAULT_CA_PATH "/etc/ssl/certs"
+#define DEFAULT_FORWARD_FILE "forward.txt"
 
 SSL_CTX *ctx;
 
@@ -39,14 +42,14 @@ struct ssl_client
   size_t encrypt_len;
 
   /* Method to invoke when unencrypted bytes are available. */
-  void (*io_on_read)(char *buf, size_t len);
+  int (*io_on_read)(SSL *ssl, char *buf, size_t len);
 } client;
 
 enum sslstatus { SSLSTATUS_OK, SSLSTATUS_WANT_IO, SSLSTATUS_FAIL};
 
 void handle_error(const char *file, int lineno, const char *msg);
 void die(const char *msg);
-void print_unencrypted_data(char *buf, size_t len);
+int send_to_pair(SSL *ssl, char *buf, size_t len);
 
 void ssl_init(char *cert, char *priv);
 void ssl_client_init(struct ssl_client *p);
@@ -62,5 +65,21 @@ int do_sock_write();
 
 void msg_callback(int write, int version, int content_type, 
     const void *buf, size_t len, SSL *ssl, void *arg);
+
+// Thread related definitions.
+pthread_t threads[MAX_THREADS];
+pthread_attr_t attr;
+int complete[MAX_THREADS];
+
+void init_thread_config(void);
+int get_thread_index();
+
+// Forward related definitions.
+struct forward_info
+{
+  int index;
+  SSL *ssl;
+};
+void *run(void *data);
 
 #endif /* __MB_SERVER_H__ */

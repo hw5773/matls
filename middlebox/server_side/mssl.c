@@ -35,7 +35,7 @@ int get_ssl_status(SSL *ssl, int n)
       MA_LOG("SSL_ERROR_SYSCALL");
       break;
     default:
-      MA_LOG("invalid status");
+      MA_LOG1d("SSL_SUCCESS", err);
   }
 
   return err;
@@ -104,7 +104,7 @@ int ssl_init(char *cert, char *priv, char *capath)
   if (SSL_CTX_use_PrivateKey_file(ctx, priv, SSL_FILETYPE_PEM) <= 0) goto err;
   if (SSL_CTX_check_private_key(ctx) != 1) goto err;
 
-  SSL_CTX_set_msg_callback(ctx, msg_callback);
+//  SSL_CTX_set_msg_callback(ctx, msg_callback);
   SSL_CTX_set_options(ctx, SSL_OP_ALL | SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3);
   return SUCCESS;
 
@@ -140,7 +140,7 @@ int ssl_client_init(struct pollfd *client, struct sockaddr *peer_addr,
 //  BIO_set_nbio(p->rbio, 1);
 //  BIO_set_nbio(p->wbio, 1);
 
-  p->client->events = POLLIN | POLLOUT | POLLERR | POLLHUP | POLLNVAL;
+  p->client->events = POLLIN | POLLERR | POLLHUP | POLLNVAL;
   SSL_set_accept_state(p->ssl);
   SSL_set_bio(p->ssl, p->rbio, p->wbio);
 
@@ -179,7 +179,7 @@ int ssl_io_operation(struct client_info *p)
       n = BIO_read(p->wbio, p->wbuf->mem + p->wbuf->len, p->wbuf->max - p->wbuf->len);
       p->wbuf->len += n;
       p->ret = n;
-      MA_LOG1lu("Read from write buffer", n);
+      MA_LOG1ld("Read from write buffer", n);
 
       while (p->wbuf->len == p->wbuf->max)
       {
@@ -187,7 +187,7 @@ int ssl_io_operation(struct client_info *p)
         p->wbuf->max += DEFAULT_BUF_SIZE;
         n = BIO_read(p->wbio, p->wbuf->mem + p->wbuf->len, p->wbuf->max - p->wbuf->len);
         p->wbuf->len += n;
-        MA_LOG1lu("Read from write buffer", n);
+        MA_LOG1ld("Read from write buffer", n);
       }
       p->ret = n;
 
@@ -213,62 +213,112 @@ err:
   return FAILURE;
 }
 
+int queue_to_write_buf(struct client_info *p, unsigned char *buf, ssize_t n)
+{
+  MA_LOG("queue to write buf");
+  if (n > (p->wbuf->max - p->wbuf->len))
+  {
+    p->wbuf->mem = (unsigned char *)realloc(p->wbuf->mem, p->wbuf->max + DEFAULT_BUF_SIZE);
+
+    if (!p->wbuf->mem)
+      return -1;
+
+    p->wbuf->max += DEFAULT_BUF_SIZE;
+  }
+
+  memcpy(p->wbuf->mem + p->wbuf->len, buf, n);
+
+  MA_LOG1ld("to write size", n);
+  p->wbuf->len += n;
+
+  return n;
+}
+/*
 int process_accept(struct client_info *p)
 {
+  MA_LOG("process accept");
   ssize_t n;
-  int err;
+  int err, ret;
+  unsigned char buf[DEFAULT_BUF_SIZE];
+
   n = SSL_accept(p->ssl);
+  MA_LOG1ld("after accept", n);
 
   err = get_ssl_status(p->ssl, n);
 
-  if (err == SSL_ERROR_WANT_WRITE)
+  ret = 0;
+  if ((err == SSL_ERROR_WANT_READ) || (err == SSL_ERROR_WANT_WRITE))
   {
     do {
-      n = BIO_read(p->wbio, p->wbuf->mem, sizeof(p->wbuf->mem));
-      p->wbuf->len += n;
+      n = BIO_read(p->wbio, buf, DEFAULT_BUF_SIZE);
+      MA_LOG1ld("after read", n);
+      if (n > 0)
+      {
+        n = queue_to_write_buf(p, buf, n);
+        ret += n;
+      }
+      else if (!BIO_should_retry(p->wbio))
+        return -1;
     } while (n > 0);
   }
 
+  if (err == 1)
+    return -1;
+
+  MA_LOG1d("SSL_is_init_finished", SSL_is_init_finished(p->ssl));
   if (!SSL_is_init_finished(p->ssl))
     return 0;
+  return n;
+}
+*/
+int on_read_cb(struct client_info *p, char *src, size_t len)
+{
+  char buf[DEFAULT_BUF_SIZE];
+  int n, err;
+
+  while (len > 0)
+  {
+    n = BIO_write(p->rbio, src, len);
+    if (n <= 0)
+      return -1;
+
+    src += n;
+    len -= n;
+
+    if (!SSL_is_init_finished(p->ssl))
+    {
+      n = SSL_accept(p->ssl);
+      err = get_ssl_status(p->ssl, n);
+
+      if ((err == SSL_ERROR_WANT_READ) || (err == SSL_ERROR_WANT_WRITE))
+        do {
+          n = BIO_read(p->wbio, buf, sizeof(buf));
+          if (n>0)
+            queue_to_write_buf(p, buf, n);
+          else if (!BIO_should_retry(p->wbio))
+            return -1;
+        } while (n > 0);
+
+      if (err == 1)
+        return -1;
+
+      if (!SSL_is_init_finished(p->ssl))
+        return 0;
+    }
+  }
+
+  return 0;
 }
 
 int do_sock_read(struct client_info *p)
 {
-  MA_LOG("do_sock_read");
-  int ret;
-  ssize_t n; 
-  n = read(p->client->fd, p->rbuf->mem + p->rbuf->len, p->rbuf->max - p->rbuf->len);
-  p->rbuf->len += n;
-  MA_LOG1lu("Read from Socket", n);
+  char buf[DEFAULT_BUF_SIZE];
+  ssize_t n = read(p->client->fd, buf, sizeof(buf));
 
-  while (p->rbuf->len >= p->rbuf->max)
-  {
-    p->rbuf->mem = (unsigned char *)realloc(p->rbuf->mem, p->rbuf->max + DEFAULT_BUF_SIZE);
-    n = read(p->client->fd, p->rbuf->mem + p->rbuf->len, p->rbuf->max - p->rbuf->len);
-    p->rbuf->len += n;
-    MA_LOG1lu("Read from Socket", n);
-  }
-
-  MA_LOG1d("In read buffer", p->rbuf->len);
-
-  n = 0;
-  while (p->rbuf->len > 0)
-  {
-    n = BIO_write(p->rbio, p->rbuf->mem + n, p->rbuf->len);
-    p->rbuf->len -= n;
-  }
-
-  MA_LOG1d("In read buffer after write", p->rbuf->len);
-
-  if (!SSL_is_init_finished(p->ssl))
-  {
-    ret = process_accept(p);
-    return ret;
-  }
-
-  get_ssl_status(p->ssl, n);
-  return p->rbuf->len;
+  if (n > 0)
+    return on_read_cb(p, buf, (size_t)n);
+  else
+     return -1;
 }
 
 int do_sock_write(struct client_info *p)
@@ -276,30 +326,19 @@ int do_sock_write(struct client_info *p)
   MA_LOG("do_sock_write");
   ssize_t n = 0;
 
-  if (get_ssl_status(p->ssl, p->ret) == SSL_ERROR_NONE)
+  n = write(p->client->fd, p->wbuf->mem, p->wbuf->len);
+  MA_LOG1ld("Write to Socket", n);
+
+  if (n>0)
   {
-/*
-    do {
-      n = BIO_read(p->wbio, p->wbuf->mem + p->wbuf->len, p->wbuf->max - p->wbuf->len);
-      MA_LOG1lu("read from wbio", n);
-      if (n > 0)
-      {
-        p->wbuf->len += n;
-        if (n >= p->wbuf->max - p->wbuf->len)
-        {
-          p->wbuf->mem = (unsigned char *)realloc(p->wbuf->mem, p->wbuf->max + DEFAULT_BUF_SIZE);
-        }
-      }
-    } while (n > 0);
-*/
-    while (p->wbuf->len > 0)
-    {
-      n = write(p->client->fd, p->wbuf->mem, p->wbuf->len);
-      p->wbuf->len -= n;
-      MA_LOG1lu("Write to Socket", n);
-    }
+    if ((size_t)n < p->wbuf->len)
+      memmove(p->wbuf->mem, p->wbuf->mem + n, p->wbuf->len - n);
+    p->wbuf->len -= n;
+    p->wbuf->mem = (unsigned char *)realloc(p->wbuf->mem, p->wbuf->len);
+    return 0;
   }
-  return n;
+  else
+    return -1;
 }
 
 void ssl_client_cleanup(struct client_info *p)

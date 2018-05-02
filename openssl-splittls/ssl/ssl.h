@@ -1417,6 +1417,10 @@ struct ssl_st
 #ifndef OPENSSL_NO_MB
 	unsigned char mb_enabled;
 #endif /* OPENSSL_NO_MB */
+
+#ifndef OPENSSL_NO_SPLIT_TLS
+    SSL *pair;
+#endif /* OPENSSL_NO_SPLIT_TLS */
 	};
 
 #endif

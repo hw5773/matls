@@ -42,14 +42,14 @@ struct ssl_client
   size_t encrypt_len;
 
   /* Method to invoke when unencrypted bytes are available. */
-  void (*io_on_read)(char *buf, size_t len);
+  int (*io_on_read)(SSL *ssl, char *buf, size_t len);
 } client;
 
 enum sslstatus { SSLSTATUS_OK, SSLSTATUS_WANT_IO, SSLSTATUS_FAIL};
 
 void handle_error(const char *file, int lineno, const char *msg);
 void die(const char *msg);
-void print_unencrypted_data(char *buf, size_t len);
+int send_to_pair(SSL *ssl, char *buf, size_t len);
 
 void ssl_init(char *cert, char *priv);
 void ssl_client_init(struct ssl_client *p);
@@ -78,6 +78,7 @@ int get_thread_index();
 struct forward_info
 {
   int index;
+  SSL *ssl;
 };
 void *run(void *data);
 

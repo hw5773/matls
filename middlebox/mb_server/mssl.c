@@ -20,6 +20,22 @@ void print_unencrypted_data(char *buf, size_t len) {
   printf("%.*s", (int)len, buf);
 }
 
+int send_to_pair(SSL *ssl, char *buf, size_t len)
+{
+  MA_LOG("Send the following data to the pair");
+  int ret = 0;
+  printf("%.*s", (int)len, buf);
+
+  while (!ssl->pair) {}
+
+  do {
+    ret += SSL_write(ssl->pair, buf, len);
+  } while (ret < len);
+
+  MA_LOG1d("Sent bytes", ret);
+  return ret;
+}
+
 void ssl_client_init(struct ssl_client *p)
 {
   memset(p, 0, sizeof(struct ssl_client));
@@ -32,7 +48,7 @@ void ssl_client_init(struct ssl_client *p)
   SSL_set_accept_state(p->ssl); /* sets ssl to work in server mode. */
   SSL_set_bio(p->ssl, p->rbio, p->wbio);
 
-  p->io_on_read = print_unencrypted_data;
+  p->io_on_read = send_to_pair;
 }
 
 void ssl_client_cleanup(struct ssl_client *p)
@@ -124,7 +140,7 @@ int on_read_cb(char* src, size_t len)
       n = SSL_read(client.ssl, buf, sizeof(buf));
       printf("SSL_read bytes: %d\n", n);
       if (n > 0)
-        client.io_on_read(buf, (size_t)n);
+        client.io_on_read(client.ssl, buf, (size_t)n);
     } while (n > 0);
 
     status = get_sslstatus(client.ssl, n);
@@ -222,6 +238,7 @@ void sni_callback(unsigned char *buf, int len, SSL *ssl)
 
   args = (struct forward_info *)malloc(sizeof(struct forward_info));
   args->index = index;
+  args->ssl = ssl;
   tidx = get_thread_index();
   rc = pthread_create(&threads[tidx], &attr, run, args);
 }
@@ -266,9 +283,12 @@ void msg_callback(int write, int version, int content_type, const void *buf, siz
 void *run(void *data)
 {
   struct forward_info *args;
+  struct timeval tv;
   unsigned char *ip;
+  unsigned char buf[DEFAULT_BUF_SIZE];
   int server, ilen, port, ret;
-  SSL *ssl;
+  SSL *ssl, *pair;
+  fd_set reads, temps;
 
   args = (struct forward_info *)data;
   ip = get_ip_by_index(args->index, &ilen);
@@ -290,8 +310,42 @@ void *run(void *data)
   else
   {
     MA_LOG1s("Succeed to connect to", ip);
+    ssl->pair = args->ssl;
+    args->ssl->pair = ssl;
   }
 
+  FD_ZERO(&reads);
+  FD_SET(server, &reads);
+  tv.tv_sec = 10;
+  tv.tv_usec = 0;
+
+  while (1)
+  {
+    ret = select(server+1, &reads, 0, 0, &tv);
+    if (ret == -1)
+    {
+      MA_LOG("Error Happened");
+      break;
+    }
+
+    else if (ret == 0)
+    {
+      break;
+    }
+
+    else
+    {
+      if (FD_ISSET(server, &reads))
+      {
+        ret = SSL_read(ssl, buf, DEFAULT_BUF_SIZE);
+        MA_LOG1d("Read bytes", ret);
+        printf("%.*s\n", (int)ret, buf);
+        send_unencrypted_bytes(buf, ret);
+      }
+    }
+  }
+
+  MA_LOG("Close the session with the server");
   SSL_free(ssl);
   close(server);
 }

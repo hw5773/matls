@@ -100,14 +100,19 @@ int main(int argc, char **argv)
         if (do_sock_read() == -1)
           break;
       }
+
       if (revents & POLLOUT)
       {
         if (client.write_len > 0)
           if (do_sock_write() == -1)
             break;
       }
+
       if (revents & (POLLERR | POLLHUP | POLLNVAL))
         break;
+
+      if (client.encrypt_len > 0)
+        do_encrypt();
     }
 
     close(fdset[1].fd);

@@ -172,7 +172,11 @@
 
 ///// Add for MB //////
 #include <vector>
-//#include <openssl/span.h>
+#include "mb_logger.h"
+
+// Note: below this is only for test, must be removed on deploy
+// static unsigned long mb_handshake_start_time;
+// static unsigned long mb_handshake_end_time;
 
 namespace bssl {
 
@@ -932,7 +936,7 @@ static enum ssl_hs_wait_t do_read_server_certificate_mb(SSL_HANDSHAKE *hs) {
   ssl->method->next_message(ssl);
 
   hs->state = state_read_certificate_status;
-  printf("[MB] read certificate done\n");
+  // printf("[MB] read certificate done\n");
   return ssl_hs_ok;
 }
 
@@ -1009,7 +1013,7 @@ static enum ssl_hs_wait_t do_verify_server_certificate(SSL_HANDSHAKE *hs) {
 ///// Add for MB /////
 static enum ssl_hs_wait_t do_verify_server_certificate_mb(SSL_HANDSHAKE *hs) {
 
-  printf("[MB] start verifying server cert\n");  
+  // printf("[MB] start verifying server cert\n");  
 
   if (!ssl_cipher_uses_certificate_auth(hs->new_cipher)) {
     hs->state = state_read_server_key_exchange;
@@ -1027,7 +1031,7 @@ static enum ssl_hs_wait_t do_verify_server_certificate_mb(SSL_HANDSHAKE *hs) {
   }
 
   hs->state = state_read_server_key_exchange;
-  printf("[MB] done verifying server cert\n");  
+  // printf("[MB] done verifying server cert\n");  
   return ssl_hs_ok;
 }
 
@@ -1801,7 +1805,15 @@ static enum ssl_hs_wait_t do_process_change_cipher_spec(SSL_HANDSHAKE *hs) {
 
 static enum ssl_hs_wait_t do_read_server_finished(SSL_HANDSHAKE *hs) {
   SSL *const ssl = hs->ssl;
-  enum ssl_hs_wait_t wait = ssl_get_finished(hs);
+
+  ///// Add for MB /////
+  enum ssl_hs_wait_t wait;
+  if (ssl->mb_enabled) {
+    wait = ssl_get_finished_mb(hs);
+  } else {
+    wait = ssl_get_finished(hs);
+  }
+
   if (wait != ssl_hs_ok) {
     return wait;
   }
@@ -1856,6 +1868,7 @@ enum ssl_hs_wait_t ssl_client_handshake(SSL_HANDSHAKE *hs) {
         static_cast<enum ssl_client_hs_state_t>(hs->state);
     switch (state) {
       case state_start_connect:
+        mb_handshake_start_time = get_current_microseconds();
         ret = do_start_connect(hs);
         break;
       case state_enter_early_data:
@@ -1921,11 +1934,12 @@ enum ssl_hs_wait_t ssl_client_handshake(SSL_HANDSHAKE *hs) {
         ret = do_read_server_finished(hs);
         break;
       case state_finish_client_handshake:
-        ret = do_finish_client_handshake(hs);
+        ret = do_finish_client_handshake(hs); 
+        mb_handshake_end_time = get_current_microseconds();
+        printf("%ld\n", mb_handshake_end_time - mb_handshake_start_time);
         break;
       case state_done:
         ret = ssl_hs_ok;
-        printf("[MB] done handshake\n");
         break;
     }
 

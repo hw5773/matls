@@ -7,8 +7,18 @@
 
 static int g_core_limit = 1;
 
+static void init_monitor(mctx_t mctx)
+{
+  MA_LOG("Create mssl socket");
+  int sock = mssl_socket(mctx, AF_INET, MOS_SOCK_SPLIT_TLS, 0);
+
+  if (sock < 0)
+    MA_LOG("Failed to create monitor raw socket!");
+}
+
 int main(int argc, char *argv[])
 {
+  int i;
   char *fname = MSSL_CONFIG_FILE;
   struct mssl_conf mcfg;
   mctx_t mctx_list[MAX_CORES];
@@ -25,7 +35,20 @@ int main(int argc, char *argv[])
 
   MA_LOG("Init Success");
 
-  mssl_create_context(0);
+  for (i=0; i<g_core_limit; i++)
+  {
+    if ((mctx_list[i] = mssl_create_context(0)) < 0)
+    {
+      MA_LOG("Failed to create mssl context");
+      return -1;
+    }
+    init_monitor(mctx_list[i]);
+  }
+/*
+  for (i=0; i<g_core_limit; i++)
+    mssl_app_join(mctx_list[i]);
 
+  mssl_destroy();
+*/
   return 0;
 }

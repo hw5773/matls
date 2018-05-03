@@ -407,7 +407,6 @@ static void feed_mos_conf_line(struct conf_block *blk, char *line, int len)
 
 static void feed_netdev_conf_line(struct conf_block *blk, char *line, int len)
 {
-  MA_LOG("feed_netdev_conf_line");
   struct netdev_conf * const conf = (struct netdev_conf *)blk->conf;
 
 #ifndef DARWIN
@@ -924,13 +923,11 @@ static void init_config(struct config *config)
     if (!blk) goto init_config_err;
     init_app_block(config, blk);
     TAILQ_INSERT_TAIL(&g_free_blkh, blk, link);
-    MA_LOG("Initialize app block");
 
     blk = (struct conf_block *)calloc(1, sizeof(struct conf_block));
     if (!blk) goto init_config_err;
     init_netdev_block(config, blk);
     TAILQ_INSERT_TAIL(&g_free_blkh, blk, link);
-    MA_LOG("Initialize netdev block");
   }
 
   for (i=0; i<MAX_MOS_BLOCK; i++)
@@ -939,25 +936,21 @@ static void init_config(struct config *config)
     if (!blk) goto init_config_err;
     init_mos_block(config, blk);
     TAILQ_INSERT_TAIL(&g_free_blkh, blk, link);
-    MA_LOG("Initialize mos block");
 
     blk = (struct conf_block *)calloc(1, sizeof(struct conf_block));
     if (!blk) goto init_config_err;
     init_arp_block(config, blk);
     TAILQ_INSERT_TAIL(&g_free_blkh, blk, link);
-    MA_LOG("Initialize arp block");
 
     blk = (struct conf_block *)calloc(1, sizeof(struct conf_block));
     if (!blk) goto init_config_err;
     init_route_block(config, blk);
     TAILQ_INSERT_TAIL(&g_free_blkh, blk, link);
-    MA_LOG("Initialize route block");
 
     blk = (struct conf_block *)calloc(1, sizeof(struct conf_block));
     if (!blk) goto init_config_err;
     init_nic_forward_block(config, blk);
     TAILQ_INSERT_TAIL(&g_free_blkh, blk, link);
-    MA_LOG("Initialize nic forward block");
   }
 
   return;
@@ -1156,7 +1149,8 @@ void patch_config(struct config *config)
 }
 
 /**
- * @brief Configure the mssl (the first half)
+ * @brief Configure the mssl (the first half) according to the config file
+ * (parsing/configuring)
  * @param File name
  * @return Success/Failure
  */
@@ -1191,11 +1185,11 @@ int load_configuration_upper_half(const char *fname)
 }
 
 /**
- * @brief Configure the mssl (the second half)
+ * @brief Matching the routing table's nic number with the arp table's nic
+ * number
  */
 void load_configuration_lower_half(void)
 {
-  MA_LOG("Progress lower half configuration");
   struct route_conf *route_conf = g_config.mos->route_table;
   struct netdev_conf *netdev_conf = g_config.mos->netdev_table;
   struct nic_forward_conf *nicfwd_conf = g_config.mos->nic_forward_table;

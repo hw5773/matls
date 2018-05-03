@@ -1,0 +1,53 @@
+[matls] ssl_init: Initialize SSL
+[matls] main: Waiting for next connection on port: 443
+[matls] main: nready: 1
+[matls] main: client accpeted: 4
+[matls] main: maxi: 1
+[matls] main: Waiting for next connection on port: 443
+[matls] main: nready: 1
+[matls] main: socket: 1
+[matls] do_sock_read: do_sock_read
+[matls] do_sock_read: Read from Socket: 307
+[matls] do_sock_read: In read buffer: 307
+[matls] do_sock_read: After BIO write: 307
+[matls] do_sock_read: In read buffer after write: 0
+[matls] process_accept: process accept
+[matls] process_accept: after accept: -1
+[matls] get_ssl_status: SSL_ERROR_WANT_READ
+[matls] process_accept: after read: 1092
+[matls] queue_to_write_buf: queue to write buf
+[matls] queue_to_write_buf: to write size: 1092
+[matls] process_accept: after read: -1
+[matls] process_accept: SSL_is_init_finished: 0
+[matls] main: Waiting for next connection on port: 443
+[matls] main: nready: 1
+[matls] main: socket: 1
+[matls] do_sock_write: do_sock_write
+[matls] do_sock_write: Write to Socket: 1092
+[matls] main: Waiting for next connection on port: 443
+[matls] main: nready: 1
+[matls] main: socket: 1
+[matls] do_sock_read: do_sock_read
+[matls] do_sock_read: Read from Socket: 318
+[matls] do_sock_read: In read buffer: 318
+[matls] do_sock_read: After BIO write: 318
+[matls] do_sock_read: In read buffer after write: 0
+[matls] process_accept: process accept
+[matls] process_accept: after accept: 1
+[matls] get_ssl_status: SSL_ERROR_NONE
+[matls] process_accept: SSL_is_init_finished: 1
+[matls] main: Waiting for next connection on port: 443
+[matls] main: nready: 1
+[matls] main: socket: 1
+[matls] do_sock_read: do_sock_read
+[matls] do_sock_read: Read from Socket: 0
+[matls] do_sock_read: In read buffer: 0
+[matls] do_sock_read: In read buffer after write: 0
+[matls] do_sock_read: no return after accept
+[matls] do_sock_read: before SSL_read
+[matls] do_sock_read: after SSL_read: -1
+[matls] get_ssl_status: SSL_ERROR_WANT_READ
+[matls] do_sock_read: before BIO_read
+[matls] do_sock_read: after BIO read: 226
+[matls] queue_to_write_buf: queue to write buf
+make: *** [sstart] Segmentation fault (core dumped)

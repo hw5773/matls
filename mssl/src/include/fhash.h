@@ -26,12 +26,12 @@ struct hashtable {
 };
 
 /*functions for hashtable*/
-struct hashtable *CreateHashtable(void);
-void DestroyHashtable(struct hashtable *ht);
+void create_hashtable(struct hashtable **ht);
+void destroy_hashtable(struct hashtable *ht);
 
 
 int HTInsert(struct hashtable *ht, tcp_stream *, unsigned int *hash);
 void* HTRemove(struct hashtable *ht, tcp_stream *);
-tcp_stream* HTSearch(struct hashtable *ht, const tcp_stream *, unsigned int *hash);
+tcp_stream* HTSearch(struct hashtable *ht, tcp_stream *, const tcp_stream *, unsigned int *hash);
 
 #endif /* __FHASH_H_ */

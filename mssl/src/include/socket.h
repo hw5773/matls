@@ -11,18 +11,17 @@
 #include "tcp_rb.h"
 #include "scalable_event.h"
 
-/*----------------------------------------------------------------------------*/
 #ifndef __SOCKET_MAP
 #define __SOCKET_MAP
 typedef struct socket_map * socket_map_t;
 #endif
-/*----------------------------------------------------------------------------*/
+
 enum socket_opts
 {
-	MTCP_NONBLOCK		= 0x01,
-	MTCP_ADDR_BIND		= 0x02, 
+	mssl_NONBLOCK		= 0x01,
+	mssl_ADDR_BIND		= 0x02, 
 };
-/*----------------------------------------------------------------------------*/
+
 struct tcp_listener
 {
 	int sockid;
@@ -34,7 +33,7 @@ struct tcp_listener
 	pthread_mutex_t accept_lock;
 	pthread_cond_t accept_cond;
 };
-/*----------------------------------------------------------------------------*/
+
 struct mon_listener
 {
 	socket_map_t socket;
@@ -73,7 +72,7 @@ struct mon_listener
 
 	TAILQ_ENTRY(mon_listener) link;
 };
-/*----------------------------------------------------------------------------*/
+
 struct mon_stream
 {
 	socket_map_t socket;
@@ -102,7 +101,7 @@ struct mon_stream
 		client_mon: 1,
 		server_mon: 1;
 };
-/*----------------------------------------------------------------------------*/
+
 struct socket_map
 {
 	int id;
@@ -117,25 +116,19 @@ struct socket_map
 		struct tcp_listener *listener;
 		struct mon_listener *monitor_listener;
 		struct mon_stream *monitor_stream;
-		struct mtcp_epoll *ep;
+		struct mssl_epoll *ep;
 		struct pipe *pp;
 	};
 
 	uint64_t epoll;			/* registered events */
 	uint64_t events;		/* available events */
-	mtcp_epoll_data_t ep_data;
+	mssl_epoll_data_t ep_data;
 
 	TAILQ_ENTRY (socket_map) link;
 };
-/*----------------------------------------------------------------------------*/
-socket_map_t 
-AllocateSocket(mctx_t mctx, int socktype);
-/*----------------------------------------------------------------------------*/
-void 
-FreeSocket(mctx_t mctx, int sockid, int socktype); 
-/*----------------------------------------------------------------------------*/
-socket_map_t 
-GetSocket(mctx_t mctx, int sockid);
-/*----------------------------------------------------------------------------*/
+
+socket_map_t allocate_socket(mctx_t mctx, int socktype);
+void free_socket(mctx_t mctx, int sockid, int socktype); 
+socket_map_t get_socket(mctx_t mctx, int sockid);
 
 #endif /* __SOCKET_H_ */

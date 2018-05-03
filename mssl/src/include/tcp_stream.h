@@ -6,8 +6,8 @@
 #else
 #include <linux/tcp.h>
 #endif
-#include <netinet/ip.h>
 #include <sys/queue.h>
+#include <netinet/ip.h>
 
 #include "mssl.h"
 #include "socket.h"
@@ -33,7 +33,7 @@ struct sockent {
 #define SOCKQ_INSERT_TAIL(head, socket) \
 do { \
 	struct sockent *__s = \
-			(struct sockent *)MPAllocateChunk(mssl->sockent_pool); \
+			(struct sockent *)mp_allocate_chunk(mssl->sockent_pool); \
 	if (__s) { \
 		__s->sock = (socket); \
 		TAILQ_INSERT_TAIL(head, __s, link); \
@@ -48,7 +48,7 @@ do { \
 	} \
 	if (__walk) { \
 		TAILQ_REMOVE(head, __walk, link); \
-		MPFreeChunk(mssl->sockent_pool, __walk); \
+		mp_free_chunk(mssl->sockent_pool, __walk); \
 	} \
 } while (0)
 #define SOCKQ_FOREACH_START(var, head) \
@@ -162,6 +162,7 @@ struct tcp_send_vars
 	uint32_t peer_wnd;		/* client window size */
 	//uint32_t snd_up;		/* send urgent pointer (not used) */
 	uint32_t iss;			/* initial sending sequence */
+  uint32_t iack;    /* initial ack sequence */
 	uint32_t fss;			/* final sending sequence */
 
 	/* retransmission timeout variables */
@@ -342,5 +343,7 @@ get_last_timestamp(struct tcp_stream *stream, uint32_t *usecs, socklen_t *sz);
 
 void
 posix_seq_srand(unsigned seed);
+
+int posix_seq_rand(void);
 
 #endif /* __TCP_STREAM_H_ */

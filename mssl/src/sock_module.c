@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <linux/if_packet.h>
-#include <linux/ip.h>
 #include <linux/tcp.h>
 #include <linux/if_ether.h>
 #include <sys/socket.h>
@@ -40,12 +39,18 @@ struct sock_private_context
   int if_idx[MAX_DEVICES];
 } g_sock_ctx;
 
+/**
+ * @brief binding the socket context with the thread context
+ */
 void sock_init_handle(struct mssl_thread_context *ctx)
 {
-  MA_LOG("Initialize the handler");
+  //MA_LOG("Initialize the handler");
   ctx->io_private_context = &g_sock_ctx;
 }
 
+/*
+ * @brief Getting the nic number from the socket
+ */
 int sock_get_nif(struct ifreq *ifr)
 {
   int i;
@@ -58,9 +63,12 @@ int sock_get_nif(struct ifreq *ifr)
   return -1;
 }
 
+/*
+ * @brief Sending the packets in write buffers
+ */
 int sock_send_pkts(struct mssl_thread_context *ctx, int idx)
 {
-  MA_LOG1s("Sending the packet to", g_config.mos->route_table->ent[idx]->dev_name);
+  //MA_LOG1s("Sending the packet to", g_config.mos->route_table->ent[idx]->dev_name);
   int i, len, sent, trial = 0, max_trial = 3;
   struct sock_private_context *spc = ctx->io_private_context;
   struct sockaddr_ll dest;
@@ -68,10 +76,11 @@ int sock_send_pkts(struct mssl_thread_context *ctx, int idx)
 
   if (len == 0)
   {
-    MA_LOG("Packet length is 0");
+    //MA_LOG("Packet length is 0");
     return 0;
   }
 
+  //MA_LOG1s("Sending the packet to", g_config.mos->route_table->ent[idx]->dev_name);
 #ifdef NETSTAT
   mssl->nstat.tx_packets[idx]++;
   mssl->nstat.tx_bytes[idx] += len + ETHER_OVR;
@@ -83,14 +92,12 @@ int sock_send_pkts(struct mssl_thread_context *ctx, int idx)
   for (i=0; i<ETH_ALEN; i++)
     dest.sll_addr[i] = spc->snd_pktbuf[idx][i];
 
-  MA_LOGmac("Destination MAC", dest.sll_addr);
+  //MA_LOGmac("Destination MAC", dest.sll_addr);
 
 tx_again:
   if (sent = (sendto(spc->fd[idx], spc->snd_pktbuf[idx], len, MSG_DONTWAIT, (struct sockaddr *)&dest, sizeof(struct sockaddr_ll))) != len)
   {
-    MA_LOG1d("Send Failed, only sent", sent);
-    MA_LOG1d("Need to send", len);
-    MA_LOG("Retry to send");
+    //MA_LOG1d("Send Failed, only sent", sent);
     trial += 1;
     if (trial < max_trial)
       goto tx_again;
@@ -104,6 +111,10 @@ tx_again:
   return 1;
 }
 
+/*
+ * @brief Receiving the packets from the socket and storing them into the read
+ * buffer
+ */
 int sock_recv_pkts(struct mssl_thread_context *ctx, int ifidx)
 {
   int i;
@@ -118,46 +129,55 @@ int sock_recv_pkts(struct mssl_thread_context *ctx, int ifidx)
 
     if (spc->rcv_pkt_len[i] < 0)
       break;
-    else
-      MA_LOG1d("Received", spc->rcv_pkt_len[i]);
+//    else
+//      MA_LOG1d("Received", spc->rcv_pkt_len[i]);
   }
 
   if (i > 0)
   {
-    MA_LOG1s("Received from", spc->dev_name[ifidx]);
-    MA_LOG1d("Num of Packets", i);
+//    MA_LOG1s("Received from", spc->dev_name[ifidx]);
+//    MA_LOG1d("Num of Packets", i);
   }
 
   return i;
 }
 
+/*
+ * @brief Getting the pointer to the buffer to be read
+ */
 uint8_t *sock_get_rptr(struct mssl_thread_context *ctx, int ifidx, int index, uint16_t *len)
 {
-  MA_LOG1d("Getting packet pointer", index);
+//  MA_LOG1d("Getting packet pointer", index);
   struct sock_private_context *spc = ctx->io_private_context;
-  MA_LOG("Getting private_context success");
+ // MA_LOG("Getting private_context success");
   if (spc->rcv_pkt_len[index] <= 0)
     return NULL;
 
   *len = spc->rcv_pkt_len[index];
-  MA_LOG1d("Length of packet", *len);
+ // MA_LOG1d("Length of packet", *len);
   return spc->rcv_pktbuf[index];
 }
 
+/*
+ * @brief Getting the pointer to the buffer to be written
+ */
 uint8_t *sock_get_wptr(struct mssl_thread_context *ctx, int idx, uint16_t len)
 {
-  MA_LOG1d("Getting write buffer pointer for the interface", idx);
+  //MA_LOG1d("Getting write buffer pointer for the interface", idx);
   struct sock_private_context *spc = ctx->io_private_context;
-  MA_LOG("Getting private context success");
+  //MA_LOG("Getting private context success");
   if (spc->snd_pkt_size[idx] != 0)
     sock_send_pkts(ctx, idx);
   spc->snd_pkt_size[idx] = len;
 
-  MA_LOG("Getting socket success!");
+  //MA_LOG("Getting socket success!");
 
   return (uint8_t *)spc->snd_pktbuf[idx];
 }
 
+/*
+ * @brief Generating the sockets and making them be in promiscuous modes
+ */
 void sock_load_module_upper_half(void)
 {
   int i, j, sockopt;
@@ -167,7 +187,6 @@ void sock_load_module_upper_half(void)
 
 
   num_dev = g_config.mos->netdev_table->num;
-  MA_LOG1d("number of interfaces", num_dev);
 
   for (i=0; i<num_dev; i++)
   {
@@ -182,7 +201,6 @@ void sock_load_module_upper_half(void)
   {
     g_sock_ctx.dev_name[i] = (char *)malloc(IFNAMSIZ);
     memcpy(g_sock_ctx.dev_name[i], ent[i]->dev_name, IFNAMSIZ-1);
-    MA_LOG1s("Device Name", g_sock_ctx.dev_name[i]);
 
     strncpy(if_opts.ifr_name, g_sock_ctx.dev_name[i], IFNAMSIZ-1);
     ioctl(g_sock_ctx.fd[i], SIOCGIFFLAGS, &if_opts);
@@ -210,7 +228,7 @@ void sock_load_module_upper_half(void)
 
     g_sock_ctx.if_idx[i] = if_idx.ifr_ifindex;
   }
-  MA_LOG("Sock module initialize success");
+  //MA_LOG("Sock module initialize success");
   return;
 err:
   for (i=0; i<num_dev; i++)
@@ -220,8 +238,6 @@ err:
 
 static void set_promisc(char *ifname)
 {
-  MA_LOG1s("set_promisc", ifname);
-
   int fd, ret;
   struct ifreq eth;
 
@@ -244,7 +260,6 @@ static void set_promisc(char *ifname)
 
   if (eth.ifr_flags & IFF_PROMISC)
   {
-    MA_LOG1s("Interface is already set to promiscuous", ifname);
     close(fd);
     return;
   }
@@ -262,6 +277,9 @@ static void set_promisc(char *ifname)
   close(fd);
 }
 
+/*
+ * @brief Making nics to be in promiscuous mode.
+ */
 void sock_load_module_lower_half(void)
 {
   struct netdev_entry **ent;

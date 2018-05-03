@@ -1,3 +1,4 @@
+
 /*
  * Copyright 1995-2016 The OpenSSL Project Authors. All Rights Reserved.
  *
@@ -57,7 +58,6 @@ int make_keypair(struct keypair **pair, EC_GROUP *group, BN_CTX *ctx) {
 int char_to_pub(unsigned char *input, int key_length, EC_POINT *pubkey, EC_GROUP *group, BN_CTX *ctx)
 {
     int klen = (key_length - 1)/ 2;
-    int ret;
     unsigned char *xstr = (unsigned char *)malloc(klen); //klen+1?
     unsigned char *ystr = (unsigned char *)malloc(klen); //klen+1?
 
@@ -149,7 +149,7 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
     // SSL_F_SSL_PARSE_CLIENTHELLO_MB_EXT
 
     unsigned char *p;
-    int i, slen, klen, nk, plen;  // klen: key length, nk: number of keys, plen: EC point length
+    int i, klen, nk, plen;  // klen: key length, nk: number of keys, plen: EC point length
     unsigned char *secret_str, *peer_str;
     struct keypair *serv_keypair;
     EC_GROUP *group;
@@ -215,6 +215,7 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
         printf("key length[%d]: %d\n", i, klen);
         peer_str = (unsigned char *)malloc(klen);
         memcpy(peer_str, p, klen);
+		PRINTK("Client Pubkey", p, klen);
         p += klen;
 
         peer_pub = EC_POINT_new(group);
@@ -254,7 +255,7 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
 	EC_GROUP *group;
 	BN_CTX *ctx;
 	unsigned char *serv_str;
-	int i, j, serv_length, plen;
+	int i, serv_length, plen;
 
     switch(group_id)
     {
@@ -281,17 +282,16 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
 
         for (i=0; i<s->mb_info.num_keys; i++)
         {
-          printf("before t1_prf\n");
-          memcpy(tmp, s->mb_info.secret[i] + 1, 32);
+		  printf("before t1_prf\n");
+          memcpy(tmp, s->mb_info.secret[i], 32);
 
           t1_prf(TLS_MD_GLOBAL_MAC_KEY_CONST, TLS_MD_GLOBAL_MAC_KEY_CONST_SIZE,
                 s->s3->server_random, SSL3_RANDOM_SIZE,
                 s->s3->client_random, SSL3_RANDOM_SIZE,
                 NULL, 0, NULL, 0,
                 s->mb_info.secret[i], SECRET_LENGTH,
-                s->mb_info.mac_array[i], SSL_MAX_GLOBAL_MAC_KEY_LENGTH); //LENGTH: 48
+                s->mb_info.mac_array[i], SSL_MAX_GLOBAL_MAC_KEY_LENGTH); //LENGTH: 32
 
-          printf("after t1_prf\n");
           PRINTK("Server Random", s->s3->server_random, SSL3_RANDOM_SIZE);
           PRINTK("Client Random", s->s3->client_random, SSL3_RANDOM_SIZE);
           PRINTK("Secret", tmp, 32);
@@ -299,7 +299,7 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
         }
     }
 
-    printf("PROGRESS: Set the length for the extension\n");
+    printf("PROGRESS: Set the length for the extension mbmb\n");
     *len = 5 + serv_length; 
     printf("PROGRESS: Complete Setting the length for the extension: %d\n", *len);
 

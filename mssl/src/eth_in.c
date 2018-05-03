@@ -25,7 +25,7 @@ inline void fillin_packet_eth_context(struct pkt_ctx *pctx, uint32_t cur_ts, int
 
 int process_packet(mssl_manager_t mssl, const int ifidx, const int index, uint32_t cur_ts, unsigned char *pkt_data, int len)
 {
-  MA_LOG("process_packet");
+//  MA_LOG("process_packet");
   struct pkt_ctx pctx;
   struct ethhdr *ethh = (struct ethhdr *)pkt_data;
   int ret = -1;
@@ -35,12 +35,13 @@ int process_packet(mssl_manager_t mssl, const int ifidx, const int index, uint32
 
   if (proto == ETH_P_IP)
   {
-    MA_LOG("This is IPv4 packet");
+    //MA_LOG("This is IPv4 packet");
     ret = process_in_ipv4_packet(mssl, &pctx);
+    //MA_LOG("Process IPv4 packet success");
   }
   else
   {
-    MA_LOG("This is not IPv4 packet");
+    //MA_LOG("This is not IPv4 packet");
     if (!mssl->num_msp || !pctx.forward)
     {
       if (proto == ETH_P_ARP)
@@ -61,5 +62,6 @@ int process_packet(mssl_manager_t mssl, const int ifidx, const int index, uint32
     }
   }
 
+  //MA_LOG("Process success");
   return ret;
 }

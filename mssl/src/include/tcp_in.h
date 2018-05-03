@@ -39,7 +39,7 @@
 
 #define TCP_DEFAULT_MSS         1460
 #define TCP_DEFAULT_WSCALE      7
-#define TCP_INITAL_WINDOW       14600
+#define TCP_INITIAL_WINDOW       14600
 
 #define TCP_SEQ_LT(a,b)     ((int32_t)((a)-(b)) < 0)
 #define TCP_SEQ_LEQ(a,b)   ((int32_t)((a)-(b)) <= 0)

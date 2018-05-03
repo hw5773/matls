@@ -92,7 +92,7 @@ def make_index_hash(f, of, start, domains):
         of.write(s)
 
         if num % 10000 == 0:
-            msg = "Progress: %s out of %s" % (num - start, start + domains)
+            msg = "Progress: %s out of %s" % (num - start + 1, domains)
             send_email(msg)
 
 def main():

@@ -1,0 +1,74 @@
+\hypertarget{pair__repo_8c}{\section{middlebox/pair\-\_\-repo.c File Reference}
+\label{pair__repo_8c}\index{middlebox/pair\-\_\-repo.\-c@{middlebox/pair\-\_\-repo.\-c}}
+}
+{\ttfamily \#include \char`\"{}pair\-\_\-repo.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}mb\-\_\-log.\-h\char`\"{}}\\*
+Include dependency graph for pair\-\_\-repo.\-c\-:
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{pair__repo_8c_ad1aef3f7e7e5562142570be3109bb8ee}{init\-\_\-repo\-\_\-table} ()
+\item 
+int \hyperlink{pair__repo_8c_a470f255046628836999e30f7dc1a164d}{free\-\_\-repo\-\_\-table} ()
+\item 
+int \hyperlink{pair__repo_8c_ae0d70af68951f21a5bbef1ed68a8c81e}{add\-\_\-pair\-\_\-to\-\_\-table} (struct \hyperlink{structpair__entry}{pair\-\_\-entry} $\ast$tmp)
+\item 
+struct \hyperlink{structpair__entry}{pair\-\_\-entry} $\ast$ \hyperlink{pair__repo_8c_adeddfb9d5ce04de11b35244a6882a426}{get\-\_\-pair\-\_\-from\-\_\-table} (uint32\-\_\-t saddr, uint16\-\_\-t sport, uint32\-\_\-t daddr, uint16\-\_\-t dport)
+\item 
+int \hyperlink{pair__repo_8c_a23493e2fe18d15155ce3831a864c7ef4}{free\-\_\-pair\-\_\-from\-\_\-table} (uint32\-\_\-t saddr, uint16\-\_\-t sport, uint32\-\_\-t daddr, uint16\-\_\-t dport)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structhash__table}{hash\-\_\-table} \hyperlink{pair__repo_8c_a37324730ab0a7b9b421c4fd4b60b3811}{pair\-\_\-table}
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{pair__repo_8c_ae0d70af68951f21a5bbef1ed68a8c81e}{\index{pair\-\_\-repo.\-c@{pair\-\_\-repo.\-c}!add\-\_\-pair\-\_\-to\-\_\-table@{add\-\_\-pair\-\_\-to\-\_\-table}}
+\index{add\-\_\-pair\-\_\-to\-\_\-table@{add\-\_\-pair\-\_\-to\-\_\-table}!pair_repo.c@{pair\-\_\-repo.\-c}}
+\subsubsection[{add\-\_\-pair\-\_\-to\-\_\-table}]{\setlength{\rightskip}{0pt plus 5cm}int add\-\_\-pair\-\_\-to\-\_\-table (
+\begin{DoxyParamCaption}
+\item[{struct {\bf pair\-\_\-entry} $\ast$}]{tmp}
+\end{DoxyParamCaption}
+)}}\label{pair__repo_8c_ae0d70af68951f21a5bbef1ed68a8c81e}
+\hypertarget{pair__repo_8c_a23493e2fe18d15155ce3831a864c7ef4}{\index{pair\-\_\-repo.\-c@{pair\-\_\-repo.\-c}!free\-\_\-pair\-\_\-from\-\_\-table@{free\-\_\-pair\-\_\-from\-\_\-table}}
+\index{free\-\_\-pair\-\_\-from\-\_\-table@{free\-\_\-pair\-\_\-from\-\_\-table}!pair_repo.c@{pair\-\_\-repo.\-c}}
+\subsubsection[{free\-\_\-pair\-\_\-from\-\_\-table}]{\setlength{\rightskip}{0pt plus 5cm}int free\-\_\-pair\-\_\-from\-\_\-table (
+\begin{DoxyParamCaption}
+\item[{uint32\-\_\-t}]{saddr, }
+\item[{uint16\-\_\-t}]{sport, }
+\item[{uint32\-\_\-t}]{daddr, }
+\item[{uint16\-\_\-t}]{dport}
+\end{DoxyParamCaption}
+)}}\label{pair__repo_8c_a23493e2fe18d15155ce3831a864c7ef4}
+\hypertarget{pair__repo_8c_a470f255046628836999e30f7dc1a164d}{\index{pair\-\_\-repo.\-c@{pair\-\_\-repo.\-c}!free\-\_\-repo\-\_\-table@{free\-\_\-repo\-\_\-table}}
+\index{free\-\_\-repo\-\_\-table@{free\-\_\-repo\-\_\-table}!pair_repo.c@{pair\-\_\-repo.\-c}}
+\subsubsection[{free\-\_\-repo\-\_\-table}]{\setlength{\rightskip}{0pt plus 5cm}int free\-\_\-repo\-\_\-table (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{pair__repo_8c_a470f255046628836999e30f7dc1a164d}
+\hypertarget{pair__repo_8c_adeddfb9d5ce04de11b35244a6882a426}{\index{pair\-\_\-repo.\-c@{pair\-\_\-repo.\-c}!get\-\_\-pair\-\_\-from\-\_\-table@{get\-\_\-pair\-\_\-from\-\_\-table}}
+\index{get\-\_\-pair\-\_\-from\-\_\-table@{get\-\_\-pair\-\_\-from\-\_\-table}!pair_repo.c@{pair\-\_\-repo.\-c}}
+\subsubsection[{get\-\_\-pair\-\_\-from\-\_\-table}]{\setlength{\rightskip}{0pt plus 5cm}struct {\bf pair\-\_\-entry}$\ast$ get\-\_\-pair\-\_\-from\-\_\-table (
+\begin{DoxyParamCaption}
+\item[{uint32\-\_\-t}]{saddr, }
+\item[{uint16\-\_\-t}]{sport, }
+\item[{uint32\-\_\-t}]{daddr, }
+\item[{uint16\-\_\-t}]{dport}
+\end{DoxyParamCaption}
+)}}\label{pair__repo_8c_adeddfb9d5ce04de11b35244a6882a426}
+\hypertarget{pair__repo_8c_ad1aef3f7e7e5562142570be3109bb8ee}{\index{pair\-\_\-repo.\-c@{pair\-\_\-repo.\-c}!init\-\_\-repo\-\_\-table@{init\-\_\-repo\-\_\-table}}
+\index{init\-\_\-repo\-\_\-table@{init\-\_\-repo\-\_\-table}!pair_repo.c@{pair\-\_\-repo.\-c}}
+\subsubsection[{init\-\_\-repo\-\_\-table}]{\setlength{\rightskip}{0pt plus 5cm}int init\-\_\-repo\-\_\-table (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{pair__repo_8c_ad1aef3f7e7e5562142570be3109bb8ee}
+
+
+\subsection{Variable Documentation}
+\hypertarget{pair__repo_8c_a37324730ab0a7b9b421c4fd4b60b3811}{\index{pair\-\_\-repo.\-c@{pair\-\_\-repo.\-c}!pair\-\_\-table@{pair\-\_\-table}}
+\index{pair\-\_\-table@{pair\-\_\-table}!pair_repo.c@{pair\-\_\-repo.\-c}}
+\subsubsection[{pair\-\_\-table}]{\setlength{\rightskip}{0pt plus 5cm}struct {\bf hash\-\_\-table} pair\-\_\-table}}\label{pair__repo_8c_a37324730ab0a7b9b421c4fd4b60b3811}

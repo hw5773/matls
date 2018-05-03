@@ -1,0 +1,149 @@
+\hypertarget{client_8c}{\section{examples/client.c File Reference}
+\label{client_8c}\index{examples/client.\-c@{examples/client.\-c}}
+}
+{\ttfamily \#include \char`\"{}logger.\-h\char`\"{}}\\*
+{\ttfamily \#include $<$stdio.\-h$>$}\\*
+{\ttfamily \#include $<$errno.\-h$>$}\\*
+{\ttfamily \#include $<$unistd.\-h$>$}\\*
+{\ttfamily \#include $<$malloc.\-h$>$}\\*
+{\ttfamily \#include $<$string.\-h$>$}\\*
+{\ttfamily \#include $<$time.\-h$>$}\\*
+{\ttfamily \#include $<$resolv.\-h$>$}\\*
+{\ttfamily \#include $<$netdb.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/ssl.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/evp.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/err.\-h$>$}\\*
+{\ttfamily \#include $<$sys/time.\-h$>$}\\*
+{\ttfamily \#include $<$sys/socket.\-h$>$}\\*
+{\ttfamily \#include $<$pthread.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/opensslv.\-h$>$}\\*
+Include dependency graph for client.\-c\-:
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{client_8c_abb508ea8227673f419e9fe3a86c30d8e}{F\-A\-I\-L}~-\/1
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void $\ast$ \hyperlink{client_8c_ad9d3ad41281ac09f0cb0d33ccb70fc7e}{run} (void $\ast$data)
+\item 
+int \hyperlink{client_8c_ae43cadad3a3a01c4f171074b1a80dc16}{open\-\_\-connection} (const char $\ast$\hyperlink{client_8c_af203df082d5c6dcaa0c88b07cf86466d}{hostname}, int port)
+\item 
+S\-S\-L\-\_\-\-C\-T\-X $\ast$ \hyperlink{client_8c_a3dc2957a6576370f83c759e6533cb399}{init\-\_\-client\-\_\-\-C\-T\-X} (void)
+\item 
+void \hyperlink{client_8c_a0f57b35929d2c19a815ebf77d10a0bfd}{load\-\_\-certificates} (B\-I\-O $\ast$outbio, S\-S\-L\-\_\-\-C\-T\-X $\ast$\hyperlink{client_8c_ad5433bcc8a463fb4df3ce5912bb11fe3}{ctx}, char $\ast$cert\-\_\-file, char $\ast$key\-\_\-file)
+\item 
+void \hyperlink{client_8c_a7f56e06a7ec8df3713912e9919051c3e}{print\-\_\-pubkey} (B\-I\-O $\ast$outbio, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$pkey)
+\item 
+int \hyperlink{client_8c_a99ed24fde392ba5e0c427c04cd8ad429}{main} (int count, char $\ast$strings\mbox{[}$\,$\mbox{]})
+\item 
+void \hyperlink{client_8c_a18d99630f8f0fb59339e315f2e23dbe9}{msg\-\_\-callback} (int write\-\_\-p, int version, int content\-\_\-type, const void $\ast$buf, size\-\_\-t len, S\-S\-L $\ast$ssl, void $\ast$arg)
+\item 
+void \hyperlink{client_8c_a02476f5389aa2c06e290cbe9d7c00628}{apps\-\_\-ssl\-\_\-info\-\_\-callback} (const S\-S\-L $\ast$s, int where, int ret)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+S\-S\-L\-\_\-\-C\-T\-X $\ast$ \hyperlink{client_8c_ad5433bcc8a463fb4df3ce5912bb11fe3}{ctx}
+\item 
+char $\ast$ \hyperlink{client_8c_af203df082d5c6dcaa0c88b07cf86466d}{hostname}
+\item 
+char $\ast$ \hyperlink{client_8c_a00f2ef852af1a666adcb53e9395f572e}{portnum}
+\item 
+B\-I\-O $\ast$ \hyperlink{client_8c_a4903f4ea946648d18bd6a32f4fd35361}{bio\-\_\-err}
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{client_8c_abb508ea8227673f419e9fe3a86c30d8e}{\index{client.\-c@{client.\-c}!F\-A\-I\-L@{F\-A\-I\-L}}
+\index{F\-A\-I\-L@{F\-A\-I\-L}!client.c@{client.\-c}}
+\subsubsection[{F\-A\-I\-L}]{\setlength{\rightskip}{0pt plus 5cm}\#define F\-A\-I\-L~-\/1}}\label{client_8c_abb508ea8227673f419e9fe3a86c30d8e}
+
+
+\subsection{Function Documentation}
+\hypertarget{client_8c_a02476f5389aa2c06e290cbe9d7c00628}{\index{client.\-c@{client.\-c}!apps\-\_\-ssl\-\_\-info\-\_\-callback@{apps\-\_\-ssl\-\_\-info\-\_\-callback}}
+\index{apps\-\_\-ssl\-\_\-info\-\_\-callback@{apps\-\_\-ssl\-\_\-info\-\_\-callback}!client.c@{client.\-c}}
+\subsubsection[{apps\-\_\-ssl\-\_\-info\-\_\-callback}]{\setlength{\rightskip}{0pt plus 5cm}void apps\-\_\-ssl\-\_\-info\-\_\-callback (
+\begin{DoxyParamCaption}
+\item[{const S\-S\-L $\ast$}]{s, }
+\item[{int}]{where, }
+\item[{int}]{ret}
+\end{DoxyParamCaption}
+)}}\label{client_8c_a02476f5389aa2c06e290cbe9d7c00628}
+\hypertarget{client_8c_a3dc2957a6576370f83c759e6533cb399}{\index{client.\-c@{client.\-c}!init\-\_\-client\-\_\-\-C\-T\-X@{init\-\_\-client\-\_\-\-C\-T\-X}}
+\index{init\-\_\-client\-\_\-\-C\-T\-X@{init\-\_\-client\-\_\-\-C\-T\-X}!client.c@{client.\-c}}
+\subsubsection[{init\-\_\-client\-\_\-\-C\-T\-X}]{\setlength{\rightskip}{0pt plus 5cm}S\-S\-L\-\_\-\-C\-T\-X $\ast$ init\-\_\-client\-\_\-\-C\-T\-X (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}\label{client_8c_a3dc2957a6576370f83c759e6533cb399}
+\hypertarget{client_8c_a0f57b35929d2c19a815ebf77d10a0bfd}{\index{client.\-c@{client.\-c}!load\-\_\-certificates@{load\-\_\-certificates}}
+\index{load\-\_\-certificates@{load\-\_\-certificates}!client.c@{client.\-c}}
+\subsubsection[{load\-\_\-certificates}]{\setlength{\rightskip}{0pt plus 5cm}void load\-\_\-certificates (
+\begin{DoxyParamCaption}
+\item[{B\-I\-O $\ast$}]{outbio, }
+\item[{S\-S\-L\-\_\-\-C\-T\-X $\ast$}]{ctx, }
+\item[{char $\ast$}]{cert\-\_\-file, }
+\item[{char $\ast$}]{key\-\_\-file}
+\end{DoxyParamCaption}
+)}}\label{client_8c_a0f57b35929d2c19a815ebf77d10a0bfd}
+\hypertarget{client_8c_a99ed24fde392ba5e0c427c04cd8ad429}{\index{client.\-c@{client.\-c}!main@{main}}
+\index{main@{main}!client.c@{client.\-c}}
+\subsubsection[{main}]{\setlength{\rightskip}{0pt plus 5cm}int main (
+\begin{DoxyParamCaption}
+\item[{int}]{count, }
+\item[{char $\ast$}]{strings\mbox{[}$\,$\mbox{]}}
+\end{DoxyParamCaption}
+)}}\label{client_8c_a99ed24fde392ba5e0c427c04cd8ad429}
+\hypertarget{client_8c_a18d99630f8f0fb59339e315f2e23dbe9}{\index{client.\-c@{client.\-c}!msg\-\_\-callback@{msg\-\_\-callback}}
+\index{msg\-\_\-callback@{msg\-\_\-callback}!client.c@{client.\-c}}
+\subsubsection[{msg\-\_\-callback}]{\setlength{\rightskip}{0pt plus 5cm}void msg\-\_\-callback (
+\begin{DoxyParamCaption}
+\item[{int}]{write\-\_\-p, }
+\item[{int}]{version, }
+\item[{int}]{content\-\_\-type, }
+\item[{const void $\ast$}]{buf, }
+\item[{size\-\_\-t}]{len, }
+\item[{S\-S\-L $\ast$}]{ssl, }
+\item[{void $\ast$}]{arg}
+\end{DoxyParamCaption}
+)}}\label{client_8c_a18d99630f8f0fb59339e315f2e23dbe9}
+\hypertarget{client_8c_ae43cadad3a3a01c4f171074b1a80dc16}{\index{client.\-c@{client.\-c}!open\-\_\-connection@{open\-\_\-connection}}
+\index{open\-\_\-connection@{open\-\_\-connection}!client.c@{client.\-c}}
+\subsubsection[{open\-\_\-connection}]{\setlength{\rightskip}{0pt plus 5cm}int open\-\_\-connection (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{hostname, }
+\item[{int}]{port}
+\end{DoxyParamCaption}
+)}}\label{client_8c_ae43cadad3a3a01c4f171074b1a80dc16}
+\hypertarget{client_8c_a7f56e06a7ec8df3713912e9919051c3e}{\index{client.\-c@{client.\-c}!print\-\_\-pubkey@{print\-\_\-pubkey}}
+\index{print\-\_\-pubkey@{print\-\_\-pubkey}!client.c@{client.\-c}}
+\subsubsection[{print\-\_\-pubkey}]{\setlength{\rightskip}{0pt plus 5cm}void print\-\_\-pubkey (
+\begin{DoxyParamCaption}
+\item[{B\-I\-O $\ast$}]{outbio, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{pkey}
+\end{DoxyParamCaption}
+)}}\label{client_8c_a7f56e06a7ec8df3713912e9919051c3e}
+\hypertarget{client_8c_ad9d3ad41281ac09f0cb0d33ccb70fc7e}{\index{client.\-c@{client.\-c}!run@{run}}
+\index{run@{run}!client.c@{client.\-c}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}void $\ast$ run (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{data}
+\end{DoxyParamCaption}
+)}}\label{client_8c_ad9d3ad41281ac09f0cb0d33ccb70fc7e}
+
+
+\subsection{Variable Documentation}
+\hypertarget{client_8c_a4903f4ea946648d18bd6a32f4fd35361}{\index{client.\-c@{client.\-c}!bio\-\_\-err@{bio\-\_\-err}}
+\index{bio\-\_\-err@{bio\-\_\-err}!client.c@{client.\-c}}
+\subsubsection[{bio\-\_\-err}]{\setlength{\rightskip}{0pt plus 5cm}B\-I\-O$\ast$ bio\-\_\-err}}\label{client_8c_a4903f4ea946648d18bd6a32f4fd35361}
+\hypertarget{client_8c_ad5433bcc8a463fb4df3ce5912bb11fe3}{\index{client.\-c@{client.\-c}!ctx@{ctx}}
+\index{ctx@{ctx}!client.c@{client.\-c}}
+\subsubsection[{ctx}]{\setlength{\rightskip}{0pt plus 5cm}S\-S\-L\-\_\-\-C\-T\-X$\ast$ ctx}}\label{client_8c_ad5433bcc8a463fb4df3ce5912bb11fe3}
+\hypertarget{client_8c_af203df082d5c6dcaa0c88b07cf86466d}{\index{client.\-c@{client.\-c}!hostname@{hostname}}
+\index{hostname@{hostname}!client.c@{client.\-c}}
+\subsubsection[{hostname}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ hostname}}\label{client_8c_af203df082d5c6dcaa0c88b07cf86466d}
+\hypertarget{client_8c_a00f2ef852af1a666adcb53e9395f572e}{\index{client.\-c@{client.\-c}!portnum@{portnum}}
+\index{portnum@{portnum}!client.c@{client.\-c}}
+\subsubsection[{portnum}]{\setlength{\rightskip}{0pt plus 5cm}char $\ast$ portnum}}\label{client_8c_a00f2ef852af1a666adcb53e9395f572e}

@@ -1,0 +1,41 @@
+\hypertarget{hash__function_8h}{\section{middlebox/hash\-\_\-function.h File Reference}
+\label{hash__function_8h}\index{middlebox/hash\-\_\-function.\-h@{middlebox/hash\-\_\-function.\-h}}
+}
+{\ttfamily \#include \char`\"{}stdint.\-h\char`\"{}}\\*
+Include dependency graph for hash\-\_\-function.\-h\-:
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{hash__function_8h_abc7d71657be8975a51684e41029b7964}{get16bits}(d)
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+uint32\-\_\-t \hyperlink{hash__function_8h_ad1a1b70cff8b395958e4f62f1f02f1bc}{\-\_\-\-\_\-hash} (const char $\ast$data, int len)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{hash__function_8h_abc7d71657be8975a51684e41029b7964}{\index{hash\-\_\-function.\-h@{hash\-\_\-function.\-h}!get16bits@{get16bits}}
+\index{get16bits@{get16bits}!hash_function.h@{hash\-\_\-function.\-h}}
+\subsubsection[{get16bits}]{\setlength{\rightskip}{0pt plus 5cm}\#define get16bits(
+\begin{DoxyParamCaption}
+\item[{}]{d}
+\end{DoxyParamCaption}
+)}}\label{hash__function_8h_abc7d71657be8975a51684e41029b7964}
+{\bfseries Value\-:}
+\begin{DoxyCode}
+((((\textcolor{keyword}{const} uint8\_t *)(d))[1] << UINT32\_C(8))\(\backslash\)
+                              +((\textcolor{keyword}{const} uint8\_t *)(d))[0])
+\end{DoxyCode}
+
+
+\subsection{Function Documentation}
+\hypertarget{hash__function_8h_ad1a1b70cff8b395958e4f62f1f02f1bc}{\index{hash\-\_\-function.\-h@{hash\-\_\-function.\-h}!\-\_\-\-\_\-hash@{\-\_\-\-\_\-hash}}
+\index{\-\_\-\-\_\-hash@{\-\_\-\-\_\-hash}!hash_function.h@{hash\-\_\-function.\-h}}
+\subsubsection[{\-\_\-\-\_\-hash}]{\setlength{\rightskip}{0pt plus 5cm}uint32\-\_\-t \-\_\-\-\_\-hash (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{data, }
+\item[{int}]{len}
+\end{DoxyParamCaption}
+)}}\label{hash__function_8h_ad1a1b70cff8b395958e4f62f1f02f1bc}

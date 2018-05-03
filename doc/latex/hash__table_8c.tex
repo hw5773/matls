@@ -1,0 +1,79 @@
+\hypertarget{hash__table_8c}{\section{middlebox/hash\-\_\-table.c File Reference}
+\label{hash__table_8c}\index{middlebox/hash\-\_\-table.\-c@{middlebox/hash\-\_\-table.\-c}}
+}
+{\ttfamily \#include $<$flex/hash\-\_\-table.\-h$>$}\\*
+Include dependency graph for hash\-\_\-table.\-c\-:
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{hash__table_8c_ab169c085175842723f0b8ef86d138f0c}{hash\-\_\-table\-\_\-insert} (struct \hyperlink{structhash__table}{hash\-\_\-table} $\ast$h, struct \hyperlink{structhash__entry}{hash\-\_\-entry} $\ast$e, const unsigned char $\ast$key, unsigned int len)
+\item 
+void \hyperlink{hash__table_8c_afce52c7df56ac3debdbeb4cdd767823f}{hash\-\_\-table\-\_\-insert\-\_\-safe} (struct \hyperlink{structhash__table}{hash\-\_\-table} $\ast$h, struct \hyperlink{structhash__entry}{hash\-\_\-entry} $\ast$e, const unsigned char $\ast$key, unsigned int len)
+\item 
+struct \hyperlink{structhash__entry}{hash\-\_\-entry} $\ast$ \hyperlink{hash__table_8c_a26234bcfb00e679df2eb4b8e1476a9d5}{hash\-\_\-table\-\_\-lookup\-\_\-key} (const struct \hyperlink{structhash__table}{hash\-\_\-table} $\ast$h, const unsigned char $\ast$str, unsigned int len)
+\item 
+struct \hyperlink{structhash__entry}{hash\-\_\-entry} $\ast$ \hyperlink{hash__table_8c_ac20b239fac318b4a3f07951f67443485}{hash\-\_\-table\-\_\-lookup\-\_\-key\-\_\-safe} (struct \hyperlink{structhash__table}{hash\-\_\-table} $\ast$h, const unsigned char $\ast$str, unsigned int len)
+\item 
+struct \hyperlink{structhash__entry}{hash\-\_\-entry} $\ast$ \hyperlink{hash__table_8c_a41c85ba1ce95224217a063dc322f815c}{hash\-\_\-table\-\_\-del\-\_\-key} (struct \hyperlink{structhash__table}{hash\-\_\-table} $\ast$h, const char $\ast$str, unsigned int len)
+\item 
+struct \hyperlink{structhash__entry}{hash\-\_\-entry} $\ast$ \hyperlink{hash__table_8c_a700e46956ce396aebc18e2dc902d072a}{hash\-\_\-table\-\_\-del\-\_\-key\-\_\-safe} (struct \hyperlink{structhash__table}{hash\-\_\-table} $\ast$h, const char $\ast$str, unsigned int len)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{hash__table_8c_a41c85ba1ce95224217a063dc322f815c}{\index{hash\-\_\-table.\-c@{hash\-\_\-table.\-c}!hash\-\_\-table\-\_\-del\-\_\-key@{hash\-\_\-table\-\_\-del\-\_\-key}}
+\index{hash\-\_\-table\-\_\-del\-\_\-key@{hash\-\_\-table\-\_\-del\-\_\-key}!hash_table.c@{hash\-\_\-table.\-c}}
+\subsubsection[{hash\-\_\-table\-\_\-del\-\_\-key}]{\setlength{\rightskip}{0pt plus 5cm}struct {\bf hash\-\_\-entry}$\ast$ hash\-\_\-table\-\_\-del\-\_\-key (
+\begin{DoxyParamCaption}
+\item[{struct {\bf hash\-\_\-table} $\ast$}]{h, }
+\item[{const char $\ast$}]{str, }
+\item[{unsigned int}]{len}
+\end{DoxyParamCaption}
+)}}\label{hash__table_8c_a41c85ba1ce95224217a063dc322f815c}
+\hypertarget{hash__table_8c_a700e46956ce396aebc18e2dc902d072a}{\index{hash\-\_\-table.\-c@{hash\-\_\-table.\-c}!hash\-\_\-table\-\_\-del\-\_\-key\-\_\-safe@{hash\-\_\-table\-\_\-del\-\_\-key\-\_\-safe}}
+\index{hash\-\_\-table\-\_\-del\-\_\-key\-\_\-safe@{hash\-\_\-table\-\_\-del\-\_\-key\-\_\-safe}!hash_table.c@{hash\-\_\-table.\-c}}
+\subsubsection[{hash\-\_\-table\-\_\-del\-\_\-key\-\_\-safe}]{\setlength{\rightskip}{0pt plus 5cm}struct {\bf hash\-\_\-entry}$\ast$ hash\-\_\-table\-\_\-del\-\_\-key\-\_\-safe (
+\begin{DoxyParamCaption}
+\item[{struct {\bf hash\-\_\-table} $\ast$}]{h, }
+\item[{const char $\ast$}]{str, }
+\item[{unsigned int}]{len}
+\end{DoxyParamCaption}
+)}}\label{hash__table_8c_a700e46956ce396aebc18e2dc902d072a}
+\hypertarget{hash__table_8c_ab169c085175842723f0b8ef86d138f0c}{\index{hash\-\_\-table.\-c@{hash\-\_\-table.\-c}!hash\-\_\-table\-\_\-insert@{hash\-\_\-table\-\_\-insert}}
+\index{hash\-\_\-table\-\_\-insert@{hash\-\_\-table\-\_\-insert}!hash_table.c@{hash\-\_\-table.\-c}}
+\subsubsection[{hash\-\_\-table\-\_\-insert}]{\setlength{\rightskip}{0pt plus 5cm}void hash\-\_\-table\-\_\-insert (
+\begin{DoxyParamCaption}
+\item[{struct {\bf hash\-\_\-table} $\ast$}]{h, }
+\item[{struct {\bf hash\-\_\-entry} $\ast$}]{e, }
+\item[{const unsigned char $\ast$}]{key, }
+\item[{unsigned int}]{len}
+\end{DoxyParamCaption}
+)}}\label{hash__table_8c_ab169c085175842723f0b8ef86d138f0c}
+\hypertarget{hash__table_8c_afce52c7df56ac3debdbeb4cdd767823f}{\index{hash\-\_\-table.\-c@{hash\-\_\-table.\-c}!hash\-\_\-table\-\_\-insert\-\_\-safe@{hash\-\_\-table\-\_\-insert\-\_\-safe}}
+\index{hash\-\_\-table\-\_\-insert\-\_\-safe@{hash\-\_\-table\-\_\-insert\-\_\-safe}!hash_table.c@{hash\-\_\-table.\-c}}
+\subsubsection[{hash\-\_\-table\-\_\-insert\-\_\-safe}]{\setlength{\rightskip}{0pt plus 5cm}void hash\-\_\-table\-\_\-insert\-\_\-safe (
+\begin{DoxyParamCaption}
+\item[{struct {\bf hash\-\_\-table} $\ast$}]{h, }
+\item[{struct {\bf hash\-\_\-entry} $\ast$}]{e, }
+\item[{const unsigned char $\ast$}]{key, }
+\item[{unsigned int}]{len}
+\end{DoxyParamCaption}
+)}}\label{hash__table_8c_afce52c7df56ac3debdbeb4cdd767823f}
+\hypertarget{hash__table_8c_a26234bcfb00e679df2eb4b8e1476a9d5}{\index{hash\-\_\-table.\-c@{hash\-\_\-table.\-c}!hash\-\_\-table\-\_\-lookup\-\_\-key@{hash\-\_\-table\-\_\-lookup\-\_\-key}}
+\index{hash\-\_\-table\-\_\-lookup\-\_\-key@{hash\-\_\-table\-\_\-lookup\-\_\-key}!hash_table.c@{hash\-\_\-table.\-c}}
+\subsubsection[{hash\-\_\-table\-\_\-lookup\-\_\-key}]{\setlength{\rightskip}{0pt plus 5cm}struct {\bf hash\-\_\-entry}$\ast$ hash\-\_\-table\-\_\-lookup\-\_\-key (
+\begin{DoxyParamCaption}
+\item[{const struct {\bf hash\-\_\-table} $\ast$}]{h, }
+\item[{const unsigned char $\ast$}]{str, }
+\item[{unsigned int}]{len}
+\end{DoxyParamCaption}
+)}}\label{hash__table_8c_a26234bcfb00e679df2eb4b8e1476a9d5}
+\hypertarget{hash__table_8c_ac20b239fac318b4a3f07951f67443485}{\index{hash\-\_\-table.\-c@{hash\-\_\-table.\-c}!hash\-\_\-table\-\_\-lookup\-\_\-key\-\_\-safe@{hash\-\_\-table\-\_\-lookup\-\_\-key\-\_\-safe}}
+\index{hash\-\_\-table\-\_\-lookup\-\_\-key\-\_\-safe@{hash\-\_\-table\-\_\-lookup\-\_\-key\-\_\-safe}!hash_table.c@{hash\-\_\-table.\-c}}
+\subsubsection[{hash\-\_\-table\-\_\-lookup\-\_\-key\-\_\-safe}]{\setlength{\rightskip}{0pt plus 5cm}struct {\bf hash\-\_\-entry}$\ast$ hash\-\_\-table\-\_\-lookup\-\_\-key\-\_\-safe (
+\begin{DoxyParamCaption}
+\item[{struct {\bf hash\-\_\-table} $\ast$}]{h, }
+\item[{const unsigned char $\ast$}]{str, }
+\item[{unsigned int}]{len}
+\end{DoxyParamCaption}
+)}}\label{hash__table_8c_ac20b239fac318b4a3f07951f67443485}

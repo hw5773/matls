@@ -1,0 +1,100 @@
+\hypertarget{packet_8c}{\section{middlebox/packet.c File Reference}
+\label{packet_8c}\index{middlebox/packet.\-c@{middlebox/packet.\-c}}
+}
+{\ttfamily \#include \char`\"{}mb\-\_\-log.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}packet.\-h\char`\"{}}\\*
+{\ttfamily \#include $<$arpa/inet.\-h$>$}\\*
+{\ttfamily \#include $<$linux/tcp.\-h$>$}\\*
+{\ttfamily \#include $<$linux/ip.\-h$>$}\\*
+{\ttfamily \#include $<$stdlib.\-h$>$}\\*
+{\ttfamily \#include $<$time.\-h$>$}\\*
+{\ttfamily \#include $<$limits.\-h$>$}\\*
+Include dependency graph for packet.\-c\-:
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{packet_8c_a5c860008cf16a08e256d79c54447e95c}{process\-\_\-packet} (struct \hyperlink{structpair__entry}{pair\-\_\-entry} $\ast$\hyperlink{ssl__locl_8h_a4014c6f4a6fa0e565ca592bcaca0fa58}{p}, struct iphdr $\ast$iph, int ipl, struct tcphdr $\ast$tcph, int tl, uint8\-\_\-t $\ast$reply, int $\ast$len)
+\item 
+int \hyperlink{packet_8c_ab3c9b1b95990a6001994312742f5b1d7}{\-\_\-process\-\_\-packet} (struct \hyperlink{structpair__entry}{pair\-\_\-entry} $\ast$\hyperlink{ssl__locl_8h_a4014c6f4a6fa0e565ca592bcaca0fa58}{p}, struct iphdr $\ast$iph, int ipl, struct tcphdr $\ast$tcph, int tl, uint8\-\_\-t $\ast$reply, int $\ast$len)
+\item 
+int \hyperlink{packet_8c_aad7a33d77dc7a2aaf7f10cab293c1add}{check\-\_\-checksum} (uint8\-\_\-t $\ast$header, int len)
+\item 
+int \hyperlink{packet_8c_af8f6c08bab52c247a753dd6e5fa249bb}{\-\_\-ip\-\_\-checksum} (struct iphdr $\ast$iph, int ihl)
+\item 
+int \hyperlink{packet_8c_a14ec8ac659365626c6d95b49c97202bc}{\-\_\-tcp\-\_\-checksum} (struct iphdr $\ast$iph, struct tcphdr $\ast$tcph, int tl)
+\item 
+int \hyperlink{packet_8c_a8b3c6dd4b89495f2c529a0b0b69dabcf}{make\-\_\-checksum} (uint8\-\_\-t $\ast$header, int len)
+\item 
+int \hyperlink{packet_8c_ab2348fe686207ac2143a1980b703505f}{parse\-\_\-entry} (struct \hyperlink{structpair__entry}{pair\-\_\-entry} $\ast$tmp, uint8\-\_\-t $\ast$buf, int len)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{packet_8c_af8f6c08bab52c247a753dd6e5fa249bb}{\index{packet.\-c@{packet.\-c}!\-\_\-ip\-\_\-checksum@{\-\_\-ip\-\_\-checksum}}
+\index{\-\_\-ip\-\_\-checksum@{\-\_\-ip\-\_\-checksum}!packet.c@{packet.\-c}}
+\subsubsection[{\-\_\-ip\-\_\-checksum}]{\setlength{\rightskip}{0pt plus 5cm}int \-\_\-ip\-\_\-checksum (
+\begin{DoxyParamCaption}
+\item[{struct iphdr $\ast$}]{iph, }
+\item[{int}]{ihl}
+\end{DoxyParamCaption}
+)}}\label{packet_8c_af8f6c08bab52c247a753dd6e5fa249bb}
+\hypertarget{packet_8c_ab3c9b1b95990a6001994312742f5b1d7}{\index{packet.\-c@{packet.\-c}!\-\_\-process\-\_\-packet@{\-\_\-process\-\_\-packet}}
+\index{\-\_\-process\-\_\-packet@{\-\_\-process\-\_\-packet}!packet.c@{packet.\-c}}
+\subsubsection[{\-\_\-process\-\_\-packet}]{\setlength{\rightskip}{0pt plus 5cm}int \-\_\-process\-\_\-packet (
+\begin{DoxyParamCaption}
+\item[{struct {\bf pair\-\_\-entry} $\ast$}]{p, }
+\item[{struct iphdr $\ast$}]{iph, }
+\item[{int}]{ipl, }
+\item[{struct tcphdr $\ast$}]{tcph, }
+\item[{int}]{tl, }
+\item[{uint8\-\_\-t $\ast$}]{reply, }
+\item[{int $\ast$}]{len}
+\end{DoxyParamCaption}
+)}}\label{packet_8c_ab3c9b1b95990a6001994312742f5b1d7}
+\hypertarget{packet_8c_a14ec8ac659365626c6d95b49c97202bc}{\index{packet.\-c@{packet.\-c}!\-\_\-tcp\-\_\-checksum@{\-\_\-tcp\-\_\-checksum}}
+\index{\-\_\-tcp\-\_\-checksum@{\-\_\-tcp\-\_\-checksum}!packet.c@{packet.\-c}}
+\subsubsection[{\-\_\-tcp\-\_\-checksum}]{\setlength{\rightskip}{0pt plus 5cm}int \-\_\-tcp\-\_\-checksum (
+\begin{DoxyParamCaption}
+\item[{struct iphdr $\ast$}]{iph, }
+\item[{struct tcphdr $\ast$}]{tcph, }
+\item[{int}]{tl}
+\end{DoxyParamCaption}
+)}}\label{packet_8c_a14ec8ac659365626c6d95b49c97202bc}
+\hypertarget{packet_8c_aad7a33d77dc7a2aaf7f10cab293c1add}{\index{packet.\-c@{packet.\-c}!check\-\_\-checksum@{check\-\_\-checksum}}
+\index{check\-\_\-checksum@{check\-\_\-checksum}!packet.c@{packet.\-c}}
+\subsubsection[{check\-\_\-checksum}]{\setlength{\rightskip}{0pt plus 5cm}int check\-\_\-checksum (
+\begin{DoxyParamCaption}
+\item[{uint8\-\_\-t $\ast$}]{header, }
+\item[{int}]{len}
+\end{DoxyParamCaption}
+)}}\label{packet_8c_aad7a33d77dc7a2aaf7f10cab293c1add}
+\hypertarget{packet_8c_a8b3c6dd4b89495f2c529a0b0b69dabcf}{\index{packet.\-c@{packet.\-c}!make\-\_\-checksum@{make\-\_\-checksum}}
+\index{make\-\_\-checksum@{make\-\_\-checksum}!packet.c@{packet.\-c}}
+\subsubsection[{make\-\_\-checksum}]{\setlength{\rightskip}{0pt plus 5cm}int make\-\_\-checksum (
+\begin{DoxyParamCaption}
+\item[{uint8\-\_\-t $\ast$}]{header, }
+\item[{int}]{len}
+\end{DoxyParamCaption}
+)}}\label{packet_8c_a8b3c6dd4b89495f2c529a0b0b69dabcf}
+\hypertarget{packet_8c_ab2348fe686207ac2143a1980b703505f}{\index{packet.\-c@{packet.\-c}!parse\-\_\-entry@{parse\-\_\-entry}}
+\index{parse\-\_\-entry@{parse\-\_\-entry}!packet.c@{packet.\-c}}
+\subsubsection[{parse\-\_\-entry}]{\setlength{\rightskip}{0pt plus 5cm}int parse\-\_\-entry (
+\begin{DoxyParamCaption}
+\item[{struct {\bf pair\-\_\-entry} $\ast$}]{tmp, }
+\item[{uint8\-\_\-t $\ast$}]{buf, }
+\item[{int}]{len}
+\end{DoxyParamCaption}
+)}}\label{packet_8c_ab2348fe686207ac2143a1980b703505f}
+\hypertarget{packet_8c_a5c860008cf16a08e256d79c54447e95c}{\index{packet.\-c@{packet.\-c}!process\-\_\-packet@{process\-\_\-packet}}
+\index{process\-\_\-packet@{process\-\_\-packet}!packet.c@{packet.\-c}}
+\subsubsection[{process\-\_\-packet}]{\setlength{\rightskip}{0pt plus 5cm}int process\-\_\-packet (
+\begin{DoxyParamCaption}
+\item[{struct {\bf pair\-\_\-entry} $\ast$}]{p, }
+\item[{struct iphdr $\ast$}]{iph, }
+\item[{int}]{ipl, }
+\item[{struct tcphdr $\ast$}]{tcph, }
+\item[{int}]{tl, }
+\item[{uint8\-\_\-t $\ast$}]{reply, }
+\item[{int $\ast$}]{len}
+\end{DoxyParamCaption}
+)}}\label{packet_8c_a5c860008cf16a08e256d79c54447e95c}

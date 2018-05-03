@@ -1,0 +1,71 @@
+\hypertarget{structsess__cert__st}{\section{sess\-\_\-cert\-\_\-st Struct Reference}
+\label{structsess__cert__st}\index{sess\-\_\-cert\-\_\-st@{sess\-\_\-cert\-\_\-st}}
+}
+
+
+{\ttfamily \#include $<$ssl\-\_\-locl.\-h$>$}
+
+
+
+Collaboration diagram for sess\-\_\-cert\-\_\-st\-:
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{structsess__cert__st_a7f6d3c322a04b8253ca8e8e5c24e4503}{S\-T\-A\-C\-K\-\_\-\-O\-F} (X509)$\ast$cert\-\_\-chain
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{structsess__cert__st_a42bfbd0ac3523b3dcac8cd6a93888a68}{peer\-\_\-cert\-\_\-type}
+\item 
+\hyperlink{ssl__locl_8h_ab376b10820d145fbabe4f4fdf0b3a770}{C\-E\-R\-T\-\_\-\-P\-K\-E\-Y} $\ast$ \hyperlink{structsess__cert__st_ac2fb4296b098a8ce04891bd06e44b474}{peer\-\_\-key}
+\item 
+\hyperlink{ssl__locl_8h_ab376b10820d145fbabe4f4fdf0b3a770}{C\-E\-R\-T\-\_\-\-P\-K\-E\-Y} \hyperlink{structsess__cert__st_a1430cf781fb5735b9884b2273005683e}{peer\-\_\-pkeys} \mbox{[}\hyperlink{ssl__locl_8h_ae56b6c56e5819da2bf95a533238f69f8}{S\-S\-L\-\_\-\-P\-K\-E\-Y\-\_\-\-N\-U\-M}\mbox{]}
+\item 
+R\-S\-A $\ast$ \hyperlink{structsess__cert__st_a589cc0b60fd0b93e39ac7829416a6b69}{peer\-\_\-rsa\-\_\-tmp}
+\item 
+D\-H $\ast$ \hyperlink{structsess__cert__st_a8a3ab6cdc82bf76e9696da0473e9ed0b}{peer\-\_\-dh\-\_\-tmp}
+\item 
+E\-C\-\_\-\-K\-E\-Y $\ast$ \hyperlink{structsess__cert__st_a2207bc91b952ac89b19ea0bedc9d9697}{peer\-\_\-ecdh\-\_\-tmp}
+\item 
+int \hyperlink{structsess__cert__st_a5f7d4df032e6fdb64bf4434497846616}{references}
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{structsess__cert__st_a7f6d3c322a04b8253ca8e8e5c24e4503}{\index{sess\-\_\-cert\-\_\-st@{sess\-\_\-cert\-\_\-st}!S\-T\-A\-C\-K\-\_\-\-O\-F@{S\-T\-A\-C\-K\-\_\-\-O\-F}}
+\index{S\-T\-A\-C\-K\-\_\-\-O\-F@{S\-T\-A\-C\-K\-\_\-\-O\-F}!sess_cert_st@{sess\-\_\-cert\-\_\-st}}
+\subsubsection[{S\-T\-A\-C\-K\-\_\-\-O\-F}]{\setlength{\rightskip}{0pt plus 5cm}sess\-\_\-cert\-\_\-st\-::\-S\-T\-A\-C\-K\-\_\-\-O\-F (
+\begin{DoxyParamCaption}
+\item[{X509}]{}
+\end{DoxyParamCaption}
+)}}\label{structsess__cert__st_a7f6d3c322a04b8253ca8e8e5c24e4503}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{structsess__cert__st_a42bfbd0ac3523b3dcac8cd6a93888a68}{\index{sess\-\_\-cert\-\_\-st@{sess\-\_\-cert\-\_\-st}!peer\-\_\-cert\-\_\-type@{peer\-\_\-cert\-\_\-type}}
+\index{peer\-\_\-cert\-\_\-type@{peer\-\_\-cert\-\_\-type}!sess_cert_st@{sess\-\_\-cert\-\_\-st}}
+\subsubsection[{peer\-\_\-cert\-\_\-type}]{\setlength{\rightskip}{0pt plus 5cm}int sess\-\_\-cert\-\_\-st\-::peer\-\_\-cert\-\_\-type}}\label{structsess__cert__st_a42bfbd0ac3523b3dcac8cd6a93888a68}
+\hypertarget{structsess__cert__st_a8a3ab6cdc82bf76e9696da0473e9ed0b}{\index{sess\-\_\-cert\-\_\-st@{sess\-\_\-cert\-\_\-st}!peer\-\_\-dh\-\_\-tmp@{peer\-\_\-dh\-\_\-tmp}}
+\index{peer\-\_\-dh\-\_\-tmp@{peer\-\_\-dh\-\_\-tmp}!sess_cert_st@{sess\-\_\-cert\-\_\-st}}
+\subsubsection[{peer\-\_\-dh\-\_\-tmp}]{\setlength{\rightskip}{0pt plus 5cm}D\-H$\ast$ sess\-\_\-cert\-\_\-st\-::peer\-\_\-dh\-\_\-tmp}}\label{structsess__cert__st_a8a3ab6cdc82bf76e9696da0473e9ed0b}
+\hypertarget{structsess__cert__st_a2207bc91b952ac89b19ea0bedc9d9697}{\index{sess\-\_\-cert\-\_\-st@{sess\-\_\-cert\-\_\-st}!peer\-\_\-ecdh\-\_\-tmp@{peer\-\_\-ecdh\-\_\-tmp}}
+\index{peer\-\_\-ecdh\-\_\-tmp@{peer\-\_\-ecdh\-\_\-tmp}!sess_cert_st@{sess\-\_\-cert\-\_\-st}}
+\subsubsection[{peer\-\_\-ecdh\-\_\-tmp}]{\setlength{\rightskip}{0pt plus 5cm}E\-C\-\_\-\-K\-E\-Y$\ast$ sess\-\_\-cert\-\_\-st\-::peer\-\_\-ecdh\-\_\-tmp}}\label{structsess__cert__st_a2207bc91b952ac89b19ea0bedc9d9697}
+\hypertarget{structsess__cert__st_ac2fb4296b098a8ce04891bd06e44b474}{\index{sess\-\_\-cert\-\_\-st@{sess\-\_\-cert\-\_\-st}!peer\-\_\-key@{peer\-\_\-key}}
+\index{peer\-\_\-key@{peer\-\_\-key}!sess_cert_st@{sess\-\_\-cert\-\_\-st}}
+\subsubsection[{peer\-\_\-key}]{\setlength{\rightskip}{0pt plus 5cm}{\bf C\-E\-R\-T\-\_\-\-P\-K\-E\-Y}$\ast$ sess\-\_\-cert\-\_\-st\-::peer\-\_\-key}}\label{structsess__cert__st_ac2fb4296b098a8ce04891bd06e44b474}
+\hypertarget{structsess__cert__st_a1430cf781fb5735b9884b2273005683e}{\index{sess\-\_\-cert\-\_\-st@{sess\-\_\-cert\-\_\-st}!peer\-\_\-pkeys@{peer\-\_\-pkeys}}
+\index{peer\-\_\-pkeys@{peer\-\_\-pkeys}!sess_cert_st@{sess\-\_\-cert\-\_\-st}}
+\subsubsection[{peer\-\_\-pkeys}]{\setlength{\rightskip}{0pt plus 5cm}{\bf C\-E\-R\-T\-\_\-\-P\-K\-E\-Y} sess\-\_\-cert\-\_\-st\-::peer\-\_\-pkeys\mbox{[}{\bf S\-S\-L\-\_\-\-P\-K\-E\-Y\-\_\-\-N\-U\-M}\mbox{]}}}\label{structsess__cert__st_a1430cf781fb5735b9884b2273005683e}
+\hypertarget{structsess__cert__st_a589cc0b60fd0b93e39ac7829416a6b69}{\index{sess\-\_\-cert\-\_\-st@{sess\-\_\-cert\-\_\-st}!peer\-\_\-rsa\-\_\-tmp@{peer\-\_\-rsa\-\_\-tmp}}
+\index{peer\-\_\-rsa\-\_\-tmp@{peer\-\_\-rsa\-\_\-tmp}!sess_cert_st@{sess\-\_\-cert\-\_\-st}}
+\subsubsection[{peer\-\_\-rsa\-\_\-tmp}]{\setlength{\rightskip}{0pt plus 5cm}R\-S\-A$\ast$ sess\-\_\-cert\-\_\-st\-::peer\-\_\-rsa\-\_\-tmp}}\label{structsess__cert__st_a589cc0b60fd0b93e39ac7829416a6b69}
+\hypertarget{structsess__cert__st_a5f7d4df032e6fdb64bf4434497846616}{\index{sess\-\_\-cert\-\_\-st@{sess\-\_\-cert\-\_\-st}!references@{references}}
+\index{references@{references}!sess_cert_st@{sess\-\_\-cert\-\_\-st}}
+\subsubsection[{references}]{\setlength{\rightskip}{0pt plus 5cm}int sess\-\_\-cert\-\_\-st\-::references}}\label{structsess__cert__st_a5f7d4df032e6fdb64bf4434497846616}
+
+
+The documentation for this struct was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+openssl-\/1.\-0.\-1j/ssl/\hyperlink{ssl__locl_8h}{ssl\-\_\-locl.\-h}\end{DoxyCompactItemize}

@@ -1,0 +1,67 @@
+\hypertarget{ngx__http__ssl__module_8c}{\section{nginx-\/1.12.0/src/http/modules/ngx\-\_\-http\-\_\-ssl\-\_\-module.c File Reference}
+\label{ngx__http__ssl__module_8c}\index{nginx-\/1.\-12.\-0/src/http/modules/ngx\-\_\-http\-\_\-ssl\-\_\-module.\-c@{nginx-\/1.\-12.\-0/src/http/modules/ngx\-\_\-http\-\_\-ssl\-\_\-module.\-c}}
+}
+{\ttfamily \#include $<$ngx\-\_\-config.\-h$>$}\\*
+{\ttfamily \#include $<$ngx\-\_\-core.\-h$>$}\\*
+{\ttfamily \#include $<$ngx\-\_\-http.\-h$>$}\\*
+Include dependency graph for ngx\-\_\-http\-\_\-ssl\-\_\-module.\-c\-:
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{ngx__http__ssl__module_8c_ab569e47cdeb310878239857c6337f230}{N\-G\-X\-\_\-\-D\-E\-F\-A\-U\-L\-T\-\_\-\-C\-I\-P\-H\-E\-R\-S}~\char`\"{}H\-I\-G\-H\-:!a\-N\-U\-L\-L\-:!\-M\-D5\char`\"{}
+\item 
+\#define \hyperlink{ngx__http__ssl__module_8c_ada039dfea47c31307cf621ebb64c4177}{N\-G\-X\-\_\-\-D\-E\-F\-A\-U\-L\-T\-\_\-\-E\-C\-D\-H\-\_\-\-C\-U\-R\-V\-E}~\char`\"{}auto\char`\"{}
+\item 
+\#define \hyperlink{ngx__http__ssl__module_8c_a9daf5ad864dc7cc16481fbcf01f4fde6}{N\-G\-X\-\_\-\-H\-T\-T\-P\-\_\-\-N\-P\-N\-\_\-\-A\-D\-V\-E\-R\-T\-I\-S\-E}~\char`\"{}\textbackslash{}x08http/1.\-1\char`\"{}
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef ngx\-\_\-int\-\_\-t($\ast$ \hyperlink{ngx__http__ssl__module_8c_a1d23e81afa2b76d8323b98681821f3d6}{ngx\-\_\-ssl\-\_\-variable\-\_\-handler\-\_\-pt} )(ngx\-\_\-connection\-\_\-t $\ast$c, ngx\-\_\-pool\-\_\-t $\ast$pool, ngx\-\_\-str\-\_\-t $\ast$s)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+ngx\-\_\-module\-\_\-t \hyperlink{ngx__http__ssl__module_8c_a1eafc973b5a2b6f65394b689234293b2}{ngx\-\_\-http\-\_\-ssl\-\_\-module}
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{ngx__http__ssl__module_8c_ab569e47cdeb310878239857c6337f230}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-module.\-c@{ngx\-\_\-http\-\_\-ssl\-\_\-module.\-c}!N\-G\-X\-\_\-\-D\-E\-F\-A\-U\-L\-T\-\_\-\-C\-I\-P\-H\-E\-R\-S@{N\-G\-X\-\_\-\-D\-E\-F\-A\-U\-L\-T\-\_\-\-C\-I\-P\-H\-E\-R\-S}}
+\index{N\-G\-X\-\_\-\-D\-E\-F\-A\-U\-L\-T\-\_\-\-C\-I\-P\-H\-E\-R\-S@{N\-G\-X\-\_\-\-D\-E\-F\-A\-U\-L\-T\-\_\-\-C\-I\-P\-H\-E\-R\-S}!ngx_http_ssl_module.c@{ngx\-\_\-http\-\_\-ssl\-\_\-module.\-c}}
+\subsubsection[{N\-G\-X\-\_\-\-D\-E\-F\-A\-U\-L\-T\-\_\-\-C\-I\-P\-H\-E\-R\-S}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\-G\-X\-\_\-\-D\-E\-F\-A\-U\-L\-T\-\_\-\-C\-I\-P\-H\-E\-R\-S~\char`\"{}H\-I\-G\-H\-:!a\-N\-U\-L\-L\-:!\-M\-D5\char`\"{}}}\label{ngx__http__ssl__module_8c_ab569e47cdeb310878239857c6337f230}
+\hypertarget{ngx__http__ssl__module_8c_ada039dfea47c31307cf621ebb64c4177}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-module.\-c@{ngx\-\_\-http\-\_\-ssl\-\_\-module.\-c}!N\-G\-X\-\_\-\-D\-E\-F\-A\-U\-L\-T\-\_\-\-E\-C\-D\-H\-\_\-\-C\-U\-R\-V\-E@{N\-G\-X\-\_\-\-D\-E\-F\-A\-U\-L\-T\-\_\-\-E\-C\-D\-H\-\_\-\-C\-U\-R\-V\-E}}
+\index{N\-G\-X\-\_\-\-D\-E\-F\-A\-U\-L\-T\-\_\-\-E\-C\-D\-H\-\_\-\-C\-U\-R\-V\-E@{N\-G\-X\-\_\-\-D\-E\-F\-A\-U\-L\-T\-\_\-\-E\-C\-D\-H\-\_\-\-C\-U\-R\-V\-E}!ngx_http_ssl_module.c@{ngx\-\_\-http\-\_\-ssl\-\_\-module.\-c}}
+\subsubsection[{N\-G\-X\-\_\-\-D\-E\-F\-A\-U\-L\-T\-\_\-\-E\-C\-D\-H\-\_\-\-C\-U\-R\-V\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\-G\-X\-\_\-\-D\-E\-F\-A\-U\-L\-T\-\_\-\-E\-C\-D\-H\-\_\-\-C\-U\-R\-V\-E~\char`\"{}auto\char`\"{}}}\label{ngx__http__ssl__module_8c_ada039dfea47c31307cf621ebb64c4177}
+\hypertarget{ngx__http__ssl__module_8c_a9daf5ad864dc7cc16481fbcf01f4fde6}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-module.\-c@{ngx\-\_\-http\-\_\-ssl\-\_\-module.\-c}!N\-G\-X\-\_\-\-H\-T\-T\-P\-\_\-\-N\-P\-N\-\_\-\-A\-D\-V\-E\-R\-T\-I\-S\-E@{N\-G\-X\-\_\-\-H\-T\-T\-P\-\_\-\-N\-P\-N\-\_\-\-A\-D\-V\-E\-R\-T\-I\-S\-E}}
+\index{N\-G\-X\-\_\-\-H\-T\-T\-P\-\_\-\-N\-P\-N\-\_\-\-A\-D\-V\-E\-R\-T\-I\-S\-E@{N\-G\-X\-\_\-\-H\-T\-T\-P\-\_\-\-N\-P\-N\-\_\-\-A\-D\-V\-E\-R\-T\-I\-S\-E}!ngx_http_ssl_module.c@{ngx\-\_\-http\-\_\-ssl\-\_\-module.\-c}}
+\subsubsection[{N\-G\-X\-\_\-\-H\-T\-T\-P\-\_\-\-N\-P\-N\-\_\-\-A\-D\-V\-E\-R\-T\-I\-S\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\-G\-X\-\_\-\-H\-T\-T\-P\-\_\-\-N\-P\-N\-\_\-\-A\-D\-V\-E\-R\-T\-I\-S\-E~\char`\"{}\textbackslash{}x08http/1.\-1\char`\"{}}}\label{ngx__http__ssl__module_8c_a9daf5ad864dc7cc16481fbcf01f4fde6}
+
+
+\subsection{Typedef Documentation}
+\hypertarget{ngx__http__ssl__module_8c_a1d23e81afa2b76d8323b98681821f3d6}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-module.\-c@{ngx\-\_\-http\-\_\-ssl\-\_\-module.\-c}!ngx\-\_\-ssl\-\_\-variable\-\_\-handler\-\_\-pt@{ngx\-\_\-ssl\-\_\-variable\-\_\-handler\-\_\-pt}}
+\index{ngx\-\_\-ssl\-\_\-variable\-\_\-handler\-\_\-pt@{ngx\-\_\-ssl\-\_\-variable\-\_\-handler\-\_\-pt}!ngx_http_ssl_module.c@{ngx\-\_\-http\-\_\-ssl\-\_\-module.\-c}}
+\subsubsection[{ngx\-\_\-ssl\-\_\-variable\-\_\-handler\-\_\-pt}]{\setlength{\rightskip}{0pt plus 5cm}typedef ngx\-\_\-int\-\_\-t($\ast$ ngx\-\_\-ssl\-\_\-variable\-\_\-handler\-\_\-pt)(ngx\-\_\-connection\-\_\-t $\ast$c, ngx\-\_\-pool\-\_\-t $\ast$pool, ngx\-\_\-str\-\_\-t $\ast$s)}}\label{ngx__http__ssl__module_8c_a1d23e81afa2b76d8323b98681821f3d6}
+
+
+\subsection{Variable Documentation}
+\hypertarget{ngx__http__ssl__module_8c_a1eafc973b5a2b6f65394b689234293b2}{\index{ngx\-\_\-http\-\_\-ssl\-\_\-module.\-c@{ngx\-\_\-http\-\_\-ssl\-\_\-module.\-c}!ngx\-\_\-http\-\_\-ssl\-\_\-module@{ngx\-\_\-http\-\_\-ssl\-\_\-module}}
+\index{ngx\-\_\-http\-\_\-ssl\-\_\-module@{ngx\-\_\-http\-\_\-ssl\-\_\-module}!ngx_http_ssl_module.c@{ngx\-\_\-http\-\_\-ssl\-\_\-module.\-c}}
+\subsubsection[{ngx\-\_\-http\-\_\-ssl\-\_\-module}]{\setlength{\rightskip}{0pt plus 5cm}ngx\-\_\-module\-\_\-t ngx\-\_\-http\-\_\-ssl\-\_\-module}}\label{ngx__http__ssl__module_8c_a1eafc973b5a2b6f65394b689234293b2}
+{\bfseries Initial value\-:}
+\begin{DoxyCode}
+= \{
+    NGX\_MODULE\_V1,
+    &ngx\_http\_ssl\_module\_ctx,              
+    ngx\_http\_ssl\_commands,                 
+    NGX\_HTTP\_MODULE,                       
+    NULL,                                  
+    NULL,                                  
+    NULL,                                  
+    NULL,                                  
+    NULL,                                  
+    NULL,                                  
+    NULL,                                  
+    NGX\_MODULE\_V1\_PADDING
+\}
+\end{DoxyCode}

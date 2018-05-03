@@ -1,0 +1,145 @@
+\hypertarget{ttpa__func_8c}{\section{openssl-\/1.0.1j/ssl/ttpa\-\_\-func.c File Reference}
+\label{ttpa__func_8c}\index{openssl-\/1.\-0.\-1j/ssl/ttpa\-\_\-func.\-c@{openssl-\/1.\-0.\-1j/ssl/ttpa\-\_\-func.\-c}}
+}
+{\ttfamily \#include \char`\"{}ttpa.\-h\char`\"{}}\\*
+Include dependency graph for ttpa\-\_\-func.\-c\-:
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{ttpa__func_8c_a767cfb378b2c66ae47d2e164e61f9984}{make\-\_\-cc\-\_\-content\-\_\-body} (unsigned char $\ast$$\ast$content, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$alice\-\_\-pub, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$carol\-\_\-pub, int nid, int $\ast$len)
+\item 
+int \hyperlink{ttpa__func_8c_a6d3c79a0d1a21eeec7595de04e29530c}{make\-\_\-cc\-\_\-request} (unsigned char $\ast$$\ast$request, unsigned char $\ast$msg, int msg\-\_\-len, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$carol\-\_\-priv, int nid, int $\ast$len)
+\item 
+int \hyperlink{ttpa__func_8c_a9f665f84b9d2b3168211b11b5a778ba9}{make\-\_\-cc\-\_\-request\-\_\-with\-\_\-verify\-\_\-cc} (unsigned char $\ast$$\ast$request, unsigned char $\ast$msg, int msg\-\_\-len, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$carol\-\_\-priv, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$alice\-\_\-pub, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$carol\-\_\-pub, int nid, int $\ast$len)
+\item 
+int \hyperlink{ttpa__func_8c_ac3cbd7a1410bca05482233d26644437e}{make\-\_\-cc\-\_\-response} (unsigned char $\ast$$\ast$response, unsigned char $\ast$request, int req\-\_\-len, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$alice\-\_\-priv, int nid, int $\ast$len)
+\item 
+int \hyperlink{ttpa__func_8c_a7f55df2af33a9bb90604f5aa933d47a3}{make\-\_\-cc\-\_\-response\-\_\-with\-\_\-verify\-\_\-request} (unsigned char $\ast$$\ast$response, unsigned char $\ast$request, int req\-\_\-len, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$alice\-\_\-priv, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$alice\-\_\-pub, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$carol\-\_\-pub, int nid, int $\ast$len)
+\item 
+int \hyperlink{ttpa__func_8c_ac1049079c3785dd0d29e705150232d7c}{make\-\_\-signature\-\_\-block} (unsigned char $\ast$$\ast$sigblk, unsigned char $\ast$msg, int msg\-\_\-len, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$priv, int nid, size\-\_\-t $\ast$sigblk\-\_\-len)
+\item 
+int \hyperlink{ttpa__func_8c_a73fd00d6dbac494813160bd59aa5f8d9}{verify\-\_\-cc\-\_\-content\-\_\-body} (unsigned char $\ast$content, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$alice\-\_\-pub, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$carol\-\_\-pub)
+\item 
+int \hyperlink{ttpa__func_8c_a13215ebe6a7e08f4abdd4dbb3e3f17aa}{verify\-\_\-cc\-\_\-request} (unsigned char $\ast$request, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$alice\-\_\-pub, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$carol\-\_\-pub)
+\item 
+int \hyperlink{ttpa__func_8c_a2f4515f55eabbda868900d1285950682}{verify\-\_\-cc\-\_\-response} (unsigned char $\ast$response, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$alice\-\_\-pub, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$carol\-\_\-pub)
+\item 
+int \hyperlink{ttpa__func_8c_a0a8364d65504a84e3c63f0e62937b816}{verify\-\_\-signature} (unsigned char $\ast$msg, int msg\-\_\-len, uint16\-\_\-t sig\-\_\-type, uint16\-\_\-t sig\-\_\-len, unsigned char $\ast$sig, E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$pub)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{ttpa__func_8c_a767cfb378b2c66ae47d2e164e61f9984}{\index{ttpa\-\_\-func.\-c@{ttpa\-\_\-func.\-c}!make\-\_\-cc\-\_\-content\-\_\-body@{make\-\_\-cc\-\_\-content\-\_\-body}}
+\index{make\-\_\-cc\-\_\-content\-\_\-body@{make\-\_\-cc\-\_\-content\-\_\-body}!ttpa_func.c@{ttpa\-\_\-func.\-c}}
+\subsubsection[{make\-\_\-cc\-\_\-content\-\_\-body}]{\setlength{\rightskip}{0pt plus 5cm}int make\-\_\-cc\-\_\-content\-\_\-body (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$$\ast$}]{content, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{alice\-\_\-pub, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{carol\-\_\-pub, }
+\item[{int}]{nid, }
+\item[{int $\ast$}]{len}
+\end{DoxyParamCaption}
+)}}\label{ttpa__func_8c_a767cfb378b2c66ae47d2e164e61f9984}
+\hypertarget{ttpa__func_8c_a6d3c79a0d1a21eeec7595de04e29530c}{\index{ttpa\-\_\-func.\-c@{ttpa\-\_\-func.\-c}!make\-\_\-cc\-\_\-request@{make\-\_\-cc\-\_\-request}}
+\index{make\-\_\-cc\-\_\-request@{make\-\_\-cc\-\_\-request}!ttpa_func.c@{ttpa\-\_\-func.\-c}}
+\subsubsection[{make\-\_\-cc\-\_\-request}]{\setlength{\rightskip}{0pt plus 5cm}int make\-\_\-cc\-\_\-request (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$$\ast$}]{request, }
+\item[{unsigned char $\ast$}]{msg, }
+\item[{int}]{msg\-\_\-len, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{carol\-\_\-priv, }
+\item[{int}]{nid, }
+\item[{int $\ast$}]{len}
+\end{DoxyParamCaption}
+)}}\label{ttpa__func_8c_a6d3c79a0d1a21eeec7595de04e29530c}
+\hypertarget{ttpa__func_8c_a9f665f84b9d2b3168211b11b5a778ba9}{\index{ttpa\-\_\-func.\-c@{ttpa\-\_\-func.\-c}!make\-\_\-cc\-\_\-request\-\_\-with\-\_\-verify\-\_\-cc@{make\-\_\-cc\-\_\-request\-\_\-with\-\_\-verify\-\_\-cc}}
+\index{make\-\_\-cc\-\_\-request\-\_\-with\-\_\-verify\-\_\-cc@{make\-\_\-cc\-\_\-request\-\_\-with\-\_\-verify\-\_\-cc}!ttpa_func.c@{ttpa\-\_\-func.\-c}}
+\subsubsection[{make\-\_\-cc\-\_\-request\-\_\-with\-\_\-verify\-\_\-cc}]{\setlength{\rightskip}{0pt plus 5cm}int make\-\_\-cc\-\_\-request\-\_\-with\-\_\-verify\-\_\-cc (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$$\ast$}]{request, }
+\item[{unsigned char $\ast$}]{msg, }
+\item[{int}]{msg\-\_\-len, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{carol\-\_\-priv, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{alice\-\_\-pub, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{carol\-\_\-pub, }
+\item[{int}]{nid, }
+\item[{int $\ast$}]{len}
+\end{DoxyParamCaption}
+)}}\label{ttpa__func_8c_a9f665f84b9d2b3168211b11b5a778ba9}
+\hypertarget{ttpa__func_8c_ac3cbd7a1410bca05482233d26644437e}{\index{ttpa\-\_\-func.\-c@{ttpa\-\_\-func.\-c}!make\-\_\-cc\-\_\-response@{make\-\_\-cc\-\_\-response}}
+\index{make\-\_\-cc\-\_\-response@{make\-\_\-cc\-\_\-response}!ttpa_func.c@{ttpa\-\_\-func.\-c}}
+\subsubsection[{make\-\_\-cc\-\_\-response}]{\setlength{\rightskip}{0pt plus 5cm}int make\-\_\-cc\-\_\-response (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$$\ast$}]{response, }
+\item[{unsigned char $\ast$}]{request, }
+\item[{int}]{req\-\_\-len, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{alice\-\_\-priv, }
+\item[{int}]{nid, }
+\item[{int $\ast$}]{len}
+\end{DoxyParamCaption}
+)}}\label{ttpa__func_8c_ac3cbd7a1410bca05482233d26644437e}
+\hypertarget{ttpa__func_8c_a7f55df2af33a9bb90604f5aa933d47a3}{\index{ttpa\-\_\-func.\-c@{ttpa\-\_\-func.\-c}!make\-\_\-cc\-\_\-response\-\_\-with\-\_\-verify\-\_\-request@{make\-\_\-cc\-\_\-response\-\_\-with\-\_\-verify\-\_\-request}}
+\index{make\-\_\-cc\-\_\-response\-\_\-with\-\_\-verify\-\_\-request@{make\-\_\-cc\-\_\-response\-\_\-with\-\_\-verify\-\_\-request}!ttpa_func.c@{ttpa\-\_\-func.\-c}}
+\subsubsection[{make\-\_\-cc\-\_\-response\-\_\-with\-\_\-verify\-\_\-request}]{\setlength{\rightskip}{0pt plus 5cm}int make\-\_\-cc\-\_\-response\-\_\-with\-\_\-verify\-\_\-request (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$$\ast$}]{response, }
+\item[{unsigned char $\ast$}]{request, }
+\item[{int}]{req\-\_\-len, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{alice\-\_\-priv, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{alice\-\_\-pub, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{carol\-\_\-pub, }
+\item[{int}]{nid, }
+\item[{int $\ast$}]{len}
+\end{DoxyParamCaption}
+)}}\label{ttpa__func_8c_a7f55df2af33a9bb90604f5aa933d47a3}
+\hypertarget{ttpa__func_8c_ac1049079c3785dd0d29e705150232d7c}{\index{ttpa\-\_\-func.\-c@{ttpa\-\_\-func.\-c}!make\-\_\-signature\-\_\-block@{make\-\_\-signature\-\_\-block}}
+\index{make\-\_\-signature\-\_\-block@{make\-\_\-signature\-\_\-block}!ttpa_func.c@{ttpa\-\_\-func.\-c}}
+\subsubsection[{make\-\_\-signature\-\_\-block}]{\setlength{\rightskip}{0pt plus 5cm}int make\-\_\-signature\-\_\-block (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$$\ast$}]{sigblk, }
+\item[{unsigned char $\ast$}]{msg, }
+\item[{int}]{msg\-\_\-len, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{priv, }
+\item[{int}]{nid, }
+\item[{size\-\_\-t $\ast$}]{sigblk\-\_\-len}
+\end{DoxyParamCaption}
+)}}\label{ttpa__func_8c_ac1049079c3785dd0d29e705150232d7c}
+\hypertarget{ttpa__func_8c_a73fd00d6dbac494813160bd59aa5f8d9}{\index{ttpa\-\_\-func.\-c@{ttpa\-\_\-func.\-c}!verify\-\_\-cc\-\_\-content\-\_\-body@{verify\-\_\-cc\-\_\-content\-\_\-body}}
+\index{verify\-\_\-cc\-\_\-content\-\_\-body@{verify\-\_\-cc\-\_\-content\-\_\-body}!ttpa_func.c@{ttpa\-\_\-func.\-c}}
+\subsubsection[{verify\-\_\-cc\-\_\-content\-\_\-body}]{\setlength{\rightskip}{0pt plus 5cm}int verify\-\_\-cc\-\_\-content\-\_\-body (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$}]{content, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{alice\-\_\-pub, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{carol\-\_\-pub}
+\end{DoxyParamCaption}
+)}}\label{ttpa__func_8c_a73fd00d6dbac494813160bd59aa5f8d9}
+\hypertarget{ttpa__func_8c_a13215ebe6a7e08f4abdd4dbb3e3f17aa}{\index{ttpa\-\_\-func.\-c@{ttpa\-\_\-func.\-c}!verify\-\_\-cc\-\_\-request@{verify\-\_\-cc\-\_\-request}}
+\index{verify\-\_\-cc\-\_\-request@{verify\-\_\-cc\-\_\-request}!ttpa_func.c@{ttpa\-\_\-func.\-c}}
+\subsubsection[{verify\-\_\-cc\-\_\-request}]{\setlength{\rightskip}{0pt plus 5cm}int verify\-\_\-cc\-\_\-request (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$}]{request, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{alice\-\_\-pub, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{carol\-\_\-pub}
+\end{DoxyParamCaption}
+)}}\label{ttpa__func_8c_a13215ebe6a7e08f4abdd4dbb3e3f17aa}
+\hypertarget{ttpa__func_8c_a2f4515f55eabbda868900d1285950682}{\index{ttpa\-\_\-func.\-c@{ttpa\-\_\-func.\-c}!verify\-\_\-cc\-\_\-response@{verify\-\_\-cc\-\_\-response}}
+\index{verify\-\_\-cc\-\_\-response@{verify\-\_\-cc\-\_\-response}!ttpa_func.c@{ttpa\-\_\-func.\-c}}
+\subsubsection[{verify\-\_\-cc\-\_\-response}]{\setlength{\rightskip}{0pt plus 5cm}int verify\-\_\-cc\-\_\-response (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$}]{response, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{alice\-\_\-pub, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{carol\-\_\-pub}
+\end{DoxyParamCaption}
+)}}\label{ttpa__func_8c_a2f4515f55eabbda868900d1285950682}
+\hypertarget{ttpa__func_8c_a0a8364d65504a84e3c63f0e62937b816}{\index{ttpa\-\_\-func.\-c@{ttpa\-\_\-func.\-c}!verify\-\_\-signature@{verify\-\_\-signature}}
+\index{verify\-\_\-signature@{verify\-\_\-signature}!ttpa_func.c@{ttpa\-\_\-func.\-c}}
+\subsubsection[{verify\-\_\-signature}]{\setlength{\rightskip}{0pt plus 5cm}int verify\-\_\-signature (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$}]{msg, }
+\item[{int}]{msg\-\_\-len, }
+\item[{uint16\-\_\-t}]{sig\-\_\-type, }
+\item[{uint16\-\_\-t}]{sig\-\_\-len, }
+\item[{unsigned char $\ast$}]{sig, }
+\item[{E\-V\-P\-\_\-\-P\-K\-E\-Y $\ast$}]{pub}
+\end{DoxyParamCaption}
+)}}\label{ttpa__func_8c_a0a8364d65504a84e3c63f0e62937b816}

@@ -1,0 +1,64 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number:
+            d9:29:cb:9b:45:a3:bb:93
+    Signature Algorithm: sha256WithRSAEncryption
+        Issuer: C=US, ST=California, L=California, O=Alice CA Ltd., OU=Alice CA Ltd., CN=Alice CA Ltd./emailAddress=ca@ca_alice.com
+        Validity
+            Not Before: May 16 10:52:00 2017 GMT
+            Not After : May 16 10:52:00 2018 GMT
+        Subject: C=US, ST=California, L=California, O=Alice Origin, OU=Origin, CN=www.alice.com/emailAddress=origin@alice.com
+        Subject Public Key Info:
+            Public Key Algorithm: id-ecPublicKey
+                Public-Key: (256 bit)
+                pub: 
+                    04:54:08:19:25:66:a2:3e:1c:0d:eb:6c:f7:93:57:
+                    c4:e2:0e:bd:41:5b:c5:7a:c9:1c:c1:f5:a1:91:41:
+                    21:c2:68:4b:84:9b:b6:cb:fc:87:78:3b:8d:19:03:
+                    09:37:df:d8:8c:9c:d3:66:5d:c2:52:5d:0b:57:62:
+                    0e:66:64:7f:c3
+                ASN1 OID: prime256v1
+                NIST CURVE: P-256
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            X509v3 Key Usage: 
+                Digital Signature, Key Encipherment, Key Agreement
+            X509v3 Subject Alternative Name: 
+                DNS:*.alice.com
+    Signature Algorithm: sha256WithRSAEncryption
+         05:26:3c:70:ba:a2:49:d4:41:17:fc:68:d3:83:e5:8b:5e:d1:
+         12:32:5a:a4:2c:48:59:87:ec:de:49:ac:64:6e:23:56:58:c0:
+         2b:7a:1e:a0:e1:e8:1f:07:3f:aa:3c:7a:d4:10:cf:70:53:13:
+         95:d3:cb:0d:8b:41:f5:b6:1e:ba:b7:8b:83:60:45:fe:da:92:
+         ac:6f:3f:b8:08:de:52:b2:08:c9:91:5b:af:54:3e:1b:41:ad:
+         b1:e7:d6:88:6a:d3:d8:e7:8d:84:b2:6f:52:4b:89:13:b3:cb:
+         f8:75:c1:ef:e0:f8:72:53:50:be:7d:df:e7:90:b5:33:b3:06:
+         b9:43:b6:78:e8:43:c3:5f:e7:e4:d2:95:37:26:1c:f7:3d:00:
+         93:a4:11:9e:4a:e5:5c:ab:3f:2a:67:c2:50:be:a8:f4:e1:d7:
+         be:6a:9f:18:b9:d6:96:51:7c:44:b6:15:c3:26:d1:50:18:d3:
+         3d:c0:fd:bb:4a:02:24:43:b5:b4:a2:2a:9a:65:db:69:ea:44:
+         2a:cd:4d:83:43:f1:07:eb:c9:b4:36:6a:73:54:ea:67:fc:c6:
+         d5:ab:e7:86:c6:01:2d:bd:9e:b6:6f:18:d4:c0:a9:43:a7:3f:
+         55:c5:1a:3d:ce:fb:d5:fb:1c:54:57:0c:ba:d5:fa:19:d7:c8:
+         cf:b7:55:87
+-----BEGIN CERTIFICATE-----
+MIIDIzCCAgugAwIBAgIJANkpy5tFo7uTMA0GCSqGSIb3DQEBCwUAMIGfMQswCQYD
+VQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTETMBEGA1UEBwwKQ2FsaWZvcm5p
+YTEWMBQGA1UECgwNQWxpY2UgQ0EgTHRkLjEWMBQGA1UECwwNQWxpY2UgQ0EgTHRk
+LjEWMBQGA1UEAwwNQWxpY2UgQ0EgTHRkLjEeMBwGCSqGSIb3DQEJARYPY2FAY2Ff
+YWxpY2UuY29tMB4XDTE3MDUxNjEwNTIwMFoXDTE4MDUxNjEwNTIwMFowgZgxCzAJ
+BgNVBAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRMwEQYDVQQHDApDYWxpZm9y
+bmlhMRUwEwYDVQQKDAxBbGljZSBPcmlnaW4xDzANBgNVBAsMBk9yaWdpbjEWMBQG
+A1UEAwwNd3d3LmFsaWNlLmNvbTEfMB0GCSqGSIb3DQEJARYQb3JpZ2luQGFsaWNl
+LmNvbTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABFQIGSVmoj4cDets95NXxOIO
+vUFbxXrJHMH1oZFBIcJoS4Sbtsv8h3g7jRkDCTff2Iyc02ZdwlJdC1diDmZkf8Oj
+MjAwMAkGA1UdEwQCMAAwCwYDVR0PBAQDAgOoMBYGA1UdEQQPMA2CCyouYWxpY2Uu
+Y29tMA0GCSqGSIb3DQEBCwUAA4IBAQAFJjxwuqJJ1EEX/GjTg+WLXtESMlqkLEhZ
+h+zeSaxkbiNWWMAreh6g4egfBz+qPHrUEM9wUxOV08sNi0H1th66t4uDYEX+2pKs
+bz+4CN5SsgjJkVuvVD4bQa2x59aIatPY542Esm9SS4kTs8v4dcHv4PhyU1C+fd/n
+kLUzswa5Q7Z46EPDX+fk0pU3Jhz3PQCTpBGeSuVcqz8qZ8JQvqj04de+ap8YudaW
+UXxEthXDJtFQGNM9wP27SgIkQ7W0oiqaZdtp6kQqzU2DQ/EH68m0NmpzVOpn/MbV
+q+eGxgEtvZ62bxjUwKlDpz9VxRo9zvvV+xxUVwy61foZ18jPt1WH
+-----END CERTIFICATE-----

@@ -1,0 +1,88 @@
+\hypertarget{structssl3__enc__method}{\section{ssl3\-\_\-enc\-\_\-method Struct Reference}
+\label{structssl3__enc__method}\index{ssl3\-\_\-enc\-\_\-method@{ssl3\-\_\-enc\-\_\-method}}
+}
+
+
+{\ttfamily \#include $<$ssl\-\_\-locl.\-h$>$}
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+int($\ast$ \hyperlink{structssl3__enc__method_a6793e5dd277dbc19ef08380031c751b8}{enc} )(S\-S\-L $\ast$, int)
+\item 
+int($\ast$ \hyperlink{structssl3__enc__method_acb78dd4b89469772b680df62569d9382}{mac} )(S\-S\-L $\ast$, unsigned char $\ast$, int)
+\item 
+int($\ast$ \hyperlink{structssl3__enc__method_a53f84a2dc07948ff4b082a7824080f3f}{setup\-\_\-key\-\_\-block} )(S\-S\-L $\ast$)
+\item 
+int($\ast$ \hyperlink{structssl3__enc__method_a5c06552bd6fce1efdcab90cc2fdb6d3b}{generate\-\_\-master\-\_\-secret} )(S\-S\-L $\ast$, unsigned char $\ast$, unsigned char $\ast$, int)
+\item 
+int($\ast$ \hyperlink{structssl3__enc__method_a29246e7e0dc5501e0f2aab7a2dac2b1a}{change\-\_\-cipher\-\_\-state} )(S\-S\-L $\ast$, int)
+\item 
+int($\ast$ \hyperlink{structssl3__enc__method_a279f059ffb51e79681dcc220967ac52f}{final\-\_\-finish\-\_\-mac} )(S\-S\-L $\ast$, const char $\ast$, int, unsigned char $\ast$)
+\item 
+int \hyperlink{structssl3__enc__method_a936196b1d38258a1103b0813440a31b2}{finish\-\_\-mac\-\_\-length}
+\item 
+int($\ast$ \hyperlink{structssl3__enc__method_a2a6053ae07f8281fb69133e2cefcdfee}{cert\-\_\-verify\-\_\-mac} )(S\-S\-L $\ast$, int, unsigned char $\ast$)
+\item 
+const char $\ast$ \hyperlink{structssl3__enc__method_a87df6867ae53bc91ec4c499762e1d33b}{client\-\_\-finished\-\_\-label}
+\item 
+int \hyperlink{structssl3__enc__method_a5d7e0116e96a09669eb0afa28f5aa70a}{client\-\_\-finished\-\_\-label\-\_\-len}
+\item 
+const char $\ast$ \hyperlink{structssl3__enc__method_a395147aef41fded62c7690876b1c016a}{server\-\_\-finished\-\_\-label}
+\item 
+int \hyperlink{structssl3__enc__method_a09dad445d45b7e4ead7dba8eff209f5d}{server\-\_\-finished\-\_\-label\-\_\-len}
+\item 
+int($\ast$ \hyperlink{structssl3__enc__method_aad11cf6fc0fe09469b05f387f7a11a80}{alert\-\_\-value} )(int)
+\item 
+int($\ast$ \hyperlink{structssl3__enc__method_a9b209b57ac54b2cb1eaddae25df08889}{export\-\_\-keying\-\_\-material} )(S\-S\-L $\ast$, unsigned char $\ast$, size\-\_\-t, const char $\ast$, size\-\_\-t, const unsigned char $\ast$, size\-\_\-t, int use\-\_\-context)
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{structssl3__enc__method_aad11cf6fc0fe09469b05f387f7a11a80}{\index{ssl3\-\_\-enc\-\_\-method@{ssl3\-\_\-enc\-\_\-method}!alert\-\_\-value@{alert\-\_\-value}}
+\index{alert\-\_\-value@{alert\-\_\-value}!ssl3_enc_method@{ssl3\-\_\-enc\-\_\-method}}
+\subsubsection[{alert\-\_\-value}]{\setlength{\rightskip}{0pt plus 5cm}int($\ast$ ssl3\-\_\-enc\-\_\-method\-::alert\-\_\-value)(int)}}\label{structssl3__enc__method_aad11cf6fc0fe09469b05f387f7a11a80}
+\hypertarget{structssl3__enc__method_a2a6053ae07f8281fb69133e2cefcdfee}{\index{ssl3\-\_\-enc\-\_\-method@{ssl3\-\_\-enc\-\_\-method}!cert\-\_\-verify\-\_\-mac@{cert\-\_\-verify\-\_\-mac}}
+\index{cert\-\_\-verify\-\_\-mac@{cert\-\_\-verify\-\_\-mac}!ssl3_enc_method@{ssl3\-\_\-enc\-\_\-method}}
+\subsubsection[{cert\-\_\-verify\-\_\-mac}]{\setlength{\rightskip}{0pt plus 5cm}int($\ast$ ssl3\-\_\-enc\-\_\-method\-::cert\-\_\-verify\-\_\-mac)(S\-S\-L $\ast$, int, unsigned char $\ast$)}}\label{structssl3__enc__method_a2a6053ae07f8281fb69133e2cefcdfee}
+\hypertarget{structssl3__enc__method_a29246e7e0dc5501e0f2aab7a2dac2b1a}{\index{ssl3\-\_\-enc\-\_\-method@{ssl3\-\_\-enc\-\_\-method}!change\-\_\-cipher\-\_\-state@{change\-\_\-cipher\-\_\-state}}
+\index{change\-\_\-cipher\-\_\-state@{change\-\_\-cipher\-\_\-state}!ssl3_enc_method@{ssl3\-\_\-enc\-\_\-method}}
+\subsubsection[{change\-\_\-cipher\-\_\-state}]{\setlength{\rightskip}{0pt plus 5cm}int($\ast$ ssl3\-\_\-enc\-\_\-method\-::change\-\_\-cipher\-\_\-state)(S\-S\-L $\ast$, int)}}\label{structssl3__enc__method_a29246e7e0dc5501e0f2aab7a2dac2b1a}
+\hypertarget{structssl3__enc__method_a87df6867ae53bc91ec4c499762e1d33b}{\index{ssl3\-\_\-enc\-\_\-method@{ssl3\-\_\-enc\-\_\-method}!client\-\_\-finished\-\_\-label@{client\-\_\-finished\-\_\-label}}
+\index{client\-\_\-finished\-\_\-label@{client\-\_\-finished\-\_\-label}!ssl3_enc_method@{ssl3\-\_\-enc\-\_\-method}}
+\subsubsection[{client\-\_\-finished\-\_\-label}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ ssl3\-\_\-enc\-\_\-method\-::client\-\_\-finished\-\_\-label}}\label{structssl3__enc__method_a87df6867ae53bc91ec4c499762e1d33b}
+\hypertarget{structssl3__enc__method_a5d7e0116e96a09669eb0afa28f5aa70a}{\index{ssl3\-\_\-enc\-\_\-method@{ssl3\-\_\-enc\-\_\-method}!client\-\_\-finished\-\_\-label\-\_\-len@{client\-\_\-finished\-\_\-label\-\_\-len}}
+\index{client\-\_\-finished\-\_\-label\-\_\-len@{client\-\_\-finished\-\_\-label\-\_\-len}!ssl3_enc_method@{ssl3\-\_\-enc\-\_\-method}}
+\subsubsection[{client\-\_\-finished\-\_\-label\-\_\-len}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-enc\-\_\-method\-::client\-\_\-finished\-\_\-label\-\_\-len}}\label{structssl3__enc__method_a5d7e0116e96a09669eb0afa28f5aa70a}
+\hypertarget{structssl3__enc__method_a6793e5dd277dbc19ef08380031c751b8}{\index{ssl3\-\_\-enc\-\_\-method@{ssl3\-\_\-enc\-\_\-method}!enc@{enc}}
+\index{enc@{enc}!ssl3_enc_method@{ssl3\-\_\-enc\-\_\-method}}
+\subsubsection[{enc}]{\setlength{\rightskip}{0pt plus 5cm}int($\ast$ ssl3\-\_\-enc\-\_\-method\-::enc)(S\-S\-L $\ast$, int)}}\label{structssl3__enc__method_a6793e5dd277dbc19ef08380031c751b8}
+\hypertarget{structssl3__enc__method_a9b209b57ac54b2cb1eaddae25df08889}{\index{ssl3\-\_\-enc\-\_\-method@{ssl3\-\_\-enc\-\_\-method}!export\-\_\-keying\-\_\-material@{export\-\_\-keying\-\_\-material}}
+\index{export\-\_\-keying\-\_\-material@{export\-\_\-keying\-\_\-material}!ssl3_enc_method@{ssl3\-\_\-enc\-\_\-method}}
+\subsubsection[{export\-\_\-keying\-\_\-material}]{\setlength{\rightskip}{0pt plus 5cm}int($\ast$ ssl3\-\_\-enc\-\_\-method\-::export\-\_\-keying\-\_\-material)(S\-S\-L $\ast$, unsigned char $\ast$, size\-\_\-t, const char $\ast$, size\-\_\-t, const unsigned char $\ast$, size\-\_\-t, int use\-\_\-context)}}\label{structssl3__enc__method_a9b209b57ac54b2cb1eaddae25df08889}
+\hypertarget{structssl3__enc__method_a279f059ffb51e79681dcc220967ac52f}{\index{ssl3\-\_\-enc\-\_\-method@{ssl3\-\_\-enc\-\_\-method}!final\-\_\-finish\-\_\-mac@{final\-\_\-finish\-\_\-mac}}
+\index{final\-\_\-finish\-\_\-mac@{final\-\_\-finish\-\_\-mac}!ssl3_enc_method@{ssl3\-\_\-enc\-\_\-method}}
+\subsubsection[{final\-\_\-finish\-\_\-mac}]{\setlength{\rightskip}{0pt plus 5cm}int($\ast$ ssl3\-\_\-enc\-\_\-method\-::final\-\_\-finish\-\_\-mac)(S\-S\-L $\ast$, const char $\ast$, int, unsigned char $\ast$)}}\label{structssl3__enc__method_a279f059ffb51e79681dcc220967ac52f}
+\hypertarget{structssl3__enc__method_a936196b1d38258a1103b0813440a31b2}{\index{ssl3\-\_\-enc\-\_\-method@{ssl3\-\_\-enc\-\_\-method}!finish\-\_\-mac\-\_\-length@{finish\-\_\-mac\-\_\-length}}
+\index{finish\-\_\-mac\-\_\-length@{finish\-\_\-mac\-\_\-length}!ssl3_enc_method@{ssl3\-\_\-enc\-\_\-method}}
+\subsubsection[{finish\-\_\-mac\-\_\-length}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-enc\-\_\-method\-::finish\-\_\-mac\-\_\-length}}\label{structssl3__enc__method_a936196b1d38258a1103b0813440a31b2}
+\hypertarget{structssl3__enc__method_a5c06552bd6fce1efdcab90cc2fdb6d3b}{\index{ssl3\-\_\-enc\-\_\-method@{ssl3\-\_\-enc\-\_\-method}!generate\-\_\-master\-\_\-secret@{generate\-\_\-master\-\_\-secret}}
+\index{generate\-\_\-master\-\_\-secret@{generate\-\_\-master\-\_\-secret}!ssl3_enc_method@{ssl3\-\_\-enc\-\_\-method}}
+\subsubsection[{generate\-\_\-master\-\_\-secret}]{\setlength{\rightskip}{0pt plus 5cm}int($\ast$ ssl3\-\_\-enc\-\_\-method\-::generate\-\_\-master\-\_\-secret)(S\-S\-L $\ast$, unsigned char $\ast$, unsigned char $\ast$, int)}}\label{structssl3__enc__method_a5c06552bd6fce1efdcab90cc2fdb6d3b}
+\hypertarget{structssl3__enc__method_acb78dd4b89469772b680df62569d9382}{\index{ssl3\-\_\-enc\-\_\-method@{ssl3\-\_\-enc\-\_\-method}!mac@{mac}}
+\index{mac@{mac}!ssl3_enc_method@{ssl3\-\_\-enc\-\_\-method}}
+\subsubsection[{mac}]{\setlength{\rightskip}{0pt plus 5cm}int($\ast$ ssl3\-\_\-enc\-\_\-method\-::mac)(S\-S\-L $\ast$, unsigned char $\ast$, int)}}\label{structssl3__enc__method_acb78dd4b89469772b680df62569d9382}
+\hypertarget{structssl3__enc__method_a395147aef41fded62c7690876b1c016a}{\index{ssl3\-\_\-enc\-\_\-method@{ssl3\-\_\-enc\-\_\-method}!server\-\_\-finished\-\_\-label@{server\-\_\-finished\-\_\-label}}
+\index{server\-\_\-finished\-\_\-label@{server\-\_\-finished\-\_\-label}!ssl3_enc_method@{ssl3\-\_\-enc\-\_\-method}}
+\subsubsection[{server\-\_\-finished\-\_\-label}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ ssl3\-\_\-enc\-\_\-method\-::server\-\_\-finished\-\_\-label}}\label{structssl3__enc__method_a395147aef41fded62c7690876b1c016a}
+\hypertarget{structssl3__enc__method_a09dad445d45b7e4ead7dba8eff209f5d}{\index{ssl3\-\_\-enc\-\_\-method@{ssl3\-\_\-enc\-\_\-method}!server\-\_\-finished\-\_\-label\-\_\-len@{server\-\_\-finished\-\_\-label\-\_\-len}}
+\index{server\-\_\-finished\-\_\-label\-\_\-len@{server\-\_\-finished\-\_\-label\-\_\-len}!ssl3_enc_method@{ssl3\-\_\-enc\-\_\-method}}
+\subsubsection[{server\-\_\-finished\-\_\-label\-\_\-len}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-enc\-\_\-method\-::server\-\_\-finished\-\_\-label\-\_\-len}}\label{structssl3__enc__method_a09dad445d45b7e4ead7dba8eff209f5d}
+\hypertarget{structssl3__enc__method_a53f84a2dc07948ff4b082a7824080f3f}{\index{ssl3\-\_\-enc\-\_\-method@{ssl3\-\_\-enc\-\_\-method}!setup\-\_\-key\-\_\-block@{setup\-\_\-key\-\_\-block}}
+\index{setup\-\_\-key\-\_\-block@{setup\-\_\-key\-\_\-block}!ssl3_enc_method@{ssl3\-\_\-enc\-\_\-method}}
+\subsubsection[{setup\-\_\-key\-\_\-block}]{\setlength{\rightskip}{0pt plus 5cm}int($\ast$ ssl3\-\_\-enc\-\_\-method\-::setup\-\_\-key\-\_\-block)(S\-S\-L $\ast$)}}\label{structssl3__enc__method_a53f84a2dc07948ff4b082a7824080f3f}
+
+
+The documentation for this struct was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+openssl-\/1.\-0.\-1j/ssl/\hyperlink{ssl__locl_8h}{ssl\-\_\-locl.\-h}\end{DoxyCompactItemize}

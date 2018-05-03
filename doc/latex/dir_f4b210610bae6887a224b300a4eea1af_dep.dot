@@ -1,0 +1,6 @@
+digraph "middlebox" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  dir_f4b210610bae6887a224b300a4eea1af [shape=box, label="middlebox", style="filled", fillcolor="#eeeeff", pencolor="black", URL="dir_f4b210610bae6887a224b300a4eea1af.html"];
+}

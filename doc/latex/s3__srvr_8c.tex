@@ -1,0 +1,178 @@
+\hypertarget{s3__srvr_8c}{\section{openssl-\/1.0.1j/ssl/s3\-\_\-srvr.c File Reference}
+\label{s3__srvr_8c}\index{openssl-\/1.\-0.\-1j/ssl/s3\-\_\-srvr.\-c@{openssl-\/1.\-0.\-1j/ssl/s3\-\_\-srvr.\-c}}
+}
+{\ttfamily \#include $<$stdio.\-h$>$}\\*
+{\ttfamily \#include \char`\"{}ssl\-\_\-locl.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}kssl\-\_\-lcl.\-h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}../crypto/constant\-\_\-time\-\_\-locl.\-h\char`\"{}}\\*
+{\ttfamily \#include $<$openssl/buffer.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/rand.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/objects.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/evp.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/hmac.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/x509.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/dh.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/bn.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/krb5\-\_\-asn.\-h$>$}\\*
+{\ttfamily \#include $<$openssl/md5.\-h$>$}\\*
+Include dependency graph for s3\-\_\-srvr.\-c\-:
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{s3__srvr_8c_a7dacb1e4514c3d4cfca600e770424b17}{R\-E\-U\-S\-E\-\_\-\-C\-I\-P\-H\-E\-R\-\_\-\-B\-U\-G}
+\item 
+\#define \hyperlink{s3__srvr_8c_a4224c58636a1006b9285e8a7ae352668}{N\-E\-T\-S\-C\-A\-P\-E\-\_\-\-H\-A\-N\-G\-\_\-\-B\-U\-G}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{s3__srvr_8c_a031c263e509ede1ea495ec5188b68f44}{I\-M\-P\-L\-E\-M\-E\-N\-T\-\_\-ssl3\-\_\-meth\-\_\-func} (\hyperlink{ssl_8h_a3b88c6ede986406c4ffec68cefbd3c55}{S\-S\-Lv3\-\_\-server\-\_\-method}, \hyperlink{ssl__locl_8h_a8b95f7bf3e9deb75ba37e29a6769c72a}{ssl3\-\_\-accept}, \hyperlink{ssl__locl_8h_ae40115724c722a925868096a2a6cec63}{ssl\-\_\-undefined\-\_\-function}, ssl3\-\_\-get\-\_\-server\-\_\-method)
+\item 
+int \hyperlink{s3__srvr_8c_a07b16c1a6c18e81f753b6bd2c4162061}{ssl3\-\_\-send\-\_\-hello\-\_\-request} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__srvr_8c_a30b1e320551cfd3cbf65823289f6479f}{ssl3\-\_\-check\-\_\-client\-\_\-hello} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__srvr_8c_a5efedba4306009d21e395057b5a71f09}{ssl3\-\_\-get\-\_\-client\-\_\-hello} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__srvr_8c_a038dc684fb2f0fad8dc76315a922290a}{ssl3\-\_\-send\-\_\-server\-\_\-hello} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__srvr_8c_a4fe1b4c723194cbe4c4b9edc0ac45340}{ssl3\-\_\-send\-\_\-server\-\_\-done} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__srvr_8c_adfbfccadbdf9fff743bbbbb158a8d5ba}{ssl3\-\_\-send\-\_\-server\-\_\-key\-\_\-exchange} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__srvr_8c_a21b4633c3744619abce0add2fe3f5900}{ssl3\-\_\-send\-\_\-certificate\-\_\-request} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__srvr_8c_a5233302597c5e5eaf157fe32b5a14dc9}{ssl3\-\_\-get\-\_\-client\-\_\-key\-\_\-exchange} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__srvr_8c_a215c097e823a3ee69cadb030e793f2f7}{ssl3\-\_\-get\-\_\-cert\-\_\-verify} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__srvr_8c_ac5365a00ee1f1e4af9e22bd55f3e3009}{ssl3\-\_\-get\-\_\-client\-\_\-certificate} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__srvr_8c_abd1c38e776687c1e8312ae11a44818fb}{ssl3\-\_\-send\-\_\-server\-\_\-certificate} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__srvr_8c_a6d61d813b3e62515d056743388a0ef66}{ssl3\-\_\-send\-\_\-newsession\-\_\-ticket} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__srvr_8c_addbb3a251831eb4645f23c9ae86838e0}{ssl3\-\_\-send\-\_\-cert\-\_\-status} (S\-S\-L $\ast$s)
+\item 
+int \hyperlink{s3__srvr_8c_aef08b32918a40caa751431acbc7c7fec}{ssl3\-\_\-get\-\_\-next\-\_\-proto} (S\-S\-L $\ast$s)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{s3__srvr_8c_a4224c58636a1006b9285e8a7ae352668}{\index{s3\-\_\-srvr.\-c@{s3\-\_\-srvr.\-c}!N\-E\-T\-S\-C\-A\-P\-E\-\_\-\-H\-A\-N\-G\-\_\-\-B\-U\-G@{N\-E\-T\-S\-C\-A\-P\-E\-\_\-\-H\-A\-N\-G\-\_\-\-B\-U\-G}}
+\index{N\-E\-T\-S\-C\-A\-P\-E\-\_\-\-H\-A\-N\-G\-\_\-\-B\-U\-G@{N\-E\-T\-S\-C\-A\-P\-E\-\_\-\-H\-A\-N\-G\-\_\-\-B\-U\-G}!s3_srvr.c@{s3\-\_\-srvr.\-c}}
+\subsubsection[{N\-E\-T\-S\-C\-A\-P\-E\-\_\-\-H\-A\-N\-G\-\_\-\-B\-U\-G}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\-E\-T\-S\-C\-A\-P\-E\-\_\-\-H\-A\-N\-G\-\_\-\-B\-U\-G}}\label{s3__srvr_8c_a4224c58636a1006b9285e8a7ae352668}
+\hypertarget{s3__srvr_8c_a7dacb1e4514c3d4cfca600e770424b17}{\index{s3\-\_\-srvr.\-c@{s3\-\_\-srvr.\-c}!R\-E\-U\-S\-E\-\_\-\-C\-I\-P\-H\-E\-R\-\_\-\-B\-U\-G@{R\-E\-U\-S\-E\-\_\-\-C\-I\-P\-H\-E\-R\-\_\-\-B\-U\-G}}
+\index{R\-E\-U\-S\-E\-\_\-\-C\-I\-P\-H\-E\-R\-\_\-\-B\-U\-G@{R\-E\-U\-S\-E\-\_\-\-C\-I\-P\-H\-E\-R\-\_\-\-B\-U\-G}!s3_srvr.c@{s3\-\_\-srvr.\-c}}
+\subsubsection[{R\-E\-U\-S\-E\-\_\-\-C\-I\-P\-H\-E\-R\-\_\-\-B\-U\-G}]{\setlength{\rightskip}{0pt plus 5cm}\#define R\-E\-U\-S\-E\-\_\-\-C\-I\-P\-H\-E\-R\-\_\-\-B\-U\-G}}\label{s3__srvr_8c_a7dacb1e4514c3d4cfca600e770424b17}
+
+
+\subsection{Function Documentation}
+\hypertarget{s3__srvr_8c_a031c263e509ede1ea495ec5188b68f44}{\index{s3\-\_\-srvr.\-c@{s3\-\_\-srvr.\-c}!I\-M\-P\-L\-E\-M\-E\-N\-T\-\_\-ssl3\-\_\-meth\-\_\-func@{I\-M\-P\-L\-E\-M\-E\-N\-T\-\_\-ssl3\-\_\-meth\-\_\-func}}
+\index{I\-M\-P\-L\-E\-M\-E\-N\-T\-\_\-ssl3\-\_\-meth\-\_\-func@{I\-M\-P\-L\-E\-M\-E\-N\-T\-\_\-ssl3\-\_\-meth\-\_\-func}!s3_srvr.c@{s3\-\_\-srvr.\-c}}
+\subsubsection[{I\-M\-P\-L\-E\-M\-E\-N\-T\-\_\-ssl3\-\_\-meth\-\_\-func}]{\setlength{\rightskip}{0pt plus 5cm}I\-M\-P\-L\-E\-M\-E\-N\-T\-\_\-ssl3\-\_\-meth\-\_\-func (
+\begin{DoxyParamCaption}
+\item[{{\bf S\-S\-Lv3\-\_\-server\-\_\-method}}]{, }
+\item[{{\bf ssl3\-\_\-accept}}]{, }
+\item[{{\bf ssl\-\_\-undefined\-\_\-function}}]{, }
+\item[{ssl3\-\_\-get\-\_\-server\-\_\-method}]{}
+\end{DoxyParamCaption}
+)}}\label{s3__srvr_8c_a031c263e509ede1ea495ec5188b68f44}
+\hypertarget{s3__srvr_8c_a30b1e320551cfd3cbf65823289f6479f}{\index{s3\-\_\-srvr.\-c@{s3\-\_\-srvr.\-c}!ssl3\-\_\-check\-\_\-client\-\_\-hello@{ssl3\-\_\-check\-\_\-client\-\_\-hello}}
+\index{ssl3\-\_\-check\-\_\-client\-\_\-hello@{ssl3\-\_\-check\-\_\-client\-\_\-hello}!s3_srvr.c@{s3\-\_\-srvr.\-c}}
+\subsubsection[{ssl3\-\_\-check\-\_\-client\-\_\-hello}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-check\-\_\-client\-\_\-hello (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__srvr_8c_a30b1e320551cfd3cbf65823289f6479f}
+\hypertarget{s3__srvr_8c_a215c097e823a3ee69cadb030e793f2f7}{\index{s3\-\_\-srvr.\-c@{s3\-\_\-srvr.\-c}!ssl3\-\_\-get\-\_\-cert\-\_\-verify@{ssl3\-\_\-get\-\_\-cert\-\_\-verify}}
+\index{ssl3\-\_\-get\-\_\-cert\-\_\-verify@{ssl3\-\_\-get\-\_\-cert\-\_\-verify}!s3_srvr.c@{s3\-\_\-srvr.\-c}}
+\subsubsection[{ssl3\-\_\-get\-\_\-cert\-\_\-verify}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-get\-\_\-cert\-\_\-verify (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__srvr_8c_a215c097e823a3ee69cadb030e793f2f7}
+\hypertarget{s3__srvr_8c_ac5365a00ee1f1e4af9e22bd55f3e3009}{\index{s3\-\_\-srvr.\-c@{s3\-\_\-srvr.\-c}!ssl3\-\_\-get\-\_\-client\-\_\-certificate@{ssl3\-\_\-get\-\_\-client\-\_\-certificate}}
+\index{ssl3\-\_\-get\-\_\-client\-\_\-certificate@{ssl3\-\_\-get\-\_\-client\-\_\-certificate}!s3_srvr.c@{s3\-\_\-srvr.\-c}}
+\subsubsection[{ssl3\-\_\-get\-\_\-client\-\_\-certificate}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-get\-\_\-client\-\_\-certificate (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__srvr_8c_ac5365a00ee1f1e4af9e22bd55f3e3009}
+\hypertarget{s3__srvr_8c_a5efedba4306009d21e395057b5a71f09}{\index{s3\-\_\-srvr.\-c@{s3\-\_\-srvr.\-c}!ssl3\-\_\-get\-\_\-client\-\_\-hello@{ssl3\-\_\-get\-\_\-client\-\_\-hello}}
+\index{ssl3\-\_\-get\-\_\-client\-\_\-hello@{ssl3\-\_\-get\-\_\-client\-\_\-hello}!s3_srvr.c@{s3\-\_\-srvr.\-c}}
+\subsubsection[{ssl3\-\_\-get\-\_\-client\-\_\-hello}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-get\-\_\-client\-\_\-hello (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__srvr_8c_a5efedba4306009d21e395057b5a71f09}
+\hypertarget{s3__srvr_8c_a5233302597c5e5eaf157fe32b5a14dc9}{\index{s3\-\_\-srvr.\-c@{s3\-\_\-srvr.\-c}!ssl3\-\_\-get\-\_\-client\-\_\-key\-\_\-exchange@{ssl3\-\_\-get\-\_\-client\-\_\-key\-\_\-exchange}}
+\index{ssl3\-\_\-get\-\_\-client\-\_\-key\-\_\-exchange@{ssl3\-\_\-get\-\_\-client\-\_\-key\-\_\-exchange}!s3_srvr.c@{s3\-\_\-srvr.\-c}}
+\subsubsection[{ssl3\-\_\-get\-\_\-client\-\_\-key\-\_\-exchange}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-get\-\_\-client\-\_\-key\-\_\-exchange (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__srvr_8c_a5233302597c5e5eaf157fe32b5a14dc9}
+\hypertarget{s3__srvr_8c_aef08b32918a40caa751431acbc7c7fec}{\index{s3\-\_\-srvr.\-c@{s3\-\_\-srvr.\-c}!ssl3\-\_\-get\-\_\-next\-\_\-proto@{ssl3\-\_\-get\-\_\-next\-\_\-proto}}
+\index{ssl3\-\_\-get\-\_\-next\-\_\-proto@{ssl3\-\_\-get\-\_\-next\-\_\-proto}!s3_srvr.c@{s3\-\_\-srvr.\-c}}
+\subsubsection[{ssl3\-\_\-get\-\_\-next\-\_\-proto}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-get\-\_\-next\-\_\-proto (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__srvr_8c_aef08b32918a40caa751431acbc7c7fec}
+\hypertarget{s3__srvr_8c_addbb3a251831eb4645f23c9ae86838e0}{\index{s3\-\_\-srvr.\-c@{s3\-\_\-srvr.\-c}!ssl3\-\_\-send\-\_\-cert\-\_\-status@{ssl3\-\_\-send\-\_\-cert\-\_\-status}}
+\index{ssl3\-\_\-send\-\_\-cert\-\_\-status@{ssl3\-\_\-send\-\_\-cert\-\_\-status}!s3_srvr.c@{s3\-\_\-srvr.\-c}}
+\subsubsection[{ssl3\-\_\-send\-\_\-cert\-\_\-status}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-send\-\_\-cert\-\_\-status (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__srvr_8c_addbb3a251831eb4645f23c9ae86838e0}
+\hypertarget{s3__srvr_8c_a21b4633c3744619abce0add2fe3f5900}{\index{s3\-\_\-srvr.\-c@{s3\-\_\-srvr.\-c}!ssl3\-\_\-send\-\_\-certificate\-\_\-request@{ssl3\-\_\-send\-\_\-certificate\-\_\-request}}
+\index{ssl3\-\_\-send\-\_\-certificate\-\_\-request@{ssl3\-\_\-send\-\_\-certificate\-\_\-request}!s3_srvr.c@{s3\-\_\-srvr.\-c}}
+\subsubsection[{ssl3\-\_\-send\-\_\-certificate\-\_\-request}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-send\-\_\-certificate\-\_\-request (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__srvr_8c_a21b4633c3744619abce0add2fe3f5900}
+\hypertarget{s3__srvr_8c_a07b16c1a6c18e81f753b6bd2c4162061}{\index{s3\-\_\-srvr.\-c@{s3\-\_\-srvr.\-c}!ssl3\-\_\-send\-\_\-hello\-\_\-request@{ssl3\-\_\-send\-\_\-hello\-\_\-request}}
+\index{ssl3\-\_\-send\-\_\-hello\-\_\-request@{ssl3\-\_\-send\-\_\-hello\-\_\-request}!s3_srvr.c@{s3\-\_\-srvr.\-c}}
+\subsubsection[{ssl3\-\_\-send\-\_\-hello\-\_\-request}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-send\-\_\-hello\-\_\-request (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__srvr_8c_a07b16c1a6c18e81f753b6bd2c4162061}
+\hypertarget{s3__srvr_8c_a6d61d813b3e62515d056743388a0ef66}{\index{s3\-\_\-srvr.\-c@{s3\-\_\-srvr.\-c}!ssl3\-\_\-send\-\_\-newsession\-\_\-ticket@{ssl3\-\_\-send\-\_\-newsession\-\_\-ticket}}
+\index{ssl3\-\_\-send\-\_\-newsession\-\_\-ticket@{ssl3\-\_\-send\-\_\-newsession\-\_\-ticket}!s3_srvr.c@{s3\-\_\-srvr.\-c}}
+\subsubsection[{ssl3\-\_\-send\-\_\-newsession\-\_\-ticket}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-send\-\_\-newsession\-\_\-ticket (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__srvr_8c_a6d61d813b3e62515d056743388a0ef66}
+\hypertarget{s3__srvr_8c_abd1c38e776687c1e8312ae11a44818fb}{\index{s3\-\_\-srvr.\-c@{s3\-\_\-srvr.\-c}!ssl3\-\_\-send\-\_\-server\-\_\-certificate@{ssl3\-\_\-send\-\_\-server\-\_\-certificate}}
+\index{ssl3\-\_\-send\-\_\-server\-\_\-certificate@{ssl3\-\_\-send\-\_\-server\-\_\-certificate}!s3_srvr.c@{s3\-\_\-srvr.\-c}}
+\subsubsection[{ssl3\-\_\-send\-\_\-server\-\_\-certificate}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-send\-\_\-server\-\_\-certificate (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__srvr_8c_abd1c38e776687c1e8312ae11a44818fb}
+\hypertarget{s3__srvr_8c_a4fe1b4c723194cbe4c4b9edc0ac45340}{\index{s3\-\_\-srvr.\-c@{s3\-\_\-srvr.\-c}!ssl3\-\_\-send\-\_\-server\-\_\-done@{ssl3\-\_\-send\-\_\-server\-\_\-done}}
+\index{ssl3\-\_\-send\-\_\-server\-\_\-done@{ssl3\-\_\-send\-\_\-server\-\_\-done}!s3_srvr.c@{s3\-\_\-srvr.\-c}}
+\subsubsection[{ssl3\-\_\-send\-\_\-server\-\_\-done}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-send\-\_\-server\-\_\-done (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__srvr_8c_a4fe1b4c723194cbe4c4b9edc0ac45340}
+\hypertarget{s3__srvr_8c_a038dc684fb2f0fad8dc76315a922290a}{\index{s3\-\_\-srvr.\-c@{s3\-\_\-srvr.\-c}!ssl3\-\_\-send\-\_\-server\-\_\-hello@{ssl3\-\_\-send\-\_\-server\-\_\-hello}}
+\index{ssl3\-\_\-send\-\_\-server\-\_\-hello@{ssl3\-\_\-send\-\_\-server\-\_\-hello}!s3_srvr.c@{s3\-\_\-srvr.\-c}}
+\subsubsection[{ssl3\-\_\-send\-\_\-server\-\_\-hello}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-send\-\_\-server\-\_\-hello (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__srvr_8c_a038dc684fb2f0fad8dc76315a922290a}
+\hypertarget{s3__srvr_8c_adfbfccadbdf9fff743bbbbb158a8d5ba}{\index{s3\-\_\-srvr.\-c@{s3\-\_\-srvr.\-c}!ssl3\-\_\-send\-\_\-server\-\_\-key\-\_\-exchange@{ssl3\-\_\-send\-\_\-server\-\_\-key\-\_\-exchange}}
+\index{ssl3\-\_\-send\-\_\-server\-\_\-key\-\_\-exchange@{ssl3\-\_\-send\-\_\-server\-\_\-key\-\_\-exchange}!s3_srvr.c@{s3\-\_\-srvr.\-c}}
+\subsubsection[{ssl3\-\_\-send\-\_\-server\-\_\-key\-\_\-exchange}]{\setlength{\rightskip}{0pt plus 5cm}int ssl3\-\_\-send\-\_\-server\-\_\-key\-\_\-exchange (
+\begin{DoxyParamCaption}
+\item[{S\-S\-L $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}\label{s3__srvr_8c_adfbfccadbdf9fff743bbbbb158a8d5ba}

@@ -300,6 +300,8 @@ void *run(void *data)
 
   MA_LOG1s("Start SSL connections to", ip);
 
+  ssl->pair = args->ssl;
+  args->ssl->pair = ssl;
   if ((ret = SSL_connect(ssl)) != 1)
   {
     ERR_print_errors_fp(stderr);
@@ -310,8 +312,6 @@ void *run(void *data)
   else
   {
     MA_LOG1s("Succeed to connect to", ip);
-    ssl->pair = args->ssl;
-    args->ssl->pair = ssl;
   }
 
   FD_ZERO(&reads);
@@ -390,6 +390,7 @@ void ssl_init(char *cert, char *priv) {
   SSL_CTX_set_options(ctx, SSL_OP_ALL|SSL_OP_NO_SSLv2|SSL_OP_NO_SSLv3);
   //SSL_CTX_set_msg_callback(ctx, msg_callback);
   SSL_CTX_set_sni_callback(ctx, sni_callback);
+  SSL_CTX_enable_mb(ctx);
 }
 
 void init_thread_config(void)

@@ -1,0 +1,1 @@
+wget -SO test.txt -T 1 -t 1 http://qq.com 2>header.txt

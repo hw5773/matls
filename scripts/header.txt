@@ -1,0 +1,44 @@
+--2017-08-20 23:16:40--  http://qq.com/
+Resolving qq.com (qq.com)... 125.39.240.113, 61.135.157.156
+Connecting to qq.com (qq.com)|125.39.240.113|:80... connected.
+HTTP request sent, awaiting response... 
+  HTTP/1.1 302 Moved Temporarily
+  Server: squid/3.5.20
+  Date: Sun, 20 Aug 2017 14:16:41 GMT
+  Content-Type: text/html
+  Transfer-Encoding: chunked
+  Connection: keep-alive
+  Location: http://www.qq.com/
+  Expires: Sun, 20 Aug 2017 14:17:41 GMT
+  Cache-Control: max-age=60
+  Vary: Accept-Encoding
+  X-Cache: HIT from tianjin.qq.com
+Location: http://www.qq.com/ [following]
+--2017-08-20 23:16:41--  http://www.qq.com/
+Resolving www.qq.com (www.qq.com)... 103.7.30.123, 240e:e1:8100:28::2:16
+Connecting to www.qq.com (www.qq.com)|103.7.30.123|:80... connected.
+HTTP request sent, awaiting response... 
+  HTTP/1.1 200 OK
+  Server: squid/3.5.20
+  Date: Sun, 20 Aug 2017 14:16:41 GMT
+  Content-Type: text/html; charset=GB2312
+  Transfer-Encoding: chunked
+  Connection: keep-alive
+  Vary: Accept-Encoding
+  Vary: Accept-Encoding
+  Expires: Sun, 20 Aug 2017 14:17:41 GMT
+  Cache-Control: max-age=60
+  Vary: Accept-Encoding
+  Vary: Accept-Encoding
+  X-Cache: MISS from xianggang.qq.com
+Length: unspecified [text/html]
+Saving to: ‘test.txt’
+
+     0K .......... .......... .......... .......... ..........  400K
+    50K .......... .......... .......... .......... ..........  789K
+   100K .......... .......... .......... .......... ..........  921K
+   150K .......... .......... .......... .......... .......... 2.45M
+   200K .......... .......... .......... ........               523K=0.3s
+
+2017-08-20 23:16:41 (709 KB/s) - ‘test.txt’ saved [244405]
+

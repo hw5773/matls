@@ -1,0 +1,11 @@
+HTTP/1.1 200 OK
+Date: Sun, 20 Aug 2017 15:11:43 GMT
+Server: Apache/2.4.7 (Ubuntu)
+Last-Modified: Sat, 25 Mar 2017 00:48:00 GMT
+ETag: "17954-54b83764ae776"
+Accept-Ranges: bytes
+Content-Length: 96596
+Cache-Control: max-age=3600
+Expires: Sun, 20 Aug 2017 16:11:43 GMT
+Content-Type: image/png
+

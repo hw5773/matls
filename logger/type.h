@@ -1,0 +1,3 @@
+#define CLIENT_HANDSHAKE_START  1
+#define CLIENT_HANDSHAKE_END    2
+

@@ -30,6 +30,10 @@ unsigned char ipb[4];
   fprintf(stderr, "[matls] %s: %s: %s\n", __func__, msg, arg1);
 #define MA_LOG1lu(msg, arg1) \
   fprintf(stderr, "[matls] %s: %s: %lu\n", __func__, msg, arg1);
+#define MA_LOG1ld(msg, arg1) \
+  fprintf(stderr, "[matls] %s: %s: %ld\n", __func__, msg, arg1);
+#define MA_LOG1u(msg, arg1) \
+  fprintf(stderr, "[matls] %s: %s: %u\n", __func__, msg, arg1);
 #define MA_LOGip(msg, ip) \
   ipb[0] = ip & 0xFF; \
   ipb[1] = (ip >> 8) & 0xFF; \
@@ -54,6 +58,8 @@ unsigned char ipb[4];
 #define MA_LOG1p(msg, arg1)
 #define MA_LOG1s(msg, arg1)
 #define MA_LOG1lu(msg, arg1)
+#define MA_LOG1ld(msg, arg1)
+#define MA_LOG1u(msg, arg1)
 #define MA_LOGip(msg, ip)
 #define MA_LOG2s(msg, arg1, arg2)
 #define MA_LOGmac(msg, mac)

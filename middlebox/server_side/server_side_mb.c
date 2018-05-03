@@ -168,9 +168,8 @@ int main(int argc, char *argv[])
 
       if (client[i].revents & POLLOUT)
       {
-        if (info[i].wbuf->len > 0)
-          if (do_sock_write(&info[i]) < 0)
-            ssl_client_cleanup(&info[i]);
+        if (do_sock_write(&info[i]) < 0)
+          ssl_client_cleanup(&info[i]);
       }
 
       if (revents & (POLLERR | POLLHUP | POLLNVAL))
@@ -178,6 +177,11 @@ int main(int argc, char *argv[])
         MA_LOG("Other events");
         ssl_client_cleanup(&info[i]);
       }
+
+      client[i].events = POLLERR | POLLHUP | POLLNVAL | POLLIN;
+      client[i].events &= ~POLLOUT;
+      if (info[i].wbuf->len > 0)
+        client[i].events |= POLLOUT;
     }
   }
   return 0;

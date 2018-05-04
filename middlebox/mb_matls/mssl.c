@@ -44,6 +44,7 @@ void ssl_client_init(struct ssl_client *p)
   p->wbio = BIO_new(BIO_s_mem());
 
   p->ssl = SSL_new(ctx);
+  p->ssl->lock = (int *)calloc(1, sizeof(int));
 
   SSL_set_accept_state(p->ssl); /* sets ssl to work in server mode. */
   SSL_set_bio(p->ssl, p->rbio, p->wbio);
@@ -302,6 +303,9 @@ void *run(void *data)
 
   ssl->pair = args->ssl;
   args->ssl->pair = ssl;
+  ssl->lock = args->ssl->lock;
+  ssl->middlebox = 1;
+  ssl->pair->middlebox = 1;
   if ((ret = SSL_connect(ssl)) != 1)
   {
     ERR_print_errors_fp(stderr);

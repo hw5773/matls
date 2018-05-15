@@ -414,14 +414,14 @@ int ssl3_accept(SSL *s)
 			if (!(s->s3->tmp.new_cipher->algorithm_auth & (SSL_aNULL|SSL_aKRB5|SSL_aSRP))
 				&& !(s->s3->tmp.new_cipher->algorithm_mkey & SSL_kPSK))
 				{
-#ifndef OPENSSL_NO_MB
+#ifndef OPENSSL_NO_MATLS
                 if (s->mb_enabled)
                 {
                   printf("[matls] invoke matls send server certificate\n");
                   ret = matls_send_server_certificate(s);
                 }
                 else
-#endif /* OPENSSL_NO_MB */
+#endif /* OPENSSL_NO_MATLS */
 				ret=ssl3_send_server_certificate(s);
 				if (ret <= 0) goto end;
 #ifndef OPENSSL_NO_TLSEXT

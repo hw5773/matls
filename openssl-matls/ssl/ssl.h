@@ -220,7 +220,7 @@ extern "C" {
 #define SSL_MIN_RSA_MODULUS_LENGTH_IN_BYTES	(512/8)
 #define SSL_MAX_KEY_ARG_LENGTH			8
 #define SSL_MAX_MASTER_KEY_LENGTH		48
-#define SSL_MAX_GLOBAL_MAC_KEY_LENGTH        48
+#define SSL_MAX_GLOBAL_MAC_KEY_LENGTH        32
 
 
 /* These are used to specify which ciphers to use and not to use */
@@ -802,10 +802,12 @@ struct keypair
 struct mb_st {
     int group_id;
     int num_keys;
-    int **key_length; //ECDH key length
+    int *key_length; //ECDH key length
     unsigned char **mac_array;
     unsigned char **secret;
     struct keypair *keypair;
+    unsigned char lock;
+    unsigned char *random[2];
 } mb_info;
 
 #endif /* OPENSSL_NO_MATLS */
@@ -1437,23 +1439,25 @@ struct ssl_st
 #endif /* OPENSSL_NO_TTPA */
 
 #ifndef OPENSSL_NO_MATLS
-    int middlebox;
+  int middlebox;
 	unsigned char mb_enabled;
-    struct mb_st mb_info;
+  struct mb_st mb_info;
 
-    unsigned char *extension_from_clnt_msg;
-    unsigned char *extension_from_srvr_msg;
-    unsigned char *cert_msg;
-    unsigned char *extended_finished_msg;
+  volatile unsigned char *extension_from_clnt_msg;
+  volatile unsigned char *extension_from_srvr_msg;
+  volatile unsigned char *cert_msg;
+  volatile unsigned char *extended_finished_msg;
 
-    int extension_from_clnt_msg_len;
-    int extension_from_srvr_msg_len;
-    int cert_msg_len;
-    int extended_finished_msg_len;
+  volatile int extension_from_clnt_msg_len;
+  volatile int extension_from_srvr_msg_len;
+  volatile int cert_msg_len;
+  volatile int extended_finished_msg_len;
+
+  volatile int *lock;
 #endif /* OPENSSL_NO_MATLS */
 
 #ifndef OPENSSL_NO_SPLIT_TLS
-    SSL *pair;
+  SSL *pair;
 #endif /* OPENSSL_NO_SPLIT_TLS */
 	};
 

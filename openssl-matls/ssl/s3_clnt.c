@@ -637,7 +637,6 @@ int ssl3_connect(SSL *s)
 			s->init_num=0;
 			break;
 
-      printf("1\n");
 		case SSL3_ST_CW_FLUSH:
 			s->rwstate=SSL_WRITING;
 			if (BIO_flush(s->wbio) <= 0)
@@ -649,7 +648,6 @@ int ssl3_connect(SSL *s)
 			s->state=s->s3->tmp.next_state;
 			break;
 
-      printf("2\n");
 		case SSL_ST_OK:
 			/* clean a few things up */
 			ssl3_cleanup_key_block(s);
@@ -666,12 +664,10 @@ int ssl3_connect(SSL *s)
 				ssl_free_wbio_buffer(s);
 			/* else do it later in ssl3_write */
 
-      printf("3\n");
 			s->init_num=0;
 			s->renegotiate=0;
 			s->new_session=0;
 
-      printf("4\n");
 			ssl_update_cache(s,SSL_SESS_CACHE_CLIENT);
 			if (s->hit) s->ctx->stats.sess_hit++;
 
@@ -680,13 +676,11 @@ int ssl3_connect(SSL *s)
 			s->handshake_func=ssl3_connect;
 			s->ctx->stats.sess_connect_good++;
 
-      printf("5\n");
 			if (cb != NULL) cb(s,SSL_CB_HANDSHAKE_DONE,1);
 
 			goto end;
 			/* break; */
 			
-      printf("6\n");
 		default:
 			SSLerr(SSL_F_SSL3_CONNECT,SSL_R_UNKNOWN_STATE);
 			ret= -1;

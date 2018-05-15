@@ -348,6 +348,9 @@ int ssl3_get_finished(SSL *s, int a, int b)
 		}
 	s->s3->change_cipher_spec=0;
 
+  p = (unsigned char *)s->init_msg;
+  i = s->s3->tmp.peer_finish_md_len;
+
 	if (i != n)
 		{
 		al=SSL_AD_DECODE_ERROR;

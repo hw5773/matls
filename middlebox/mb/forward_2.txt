@@ -1,2 +1,2 @@
-www.matls.com 147.46.114.149 443
+www.matls.com www.matls.com 443
 www.test.com 1.2.3.4 7890

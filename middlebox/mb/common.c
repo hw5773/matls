@@ -28,6 +28,6 @@ int open_connection(const char *hostname, int port)
          perror(hostname);
          abort();
     }
-         return sd;
+    return sd;
 }
 

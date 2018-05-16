@@ -16,7 +16,7 @@
 #define FAIL    -1
 
 int open_listener(int port);
-SSL_CTX* init_server_ctx();
+SSL_CTX* init_middlebox_ctx();
 void load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file);
 void print_pubkey(EVP_PKEY *pkey);
 BIO *bio_err;
@@ -47,7 +47,7 @@ int main(int count, char *strings[])
 	key = strings[3];
   forward_file = strings[4];
 
-	ctx = init_server_ctx();        /* initialize SSL */
+	ctx = init_middlebox_ctx();        /* initialize SSL */
 	load_certificates(ctx, cert, key);
   init_forward_table(forward_file);
   init_thread_config();
@@ -100,7 +100,7 @@ int main(int count, char *strings[])
 
 void *mb_run(void *data)
 {
-  printf("[matls] start server loop\n");
+  MA_LOG("start server loop\n");
   struct info *info;
   int client, ret;
   SSL *ssl;
@@ -111,12 +111,12 @@ void *mb_run(void *data)
   SSL_set_fd(ssl, client);
 //  SSL_enable_mb(ssl);
 
-  MA_LOG("[matls] start matls handshake");
+  MA_LOG("start matls handshake");
   ret = SSL_accept(ssl);
   if (SSL_is_init_finished(ssl))
     MA_LOG("complete handshake");
   
-  MA_LOG1d("[matls] end matls handshake", ret);
+  MA_LOG1d("end matls handshake", ret);
 
   SSL_free(ssl);
   close(client);
@@ -181,7 +181,7 @@ void apps_ssl_info_callback(const SSL *s, int where, int ret)
 	}
 }
 
-SSL_CTX* init_server_ctx()
+SSL_CTX* init_middlebox_ctx()
 {   
 	SSL_METHOD *method;
 
@@ -195,8 +195,11 @@ SSL_CTX* init_server_ctx()
 	}
 
 	SSL_CTX_set_info_callback(ctx, apps_ssl_info_callback);
-	//SSL_CTX_set_msg_callback(ctx, msg_callback);
+	SSL_CTX_set_msg_callback(ctx, msg_callback);
   SSL_CTX_set_sni_callback(ctx, sni_callback);
+  printf("set info callback, msg callback, sni callback complete\n");
+  ctx->middlebox = 1;
+  //SSL_CTX_is_middlebox(ctx);
 
 	return ctx;
 }

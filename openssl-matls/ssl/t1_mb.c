@@ -473,8 +473,10 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
         else
           MA_LOG("Server");
 
+        printf("here 1\n");
         memcpy(tmp, s->mb_info.secret[i], SECRET_LENGTH);
 
+        printf("here 2\n");
         t1_prf(TLS_MD_GLOBAL_MAC_KEY_CONST, TLS_MD_GLOBAL_MAC_KEY_CONST_SIZE,
                 s->mb_info.random[SERVER], s->mb_info.key_length[SERVER],
                 s->mb_info.random[CLIENT], s->mb_info.key_length[CLIENT],

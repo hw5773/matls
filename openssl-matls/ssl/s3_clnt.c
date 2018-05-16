@@ -1199,7 +1199,6 @@ int matls_get_server_certificate(SSL *s)
 		}
 
   num_certs = *(p++);
-  printf("num_certs: %d\n", num_certs);
   offset++;
 
   for (i=num_certs; i>1; i--)
@@ -1211,8 +1210,15 @@ int matls_get_server_certificate(SSL *s)
   }
 
   ///// Add for matls /////
-  s->cert_msg = (unsigned char *)malloc(offset);
-  memcpy(s->cert_msg, d, offset);
+  if (s->middlebox)
+  {
+    s->cert_msg = (unsigned char *)malloc(n);
+    s->cert_msg_len = n;
+    /* add the number of certificates by one. 
+     * The pair only needs to append one certificate to the server certificate message */
+    //*d = num_certs + 1; 
+    memcpy(s->cert_msg, d, n);
+  }
   /////////////////////////
 
 	n2l3(p,llen);

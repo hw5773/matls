@@ -271,7 +271,7 @@ void msg_callback(int write, int version, int content_type, const void *buf, siz
     default:
       printf("invalid\n");
   }
-
+/*
   for (i=0; i<len; i++)
   {
     printf("%02X ", p[i]);
@@ -279,6 +279,7 @@ void msg_callback(int write, int version, int content_type, const void *buf, siz
       printf("\n");
   }
   printf("\n");
+*/
 }
 
 void *run(void *data)
@@ -299,6 +300,7 @@ void *run(void *data)
   ssl = SSL_new(ctx);
   SSL_set_fd(ssl, server);
   SSL_set_tlsext_host_name(ssl, "www.matls.com");
+  SSL_enable_mb(ssl);
 
   MA_LOG1s("Start SSL connections to", ip);
 

@@ -414,6 +414,28 @@ int ssl3_send_change_cipher_spec(SSL *s, int a, int b)
 	return(ssl3_do_write(s,SSL3_RT_CHANGE_CIPHER_SPEC));
 	}
 
+static int matls_add_cert_to_buf(BUF_MEM *buf, unsigned long *l, X509 *x)
+{
+  int n;
+  unsigned char *p;
+
+  n = i2d_X509(x, NULL);
+
+  if (!BUF_MEM_grow_clean(buf, (int)(n + 3 + *l)))
+  {
+    SSLerr(SSL_F_SSL3_ADD_CERT_TO_BUF, ERR_R_BUF_LIB);
+    return -1;
+  }
+
+  p = (unsigned char *)&(buf->data[*l]);
+  l2n3(n, p);
+  i2d_X509(x, &p);
+  *l+=n+3;
+
+  return 0;
+}
+
+
 static int ssl3_add_cert_to_buf(BUF_MEM *buf, unsigned long *l, X509 *x)
 	{
 	int n;
@@ -577,10 +599,18 @@ unsigned long ssl3_output_orig_cert_chain(SSL *s, X509 *x)
 unsigned long matls_output_cert_chain(SSL *s, X509 *x)
 	{
 	unsigned char *p;
-	int i;
-	unsigned long l=8;
+	int i, tmp, nk = 0;
+	unsigned long l, init, len_pos, len;
 	BUF_MEM *buf;
 	int no_chain;
+
+  if (s->middlebox)
+  {
+    init = l = s->pair->cert_msg_len + 7;
+    len_pos = s->pair->cert_msg_len + 4;
+  }
+  else
+    l = 8;
 
 	if ((s->mode & SSL_MODE_NO_AUTO_CHAIN) || s->ctx->extra_certs)
 		no_chain = 1;
@@ -589,17 +619,32 @@ unsigned long matls_output_cert_chain(SSL *s, X509 *x)
 
 	/* TLSv1 sends a chain with nothing in it, instead of an alert */
 	buf=s->init_buf;
-	if (!BUF_MEM_grow_clean(buf,10))
+
+  if (s->middlebox)
+  {
+    if (!BUF_MEM_grow_clean(buf, l))
+    {
+      SSLerr(SSL_F_SSL3_OUTPUT_CERT_CHAIN, ERR_R_BUF_LIB);
+      return 0;
+    }
+    p = &(buf->data[4]);
+    memcpy(p, s->pair->cert_msg, s->pair->cert_msg_len);
+  }
+  else
+  {
+	  if (!BUF_MEM_grow_clean(buf,10))
 		{
-		SSLerr(SSL_F_SSL3_OUTPUT_CERT_CHAIN,ERR_R_BUF_LIB);
-		return(0);
+		  SSLerr(SSL_F_SSL3_OUTPUT_CERT_CHAIN, ERR_R_BUF_LIB);
+		  return(0);
 		}
+  }
+
 	if (x != NULL)
 		{
 		if (no_chain)
 			{
-			if (ssl3_add_cert_to_buf(buf, &l, x))
-				return(0);
+			  if (ssl3_add_cert_to_buf(buf, &l, x))
+				  return(0);
 			}
 		else
 			{
@@ -634,15 +679,36 @@ unsigned long matls_output_cert_chain(SSL *s, X509 *x)
 			return(0);
 		}
 
-	l-=8;
+	p = (unsigned char *)&(buf->data[len_pos]);
+  len = l - init;
+  l2n3(len, p);
+  printf("length of the newly added certificate chain: %d\n", len);
+	
 	p=(unsigned char *)&(buf->data[4]);
+  if (s->middlebox)
+  {
+    nk = *p;
+    *(p++) = nk + 1;
+  }
+  else
+  {
     *(p++) = 1;
+  }
+
+  l -= 4;
+	p = (unsigned char *)&(buf->data[0]);
+	*(p++) = SSL3_MT_CERTIFICATE;
 	l2n3(l,p);
-	l+=4;
-	p=(unsigned char *)&(buf->data[0]);
-	*(p++)=SSL3_MT_CERTIFICATE;
-	l2n3(l,p);
-	l+=4;
+  printf("total length: %d\n", l);
+	l += 4;
+
+  p = (unsigned char *)&(buf->data[5]);
+  n2l3(p, tmp);
+  printf("first certificate length: %d\n", tmp);
+  p += tmp;
+  n2l3(p, tmp);
+  printf("next certificate length: %d\n", tmp);
+
 	return(l);
 	}
 #endif /* OPENSSL_NO_MATLS */

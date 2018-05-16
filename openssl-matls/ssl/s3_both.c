@@ -126,6 +126,14 @@
 #include <stdint.h>
 
 #ifndef OPENSSL_NO_MATLS
+
+#define MATLS_VERSION_LENGTH 2
+#define MATLS_CIPHERSUITE_LENGTH 2
+#define MATLS_TRANSCRIPT_LENGTH s->s3->tmp.finish_md_len
+
+#define MATLS_M_LENGTH MATLS_VERSION_LENGTH + MATLS_CIPHERSUITE_LENGTH + MATLS_TRANSCRIPT_LENGTH
+#define MATLS_H_LENGTH 32
+
 int idx;
 
 #define PRINTK(msg, arg1, arg2) \
@@ -425,12 +433,35 @@ int matls_send_finished(SSL *s, int a, int b, const char *sender, int slen)
 		/* extended finish */
 		if (s->mb_enabled)
 		{
-
 			/* num_msg (1byte) + [msg: mac_key(32) + version(2) + cipher(2) + ti(12)] (32byte) + sig_len (2)  + signature */
 
-			unsigned char *pp;
-			/* msg: for hash */
-			unsigned char *msg = (unsigned char *)malloc(48); //mac, version, cipher, ti
+      unsigned char *tmp;       /* for prior message */
+      unsigned char *pp;        /* for pointer */
+      unsigned char *msg;       /* for hash */
+      unsigned char *m = NULL;  /* prior message */
+      unsigned char *h;         /* prior digest */
+      unsigned char *sig;       /* prior signature */
+      int plen, nk;
+
+      if (s->middlebox)
+      {
+        while(!(s->pair->extended_finished_msg)) { printf(""); }
+        tmp = (unsigned char *)malloc(s->pair->extended_finished_msg_len);
+        nk = *(tmp++);
+        printf("num keys: %d\n", nk);
+
+        m = (unsigned char *)malloc((nk - 1) * MATLS_M_LENGTH);
+
+        // TODO: initializing
+
+        plen = SSL_MAX_GLOBAL_MAC_KEY_LENGTH + MATLS_M_LENGTH + MATLS_H_LENGTH;
+      }
+      else
+      {
+        plen = SSL_MAX_GLOBAL_MAC_KEY_LENGTH + MATLS_M_LENGTH;
+      }
+
+			msg = (unsigned char *)malloc(plen); //mac, version, cipher, ti
 			pp = msg;
 			/* mac_key (32) */
 			memcpy(msg, s->mb_info.mac_array[0], SSL_MAX_GLOBAL_MAC_KEY_LENGTH);

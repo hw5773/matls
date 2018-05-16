@@ -123,6 +123,164 @@
 #include <openssl/objects.h>
 #include <openssl/evp.h>
 #include <openssl/x509.h>
+#include <stdint.h>
+
+#ifndef OPENSSL_NO_MATLS
+int idx;
+
+#define PRINTK(msg, arg1, arg2) \
+  printf("[matls] %s: %s (%d bytes) ", __func__, msg, arg2); \
+  for (idx=0;idx<arg2;idx++) \
+  { \
+	      if (idx % 10 == 0) \
+	        printf("\n"); \
+	      printf("%02X ", arg1[idx]); \
+	    } \
+  printf("\n");
+
+int make_signature_block2(unsigned char **sigblk, unsigned char *msg, int msg_len, EVP_PKEY *priv, int nid, int *sigblk_len)
+{
+	int i, rc, rc1, rc2;
+	EVP_MD_CTX *ctx;
+	unsigned char *sig, *p;
+	size_t sig_len;
+	uint16_t sig_type;
+
+	ctx = EVP_MD_CTX_create();
+	if (ctx == NULL)
+	{
+		printf("EVP_MD_CTX_create failed\n");
+		goto err;
+	}
+
+	// Initialize the md according to nid
+	switch (nid)
+	{
+		case NID_sha256:
+			rc1 = EVP_DigestInit_ex(ctx, EVP_sha256(), NULL);
+			rc2 = EVP_DigestSignInit(ctx, NULL, EVP_sha256(), NULL, priv);
+			sig_type = NID_sha256;
+			break;
+		default:
+			printf("Unknown Hash algorithm\n");
+			goto err;
+	}
+
+	// Make the signature
+	if (rc1 != 1)
+	{
+		printf("PROGRESS: Digest Init Failed\n");
+		goto err;
+	}
+	if (rc2 != 1)
+	{
+		printf("PROGRESS: DigestSign Init Failed\n");
+		goto err;
+	}
+
+	rc = EVP_DigestSignUpdate(ctx, msg, msg_len);
+	if (rc != 1)
+	{
+		printf("PROGRESS: DigestSign Update Failed\n");
+		goto err;
+	}
+
+	rc = EVP_DigestSignFinal(ctx, NULL, &sig_len);
+	if (rc != 1)
+	{
+		printf("PROGRESS: DigestSign Final Failed\n");
+		goto err;
+	}
+	printf("PROGRESS: Signature length: %d\n", (int)sig_len);
+	sig = OPENSSL_malloc(sig_len);
+
+	if (sig == NULL)
+	{
+		printf("PROGRESS: OPENSSL_malloc error\n");
+		goto err;
+	}
+
+	rc = EVP_DigestSignFinal(ctx, sig, &sig_len);
+	if (rc != 1)
+	{
+		printf("PROGRESS: DigestSign Final Failed\n");
+		goto err;
+	}
+
+	//*sigblk_len = 2 * sizeof(uint16_t) + sig_len;
+	*sigblk_len = sig_len;
+	*sigblk = (unsigned char *)OPENSSL_malloc(*sigblk_len);
+	p = *sigblk;
+	//s2n(sig_type, p);
+	//s2n(sig_len, p);
+	memcpy(p, sig, sig_len);
+
+	printf("PROGRESS: Sig in make cc >>>\n");
+	for (i=0; i<sig_len; i++)
+	{
+		if (i % 10 == 0)
+			printf("\n");
+		printf("%02X ", sig[i]);
+	}
+	printf("\n");
+
+	printf("PROGRESS: Length of message: %d\n", msg_len);
+	printf("PROGRESS: Signature type: %d\n", (int)sig_type);
+	printf("PROGRESS: Length of signature: %d\n", (int)sig_len);
+	OPENSSL_free(sig);
+	EVP_MD_CTX_cleanup(ctx);
+
+	return 1;
+
+err:
+	EVP_MD_CTX_cleanup(ctx);
+
+	return 0;
+}
+
+int digest_message(unsigned char *message, size_t message_len, unsigned char **digest, unsigned int *digest_len)
+{
+
+	EVP_MD_CTX *ctx;
+
+	ctx = EVP_MD_CTX_create();
+
+	if(ctx == NULL)
+	{
+		printf("EVP_MD_CTX_create failed\n");
+		goto err;
+	}
+	if(1 != EVP_DigestInit_ex(ctx, EVP_sha256(), NULL))
+	{
+		printf("EVP_DigestInit failed\n");
+		goto err;
+	}
+	// what is EVP_DigestSignInit in ttpa_func.c
+	if(1 != EVP_DigestUpdate(ctx, message, message_len))
+	{
+		printf("EVP_DigestUpdate failed\n");
+		goto err;
+	}
+	if((*digest = (unsigned char *)OPENSSL_malloc(EVP_MD_size(EVP_sha256()))) == NULL)
+	{
+		printf("OPENSSL_malloc failed\n");
+		goto err;
+	}
+	if(1 != EVP_DigestFinal_ex(ctx, *digest, digest_len))
+	{
+		printf("EVP_DigestFinal_ex failed\n");
+		goto err;
+	}
+	EVP_MD_CTX_destroy(ctx);
+
+	return 1;
+
+err:
+	EVP_MD_CTX_cleanup(ctx);
+
+	return 0;
+}
+#endif /* OPENSSL_NO_MATLS */
 
 /* send s->init_buf in records of type 'type' (SSL3_RT_HANDSHAKE or SSL3_RT_CHANGE_CIPHER_SPEC) */
 int ssl3_do_write(SSL *s, int type)
@@ -203,6 +361,144 @@ int ssl3_send_finished(SSL *s, int a, int b, const char *sender, int slen)
 	/* SSL3_ST_SEND_xxxxxx_HELLO_B */
 	return(ssl3_do_write(s,SSL3_RT_HANDSHAKE));
 	}
+
+#ifndef OPENSSL_NO_MATLS
+int matls_send_finished(SSL *s, int a, int b, const char *sender, int slen)
+{
+	unsigned char *p,*d;
+	int i, j, ret;
+	unsigned long l;
+	int num_msg = 1;
+
+	if (s->state == a)
+	{
+		d=(unsigned char *)s->init_buf->data;
+		p= &(d[4]);
+
+		i=s->method->ssl3_enc->final_finish_mac(s,
+					sender,slen,s->s3->tmp.finish_md);
+		if (i == 0)
+			return 0;
+		PRINTK("verify_data", s->s3->tmp.finish_md, i);
+		s->s3->tmp.finish_md_len = i;
+		memcpy(p, s->s3->tmp.finish_md, i);
+		p+=i;
+		l=i;
+
+		/* Copy the finished so we can use it for
+		   renegotiation checks */
+		if(s->type == SSL_ST_CONNECT)
+		{
+			OPENSSL_assert(i <= EVP_MAX_MD_SIZE);
+			memcpy(s->s3->previous_client_finished,
+					s->s3->tmp.finish_md, i);
+			s->s3->previous_client_finished_len=i;
+		}
+		else
+		{
+			OPENSSL_assert(i <= EVP_MAX_MD_SIZE);
+			memcpy(s->s3->previous_server_finished,
+					s->s3->tmp.finish_md, i);
+			s->s3->previous_server_finished_len=i;
+		}
+
+#ifdef OPENSSL_SYS_WIN16
+		/* MSVC 1.5 does not clear the top bytes of the word unless
+		 * I do this.
+		 */
+		l&=0xffff;
+#endif
+
+		*(d++)=SSL3_MT_FINISHED; //0x14
+		
+		if (!s->mb_enabled)
+		{
+			l2n3(l,d); 
+			s->init_num=(int)l+4;
+			s->init_off=0;
+		}
+
+		s->state=b;
+
+		//PRINTK("init_buf->data", s->init_buf->data, 20)
+		
+		/* extended finish */
+		if (s->mb_enabled)
+		{
+
+			/* num_msg (1byte) + [msg: mac_key(32) + version(2) + cipher(2) + ti(12)] (32byte) + sig_len (2)  + signature */
+
+			unsigned char *pp;
+			/* msg: for hash */
+			unsigned char *msg = (unsigned char *)malloc(48); //mac, version, cipher, ti
+			pp = msg;
+			/* mac_key (32) */
+			memcpy(msg, s->mb_info.mac_array[0], SSL_MAX_GLOBAL_MAC_KEY_LENGTH);
+			pp += SSL_MAX_GLOBAL_MAC_KEY_LENGTH;
+			PRINTK("mac_key", s->mb_info.mac_array[0], SSL_MAX_GLOBAL_MAC_KEY_LENGTH);
+
+			/* version (2) */
+			*(pp++) = s->version >> 8;
+			*(pp++) = s->version & 0xff;
+			printf("version: %d\n", s->version); 
+
+			/* ciphersuit (2) */
+			j = ssl3_put_cipher_by_char(s->s3->tmp.new_cipher,pp);
+			PRINTK("ciphersuit", pp, j);
+			pp += j;
+
+			/* ti (12) */
+			memcpy(pp, s->s3->tmp.finish_md, i);
+			pp += i;
+			l = i;
+
+			PRINTK("before hash", msg, 48);
+
+			/* hash the msg (48) */
+			unsigned char *digest;
+			unsigned int digest_len;
+			ret = digest_message(msg, 48, &digest, &digest_len);
+			if (ret == 0)
+				return 0;
+
+			/* make signature block */
+			unsigned char *sigblk;
+			int sigblk_len;
+			if (!make_signature_block2(&sigblk, digest, digest_len, (s->cert->key->privatekey), NID_sha256, &sigblk_len))
+			{
+				printf("ERROR: make the signature block failed\n");
+				return 0;
+			}
+			printf("PROGRESS: make the signature block\n");
+
+			/* put num_msg */
+			*(p++) = num_msg;
+			printf("num_msg\n%02X\n", num_msg);
+			
+			/* put hashed msg */
+			memcpy(p, digest, digest_len);
+			p+=digest_len;
+			PRINTK("hashed msg", digest, digest_len);
+
+			/* put the signature length */
+			printf("sigblk_len: %d\n\n", sigblk_len);
+			s2n(sigblk_len, p);
+			
+			/* put the signature block */
+			memcpy(p, sigblk, sigblk_len);
+			PRINTK("signature block", sigblk, sigblk_len);
+
+			l += (1 + digest_len + 2 + sigblk_len);
+			l2n3(l,d); 
+			s->init_num=(int)l+4;
+			s->init_off=0;
+		}
+	}
+
+	/* SSL3_ST_SEND_xxxxxx_HELLO_B */
+	return(ssl3_do_write(s,SSL3_RT_HANDSHAKE));
+}
+#endif /* OPENSSL_NO_MATLS */
 
 #ifndef OPENSSL_NO_NEXTPROTONEG
 /* ssl3_take_mac calculates the Finished MAC for the handshakes messages seen to far. */

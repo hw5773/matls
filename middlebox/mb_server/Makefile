@@ -1,6 +1,6 @@
-CERT_FILE=matls_cert.crt
+CERT_FILE=matls.pem
 CA_CERT_FILE=ca_alice.pem
-KEY_FILE=matls_priv.pem
+KEY_FILE=matls.key
 FORWARD_FILE=forward.txt
 
 SERVER=mb_server

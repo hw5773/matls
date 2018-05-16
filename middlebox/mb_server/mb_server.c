@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 
   if (argc == 1)
   {
-    port = 5555;
+    port = 443;
     cert = DEFAULT_CERT;
     priv = DEFAULT_PRIV;
     capath = DEFAULT_CA_PATH;

@@ -1,0 +1,93 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+CA_CERT_FILE	Makefile	/^CA_CERT_FILE=ca_alice.pem$/;"	m
+CERT_FILE	Makefile	/^CERT_FILE=matls_cert.crt$/;"	m
+CFLAGS	Makefile	/^CFLAGS=-DDEBUG -o$/;"	m
+DEFAULT_BUF_SIZE	mssl.h	14;"	d
+DEFAULT_CA_PATH	mssl.h	20;"	d
+DEFAULT_CERT	mssl.h	18;"	d
+DEFAULT_FORWARD_FILE	mssl.h	21;"	d
+DEFAULT_PRIV	mssl.h	19;"	d
+FLAGS	Makefile	/^FLAGS=-I..\/..\/openssl-splittls-lib\/include -L..\/..\/openssl-splittls-lib\/lib$/;"	m
+FORWARD_FILE	Makefile	/^FORWARD_FILE=forward.txt$/;"	m
+GCC	Makefile	/^GCC=gcc$/;"	m
+GDB	Makefile	/^GDB=gdb$/;"	m
+HOST	Makefile	/^HOST=127.0.0.1$/;"	m
+KEY_FILE	Makefile	/^KEY_FILE=matls_priv.pem$/;"	m
+LDFLAGS	Makefile	/^LDFLAGS=-lssl -lcrypto -ldl -lpthread$/;"	m
+MAX_CLNT_SIZE	mssl.h	15;"	d
+MAX_ENTRIES	table.h	11;"	d
+MAX_NAME_LENGTH	table.h	12;"	d
+MAX_THREADS	mssl.h	16;"	d
+NUM_OF_THREADS	Makefile	/^NUM_OF_THREADS=1$/;"	m
+PORT	Makefile	/^PORT=443$/;"	m
+SERVER	Makefile	/^SERVER=mb_server$/;"	m
+SERVER_OBJ	Makefile	/^SERVER_OBJ=mb_server.o mssl.o table.o common.o$/;"	m
+SERVER_SRC	Makefile	/^SERVER_SRC=mb_server.c mssl.c table.c common.c$/;"	m
+SSLSTATUS_FAIL	mssl.h	/^enum sslstatus { SSLSTATUS_OK, SSLSTATUS_WANT_IO, SSLSTATUS_FAIL};$/;"	e	enum:sslstatus
+SSLSTATUS_OK	mssl.h	/^enum sslstatus { SSLSTATUS_OK, SSLSTATUS_WANT_IO, SSLSTATUS_FAIL};$/;"	e	enum:sslstatus
+SSLSTATUS_WANT_IO	mssl.h	/^enum sslstatus { SSLSTATUS_OK, SSLSTATUS_WANT_IO, SSLSTATUS_FAIL};$/;"	e	enum:sslstatus
+__COMMON_H__	common.h	9;"	d
+__MB_SERVER_H__	mssl.h	2;"	d
+__TABLE_H__	table.h	9;"	d
+attr	mssl.h	/^pthread_attr_t attr;$/;"	v
+client	mssl.h	/^} client;$/;"	v	typeref:struct:ssl_client
+complete	mssl.h	/^int complete[MAX_THREADS];$/;"	v
+ctx	mssl.h	/^SSL_CTX *ctx;$/;"	v
+die	mssl.c	/^void die(const char *msg) {$/;"	f
+do_encrypt	mssl.c	/^int do_encrypt()$/;"	f
+do_sock_read	mssl.c	/^int do_sock_read()$/;"	f
+do_sock_write	mssl.c	/^int do_sock_write()$/;"	f
+encrypt_buf	mssl.h	/^  char* encrypt_buf;$/;"	m	struct:ssl_client
+encrypt_len	mssl.h	/^  size_t encrypt_len;$/;"	m	struct:ssl_client
+fd	mssl.h	/^  int fd;$/;"	m	struct:ssl_client
+find_by_name	table.c	/^int find_by_name(unsigned char *buf, int len)$/;"	f
+forward_info	mssl.h	/^struct forward_info$/;"	s
+forward_ips	table.h	/^  unsigned char *forward_ips[MAX_ENTRIES];$/;"	m	struct:forward_table
+forward_names	table.h	/^  unsigned char *forward_names[MAX_ENTRIES];$/;"	m	struct:forward_table
+forward_ports	table.h	/^  int forward_ports[MAX_ENTRIES];$/;"	m	struct:forward_table
+forward_table	table.h	/^struct forward_table$/;"	s
+free_forward_table	table.c	/^void free_forward_table(void)$/;"	f
+get_current_microseconds	logger.h	/^unsigned long get_current_microseconds()$/;"	f
+get_ip_by_index	table.c	/^unsigned char *get_ip_by_index(int index, int *len)$/;"	f
+get_port_by_index	table.c	/^int get_port_by_index(int index)$/;"	f
+get_sslstatus	mssl.c	/^static enum sslstatus get_sslstatus(SSL* ssl, int n)$/;"	f	file:
+get_thread_index	mssl.c	/^int get_thread_index(void)$/;"	f
+handle_error	mssl.c	/^void handle_error(const char *file, int lineno, const char *msg) {$/;"	f
+index	mssl.h	/^  int index;$/;"	m	struct:forward_info
+init_forward_table	table.c	/^int init_forward_table(unsigned char *filename)$/;"	f
+init_thread_config	mssl.c	/^void init_thread_config(void)$/;"	f
+insert_entry	table.c	/^int insert_entry(unsigned char *name, int nlen, unsigned char *ip, int ilen, int port)$/;"	f
+int_error	mssl.c	12;"	d	file:
+io_on_read	mssl.h	/^  int (*io_on_read)(SSL *ssl, char *buf, size_t len);$/;"	m	struct:ssl_client
+ip_lengths	table.h	/^  int ip_lengths[MAX_ENTRIES];$/;"	m	struct:forward_table
+main	mb_server.c	/^int main(int argc, char **argv)$/;"	f
+msg_callback	mssl.c	/^void msg_callback(int write, int version, int content_type, const void *buf, size_t len, SSL *ssl, void *arg)$/;"	f
+name_lengths	table.h	/^  int name_lengths[MAX_ENTRIES];$/;"	m	struct:forward_table
+num_of_entries	table.h	/^  int num_of_entries;$/;"	m	struct:forward_table
+on_read_cb	mssl.c	/^int on_read_cb(char* src, size_t len)$/;"	f
+open_connection	common.c	/^int open_connection(const char *hostname, int port)$/;"	f
+print_unencrypted_data	mssl.c	/^void print_unencrypted_data(char *buf, size_t len) {$/;"	f
+queue_encrypted_bytes	mssl.c	/^void queue_encrypted_bytes(const char *buf, size_t len)$/;"	f
+rbio	mssl.h	/^  BIO *rbio; \/* SSL reads from, we write to. *\/$/;"	m	struct:ssl_client
+run	mssl.c	/^void *run(void *data)$/;"	f
+send_to_pair	mssl.c	/^int send_to_pair(SSL *ssl, char *buf, size_t len)$/;"	f
+send_unencrypted_bytes	mssl.c	/^void send_unencrypted_bytes(const char *buf, size_t len)$/;"	f
+sni_callback	mssl.c	/^void sni_callback(unsigned char *buf, int len, SSL *ssl)$/;"	f
+ssl	mssl.h	/^  SSL *ssl;$/;"	m	struct:forward_info
+ssl	mssl.h	/^  SSL *ssl;$/;"	m	struct:ssl_client
+ssl_client	mssl.h	/^struct ssl_client$/;"	s
+ssl_client_cleanup	mssl.c	/^void ssl_client_cleanup(struct ssl_client *p)$/;"	f
+ssl_client_init	mssl.c	/^void ssl_client_init(struct ssl_client *p)$/;"	f
+ssl_client_want_write	mssl.c	/^int ssl_client_want_write(struct ssl_client *cp) {$/;"	f
+ssl_init	mssl.c	/^void ssl_init(char *cert, char *priv) {$/;"	f
+sslstatus	mssl.h	/^enum sslstatus { SSLSTATUS_OK, SSLSTATUS_WANT_IO, SSLSTATUS_FAIL};$/;"	g
+table	table.h	/^} *table;$/;"	v	typeref:struct:forward_table
+threads	mssl.h	/^pthread_t threads[MAX_THREADS];$/;"	v
+wbio	mssl.h	/^  BIO *wbio; \/* SSL writes to, we read from. *\/$/;"	m	struct:ssl_client
+write_buf	mssl.h	/^  char* write_buf;$/;"	m	struct:ssl_client
+write_len	mssl.h	/^  size_t write_len;$/;"	m	struct:ssl_client

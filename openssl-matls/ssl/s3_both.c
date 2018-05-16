@@ -980,7 +980,7 @@ unsigned long matls_output_cert_chain(SSL *s, X509 *x)
   l2n3(len, p);
   printf("length of the newly added certificate chain: %d\n", len);
 	
-	p=(unsigned char *)&(buf->data[4]);
+	p = (unsigned char *)&(buf->data[4]);
   if (s->middlebox)
   {
     nk = *p;

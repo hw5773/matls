@@ -975,38 +975,37 @@ unsigned long matls_output_cert_chain(SSL *s, X509 *x)
 			return(0);
 		}
 
-	p = (unsigned char *)&(buf->data[len_pos]);
-  len = l - init;
-  l2n3(len, p);
-  printf("length of the newly added certificate chain: %d\n", len);
-	
 	p = (unsigned char *)&(buf->data[4]);
-  if (s->middlebox)
-  {
-    nk = *p;
-    *(p++) = nk + 1;
-  }
-  else
-  {
-    *(p++) = 1;
-  }
+	if (s->middlebox)
+	{
+    	nk = *p;
+    	*(p++) = nk + 1;
+  	}
+  	else
+  	{
+    	*(p++) = 1;
+		l -= 8;
+		l2n3(l, p);
+		l += 4;
+  	}
 
-  l -= 4;
+	if (s->middlebox)
+	{
+		p = (unsigned char *)&(buf->data[len_pos]);
+  		len = l - init;
+  		l2n3(len, p);
+  		printf("length of the newly added certificate chain: %d\n", len);
+		l -= 4;
+	}
+
 	p = (unsigned char *)&(buf->data[0]);
 	*(p++) = SSL3_MT_CERTIFICATE;
 	l2n3(l,p);
-  printf("total length: %d\n", l);
+ 	printf("total length: %d\n", l);
 	l += 4;
 
-  p = (unsigned char *)&(buf->data[5]);
-  n2l3(p, tmp);
-  printf("first certificate length: %d\n", tmp);
-  p += tmp;
-  n2l3(p, tmp);
-  printf("next certificate length: %d\n", tmp);
-
 	return(l);
-	}
+}
 #endif /* OPENSSL_NO_MATLS */
 
 /* Obtain handshake message of message type 'mt' (any if mt == -1),

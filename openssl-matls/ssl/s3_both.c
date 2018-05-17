@@ -199,7 +199,6 @@ int make_signature_block2(unsigned char **sigblk, unsigned char *msg, int msg_le
 		printf("PROGRESS: DigestSign Final Failed\n");
 		goto err;
 	}
-	printf("PROGRESS: Signature length: %d\n", (int)sig_len);
 	sig = OPENSSL_malloc(sig_len);
 
 	if (sig == NULL)
@@ -215,26 +214,10 @@ int make_signature_block2(unsigned char **sigblk, unsigned char *msg, int msg_le
 		goto err;
 	}
 
-	//*sigblk_len = 2 * sizeof(uint16_t) + sig_len;
 	*sigblk_len = sig_len;
 	*sigblk = (unsigned char *)OPENSSL_malloc(*sigblk_len);
 	p = *sigblk;
-	//s2n(sig_type, p);
-	//s2n(sig_len, p);
 	memcpy(p, sig, sig_len);
-
-	printf("PROGRESS: Sig in make cc >>>\n");
-	for (i=0; i<sig_len; i++)
-	{
-		if (i % 10 == 0)
-			printf("\n");
-		printf("%02X ", sig[i]);
-	}
-	printf("\n");
-
-	printf("PROGRESS: Length of message: %d\n", msg_len);
-	printf("PROGRESS: Signature type: %d\n", (int)sig_type);
-	printf("PROGRESS: Length of signature: %d\n", (int)sig_len);
 	OPENSSL_free(sig);
 	EVP_MD_CTX_cleanup(ctx);
 
@@ -467,27 +450,29 @@ int matls_send_finished(SSL *s, int a, int b, const char *sender, int slen)
         plen = SSL_MAX_GLOBAL_MAC_KEY_LENGTH + MATLS_M_LENGTH;
       }
 
-			msg = (unsigned char *)malloc(plen); //mac, version, cipher, ti
-      parameters = (unsigned char *)malloc(MATLS_M_LENGTH);
+		msg = (unsigned char *)malloc(plen); //mac, version, cipher, ti
+      	parameters = (unsigned char *)malloc(MATLS_M_LENGTH);
 
-			pp = msg;
-			/* mac_key (32) */
+		pp = msg;
+		/* mac_key (32) */
+		if (s->middlebox)
 			memcpy(msg, s->mb_info.mac_array[s->server], SSL_MAX_GLOBAL_MAC_KEY_LENGTH);
-			pp += SSL_MAX_GLOBAL_MAC_KEY_LENGTH;
-			PRINTK("mac_key", s->mb_info.mac_array[0], SSL_MAX_GLOBAL_MAC_KEY_LENGTH);
+		else
+			memcpy(msg, s->mb_info.mac_array[0], SSL_MAX_GLOBAL_MAC_KEY_LENGTH);
+		pp += SSL_MAX_GLOBAL_MAC_KEY_LENGTH;
+		PRINTK("mac_key", s->mb_info.mac_array[0], SSL_MAX_GLOBAL_MAC_KEY_LENGTH);
 
 			/* version (2) */
       parameters[poff++] = s->version >> 8;
       parameters[poff++] = s->version & 0xff;
-			printf("version: %d\n", s->version); 
 
 			/* ciphersuit (2) */
-			j = ssl3_put_cipher_by_char(s->s3->tmp.new_cipher, parameters);
-			PRINTK("ciphersuit", parameters, MATLS_CIPHERSUITE_LENGTH);
+			j = ssl3_put_cipher_by_char(s->s3->tmp.new_cipher, &(parameters[poff]));
+			PRINTK("version and ciphersuite", parameters, poff);
       poff += MATLS_CIPHERSUITE_LENGTH;
 
 			/* ti (12) */
-			memcpy(parameters, s->s3->tmp.finish_md, MATLS_TRANSCRIPT_LENGTH);
+			memcpy(parameters + poff, s->s3->tmp.finish_md, MATLS_TRANSCRIPT_LENGTH);
 			poff += MATLS_TRANSCRIPT_LENGTH;
 			l = MATLS_TRANSCRIPT_LENGTH; // length of verify_data
 

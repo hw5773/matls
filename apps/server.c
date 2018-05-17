@@ -59,6 +59,7 @@ int main(int count, char *strings[])
 	server = open_listener(atoi(portnum));    /* create server socket */
 
 	struct sockaddr_in addr;
+	unsigned char buf[2048];
 	socklen_t len = sizeof(addr);
 
 	while ((client = accept(server, (struct sockaddr *)&addr, &len)))
@@ -79,18 +80,19 @@ int main(int count, char *strings[])
 		BIO_printf(outbio, "PROGRESS: TLS Handshake Complete!\n");
 
 		BIO_printf(outbio, "ELAPSED TIME: %lu us\n", hs_end - hs_start);
-/*
+
 		int sent = 0;
 
+		SSL_read(ssl, buf, sizeof(buf));
 		sent = SSL_write(ssl, response, response_len);
 
 		if (sent != response_len)
 		{
 			BIO_printf(outbio, "SERVER: Send the HTTP Test Page Failed: %d\n", sent);
-			abort();
+			//abort();
 		}
-		BIO_printf(outbio, "SERVER: Send the HTTP HTTP Test Page Success: %d\n", sent);
-*/
+		BIO_printf(outbio, "SERVER: Send the HTTP Test Page Success: %d\n", sent);
+
 		//close(client);
 	}
 
@@ -127,11 +129,13 @@ int open_listener(int port)
 
 void msg_callback(int write_p, int version, int content_type, const void *buf, size_t len, SSL *ssl, void *arg)
 {
+	/*
 	if (write_p == 2)
 		printf("buf: %s\n", (unsigned char *)buf);
 	else
 	{
 	}
+	*/
 }
 
 void apps_ssl_info_callback(const SSL *s, int where, int ret)

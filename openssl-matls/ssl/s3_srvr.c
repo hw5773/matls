@@ -3414,9 +3414,7 @@ int matls_send_server_certificate(SSL *s)
 				}
 			}
 
-		printf("1\n");
 		l=matls_output_cert_chain(s,x);
-		printf("2\n");
 		s->state=SSL3_ST_SW_CERT_B;
 		s->init_num=(int)l;
 		s->init_off=0;

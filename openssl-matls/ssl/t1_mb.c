@@ -153,7 +153,7 @@ int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len,
     if (p)
     {
       MA_LOG("Before waiting the message");
-      while (!(s->pair && s->pair->extension_from_clnt_msg)) { printf(""); }
+      while (!(s->pair && (s->pair->extension_from_clnt_msg > 0))) { printf(""); }
       MA_LOG("The client side pair has the extension message");
       memcpy(&(s->mb_info), &(s->pair->mb_info), sizeof(struct mb_st));
       group_id = s->mb_info.group_id;
@@ -177,7 +177,7 @@ int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len,
       MA_LOG("after free");
 
       MA_LOG1p("s->lock", s->lock);
-      while (*(s->lock)) {}
+      while (*(s->lock)) { printf(""); }
       *(s->lock) = 1;
       if (!(s->mb_info.keypair))
       {
@@ -258,11 +258,11 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
     if (s->middlebox)
     {
       MA_LOG("Copy this extension message to my SSL struct (not to pair)");
-      s->extension_from_clnt_msg_len = len;
       s->extension_from_clnt_msg = (unsigned char *)malloc(len);
       MA_LOG1p("after malloc", s->extension_from_clnt_msg);
       memcpy(s->extension_from_clnt_msg, d, len);
       MA_LOG1d("after memcpy", len);
+      s->extension_from_clnt_msg_len = len;
     }
     p = d;
     int ext_len;
@@ -321,7 +321,7 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
 
     if (s->middlebox)
     {
-      while ((s->lock) && *(s->lock)) {}
+      while ((s->lock) && *(s->lock)) { printf(""); }
       *(s->lock) = 1;
       if (!(s->mb_info.keypair))
       {
@@ -424,7 +424,7 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
     {
       int tmp1;
       MA_LOG("Before waiting the message");
-      while (!(s->pair && s->pair->extension_from_srvr_msg)) { printf(""); }
+      while (!(s->pair && (s->pair->extension_from_srvr_msg_len > 0))) { printf(""); }
       MA_LOG("The server side pair has the extension message");
 
       MA_LOG1d("before memcpy", s->pair->extension_from_srvr_msg_len);
@@ -473,10 +473,9 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
         else
           MA_LOG("Server");
 
-        printf("here 1\n");
+        while (!s->mb_info.secret[i]) { printf(""); }
         memcpy(tmp, s->mb_info.secret[i], SECRET_LENGTH);
 
-        printf("here 2\n");
         t1_prf(TLS_MD_GLOBAL_MAC_KEY_CONST, TLS_MD_GLOBAL_MAC_KEY_CONST_SIZE,
                 s->mb_info.random[SERVER], s->mb_info.key_length[SERVER],
                 s->mb_info.random[CLIENT], s->mb_info.key_length[CLIENT],
@@ -542,9 +541,9 @@ int ssl_parse_serverhello_mb_ext(SSL *s, unsigned char *d, int size, int *al)
 
   keypair = s->pair->mb_info.keypair;
   MA_LOG1d("Parse serverhello matls", size);
-  s->extension_from_srvr_msg_len = size;
   s->extension_from_srvr_msg = (unsigned char *)malloc(size);
   memcpy(s->extension_from_srvr_msg, d, size);
+  s->extension_from_srvr_msg_len = size;
   MA_LOG("after memcpy");
 
   p = d;

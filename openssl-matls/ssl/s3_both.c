@@ -426,7 +426,9 @@ int matls_send_finished(SSL *s, int a, int b, const char *sender, int slen)
 
       if (s->middlebox)
       {
+        printf("waiting for extended finished message from the server-side entity\n");
         while(!(s->pair->extended_finished_msg)) { printf(""); }
+        printf("get the message from the server-side entity\n");
         tmp = (unsigned char *)malloc(s->pair->extended_finished_msg_len);
         memcpy(tmp, s->pair->extended_finished_msg, s->pair->extended_finished_msg_len);
         num_msg = *tmp;
@@ -468,8 +470,8 @@ int matls_send_finished(SSL *s, int a, int b, const char *sender, int slen)
 
 			/* ciphersuit (2) */
 			j = ssl3_put_cipher_by_char(s->s3->tmp.new_cipher, &(parameters[poff]));
-			PRINTK("version and ciphersuite", parameters, poff);
       poff += MATLS_CIPHERSUITE_LENGTH;
+			PRINTK("version and ciphersuite", parameters, poff);
 
 			/* ti (12) */
 			memcpy(parameters + poff, s->s3->tmp.finish_md, MATLS_TRANSCRIPT_LENGTH);
@@ -585,7 +587,7 @@ static void ssl3_take_mac(SSL *s)
 #ifndef OPENSSL_NO_MATLS
 int matls_get_finished(SSL *s, int a, int b)
 	{
-	int al,i,ok, num_message, mlen;
+	int al,i,ok, num_message;
 	long n;
 	unsigned char *p;
 
@@ -617,11 +619,13 @@ int matls_get_finished(SSL *s, int a, int b)
 	p = (unsigned char *)s->init_msg;
 	i = s->s3->tmp.peer_finish_md_len;
   printf("peer finish md length: %d\n", i);
-	p = (unsigned char *)s->init_msg;
-	i = s->s3->tmp.peer_finish_md_len;
   printf("received finished msg len: %d\n", n);
-  s->extended_finished_msg_len = n;
-  s->extended_finished_msg = (unsigned char *)malloc(n);
+
+  ///// Need to modify -12 is right? we need to divide verify data and others/////
+  s->extended_finished_msg = (unsigned char *)malloc(n - 12);
+  memcpy(s->extended_finished_msg, p + 12, n - 12);
+  s->extended_finished_msg_len = n - 12;
+  ////////////////////////////////////////
 /*
 	if (i != n)
 		{
@@ -639,9 +643,6 @@ int matls_get_finished(SSL *s, int a, int b)
 
   p += i;
   num_message = *(p++);
-  mlen = *(p++);
-  printf("num_message: %d\n", num_message);
-  printf("mlen: %d\n", mlen);
 
         /* Copy the finished so we can use it for
            renegotiation checks */

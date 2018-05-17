@@ -352,8 +352,14 @@ SSL *SSL_new(SSL_CTX *ctx)
 
   s->extension_from_srvr_msg_len = 0;
   s->extension_from_clnt_msg_len = 0;
+  s->cert_msg_len = 0;
+  s->extended_finished_msg_len = 0;
+
   s->extension_from_srvr_msg = NULL;
   s->extension_from_clnt_msg = NULL;
+  s->cert_msg = NULL;
+  s->extended_finished_msg = NULL;
+
 #endif /* OPENSSL_NO_MATLS */
 
 	s->read_ahead=ctx->read_ahead;

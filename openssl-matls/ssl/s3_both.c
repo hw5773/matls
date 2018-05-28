@@ -639,7 +639,7 @@ int matls_send_extended_finished(SSL *s)
     else
       HMAC(EVP_sha256(), s->mb_info.mac_array[0], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, plen, digest, &digest_len);
 
-    printf("after hmac\n");
+    printf("after hmac: %ld\n", digest_len);
 		if (ret == 0)
 			return 0;
 

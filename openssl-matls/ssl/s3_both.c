@@ -633,11 +633,13 @@ int matls_send_extended_finished(SSL *s)
 
 		PRINTK("before hash", msg, plen);
 
+    printf("before hmac\n");
     if (s->middlebox)
       HMAC(EVP_sha256(), s->mb_info.mac_array[s->server], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, plen, digest, &digest_len);
     else
       HMAC(EVP_sha256(), s->mb_info.mac_array[0], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, plen, digest, &digest_len);
 
+    printf("after hmac\n");
 		if (ret == 0)
 			return 0;
 

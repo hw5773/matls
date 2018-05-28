@@ -610,32 +610,42 @@ int ssl3_connect(SSL *s)
 
 			s->s3->flags |= SSL3_FLAGS_CCS_OK;
       printf("before get finished\n");
-      if (s->middlebox)
-      {
-        printf("before matls get finished\n");
-        ret = matls_get_finished(s, SSL3_ST_CR_FINISHED_A, 
-        SSL3_ST_CR_FINISHED_B);
-      }
-      else
-      {
-        printf("ssl3 get finished\n");
-			  ret=ssl3_get_finished(s,SSL3_ST_CR_FINISHED_A,
+      printf("ssl3 get finished\n");
+			ret=ssl3_get_finished(s,SSL3_ST_CR_FINISHED_A,
 				SSL3_ST_CR_FINISHED_B);
-      }
+
       printf("after get finished:%d\n", ret);
 			if (ret <= 0) goto end;
-
-///// TODO: Need to design and implement the below function. Or need to implement new state.
-			// ret = ssl3_get_extended_finished();
-			// if (ret <= 0) goto end;
-/////
 
 			if (s->hit)
 				s->state=SSL3_ST_CW_CHANGE_A;
 			else
+#ifndef OPENSSL_NO_MATLS
+      {
+        if (s->mb_enabled)
+          s->state = SSL3_ST_CR_EXTENDED_FINISHED_A;
+        else
+#endif /* OPENSSL_NO_MATLS */
 				s->state=SSL_ST_OK;
+#ifndef OPENSSL_NO_MATLS
+      }
+#endif /* OPENSSL_NO_MATLS */
 			s->init_num=0;
 			break;
+
+#ifndef OPENSSL_NO_MATLS
+    case SSL3_ST_CR_EXTENDED_FINISHED_A:
+    case SSL3_ST_CR_EXTENDED_FINISHED_B:
+      ret = matls_get_extended_finished(s);
+      if (ret <= 0) goto end;
+      
+      if (s->hit)
+        s->state = SSL3_ST_CW_CHANGE_A;
+      else
+        s->state = SSL_ST_OK;
+
+      break;
+#endif /* OPENSSL_NO_MATLS */
 
 		case SSL3_ST_CW_FLUSH:
 			s->rwstate=SSL_WRITING;

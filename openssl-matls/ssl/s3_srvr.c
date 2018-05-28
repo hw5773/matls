@@ -770,24 +770,11 @@ int ssl3_accept(SSL *s)
 
 		case SSL3_ST_SW_FINISHED_A:
 		case SSL3_ST_SW_FINISHED_B:
-#ifndef OPENSSL_NO_MATLS
-			if (s->mb_enabled)
-			{
-				ret = matls_send_finished(s,
-					SSL3_ST_SW_FINISHED_A,SSL3_ST_SW_FINISHED_B,
-					s->method->ssl3_enc->server_finished_label,
-					s->method->ssl3_enc->server_finished_label_len);
-			}
-			else
-			{
-#endif /* OPENSSL_NO_MATLS */
 			ret=ssl3_send_finished(s,
 				SSL3_ST_SW_FINISHED_A,SSL3_ST_SW_FINISHED_B,
 				s->method->ssl3_enc->server_finished_label,
 				s->method->ssl3_enc->server_finished_label_len);
-#ifndef OPENSSL_NO_MATLS
-			}
-#endif /* OPENSSL_NO_MATLS */
+
 			if (ret <= 0) goto end;
 			s->state=SSL3_ST_SW_FLUSH;
 			if (s->hit)
@@ -805,9 +792,38 @@ int ssl3_accept(SSL *s)
 #endif
 				}
 			else
+#ifndef OPENSSL_NO_MATLS
+      {
+        if (s->mb_enabled)
+        {
+          s->s3->tmp.next_state = SSL3_ST_SW_EXTENDED_FINISHED_A;
+        }
+        else
+#endif /* OPENSSL_NO_MATLS */
 				s->s3->tmp.next_state=SSL_ST_OK;
+#ifndef OPENSSL_NO_MATLS
+      }
+#endif /* OPENSSL_NO_MATLS */
 			s->init_num=0;
 			break;
+
+#ifndef OPENSSL_NO_MATLS
+    case SSL3_ST_SW_EXTENDED_FINISHED_A:
+    case SSL3_ST_SW_EXTENDED_FINISHED_B:
+      ret = matls_send_extended_finished(s);
+      if (ret <= 0) goto end;
+      s->state = SSL3_ST_SW_FLUSH;
+
+      if (s->hit)
+      {
+        s->s3->tmp.next_state = SSL3_ST_SR_FINISHED_A;
+      }
+      else
+        s->s3->tmp.next_state = SSL_ST_OK;
+
+      s->init_num = 0;
+      break;
+#endif /* OPENSSL_NO_MATLS */
 
 		case SSL_ST_OK:
 			/* clean a few things up */

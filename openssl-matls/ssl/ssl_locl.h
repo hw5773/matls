@@ -1141,7 +1141,9 @@ int matls_send_mb_certificate(SSL *s);
 unsigned long matls_output_cert_chain(SSL *s, X509 *x);
 int matls_get_server_certificate(SSL *s);
 int matls_get_finished(SSL *s,int state_a,int state_b);
+int matls_get_extended_finished(SSL *s);
 int matls_send_finished(SSL *s, int a, int b, const char *sender, int slen);
+int matls_send_extended_finished(SSL *s);
 #endif /* OPENSSL_NO_MATLS */
 
 #ifndef OPENSSL_NO_HEARTBEATS

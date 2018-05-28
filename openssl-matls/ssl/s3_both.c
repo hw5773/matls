@@ -123,6 +123,7 @@
 #include <openssl/objects.h>
 #include <openssl/evp.h>
 #include <openssl/x509.h>
+#include <openssl/hmac.h>
 #include <stdint.h>
 
 #ifndef OPENSSL_NO_MATLS
@@ -148,7 +149,7 @@ int idx;
 
 int make_signature_block2(unsigned char **sigblk, unsigned char *msg, int msg_len, EVP_PKEY *priv, int nid, int *sigblk_len)
 {
-	int i, rc, rc1, rc2;
+	int rc, rc1, rc2;
 	EVP_MD_CTX *ctx;
 	unsigned char *sig, *p;
 	size_t sig_len;
@@ -555,6 +556,149 @@ int matls_send_finished(SSL *s, int a, int b, const char *sender, int slen)
 	/* SSL3_ST_SEND_xxxxxx_HELLO_B */
 	return(ssl3_do_write(s,SSL3_RT_HANDSHAKE));
 }
+
+int matls_send_extended_finished(SSL *s)
+{
+	unsigned char *p, *d, *pp, *tmp, *msg, *parameters;
+	int j, ret, mlen, slen, plen, poff = 0;
+	unsigned long l;
+	int num_msg = 1;
+	unsigned char *digest;
+	unsigned int digest_len;
+	unsigned char *sigblk;
+	int sigblk_len;
+
+	if (s->state == SSL3_ST_SW_EXTENDED_FINISHED_A)
+	{
+		d=(unsigned char *)s->init_buf->data;
+		p= &(d[4]);
+
+    *(d++) = SSL3_MT_EXTENDED_FINISHED;
+
+    if (s->middlebox)
+    {
+      printf("waiting for extended finished message from the server-side entity\n");
+      while(!(s->pair->extended_finished_msg)) { printf(""); }
+      printf("get the message from the server-side entity\n");
+      tmp = (unsigned char *)malloc(s->pair->extended_finished_msg_len);
+      memcpy(tmp, s->pair->extended_finished_msg, s->pair->extended_finished_msg_len);
+      num_msg = *tmp;
+      printf("num keys: %d\n", num_msg);
+
+      if (num_msg < 1)
+      {
+        perror("Error: invalid number of keys\n");
+        exit(1);
+      }
+
+      mlen = (num_msg-1) * MATLS_M_LENGTH;
+      slen = s->pair->extended_finished_msg_len - 1 - mlen - MATLS_H_LENGTH;
+      plen = MATLS_H_LENGTH + MATLS_M_LENGTH;
+      printf("mlen: %d, slen: %d, plen: %d\n", mlen, slen, plen);
+      num_msg++;
+    }
+    else // Server
+    {
+      mlen = 0; slen = 0;
+      plen = MATLS_M_LENGTH;
+    }
+
+		msg = (unsigned char *)malloc(plen); //mac, version, cipher, ti
+    parameters = (unsigned char *)malloc(MATLS_M_LENGTH);
+
+    pp = msg;
+
+    if (s->middlebox)
+    {
+      memcpy(pp, tmp + mlen + 1, MATLS_H_LENGTH);
+      pp += MATLS_H_LENGTH;
+    }
+
+		/* version (2) */
+    parameters[poff++] = s->version >> 8;
+    parameters[poff++] = s->version & 0xff;
+
+		/* ciphersuit (2) */
+		j = ssl3_put_cipher_by_char(s->s3->tmp.new_cipher, &(parameters[poff]));
+    poff += MATLS_CIPHERSUITE_LENGTH;
+		PRINTK("version and ciphersuite", parameters, poff);
+
+		/* ti (12) */
+		memcpy(parameters + poff, s->s3->tmp.finish_md, MATLS_TRANSCRIPT_LENGTH);
+		poff += MATLS_TRANSCRIPT_LENGTH;
+		l = MATLS_TRANSCRIPT_LENGTH; // length of verify_data
+
+    memcpy(pp, parameters, MATLS_M_LENGTH);
+    pp += MATLS_M_LENGTH;
+
+		PRINTK("before hash", msg, plen);
+
+    if (s->middlebox)
+      HMAC(EVP_sha256(), s->mb_info.mac_array[s->server], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, plen, digest, &digest_len);
+    else
+      HMAC(EVP_sha256(), s->mb_info.mac_array[0], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, plen, digest, &digest_len);
+
+		if (ret == 0)
+			return 0;
+
+		/* make signature block */
+		if (!make_signature_block2(&sigblk, digest, digest_len, (s->cert->key->privatekey), NID_sha256, &sigblk_len))
+		{
+			printf("ERROR: make the signature block failed\n");
+			return 0;
+		}
+		printf("PROGRESS: make the signature block\n");
+
+		/* put num_msg */
+		*(p++) = num_msg;
+		printf("num_msg\n%02X\n", num_msg);
+    l += 1;
+			
+    /* put message */
+    if (s->middlebox)
+    {
+      memcpy(p, tmp + 1, mlen);
+      p += mlen;
+      memcpy(p, parameters, MATLS_M_LENGTH);
+      p += MATLS_M_LENGTH;
+
+      l += (MATLS_M_LENGTH + mlen);
+    }
+
+		/* put hashed msg */
+		memcpy(p, digest, digest_len);
+		p += digest_len;
+    l += digest_len;
+		PRINTK("hashed msg", digest, digest_len);
+
+    /* put the prior signatures */
+    if (s->middlebox)
+    {
+      memcpy(p, tmp + 1 + mlen + MATLS_H_LENGTH, slen);
+      p += slen;
+      l += slen;
+    }
+
+		/* put the signature length */
+		printf("sigblk_len: %d\n\n", sigblk_len);
+		s2n(sigblk_len, p);
+    l += 2;
+			
+		/* put the signature block */
+		memcpy(p, sigblk, sigblk_len);
+    p += sigblk_len;
+    l += sigblk_len;
+		PRINTK("signature block", sigblk, sigblk_len);
+
+		l2n3(l,d); 
+		s->init_num=(int)l+4; // total length including the message type
+		s->init_off=0;
+    s->state = SSL3_ST_SW_EXTENDED_FINISHED_B;
+	}
+
+	/* SSL3_ST_SEND_xxxxxx_HELLO_B */
+	return(ssl3_do_write(s,SSL3_RT_HANDSHAKE));
+}
 #endif /* OPENSSL_NO_MATLS */
 
 #ifndef OPENSSL_NO_NEXTPROTONEG
@@ -586,7 +730,7 @@ static void ssl3_take_mac(SSL *s)
 
 #ifndef OPENSSL_NO_MATLS
 int matls_get_finished(SSL *s, int a, int b)
-	{
+{
 	int al,i,ok, num_message;
 	long n;
 	unsigned char *p;
@@ -619,7 +763,7 @@ int matls_get_finished(SSL *s, int a, int b)
 	p = (unsigned char *)s->init_msg;
 	i = s->s3->tmp.peer_finish_md_len;
   printf("peer finish md length: %d\n", i);
-  printf("received finished msg len: %d\n", n);
+  printf("received finished msg len: %ld\n", n);
 
   ///// Need to modify -12 is right? we need to divide verify data and others/////
   s->extended_finished_msg = (unsigned char *)malloc(n - 12);
@@ -665,7 +809,39 @@ int matls_get_finished(SSL *s, int a, int b)
 f_err:
 	ssl3_send_alert(s,SSL3_AL_FATAL,al);
 	return(0);
-	}
+}
+
+int matls_get_extended_finished(SSL *s)
+	{
+	int ok;
+	long n;
+	unsigned char *p;
+
+#ifdef OPENSSL_NO_NEXTPROTONEG
+	/* the mac has already been generated when we received the
+	 * change cipher spec message and is in s->s3->tmp.peer_finish_md.
+	 */ 
+#endif
+
+  printf("matls get extended finished\n");
+	n=s->method->ssl_get_message(s,
+		SSL3_ST_CR_EXTENDED_FINISHED_A,
+		SSL3_ST_CR_EXTENDED_FINISHED_B,
+		SSL3_MT_EXTENDED_FINISHED,
+		20000, /* should actually be 36+4 :-) */
+		&ok);
+
+	if (!ok) return((int)n);
+
+	p = (unsigned char *)s->init_msg;
+
+  s->extended_finished_msg = (unsigned char *)malloc(n);
+  memcpy(s->extended_finished_msg, p, n);
+  s->extended_finished_msg_len = n;
+
+	return(1);
+}
+
 #endif /* OPENSSL_NO_MATLS */
 
 int ssl3_get_finished(SSL *s, int a, int b)
@@ -687,7 +863,7 @@ int ssl3_get_finished(SSL *s, int a, int b)
 		SSL3_MT_FINISHED,
 		20000, /* should actually be 36+4 :-) */
 		&ok);
-  printf("after get message in get finished: %d\n", n);
+  printf("after get message in get finished: %d\n", (int) n);
 
 	if (!ok) return((int)n);
 
@@ -861,7 +1037,6 @@ unsigned long ssl3_output_orig_cert_chain(SSL *s, X509 *x)
 {
 	s->orig_cert_buf = BUF_MEM_new();
 
-	unsigned char *p;
 	int i;
 	unsigned long l=7;
 	BUF_MEM *buf;

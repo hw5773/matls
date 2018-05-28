@@ -221,6 +221,9 @@ extern "C" {
 #define SSL_MAX_KEY_ARG_LENGTH			8
 #define SSL_MAX_MASTER_KEY_LENGTH		48
 #define SSL_MAX_GLOBAL_MAC_KEY_LENGTH        32
+#ifndef OPENSSL_NO_MATLS
+#define SSL_MAX_ACCOUNTABILITY_KEY_LENGTH        32
+#endif /* OPENSSL_NO_MATLS */
 
 
 /* These are used to specify which ciphers to use and not to use */

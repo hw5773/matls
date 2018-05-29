@@ -300,8 +300,7 @@ void *run(void *data)
   ssl = SSL_new(ctx);
   SSL_set_fd(ssl, server);
   SSL_set_tlsext_host_name(ssl, "www.matls.com");
-  SSL_enable_mb(ssl);
-
+  
   MA_LOG1s("Start SSL connections to", ip);
 
   ssl->pair = args->ssl;
@@ -309,6 +308,18 @@ void *run(void *data)
   ssl->lock = args->ssl->lock;
   ssl->middlebox = 1;
   ssl->pair->middlebox = 1;
+
+  if (ssl->pair->mb_enabled)
+  {
+    SSL_enable_mb(ssl);
+    MA_LOG1d("matls enabled", ssl->mb_enabled);
+  }
+  else
+  {
+    SSL_disable_mb(ssl);
+    MA_LOG1d("matls disabled", ssl->mb_enabled);
+  }
+
   if ((ret = SSL_connect(ssl)) != 1)
   {
     ERR_print_errors_fp(stderr);
@@ -345,13 +356,18 @@ void *run(void *data)
       if (FD_ISSET(server, &reads))
       {
         ret = SSL_read(ssl, buf, DEFAULT_BUF_SIZE);
-        MA_LOG1d("Read bytes", ret);
-        printf("%.*s\n", (int)ret, buf);
+        if (ret > 0)
+        {
+          MA_LOG1d("Read bytes", ret);
+          printf("%.*s\n", (int)ret, buf);
+        }
         send_unencrypted_bytes(buf, ret);
       }
     }
   }
 
+  MA_LOG("Succeed to establish the secure session with the server-side entity");
+  while(1) {}
   MA_LOG("Close the session with the server");
   SSL_free(ssl);
   close(server);

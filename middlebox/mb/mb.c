@@ -81,15 +81,12 @@ int main(int count, char *strings[])
 
     pthread_attr_destroy(&attr);
 
-    for (i=0; i<MAX_THREADS; i++)
-    {
-      rc = pthread_join(threads[i], &status);
+    rc = pthread_join(threads[tidx], &status);
 
-      if (rc)
-      {
-        MA_LOG("error in join");
-        return 1;
-      }
+    if (rc)
+    {
+      MA_LOG1d("error in join", rc);
+      return 1;
     }
 	}
 
@@ -160,8 +157,8 @@ void *mb_run(void *data)
     break;
   }
 
-  SSL_free(ssl);
-  close(client);
+//  SSL_free(ssl);
+//  close(client);
 }
 
 int get_total_length(char *buf, int rcvd)

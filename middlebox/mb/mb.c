@@ -22,6 +22,7 @@ void load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file);
 void print_pubkey(EVP_PKEY *pkey);
 BIO *bio_err;
 void *mb_run(void *data);
+int get_total_length(char *buf, int rcvd);
 
 struct info
 {
@@ -103,7 +104,7 @@ void *mb_run(void *data)
 {
   MA_LOG("start server loop\n");
   struct info *info;
-  int client, ret, rcvd, sent;
+  int client, ret, rcvd, sent, tot_len = -1, head_len = -1, body_len = -1;
   unsigned char buf[BUF_SIZE];
 
   SSL *ssl;
@@ -126,7 +127,9 @@ void *mb_run(void *data)
     MA_LOG("complete handshake");
   MA_LOG1d("end matls handshake", ret);
 
-  while (SSL_get_rbio(ssl) && SSL_get_wbio(ssl) && SSL_get_rbio(ssl->pair) && SSL_get_wbio(ssl->pair))
+  while (!(SSL_is_init_finished(ssl) && SSL_is_init_finished(ssl->pair))) {}
+
+  while (1)
   {
     rcvd = SSL_read(ssl, buf, BUF_SIZE);
     MA_LOG1d("Received from Client-side", rcvd);
@@ -135,16 +138,63 @@ void *mb_run(void *data)
     sent = SSL_write(ssl->pair, buf, rcvd);
     MA_LOG1d("Sent to Server-side", sent);
 
-    rcvd = SSL_read(ssl->pair, buf, BUF_SIZE);
-    MA_LOG1d("Received from Server-side", rcvd);
-    MA_LOG1s("Message", buf);
+    do {
+      rcvd = SSL_read(ssl->pair, buf, BUF_SIZE);
+      MA_LOG1d("Received from Server-side", rcvd);
+      MA_LOG1s("Message", buf);
+      
+      sent = SSL_write(ssl, buf, rcvd);
+      MA_LOG1d("Sent to Client-side", sent);
 
-    sent = SSL_write(ssl, buf, rcvd);
-    MA_LOG1d("Sent to Client-side", sent);
+      if (tot_len < 0)
+        tot_len = get_total_length(buf, rcvd);
+
+      MA_LOG1d("Total Length", tot_len);
+
+      tot_len -= rcvd;
+
+      if (tot_len <= 0)
+        break;
+    } while(1);
+
+    break;
   }
 
   SSL_free(ssl);
   close(client);
+}
+
+int get_total_length(char *buf, int rcvd)
+{
+  int tot_len, head_len, body_len, index, tok_len;
+  const char *clen = "Content-Length";
+  char *token = NULL;
+  char val[4];
+
+  head_len = strstr(buf, "\r\n\r\n") - buf + 4;
+  MA_LOG1d("Header Length", head_len);
+  
+  token = strtok(buf, "\n");
+
+  while (token)
+  {
+    tok_len = strlen(token);
+    index = strstr(token, ":") - token;
+
+    if (strncmp(token, clen, index - 1) == 0)
+    {
+      memcpy(val, token + index + 1, tok_len - index - 1);
+      body_len = atoi(val);
+      MA_LOG1d("Body Length", body_len);
+      break;
+    }
+
+    token = strtok(NULL, "\n");
+  }
+
+  tot_len = head_len + body_len;
+
+  return tot_len;
 }
 
 int open_listener(int port)

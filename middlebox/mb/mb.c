@@ -14,6 +14,7 @@
 #include "../common/logs.h"
 
 #define FAIL    -1
+#define BUF_SIZE 1024
 
 int open_listener(int port);
 SSL_CTX* init_middlebox_ctx();
@@ -102,21 +103,45 @@ void *mb_run(void *data)
 {
   MA_LOG("start server loop\n");
   struct info *info;
-  int client, ret;
+  int client, ret, rcvd, sent;
+  unsigned char buf[BUF_SIZE];
+
   SSL *ssl;
 
   info = (struct info *)data;
   client = info->sock;
   ssl = SSL_new(ctx);
   SSL_set_fd(ssl, client);
-//  SSL_enable_mb(ssl);
 
-  MA_LOG("start matls handshake");
+#ifdef MATLS
+  SSL_enable_mb(ssl);
+  MA_LOG("matls enabled");
+#else
+  SSL_disable_mb(ssl);
+  MA_LOG("split tls enabled");
+#endif
+
   ret = SSL_accept(ssl);
   if (SSL_is_init_finished(ssl))
     MA_LOG("complete handshake");
-  
   MA_LOG1d("end matls handshake", ret);
+
+  while (SSL_get_rbio(ssl) && SSL_get_wbio(ssl) && SSL_get_rbio(ssl->pair) && SSL_get_wbio(ssl->pair))
+  {
+    rcvd = SSL_read(ssl, buf, BUF_SIZE);
+    MA_LOG1d("Received from Client-side", rcvd);
+    MA_LOG1s("Message from Client-side", buf);
+
+    sent = SSL_write(ssl->pair, buf, rcvd);
+    MA_LOG1d("Sent to Server-side", sent);
+
+    rcvd = SSL_read(ssl->pair, buf, BUF_SIZE);
+    MA_LOG1d("Received from Server-side", rcvd);
+    MA_LOG1s("Message", buf);
+
+    sent = SSL_write(ssl, buf, rcvd);
+    MA_LOG1d("Sent to Client-side", sent);
+  }
 
   SSL_free(ssl);
   close(client);

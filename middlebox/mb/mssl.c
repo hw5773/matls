@@ -288,7 +288,7 @@ void *run(void *data)
   struct timeval tv;
   unsigned char *ip;
   unsigned char buf[DEFAULT_BUF_SIZE];
-  int server, port, ret;
+  int server, port, ret, rcvd, sent;
   SSL *ssl, *pair;
   fd_set reads, temps;
 
@@ -309,16 +309,13 @@ void *run(void *data)
   ssl->middlebox = 1;
   ssl->pair->middlebox = 1;
 
-  if (ssl->pair->mb_enabled)
-  {
-    SSL_enable_mb(ssl);
-    MA_LOG1d("matls enabled", ssl->mb_enabled);
-  }
-  else
-  {
-    SSL_disable_mb(ssl);
-    MA_LOG1d("matls disabled", ssl->mb_enabled);
-  }
+#ifdef MATLS
+  SSL_enable_mb(ssl);
+  MA_LOG1d("matls enabled", ssl->mb_enabled);
+#else
+  SSL_disable_mb(ssl);
+  MA_LOG1d("matls disabled", ssl->mb_enabled);
+#endif
 
   if ((ret = SSL_connect(ssl)) != 1)
   {
@@ -331,7 +328,7 @@ void *run(void *data)
   {
     MA_LOG1s("Succeed to connect to", ip);
   }
-
+/*
   FD_ZERO(&reads);
   FD_SET(server, &reads);
   tv.tv_sec = 10;
@@ -355,22 +352,24 @@ void *run(void *data)
     {
       if (FD_ISSET(server, &reads))
       {
-        ret = SSL_read(ssl, buf, DEFAULT_BUF_SIZE);
-        if (ret > 0)
+        rcvd = SSL_read(ssl, buf, DEFAULT_BUF_SIZE);
+        if (rcvd > 0)
         {
-          MA_LOG1d("Read bytes", ret);
+          MA_LOG1d("Received from Server-side", ret);
           printf("%.*s\n", (int)ret, buf);
         }
-        send_unencrypted_bytes(buf, ret);
+        //send_unencrypted_bytes(buf, ret);
+        sent = SSL_write(ssl->pair, buf, rcvd);
+        MA_LOG1d("Sent to Client-side", ret);
       }
     }
   }
 
   MA_LOG("Succeed to establish the secure session with the server-side entity");
-  while(1) {}
   MA_LOG("Close the session with the server");
   SSL_free(ssl);
   close(server);
+*/
 }
 
 void ssl_init(char *cert, char *priv) {

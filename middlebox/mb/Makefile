@@ -29,9 +29,15 @@ FORWARD_FILE_1=forward_1.txt
 FORWARD_FILE_2=forward_2.txt
 FORWARD_FILE_3=forward_3.txt
 
-default: mb_server
+default: matls
 
-mb_server:
+matls:
+	${GCC} -DMATLS ${CFLAGS} ${SERVER} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} -DMATLS ${CFLAGS} ${SERVER_1} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} -DMATLS ${CFLAGS} ${SERVER_2} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} -DMATLS ${CFLAGS} ${SERVER_3} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
+
+split:
 	${GCC} ${CFLAGS} ${SERVER} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
 	${GCC} ${CFLAGS} ${SERVER_1} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
 	${GCC} ${CFLAGS} ${SERVER_2} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}

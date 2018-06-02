@@ -1046,6 +1046,9 @@ struct ssl_ctx_st
 
 #ifndef OPENSSL_NO_MATLS
     int middlebox; // if 1, this is a middlebox
+	int server_side;
+	int proof_length;
+	unsigned char *proof;
 	unsigned char mb_enabled;
     struct mb_st mb_info;
 #endif /* OPENSSL_NO_MATLS */
@@ -1443,7 +1446,10 @@ struct ssl_st
 
 #ifndef OPENSSL_NO_MATLS
   int middlebox;
-	unsigned char mb_enabled;
+  int server_side;
+  unsigned char mb_enabled;
+  unsigned char *proof;
+  int proof_length;
   struct mb_st mb_info;
 
   volatile unsigned char *extension_from_clnt_msg;
@@ -2028,9 +2034,16 @@ int SSL_shutdown(SSL *s);
 void SSL_is_middlebox(SSL *s);
 int SSL_enable_mb(SSL *s);
 int SSL_disable_mb(SSL *s);
+int SSL_set_server_side(SSL *s);
+int SSL_set_client_side(SSL *s);
+int SSL_use_proof_file(SSL *s, const char *file);
+
 void SSL_CTX_is_middlebox(SSL_CTX *ctx);
 int SSL_CTX_enable_mb(SSL_CTX *ctx);
 int SSL_CTX_disable_mb(SSL_CTX *ctx);
+int SSL_CTX_set_server_side(SSL_CTX *ctx);
+int SSL_CTX_set_client_side(SSL_CTX *ctx);
+int SSL_CTX_use_proof_file(SSL_CTX *ctx, const char *file);
 #endif /* OPENSSL_NO_MATLS */
 
 const SSL_METHOD *SSL_get_ssl_method(SSL *s);
@@ -2351,6 +2364,8 @@ void ERR_load_SSL_strings(void);
 #define SSL_F_SSL_PARSE_CLIENTHELLO_MB_EXT      702
 #define SSL_F_SSL_ADD_SERVERHELLO_MB_EXT        703
 #define SSL_F_SSL_PARSE_SERVERHELLO_MB_EXT      704
+#define SSL_F_SSL_USE_PROOF_FILE				705
+#define SSL_F_SSL_CTX_USE_PROOF_FILE			706
 #endif /* OPENSSL_NO_MATLS */
 
 #define SSL_F_SSL_CTX_CHECK_PRIVATE_KEY			 168

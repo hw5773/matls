@@ -222,8 +222,6 @@ int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len,
       MA_LOG1d("length of client hello extension", *len);
     }
 
-    MA_LOG("after if");
-
     return 1;
 }
 
@@ -434,7 +432,16 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
       n2s(p, ext_len);
       MA_LOG1d("ext_len", ext_len);
       p -= 2;
-      ext_len = ext_len + 2 + pub_length;
+
+	  if (s->server_side)
+	  {
+		ext_len = ext_len + TYPE_LENGTH + META_LENGTH + pub_length + META_LENGTH + s->proof_length;
+	  }
+	  else
+	  {
+      	ext_len = ext_len + TYPE_LENGTH + META_LENGTH + pub_length;
+	  }
+	  
       s2n(ext_len, p);
 
       n2s(p, tmp1);
@@ -445,21 +452,34 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
       MA_LOG1d("num keys after", (*p));
       p++;
       p += s->pair->extension_from_srvr_msg_len - 5;
+
+	  if (s->server_side)
+	  {
+		*p = TYPE_SERVER_SIDE;
+		p++;
+		*len = s->pair_extension_from_srvr_msg_len + TYPE_LENGTH + META_LENGTH + pub_length + META_LENGTH + s->proof_length;
+	  }
+	  else
+	  {
+		*p = TYPE_CLIENT_SIDE;
+		p++;
+		*len = s->pair_extension_from_srvr_msg_len + TYPE_LENGTH + META_LENGTH + pub_length;
+	  }
       s2n(pub_length, p);
       memcpy(p, pub_str, pub_length);
-      *len = s->pair->extension_from_srvr_msg_len + 2 + pub_length;
     }
     else
     {
-      ext_len = 5 + pub_length;
+      ext_len = META_LENGTH + 1 + TYPE_LENGTH + META_LENGTH + pub_length;
       s2n(ext_len, p);
-		  s2n(group_id, p);
-		  *(p++) = num_keys;
-		  s2n(pub_length, p); //pubkey_len
-		  memcpy(p, pub_str, pub_length); //pubkey
+	  s2n(group_id, p);
+	  *(p++) = num_keys;
+	  *(p++) = TYPE_SERVER;
+	  s2n(pub_length, p); //pubkey_len
+	  memcpy(p, pub_str, pub_length); //pubkey
       p += pub_length;
-      *len = 7 + pub_length;
-	  }
+      *len = META_LENGTH + META_LENGTH + 1 + TYPE_LENGTH + META_LENGTH + pub_length;
+	}
     PRINTK("MB Pubkey", pub_str, pub_length);
     unsigned char *tmp = (unsigned char *)malloc(SECRET_LENGTH);
 

@@ -2617,7 +2617,7 @@ int SSL_CTX_disable_ttpa(SSL_CTX *ctx)
 void SSL_is_middlebox(SSL *s)
 {
 #ifdef MB_DEBUG
-  printf("[DEBUG] %s:%s:%s: This is set to a middlebox\n", __FILE__, __func__, __LINE__);
+  printf("[DEBUG] %s:%s:%d: This is set to a middlebox\n", __FILE__, __func__, __LINE__);
 #endif
   s->middlebox = 1;
 }
@@ -2625,7 +2625,7 @@ void SSL_is_middlebox(SSL *s)
 int SSL_set_server_side(SSL *s)
 {
 #ifdef MB_DEBUG
-  printf("[DEBUG] %s:%s:%s: This is set to a server side middlebox\n", __FILE__, __func__, __LINE__);
+  printf("[DEBUG] %s:%s:%d: This is set to a server side middlebox\n", __FILE__, __func__, __LINE__);
 #endif
   s->server_side = 1;
 
@@ -2635,7 +2635,7 @@ int SSL_set_server_side(SSL *s)
 int SSL_set_client_side(SSL *s)
 {
 #ifdef MB_DEBUG
-  printf("[DEBUG] %s:%s:%s: This is set to a client side middlebox\n", __FILE__, __func__, __LINE__);
+  printf("[DEBUG] %s:%s:%d: This is set to a client side middlebox\n", __FILE__, __func__, __LINE__);
 #endif
   s->server_side = 0;
 
@@ -2644,8 +2644,9 @@ int SSL_set_client_side(SSL *s)
 
 int SSL_enable_mb(SSL *s)
 {
+  printf("ssl enable mb\n");
 #ifdef MB_DEBUG
-	printf("[DEBUG] %s:%s:%s: mb enabled\n", __FILE__, __func__, __LINE__);
+	printf("[DEBUG] %s:%s:%d: mb enabled\n", __FILE__, __func__, __LINE__);
 #endif
 	s->mb_enabled = 1;
 	return 1;
@@ -2653,8 +2654,9 @@ int SSL_enable_mb(SSL *s)
 
 int SSL_disable_mb(SSL *s)
 {
+  printf("ssl disable mb\n");
 #ifdef MB_DEBUG
-	printf("[DEBUG] %s:%s:%s: mb disabled\n", __FILE__, __func__, __LINE__);
+	printf("[DEBUG] %s:%s:%d: mb disabled\n", __FILE__, __func__, __LINE__);
 #endif
 	s->mb_enabled = 0;
 	return 1;
@@ -2663,7 +2665,7 @@ int SSL_disable_mb(SSL *s)
 void SSL_CTX_is_middlebox(SSL_CTX *ctx)
 {
 #ifdef MB_DEBUG
-  printf("[DEBUG] %s:%s:%s: This is set to a middlebox\n", __FILE__, __func__, __LINE__);
+  printf("[DEBUG] %s:%s:%d: This is set to a middlebox\n", __FILE__, __func__, __LINE__);
 #endif
   printf("Before setting as a middlebox\n");
   ctx->middlebox = 1;
@@ -2673,7 +2675,7 @@ void SSL_CTX_is_middlebox(SSL_CTX *ctx)
 int SSL_CTX_set_server_side(SSL_CTX *ctx)
 {
 #ifdef MB_DEBUG
-  printf("[DEBUG] %s:%s:%s: This is set to a server-side middlebox\n", __FILE__, __func__, __LINE__);
+  printf("[DEBUG] %s:%s:%d: This is set to a server-side middlebox\n", __FILE__, __func__, __LINE__);
 #endif
   ctx->server_side = 1;
 
@@ -2683,7 +2685,7 @@ int SSL_CTX_set_server_side(SSL_CTX *ctx)
 int SSL_CTX_set_client_side(SSL_CTX *ctx)
 {
 #ifdef MB_DEBUG
-  printf("[DEBUG] %s:%s:%s: This is set to a client-side middlebox\n", __FILE__, __func__, __LINE__);
+  printf("[DEBUG] %s:%s:%d: This is set to a client-side middlebox\n", __FILE__, __func__, __LINE__);
 #endif
   ctx->server_side = 0;
 

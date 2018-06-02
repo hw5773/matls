@@ -234,6 +234,7 @@ int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len,
 // Output: 1 for Success, 0 for Failure
 int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
 {
+  MA_LOG("Parse client hello");
     // SSL_F_SSL_PARSE_CLIENTHELLO_MB_EXT
 
     unsigned char *p;

@@ -331,12 +331,11 @@ int ssl3_connect(SSL *s)
 			if (!(s->s3->tmp.new_cipher->algorithm_auth & (SSL_aNULL|SSL_aSRP)) &&
 			    !(s->s3->tmp.new_cipher->algorithm_mkey & SSL_kPSK))
 				{
-          if (s->middlebox)
+          if (s->mb_enabled && s->middlebox)
             ret = matls_get_server_certificate(s);
           else
     				ret=ssl3_get_server_certificate(s);
           printf("ret: %d\n", ret);
-          printf("finish matls get server certificate\n");
 				if (ret <= 0) goto end;
 
 #ifndef OPENSSL_NO_MATLS

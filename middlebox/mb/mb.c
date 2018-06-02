@@ -266,8 +266,8 @@ SSL_CTX* init_middlebox_ctx()
 		abort();
 	}
 
-	SSL_CTX_set_info_callback(ctx, apps_ssl_info_callback);
-	SSL_CTX_set_msg_callback(ctx, msg_callback);
+	//SSL_CTX_set_info_callback(ctx, apps_ssl_info_callback);
+	//SSL_CTX_set_msg_callback(ctx, msg_callback);
   SSL_CTX_set_sni_callback(ctx, sni_callback);
   printf("set info callback, msg callback, sni callback complete\n");
   ctx->middlebox = 1;

@@ -457,16 +457,23 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
 	  {
 		*p = TYPE_SERVER_SIDE;
 		p++;
-		*len = s->pair_extension_from_srvr_msg_len + TYPE_LENGTH + META_LENGTH + pub_length + META_LENGTH + s->proof_length;
+		*len = s->pair->extension_from_srvr_msg_len + TYPE_LENGTH + META_LENGTH + pub_length + META_LENGTH + s->proof_length;
 	  }
 	  else
 	  {
 		*p = TYPE_CLIENT_SIDE;
 		p++;
-		*len = s->pair_extension_from_srvr_msg_len + TYPE_LENGTH + META_LENGTH + pub_length;
+		*len = s->pair->extension_from_srvr_msg_len + TYPE_LENGTH + META_LENGTH + pub_length;
 	  }
       s2n(pub_length, p);
       memcpy(p, pub_str, pub_length);
+	  p += pub_length;
+
+	  if (s->server_side)
+	  {
+		s2n(s->proof_length, p);
+		memcpy(p, s->proof, s->proof_length);
+	  }
     }
     else
     {

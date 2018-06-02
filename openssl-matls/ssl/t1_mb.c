@@ -203,7 +203,7 @@ int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len,
       n2s(p, ext_len);
       p -= 2;
       MA_LOG1d("ext_len before", ext_len);
-      ext_len = ext_len + 2 + pub_length;
+      ext_len = ext_len + TYPE_LENGTH + META_LENGTH + pub_length;
       MA_LOG1d("ext_len after", ext_len);
       s2n(ext_len, p);
       p += 2; // Group ID
@@ -213,12 +213,25 @@ int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len,
       MA_LOG1d("after number of keys", (int)*p);
       p++;
       p += s->pair->extension_from_clnt_msg_len - 5;
+
+      if (s->server_side)
+      {
+        *p = TYPE_SERVER_SIDE;
+        p++;
+        *len = s->pair->extension_from_clnt_msg_len + TYPE_LENGTH + META_LENGTH + pub_length + META_LENGTH + s->proof_length;
+      }
+      else
+      {
+        *p = TYPE_CLIENT_SIDE;
+        p++;
+        *len = s->pair->extension_from_clnt_msg_len + TYPE_LENGTH + META_LENGTH + pub_length;
+      }
       s2n(pub_length, p);
       MA_LOG1d("Added Public Key Length", pub_length);
       memcpy(p, pub_str, pub_length);
+      p += pub_length;
 
       MA_LOG1d("s->pair->extension_from_clnt_msg_len", s->pair->extension_from_clnt_msg_len);
-      *len = s->pair->extension_from_clnt_msg_len + 2 + pub_length;
       MA_LOG1d("length of client hello extension", *len);
     }
 
@@ -290,7 +303,6 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
 
     if (s->middlebox) // middlebox, index 0: client->server, index 1: server->client
     {
-
       nk = 2;
       s->mb_info.key_length = (int *)calloc(2, sizeof(int));
       s->mb_info.secret = (unsigned char **)calloc(2, sizeof(unsigned char *));
@@ -351,6 +363,13 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
     for (i=0; i<end; i++)
     {
       secret = EC_POINT_new(group);
+
+      if (*p != TYPE_CLIENT_SIDE)
+      {
+        MA_LOG1d("Wrong Type", *p);
+      }
+
+      p++;
       n2s(p, klen);
 
       s->mb_info.key_length[i] = klen;
@@ -419,6 +438,7 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
 
   if (p) {
     pub_to_char(s->mb_info.keypair->pub, &pub_str, &pub_length, group, ctx);
+
     if (s->middlebox)
     {
       int tmp1;
@@ -434,14 +454,14 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
       MA_LOG1d("ext_len", ext_len);
       p -= 2;
 
-	  if (s->server_side)
-	  {
-		ext_len = ext_len + TYPE_LENGTH + META_LENGTH + pub_length + META_LENGTH + s->proof_length;
-	  }
-	  else
-	  {
+	    if (s->server_side)
+	    {
+		    ext_len = ext_len + TYPE_LENGTH + META_LENGTH + pub_length + META_LENGTH + s->proof_length;
+	    }
+	    else
+	    {
       	ext_len = ext_len + TYPE_LENGTH + META_LENGTH + pub_length;
-	  }
+	    }
 	  
       s2n(ext_len, p);
 
@@ -454,40 +474,41 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
       p++;
       p += s->pair->extension_from_srvr_msg_len - 5;
 
-	  if (s->server_side)
-	  {
-		*p = TYPE_SERVER_SIDE;
-		p++;
-		*len = s->pair->extension_from_srvr_msg_len + TYPE_LENGTH + META_LENGTH + pub_length + META_LENGTH + s->proof_length;
-	  }
-	  else
-	  {
-		*p = TYPE_CLIENT_SIDE;
-		p++;
-		*len = s->pair->extension_from_srvr_msg_len + TYPE_LENGTH + META_LENGTH + pub_length;
-	  }
+	    if (s->server_side)
+	    {
+		    *p = TYPE_SERVER_SIDE;
+		    p++;
+		    *len = s->pair->extension_from_srvr_msg_len + TYPE_LENGTH + META_LENGTH + pub_length + META_LENGTH + s->proof_length;
+	    }
+	    else
+	    {
+		    *p = TYPE_CLIENT_SIDE;
+		    p++;
+		    *len = s->pair->extension_from_srvr_msg_len + TYPE_LENGTH + META_LENGTH + pub_length;
+	    }
+
       s2n(pub_length, p);
       memcpy(p, pub_str, pub_length);
-	  p += pub_length;
+	    p += pub_length;
 
-	  if (s->server_side)
-	  {
-		s2n(s->proof_length, p);
-		memcpy(p, s->proof, s->proof_length);
-	  }
+	    if (s->server_side)
+	    {
+		    s2n(s->proof_length, p);
+		    memcpy(p, s->proof, s->proof_length);
+	    }
     }
     else
     {
       ext_len = META_LENGTH + 1 + TYPE_LENGTH + META_LENGTH + pub_length;
       s2n(ext_len, p);
-	  s2n(group_id, p);
-	  *(p++) = num_keys;
-	  *(p++) = TYPE_SERVER;
-	  s2n(pub_length, p); //pubkey_len
-	  memcpy(p, pub_str, pub_length); //pubkey
+	    s2n(group_id, p);
+	    *(p++) = num_keys;
+	    *(p++) = TYPE_SERVER;
+	    s2n(pub_length, p); //pubkey_len
+	    memcpy(p, pub_str, pub_length); //pubkey
       p += pub_length;
       *len = META_LENGTH + META_LENGTH + 1 + TYPE_LENGTH + META_LENGTH + pub_length;
-	}
+	  }
     PRINTK("MB Pubkey", pub_str, pub_length);
     unsigned char *tmp = (unsigned char *)malloc(SECRET_LENGTH);
 
@@ -556,7 +577,7 @@ int ssl_parse_serverhello_mb_ext(SSL *s, unsigned char *d, int size, int *al)
   unsigned char *p;
   unsigned char *secret_str, *peer_str;
   struct keypair *keypair;
-  int plen, klen, ext_len, group_id, num_keys;
+  int plen, klen, ext_len, group_id, num_keys, type;
   EC_GROUP *group;
   BIGNUM *x, *y;
   EC_POINT *secret, *peer_pub;
@@ -598,6 +619,9 @@ int ssl_parse_serverhello_mb_ext(SSL *s, unsigned char *d, int size, int *al)
   y = BN_new();
 
   secret = EC_POINT_new(group);
+  type = *(p++);
+
+  MA_LOG1d("Received Type", type);
   n2s(p, klen);
   MA_LOG1d("Received Server Key Length", klen);
   s->pair->mb_info.key_length[SERVER] = klen;

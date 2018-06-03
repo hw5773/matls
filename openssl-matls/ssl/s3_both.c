@@ -630,16 +630,16 @@ int matls_send_extended_finished(SSL *s)
     }
 
 		/* version (2) */
-    parameters[poff++] = s->version >> 8;
-    parameters[poff++] = s->version & 0xff;
+    parameters[poff++] = s->pair->version >> 8;
+    parameters[poff++] = s->pair->version & 0xff;
 
 		/* ciphersuit (2) */
-		j = ssl3_put_cipher_by_char(s->s3->tmp.new_cipher, &(parameters[poff]));
+		j = ssl3_put_cipher_by_char(s->pair->s3->tmp.new_cipher, &(parameters[poff]));
     poff += MATLS_CIPHERSUITE_LENGTH;
 		PRINTK("version and ciphersuite", parameters, poff);
 
 		/* ti (12) */
-		memcpy(parameters + poff, s->s3->tmp.finish_md, MATLS_TRANSCRIPT_LENGTH);
+		memcpy(parameters + poff, s->pair->s3->tmp.finish_md, MATLS_TRANSCRIPT_LENGTH);
 		poff += MATLS_TRANSCRIPT_LENGTH;
 //		l = MATLS_TRANSCRIPT_LENGTH; // length of verify_data
 

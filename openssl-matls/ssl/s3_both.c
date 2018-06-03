@@ -604,7 +604,7 @@ int matls_send_extended_finished(SSL *s)
         mlen += tlen;
         tmp2 += tlen;
       }
-      mlen += (num_msg - 1);
+      mlen += num_msg;
       slen = s->pair->extended_finished_msg_len - 1 - mlen - MATLS_H_LENGTH;
       plen = MATLS_H_LENGTH + MATLS_M_LENGTH;
       printf("mlen: %d, slen: %d, plen: %d\n", mlen, slen, plen);
@@ -719,6 +719,8 @@ int matls_send_extended_finished(SSL *s)
 		s->init_off=0;
     s->state = SSL3_ST_SW_EXTENDED_FINISHED_B;
 	}
+
+	PRINTK("Extended Finished Message", d, l+4);
 
 	printf("Message Length: %lu\n", l);
 	/* SSL3_ST_SEND_xxxxxx_HELLO_B */

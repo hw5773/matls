@@ -628,7 +628,7 @@ int matls_send_extended_finished(SSL *s)
 		/* ti (12) */
 		memcpy(parameters + poff, s->s3->tmp.finish_md, MATLS_TRANSCRIPT_LENGTH);
 		poff += MATLS_TRANSCRIPT_LENGTH;
-		l = MATLS_TRANSCRIPT_LENGTH; // length of verify_data
+//		l = MATLS_TRANSCRIPT_LENGTH; // length of verify_data
 
     memcpy(pp, parameters, MATLS_M_LENGTH);
     pp += MATLS_M_LENGTH;
@@ -655,7 +655,7 @@ int matls_send_extended_finished(SSL *s)
 		/* put num_msg */
 		*(p++) = num_msg;
 		printf("num_msg\n%02X\n", num_msg);
-    l += 1;
+    l = 1;
 			
     /* put message */
     if (s->middlebox)

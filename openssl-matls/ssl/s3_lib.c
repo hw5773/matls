@@ -4189,53 +4189,6 @@ int ssl3_shutdown(SSL *s)
 		return(0);
 	}
 
-#ifndef OPENSSL_NO_MATLS
-int digest_message(unsigned char *message, size_t message_len, unsigned char **digest, unsigned int *digest_len)
-{
-  EVP_MD_CTX *ctx;
-  ctx = EVP_MD_CTX_create();
-
-  if (ctx == NULL)
-  {
-    printf("EVP_MD_CTX_create failed\n");
-    goto err;
-  }
-
-  if (EVP_DigestInit_ex(ctx, EVP_sha256(), NULL) != 1)
-  {
-    printf("EVP_DigestInit failed\n");
-    goto err;
-  }
-
-  if (EVP_DigestUpdate(ctx, message, message_len) != 1)
-  {
-    printf("EVP_DigestUpdate failed\n");
-    goto err;
-  }
-
-  if ((*digest = (unsigned char *)OPENSSL_malloc(EVP_MD_size(EVP_sha256()))) == NULL)
-  {
-    printf("OPENSSL_malloc failed\n");
-    goto err;
-  }
-
-  if (EVP_DigestFinal_ex(ctx, *digest, digest_len) != 1)
-  {
-    printf("EVP_DigestFinal_ex failed\n");
-    goto err;
-  }
-
-  EVP_MD_CTX_destroy(ctx);
-
-  return 1;
-
-err:
-  EVP_MD_CTX_cleanup(ctx);
-
-  return 0;
-}
-#endif /* OPENSSL_NO_MATLS */
-
 int ssl3_write(SSL *s, const void *buf, int len)
 {
 	int ret,n;
@@ -4288,7 +4241,7 @@ int ssl3_write(SSL *s, const void *buf, int len)
 
 		/* We have flushed the buffer, so remove it */
 		ssl_free_wbio_buffer(s);
-		s->s3->flags& = ~SSL3_FLAGS_POP_BUFFER;
+		s->s3->flags &= ~SSL3_FLAGS_POP_BUFFER;
 
 		ret = s->s3->delay_buf_pop_ret;
 		s->s3->delay_buf_pop_ret = 0;

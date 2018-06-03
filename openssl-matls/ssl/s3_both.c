@@ -720,7 +720,7 @@ int matls_send_extended_finished(SSL *s)
     s->state = SSL3_ST_SW_EXTENDED_FINISHED_B;
 	}
 
-	PRINTK("Extended Finished Message", d, l+4);
+	PRINTK("Extended Finished Message", d, l);
 
 	printf("Message Length: %lu\n", l);
 	/* SSL3_ST_SEND_xxxxxx_HELLO_B */

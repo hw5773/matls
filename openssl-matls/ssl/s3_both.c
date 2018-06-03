@@ -640,16 +640,15 @@ int matls_send_extended_finished(SSL *s)
 		PRINTK("version and ciphersuite", parameters, poff);
 
 		/* ti (12) */
-		memcpy(parameters + poff, s->s3->tmp.finish_md, MATLS_TRANSCRIPT_LENGTH);
+		memcpy(parameters + poff, s->s3->previous_client_finished, MATLS_TRANSCRIPT_LENGTH);
 		poff += MATLS_TRANSCRIPT_LENGTH;
 //		l = MATLS_TRANSCRIPT_LENGTH; // length of verify_data
 
     memcpy(pp, parameters, MATLS_M_LENGTH);
     pp += MATLS_M_LENGTH;
 
-		PRINTK("before hash", msg, plen);
+		PRINTK("before hmac", msg, plen);
 
-    printf("before hmac\n");
     if (s->middlebox)
 	{
 		printf("s->server: %d\n", s->server);
@@ -663,7 +662,7 @@ int matls_send_extended_finished(SSL *s)
 	}
 
     printf("after hmac: %ld\n", digest_len);
-	PRINTK("digest", digest, digest_len);
+	  PRINTK("hmac", digest, digest_len);
 
 		/* make signature block */
 		if (!make_signature_block2(&sigblk, digest, digest_len, (s->cert->key->privatekey), NID_sha256, &sigblk_len))
@@ -681,6 +680,7 @@ int matls_send_extended_finished(SSL *s)
     /* put message */
     if (s->middlebox)
     {
+      tmp1 = p;
       memcpy(p, tmp1, mlen);
       p += mlen;
       *(p++) = MATLS_M_PAIR_LENGTH;
@@ -698,6 +698,9 @@ int matls_send_extended_finished(SSL *s)
 		  p += s->pair->s3->tmp.finish_md_len;
 
       l += (MATLS_M_PAIR_LENGTH + mlen + 1);
+
+      PRINTK("Pair Finished", s->pair->s3->tmp.finish_md, s->pair->s3->tmp.finish_md_len);
+      PRINTK("Appended parameters", tmp1, MATLS_M_PAIR_LENGTH + 1);
     }
 
 		/* put hashed msg */

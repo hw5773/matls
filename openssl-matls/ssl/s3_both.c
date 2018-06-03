@@ -644,8 +644,8 @@ int matls_send_extended_finished(SSL *s)
     if (s->middlebox)
 	{
 		printf("s->server: %d\n", s->server);
-		PRINTK("used accountability key", s->mb_info.mac_array[s->server], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
-      digest = HMAC(EVP_sha256(), s->mb_info.mac_array[s->server], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, plen, NULL, &digest_len);
+		PRINTK("used accountability key", s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
+      digest = HMAC(EVP_sha256(), s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, plen, NULL, &digest_len);
 	}
     else
 	{

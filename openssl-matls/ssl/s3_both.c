@@ -680,7 +680,7 @@ int matls_send_extended_finished(SSL *s)
     /* put message */
     if (s->middlebox)
     {
-      tmp1 = p;
+      tmp2 = p;
       memcpy(p, tmp1, mlen);
       p += mlen;
       *(p++) = MATLS_M_PAIR_LENGTH;
@@ -700,7 +700,7 @@ int matls_send_extended_finished(SSL *s)
       l += (MATLS_M_PAIR_LENGTH + mlen + 1);
 
       PRINTK("Pair Finished", s->pair->s3->tmp.peer_finish_md, s->pair->s3->tmp.peer_finish_md_len);
-      PRINTK("Appended parameters", tmp1, MATLS_M_PAIR_LENGTH + 1);
+      PRINTK("Appended parameters", tmp2, MATLS_M_PAIR_LENGTH + 1);
     }
 
 		/* put hashed msg */
@@ -713,6 +713,7 @@ int matls_send_extended_finished(SSL *s)
     if (s->middlebox)
     {
       memcpy(p, tmp1 + mlen + MATLS_H_LENGTH, slen);
+      PRINTK("Previous Signature", p, slen);
       p += slen;
       l += slen;
     }

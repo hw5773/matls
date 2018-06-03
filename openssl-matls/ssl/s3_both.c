@@ -613,7 +613,7 @@ int matls_send_extended_finished(SSL *s)
     else // Server
     {
       mlen = 0; slen = 0;
-      plen = MATLS_M_LENGTH + 1;
+      plen = MATLS_M_LENGTH;
       printf("mlen: %d, slen: %d, plen: %d\n", mlen, slen, plen);
     }
 

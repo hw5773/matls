@@ -132,7 +132,7 @@
 #define MATLS_CIPHERSUITE_LENGTH 2
 #define MATLS_TRANSCRIPT_LENGTH s->s3->tmp.finish_md_len
 
-#define MATLS_M_LENGTH (1 + MATLS_VERSION_LENGTH + MATLS_CIPHERSUITE_LENGTH + MATLS_TRANSCRIPT_LENGTH)
+#define MATLS_M_LENGTH (MATLS_VERSION_LENGTH + MATLS_CIPHERSUITE_LENGTH + MATLS_TRANSCRIPT_LENGTH)
 #define MATLS_H_LENGTH 32
 
 int idx;
@@ -455,7 +455,7 @@ int matls_send_finished(SSL *s, int a, int b, const char *sender, int slen)
       }
 
 		msg = (unsigned char *)malloc(plen); //mac, version, cipher, ti
-      	parameters = (unsigned char *)malloc(MATLS_M_LENGTH);
+      	parameters = (unsigned char *)malloc(MATLS_M_LENGTH + 1);
 
 		pp = msg;
 		/* mac_key (32) */
@@ -598,14 +598,14 @@ int matls_send_extended_finished(SSL *s)
 
       mlen = (num_msg-1) * MATLS_M_LENGTH;
       slen = s->pair->extended_finished_msg_len - 1 - mlen - MATLS_H_LENGTH;
-      plen = MATLS_H_LENGTH + MATLS_M_LENGTH;
+      plen = MATLS_H_LENGTH + MATLS_M_LENGTH + 1;
       printf("mlen: %d, slen: %d, plen: %d\n", mlen, slen, plen);
       num_msg++;
     }
     else // Server
     {
       mlen = 0; slen = 0;
-      plen = MATLS_M_LENGTH;
+      plen = MATLS_M_LENGTH + 1;
       printf("mlen: %d, slen: %d, plen: %d\n", mlen, slen, plen);
     }
 
@@ -613,6 +613,7 @@ int matls_send_extended_finished(SSL *s)
     parameters = (unsigned char *)malloc(MATLS_M_LENGTH);
 
     pp = msg;
+    (*pp++) = MATLS_M_LENGTH;
 
     if (s->middlebox)
     {
@@ -620,9 +621,6 @@ int matls_send_extended_finished(SSL *s)
       pp += MATLS_H_LENGTH;
 	  PRINTK("Received hash", pp, MATLS_H_LENGTH);
     }
-
-    /* length of MATLS_M_LENGTH */
-    parameters[poff++] = MATLS_M_LENGTH;
 
 		/* version (2) */
     parameters[poff++] = s->version >> 8;

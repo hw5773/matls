@@ -462,7 +462,7 @@ int matls_send_finished(SSL *s, int a, int b, const char *sender, int slen)
 		if (s->middlebox)
 		{
 			printf("server: %d\n", s->server);
-			PRINTK("accountability key used", s->mb_info.mac_array[s->server], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
+			PRINTK("accountability key used", s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
 			memcpy(msg, s->mb_info.mac_array[s->server], SSL_MAX_GLOBAL_MAC_KEY_LENGTH);
 		}
 		else

@@ -691,6 +691,7 @@ int matls_send_extended_finished(SSL *s)
 
 		  /* ciphersuit (2) */
 		  j = ssl3_put_cipher_by_char(s->pair->s3->tmp.new_cipher, p);
+      p += MATLS_CIPHERSUITE_LENGTH;
 
 		  /* ti (12) */
 		  memcpy(p, s->pair->s3->tmp.finish_md, s->pair->s3->tmp.finish_md_len);

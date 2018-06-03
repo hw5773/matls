@@ -460,7 +460,10 @@ int matls_send_finished(SSL *s, int a, int b, const char *sender, int slen)
 		pp = msg;
 		/* mac_key (32) */
 		if (s->middlebox)
+		{
+			printf("server: %d\n", s->server);
 			memcpy(msg, s->mb_info.mac_array[s->server], SSL_MAX_GLOBAL_MAC_KEY_LENGTH);
+		}
 		else
 			memcpy(msg, s->mb_info.mac_array[0], SSL_MAX_GLOBAL_MAC_KEY_LENGTH);
 		pp += SSL_MAX_GLOBAL_MAC_KEY_LENGTH;
@@ -614,6 +617,7 @@ int matls_send_extended_finished(SSL *s)
     {
       memcpy(pp, tmp + mlen + 1, MATLS_H_LENGTH);
       pp += MATLS_H_LENGTH;
+	  PRINTK("Received hash", pp, MATLS_H_LENGTH);
     }
 
 		/* version (2) */
@@ -699,6 +703,7 @@ int matls_send_extended_finished(SSL *s)
     s->state = SSL3_ST_SW_EXTENDED_FINISHED_B;
 	}
 
+	printf("Message Length: %lu\n", l);
 	/* SSL3_ST_SEND_xxxxxx_HELLO_B */
 	return(ssl3_do_write(s,SSL3_RT_HANDSHAKE));
 }

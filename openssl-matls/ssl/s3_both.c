@@ -564,8 +564,8 @@ int matls_send_finished(SSL *s, int a, int b, const char *sender, int slen)
 
 int matls_send_extended_finished(SSL *s)
 {
-	unsigned char *p, *d, *pp, *tmp, *msg, *parameters;
-	int j, ret, mlen, slen, plen, poff = 0;
+	unsigned char *p, *d, *pp, *tmp1, *tmp2, *msg, *parameters;
+	int i, j, ret, mlen, slen, plen, tlen, poff = 0;
 	unsigned long l;
 	int num_msg = 1;
 	unsigned char *digest;
@@ -585,9 +585,9 @@ int matls_send_extended_finished(SSL *s)
       printf("waiting for extended finished message from the server-side entity\n");
       while(!(s->pair->extended_finished_msg)) { printf(""); }
       printf("get the message from the server-side entity\n");
-      tmp = (unsigned char *)malloc(s->pair->extended_finished_msg_len);
-      memcpy(tmp, s->pair->extended_finished_msg, s->pair->extended_finished_msg_len);
-      num_msg = *tmp;
+      tmp1 = (unsigned char *)malloc(s->pair->extended_finished_msg_len);
+      memcpy(tmp1, s->pair->extended_finished_msg, s->pair->extended_finished_msg_len);
+      num_msg = *(tmp1++);
       printf("num keys: %d\n", num_msg);
 
       if (num_msg < 1)
@@ -596,9 +596,17 @@ int matls_send_extended_finished(SSL *s)
         exit(1);
       }
 
-      mlen = (num_msg-1) * MATLS_M_LENGTH;
+      tmp2 = tmp1;
+      mlen = 0;
+      for (i=0; i<(num_msg -1); i++)
+      {
+        tlen = *(tmp2++);
+        mlen += tlen;
+        tmp2 += tlen;
+      }
+      mlen += num_msg;
       slen = s->pair->extended_finished_msg_len - 1 - mlen - MATLS_H_LENGTH;
-      plen = MATLS_H_LENGTH + MATLS_M_LENGTH + 1;
+      plen = MATLS_H_LENGTH + MATLS_M_LENGTH;
       printf("mlen: %d, slen: %d, plen: %d\n", mlen, slen, plen);
       num_msg++;
     }
@@ -613,11 +621,10 @@ int matls_send_extended_finished(SSL *s)
     parameters = (unsigned char *)malloc(MATLS_M_LENGTH);
 
     pp = msg;
-    (*pp++) = MATLS_M_LENGTH;
 
     if (s->middlebox)
     {
-      memcpy(pp, tmp + mlen + 1, MATLS_H_LENGTH);
+      memcpy(pp, tmp1 + mlen, MATLS_H_LENGTH);
       pp += MATLS_H_LENGTH;
 	  PRINTK("Received hash", pp, MATLS_H_LENGTH);
     }
@@ -673,12 +680,13 @@ int matls_send_extended_finished(SSL *s)
     /* put message */
     if (s->middlebox)
     {
-      memcpy(p, tmp + 1, mlen);
+      memcpy(p, tmp1, mlen);
       p += mlen;
+      *(p++) = MATLS_M_LENGTH;
       memcpy(p, parameters, MATLS_M_LENGTH);
       p += MATLS_M_LENGTH;
 
-      l += (MATLS_M_LENGTH + mlen);
+      l += (MATLS_M_LENGTH + mlen + 1);
     }
 
 		/* put hashed msg */
@@ -690,7 +698,7 @@ int matls_send_extended_finished(SSL *s)
     /* put the prior signatures */
     if (s->middlebox)
     {
-      memcpy(p, tmp + 1 + mlen + MATLS_H_LENGTH, slen);
+      memcpy(p, tmp1 + mlen + MATLS_H_LENGTH, slen);
       p += slen;
       l += slen;
     }

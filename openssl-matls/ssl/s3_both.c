@@ -625,8 +625,8 @@ int matls_send_extended_finished(SSL *s)
     if (s->middlebox)
     {
       memcpy(pp, tmp1 + mlen, MATLS_H_LENGTH);
+	    PRINTK("Received hash", pp, MATLS_H_LENGTH);
       pp += MATLS_H_LENGTH;
-	  PRINTK("Received hash", pp, MATLS_H_LENGTH);
     }
 
 		/* version (2) */

@@ -462,6 +462,7 @@ int matls_send_finished(SSL *s, int a, int b, const char *sender, int slen)
 		if (s->middlebox)
 		{
 			printf("server: %d\n", s->server);
+			PRINTK("accountability key used", s->mb_info.mac_array[s->server], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
 			memcpy(msg, s->mb_info.mac_array[s->server], SSL_MAX_GLOBAL_MAC_KEY_LENGTH);
 		}
 		else
@@ -641,9 +642,16 @@ int matls_send_extended_finished(SSL *s)
 
     printf("before hmac\n");
     if (s->middlebox)
+	{
+		printf("s->server: %d\n", s->server);
+		PRINTK("used accountability key", s->mb_info.mac_array[s->server], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
       digest = HMAC(EVP_sha256(), s->mb_info.mac_array[s->server], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, plen, NULL, &digest_len);
+	}
     else
+	{
+		PRINTK("used accountability key", s->mb_info.mac_array[0], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
       digest = HMAC(EVP_sha256(), s->mb_info.mac_array[0], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, plen, NULL, &digest_len);
+	}
 
     printf("after hmac: %ld\n", digest_len);
 	PRINTK("digest", digest, digest_len);

@@ -132,7 +132,7 @@
 #define MATLS_CIPHERSUITE_LENGTH 2
 #define MATLS_TRANSCRIPT_LENGTH s->s3->tmp.finish_md_len
 
-#define MATLS_M_LENGTH (MATLS_VERSION_LENGTH + MATLS_CIPHERSUITE_LENGTH + MATLS_TRANSCRIPT_LENGTH)
+#define MATLS_M_LENGTH (1 + MATLS_VERSION_LENGTH + MATLS_CIPHERSUITE_LENGTH + MATLS_TRANSCRIPT_LENGTH)
 #define MATLS_H_LENGTH 32
 
 int idx;
@@ -584,7 +584,7 @@ int matls_send_extended_finished(SSL *s)
     {
       printf("waiting for extended finished message from the server-side entity\n");
       while(!(s->pair->extended_finished_msg)) { printf(""); }
-      printf("get the message from the server-side entity: %d\n", s->pair->extended_finished_msg_len);
+      printf("get the message from the server-side entity\n");
       tmp = (unsigned char *)malloc(s->pair->extended_finished_msg_len);
       memcpy(tmp, s->pair->extended_finished_msg, s->pair->extended_finished_msg_len);
       num_msg = *tmp;
@@ -620,6 +620,9 @@ int matls_send_extended_finished(SSL *s)
       pp += MATLS_H_LENGTH;
 	  PRINTK("Received hash", pp, MATLS_H_LENGTH);
     }
+
+    /* length of MATLS_M_LENGTH */
+    parameters[poff++] = MATLS_M_LENGTH;
 
 		/* version (2) */
     parameters[poff++] = s->version >> 8;

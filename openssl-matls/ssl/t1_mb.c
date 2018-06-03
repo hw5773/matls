@@ -423,6 +423,7 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
 	BN_CTX *ctx;
 	unsigned char *pub_str;
 	int i, pub_length, plen, ext_len;
+  struct keypair *keypair;
 
   switch(group_id)
   {
@@ -437,7 +438,29 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
   ctx = BN_CTX_new();
 
   if (p) {
+    MA_LOG1p("s->lock", s->lock);
+    while (*(s->lock)) { printf(""); }
+    *(s->lock) = 1;
+    if (!(s->mb_info.keypair))
+    {
+      if (s->pair && s->pair->mb_info.keypair)
+        s->mb_info.keypair = s->pair->mb_info.keypair;
+      else
+      {
+        MA_LOG("before keypair");
+        make_keypair(&keypair, group, ctx);
+        MA_LOG("after keypair");
+        s->mb_info.keypair = keypair;
+        if (s->pair)
+          s->pair->mb_info.keypair = keypair;
+      }
+    }
+    *(s->lock) = 0;
+    MA_LOG1d("lock value", *(s->lock));
+
+    MA_LOG1p("keypair->pub", s->mb_info.keypair->pub);
     pub_to_char(s->mb_info.keypair->pub, &pub_str, &pub_length, group, ctx);
+    MA_LOG1d("the length of public key", pub_length);
 
     if (s->middlebox)
     {
@@ -525,17 +548,17 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
         while (!s->mb_info.secret[i]) { printf(""); }
         memcpy(tmp, s->mb_info.secret[i], SECRET_LENGTH);
 
-        t1_prf(TLS_MD_GLOBAL_MAC_KEY_CONST, TLS_MD_GLOBAL_MAC_KEY_CONST_SIZE,
+        t1_prf(TLS_MD_ACCOUNTABILITY_KEY_CONST, TLS_MD_ACCOUNTABILITY_KEY_CONST_SIZE,
                 s->mb_info.random[SERVER], s->mb_info.key_length[SERVER],
                 s->mb_info.random[CLIENT], s->mb_info.key_length[CLIENT],
                 NULL, 0, NULL, 0,
                 s->mb_info.secret[i], SECRET_LENGTH,
-                s->mb_info.mac_array[i], SSL_MAX_GLOBAL_MAC_KEY_LENGTH); //LENGTH: 32
+                s->mb_info.mac_array[i], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH); //LENGTH: 32
 
         PRINTK("Server Random", s->mb_info.random[SERVER], s->mb_info.key_length[SERVER]);
         PRINTK("Client Random", s->mb_info.random[CLIENT], s->mb_info.key_length[CLIENT]);
         PRINTK("Secret", tmp, SECRET_LENGTH);
-        PRINTK("Global MAC", s->mb_info.mac_array[i], SSL_MAX_GLOBAL_MAC_KEY_LENGTH);
+        PRINTK("Global MAC", s->mb_info.mac_array[i], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
       }
     }
     else
@@ -544,17 +567,17 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
       {
         memcpy(tmp, s->mb_info.secret[i], SECRET_LENGTH);
 
-        t1_prf(TLS_MD_GLOBAL_MAC_KEY_CONST, TLS_MD_GLOBAL_MAC_KEY_CONST_SIZE,
+        t1_prf(TLS_MD_ACCOUNTABILITY_KEY_CONST, TLS_MD_ACCOUNTABILITY_KEY_CONST_SIZE,
                 pub_str, pub_length,
                 s->mb_info.random[CLIENT], s->mb_info.key_length[CLIENT],
                 NULL, 0, NULL, 0,
                 s->mb_info.secret[i], SECRET_LENGTH,
-                s->mb_info.mac_array[i], SSL_MAX_GLOBAL_MAC_KEY_LENGTH); //LENGTH: 32
+                s->mb_info.mac_array[i], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH); //LENGTH: 32
 
         PRINTK("Server Random", pub_str, pub_length);
         PRINTK("Client Random", s->mb_info.random[CLIENT], s->mb_info.key_length[CLIENT]);
         PRINTK("Secret", tmp, SECRET_LENGTH);
-        PRINTK("Global MAC", s->mb_info.mac_array[i], SSL_MAX_GLOBAL_MAC_KEY_LENGTH);
+        PRINTK("Global MAC", s->mb_info.mac_array[i], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
       }
     }
   }

@@ -315,6 +315,7 @@ int ssl3_send_finished(SSL *s, int a, int b, const char *sender, int slen)
 			return 0;
 		s->s3->tmp.finish_md_len = i;
 		memcpy(p, s->s3->tmp.finish_md, i);
+		PRINTK("verify data", s->s3->tmp.finish_md, i);
 		p+=i;
 		l=i;
 
@@ -601,6 +602,7 @@ int matls_send_extended_finished(SSL *s)
     {
       mlen = 0; slen = 0;
       plen = MATLS_M_LENGTH;
+      printf("mlen: %d, slen: %d, plen: %d\n", mlen, slen, plen);
     }
 
 		msg = (unsigned char *)malloc(plen); //mac, version, cipher, ti
@@ -839,6 +841,7 @@ int matls_get_extended_finished(SSL *s)
   s->extended_finished_msg = (unsigned char *)malloc(n);
   memcpy(s->extended_finished_msg, p, n);
   s->extended_finished_msg_len = n;
+  printf("Length of extended finished message: %d\n", n);
 
 	return(1);
 }

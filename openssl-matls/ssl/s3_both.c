@@ -584,7 +584,7 @@ int matls_send_extended_finished(SSL *s)
     {
       printf("waiting for extended finished message from the server-side entity\n");
       while(!(s->pair->extended_finished_msg)) { printf(""); }
-      printf("get the message from the server-side entity\n");
+      printf("get the message from the server-side entity: %d\n", s->pair->extended_finished_msg_len);
       tmp = (unsigned char *)malloc(s->pair->extended_finished_msg_len);
       memcpy(tmp, s->pair->extended_finished_msg, s->pair->extended_finished_msg_len);
       num_msg = *tmp;

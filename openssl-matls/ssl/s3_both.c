@@ -640,7 +640,7 @@ int matls_send_extended_finished(SSL *s)
 		PRINTK("version and ciphersuite", parameters, poff);
 
 		/* ti (12) */
-		memcpy(parameters + poff, s->s3->previous_client_finished, MATLS_TRANSCRIPT_LENGTH);
+		memcpy(parameters + poff, s->s3->tmp.finish_md, MATLS_TRANSCRIPT_LENGTH);
 		poff += MATLS_TRANSCRIPT_LENGTH;
 //		l = MATLS_TRANSCRIPT_LENGTH; // length of verify_data
 
@@ -694,12 +694,12 @@ int matls_send_extended_finished(SSL *s)
       p += MATLS_CIPHERSUITE_LENGTH;
 
 		  /* ti (12) */
-		  memcpy(p, s->pair->s3->tmp.finish_md, s->pair->s3->tmp.finish_md_len);
-		  p += s->pair->s3->tmp.finish_md_len;
+		  memcpy(p, s->pair->s3->tmp.peer_finish_md, s->pair->s3->tmp.peer_finish_md_len);
+		  p += s->pair->s3->tmp.peer_finish_md_len;
 
       l += (MATLS_M_PAIR_LENGTH + mlen + 1);
 
-      PRINTK("Pair Finished", s->pair->s3->tmp.finish_md, s->pair->s3->tmp.finish_md_len);
+      PRINTK("Pair Finished", s->pair->s3->tmp.peer_finish_md, s->pair->s3->tmp.peer_finish_md_len);
       PRINTK("Appended parameters", tmp1, MATLS_M_PAIR_LENGTH + 1);
     }
 

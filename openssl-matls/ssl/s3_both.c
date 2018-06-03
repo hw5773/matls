@@ -133,6 +133,7 @@
 #define MATLS_TRANSCRIPT_LENGTH s->s3->tmp.finish_md_len
 
 #define MATLS_M_LENGTH (MATLS_VERSION_LENGTH + MATLS_CIPHERSUITE_LENGTH + MATLS_TRANSCRIPT_LENGTH)
+#define MATLS_M_PAIR_LENGTH (MATLS_VERSION_LENGTH + MATLS_CIPHERSUITE_LENGTH + s->pair->s3->tmp.finish_md_len)
 #define MATLS_H_LENGTH 32
 
 int idx;
@@ -630,16 +631,16 @@ int matls_send_extended_finished(SSL *s)
     }
 
 		/* version (2) */
-    parameters[poff++] = s->pair->version >> 8;
-    parameters[poff++] = s->pair->version & 0xff;
+    parameters[poff++] = s->version >> 8;
+    parameters[poff++] = s->version & 0xff;
 
 		/* ciphersuit (2) */
-		j = ssl3_put_cipher_by_char(s->pair->s3->tmp.new_cipher, &(parameters[poff]));
+		j = ssl3_put_cipher_by_char(s->s3->tmp.new_cipher, &(parameters[poff]));
     poff += MATLS_CIPHERSUITE_LENGTH;
 		PRINTK("version and ciphersuite", parameters, poff);
 
 		/* ti (12) */
-		memcpy(parameters + poff, s->pair->s3->tmp.finish_md, MATLS_TRANSCRIPT_LENGTH);
+		memcpy(parameters + poff, s->s3->tmp.finish_md, MATLS_TRANSCRIPT_LENGTH);
 		poff += MATLS_TRANSCRIPT_LENGTH;
 //		l = MATLS_TRANSCRIPT_LENGTH; // length of verify_data
 
@@ -682,11 +683,20 @@ int matls_send_extended_finished(SSL *s)
     {
       memcpy(p, tmp1, mlen);
       p += mlen;
-      *(p++) = MATLS_M_LENGTH;
-      memcpy(p, parameters, MATLS_M_LENGTH);
-      p += MATLS_M_LENGTH;
+      *(p++) = MATLS_M_PAIR_LENGTH;
 
-      l += (MATLS_M_LENGTH + mlen + 1);
+		  /* version (2) */
+      *(p++) = s->version >> 8;
+      *(p++) = s->version & 0xff;
+
+		  /* ciphersuit (2) */
+		  j = ssl3_put_cipher_by_char(s->pair->s3->tmp.new_cipher, p);
+
+		  /* ti (12) */
+		  memcpy(p, s->pair->s3->tmp.finish_md, s->pair->s3->tmp.finish_md_len);
+		  p += s->pair->s3->tmp.finish_md_len;
+
+      l += (MATLS_M_PAIR_LENGTH + mlen + 1);
     }
 
 		/* put hashed msg */

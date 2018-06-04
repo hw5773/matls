@@ -268,10 +268,6 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
 
     MA_LOG1d("Length", len);
 
-    SSL_register_id(s);
-
-    MA_LOG2s("Register ID", s->id->data, s->id->length);
-
     if (s->middlebox)
     {
       MA_LOG("Copy this extension message to my SSL struct (not to pair)");
@@ -537,6 +533,9 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
       p += pub_length;
       *len = META_LENGTH + META_LENGTH + 1 + TYPE_LENGTH + META_LENGTH + pub_length;
 	  }
+
+    SSL_register_id(s);
+
     PRINTK("MB Pubkey", pub_str, pub_length);
     unsigned char *tmp = (unsigned char *)malloc(SECRET_LENGTH);
 

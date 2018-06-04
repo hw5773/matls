@@ -1265,7 +1265,7 @@ int SSL_register_id(SSL *s)
   CERT_PKEY *cpk;
   BUF_MEM *buf;
   buf = BUF_MEM_new();
-  unsigned long l = 7;
+  unsigned long l = 0;
   int i, no_chain;
 
   X509 *x;
@@ -1277,9 +1277,13 @@ int SSL_register_id(SSL *s)
     cpk = ssl_get_server_send_pkey(s);
 
     if (cpk)
+    {
       x = cpk->x509;
+    }
     else
+    {
       x = NULL;
+    }
 
     if ((s->mode & SSL_MODE_NO_AUTO_CHAIN) || s->ctx->extra_certs)
       no_chain = 1;
@@ -1330,10 +1334,6 @@ int SSL_register_id(SSL *s)
       if (!ssl3_add_cert_to_buf(buf, &l, x))
         return 0;
     }
-
-    s->id = buf;
-
-    PRINTK("Identifier after load", s->id->data, s->id->length);
   }
   return 1;
 }

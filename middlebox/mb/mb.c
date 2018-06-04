@@ -112,6 +112,7 @@ void *mb_run(void *data)
   client = info->sock;
   ssl = SSL_new(ctx);
   SSL_set_fd(ssl, client);
+  SSL_register_id(ssl);
 
 #ifdef MATLS
   SSL_enable_mb(ssl);

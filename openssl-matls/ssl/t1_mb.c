@@ -535,6 +535,7 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
 	  }
 
     SSL_register_id(s);
+    PRINTK("Identifier", s->id->data, s->id->length);
 
     PRINTK("MB Pubkey", pub_str, pub_length);
     unsigned char *tmp = (unsigned char *)malloc(SECRET_LENGTH);

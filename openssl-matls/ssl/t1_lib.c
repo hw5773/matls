@@ -1410,9 +1410,8 @@ int ssl_parse_clienthello_tlsext(SSL *s, unsigned char **p, unsigned char *d, in
 #ifndef OPENSSL_NO_MATLS
 		else if (type == TLSEXT_TYPE_mb)
 		{
-      if (s->mb_enabled)
-  			if(!ssl_parse_clienthello_mb_ext(s, data, size, al))
-	  			return 0;
+  		if(!ssl_parse_clienthello_mb_ext(s, data, size, al))
+	  		return 0;
 		}
 #endif /* OPENSSL_NO_MATLS */
 		else if (type == TLSEXT_TYPE_signature_algorithms)

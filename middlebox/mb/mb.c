@@ -18,7 +18,7 @@
 #define BUF_SIZE 1024
 
 int open_listener(int port);
-SSL_CTX* init_middlebox_ctx();
+SSL_CTX* init_middlebox_ctx(int server_side);
 void load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file);
 void print_pubkey(EVP_PKEY *pkey);
 BIO *bio_err;
@@ -33,11 +33,11 @@ struct info
 // Origin Server Implementation
 int main(int count, char *strings[])
 {  
-	int server, client, rc, tidx = 0, i;
+	int server, client, rc, tidx = 0, i, server_side;
 	char *portnum, *cert, *key, *forward_file;
   void *status;
 
-	if ( count != 5 )
+	if ( count != 6 )
 	{
 		printf("Usage: %s <portnum> <cert_file> <key_file> <forward_file>\n", strings[0]);
 		exit(0);
@@ -49,8 +49,9 @@ int main(int count, char *strings[])
 	cert = strings[2];
 	key = strings[3];
   forward_file = strings[4];
+  server_side = atoi(strings[5]);
 
-	ctx = init_middlebox_ctx();        /* initialize SSL */
+	ctx = init_middlebox_ctx(server_side);        /* initialize SSL */
 	load_certificates(ctx, cert, key);
   init_forward_table(forward_file);
   init_thread_config();
@@ -254,7 +255,7 @@ void apps_ssl_info_callback(const SSL *s, int where, int ret)
 	}
 }
 
-SSL_CTX* init_middlebox_ctx()
+SSL_CTX* init_middlebox_ctx(int server_side)
 {   
 	SSL_METHOD *method;
 
@@ -271,8 +272,13 @@ SSL_CTX* init_middlebox_ctx()
 	//SSL_CTX_set_msg_callback(ctx, msg_callback);
   SSL_CTX_set_sni_callback(ctx, sni_callback);
   printf("set info callback, msg callback, sni callback complete\n");
-  ctx->middlebox = 1;
-  //SSL_CTX_is_middlebox(ctx);
+
+  SSL_CTX_is_middlebox(ctx);
+
+  if (server_side)
+    SSL_CTX_set_server_side(ctx);
+  else
+    SSL_CTX_set_client_side(ctx);
 
 	return ctx;
 }

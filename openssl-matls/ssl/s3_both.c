@@ -741,6 +741,7 @@ int matls_send_extended_finished(SSL *s)
 	/* SSL3_ST_SEND_xxxxxx_HELLO_B */
 	return(ssl3_do_write(s,SSL3_RT_HANDSHAKE));
 }
+
 #endif /* OPENSSL_NO_MATLS */
 
 #ifndef OPENSSL_NO_NEXTPROTONEG
@@ -1258,6 +1259,85 @@ unsigned long matls_output_cert_chain(SSL *s, X509 *x)
 
 	return(l);
 }
+
+int SSL_register_id(SSL *s)
+{
+  CERT_PKEY *cpk;
+  BUF_MEM *buf;
+  buf = BUF_MEM_new();
+  unsigned long l = 7;
+  int i, no_chain;
+
+  X509 *x;
+  STACK_OF(X509) *extra_certs;
+  X509_STORE *chain_store;
+
+  if (s->cert)
+  {
+    cpk = ssl_get_server_send_pkey(s);
+
+    if (cpk)
+      x = cpk->x509;
+    else
+      x = NULL;
+
+    if ((s->mode & SSL_MODE_NO_AUTO_CHAIN) || s->ctx->extra_certs)
+      no_chain = 1;
+    else
+      no_chain = 0;
+
+    if (!BUF_MEM_grow_clean(buf, 10))
+    {
+      SSLerr(SSL_F_SSL3_OUTPUT_CERT_CHAIN, ERR_R_BUF_LIB);
+      return 0;
+    }
+
+    if (x != NULL)
+    {
+      if (no_chain)
+      {
+        if (!ssl3_add_cert_to_buf(buf, &l, x))
+          return 0;
+      }
+      else
+      {
+        X509_STORE_CTX xs_ctx;
+
+        if (!X509_STORE_CTX_init(&xs_ctx, s->ctx->cert_store, x, NULL))
+        {
+          SSLerr(SSL_F_SSL3_OUTPUT_CERT_CHAIN, ERR_R_X509_LIB);
+          return 0;
+        }
+        X509_verify_cert(&xs_ctx);
+        ERR_clear_error();
+        for (i=0; i<sk_X509_num(xs_ctx.chain); i++)
+        {
+          x = sk_X509_value(xs_ctx.chain, i);
+
+          if (!ssl3_add_cert_to_buf(buf, &l, x))
+          {
+            X509_STORE_CTX_cleanup(&xs_ctx);
+            return 0;
+          }
+        }
+        X509_STORE_CTX_cleanup(&xs_ctx);
+      }
+    }
+
+    for (i=0; i<sk_X509_num(extra_certs); i++)
+    {
+      x = sk_X509_value(extra_certs, i);
+      if (!ssl3_add_cert_to_buf(buf, &l, x))
+        return 0;
+    }
+
+    s->id = buf;
+
+    PRINTK("Identifier after load", s->id->data, s->id->length);
+  }
+  return 1;
+}
+
 #endif /* OPENSSL_NO_MATLS */
 
 /* Obtain handshake message of message type 'mt' (any if mt == -1),

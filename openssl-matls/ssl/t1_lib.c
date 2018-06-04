@@ -800,7 +800,7 @@ unsigned char *ssl_add_serverhello_tlsext(SSL *s, unsigned char *buf, unsigned c
 #endif /* OPENSSL_NO_TTPA */
 
 #ifndef OPENSSL_NO_MATLS
-	if (s->mb_enabled)
+	if (s->mb_enabled && s->matls_received)
 	{
 #ifdef MB_DEBUG
 		printf("[MB] Add TLS extension for middlebox start\n");

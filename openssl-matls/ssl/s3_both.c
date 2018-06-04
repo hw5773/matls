@@ -1334,7 +1334,10 @@ int SSL_register_id(SSL *s)
       if (!ssl3_add_cert_to_buf(buf, &l, x))
         return 0;
     }
+
+    s->id = buf;
   }
+  
   return 1;
 }
 

@@ -453,7 +453,7 @@ unsigned char *ssl_add_clienthello_tlsext(SSL *s, unsigned char *buf, unsigned c
 #endif /* OPENSSL_NO_TTPA */
 
 #ifndef OPENSSL_NO_MATLS
-		if (s->mb_enabled && s->matls_received)
+		if (s->mb_enabled)
 		{
 			int el;
       unsigned char *tmp;

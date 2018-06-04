@@ -220,7 +220,10 @@ extern "C" {
 #define SSL_MIN_RSA_MODULUS_LENGTH_IN_BYTES	(512/8)
 #define SSL_MAX_KEY_ARG_LENGTH			8
 #define SSL_MAX_MASTER_KEY_LENGTH		48
-#define SSL_MAX_GLOBAL_MAC_KEY_LENGTH        48
+#define SSL_MAX_GLOBAL_MAC_KEY_LENGTH        32
+#ifndef OPENSSL_NO_MATLS
+#define SSL_MAX_ACCOUNTABILITY_KEY_LENGTH        32
+#endif /* OPENSSL_NO_MATLS */
 
 
 /* These are used to specify which ciphers to use and not to use */
@@ -802,10 +805,12 @@ struct keypair
 struct mb_st {
     int group_id;
     int num_keys;
-    int **key_length; //ECDH key length
+    int *key_length; //ECDH key length
     unsigned char **mac_array;
     unsigned char **secret;
     struct keypair *keypair;
+    unsigned char lock;
+    unsigned char *random[2];
 } mb_info;
 
 #endif /* OPENSSL_NO_MATLS */
@@ -1041,6 +1046,9 @@ struct ssl_ctx_st
 
 #ifndef OPENSSL_NO_MATLS
     int middlebox; // if 1, this is a middlebox
+	int server_side;
+	int proof_length;
+	unsigned char *proof;
 	unsigned char mb_enabled;
     struct mb_st mb_info;
 #endif /* OPENSSL_NO_MATLS */
@@ -1437,23 +1445,28 @@ struct ssl_st
 #endif /* OPENSSL_NO_TTPA */
 
 #ifndef OPENSSL_NO_MATLS
-    int middlebox;
-	unsigned char mb_enabled;
-    struct mb_st mb_info;
+  int middlebox;
+  int server_side;
+  unsigned char mb_enabled;
+  unsigned char *proof;
+  int proof_length;
+  struct mb_st mb_info;
 
-    unsigned char *extension_from_clnt_msg;
-    unsigned char *extension_from_srvr_msg;
-    unsigned char *cert_msg;
-    unsigned char *extended_finished_msg;
+  volatile unsigned char *extension_from_clnt_msg;
+  volatile unsigned char *extension_from_srvr_msg;
+  volatile unsigned char *cert_msg;
+  volatile unsigned char *extended_finished_msg;
 
-    int extension_from_clnt_msg_len;
-    int extension_from_srvr_msg_len;
-    int cert_msg_len;
-    int extended_finished_msg_len;
+  volatile int extension_from_clnt_msg_len;
+  volatile int extension_from_srvr_msg_len;
+  volatile int cert_msg_len;
+  volatile int extended_finished_msg_len;
+
+  volatile int *lock;
 #endif /* OPENSSL_NO_MATLS */
 
 #ifndef OPENSSL_NO_SPLIT_TLS
-    SSL *pair;
+  SSL *pair;
 #endif /* OPENSSL_NO_SPLIT_TLS */
 	};
 
@@ -2021,9 +2034,16 @@ int SSL_shutdown(SSL *s);
 void SSL_is_middlebox(SSL *s);
 int SSL_enable_mb(SSL *s);
 int SSL_disable_mb(SSL *s);
+int SSL_set_server_side(SSL *s);
+int SSL_set_client_side(SSL *s);
+int SSL_use_proof_file(SSL *s, const char *file);
+
 void SSL_CTX_is_middlebox(SSL_CTX *ctx);
 int SSL_CTX_enable_mb(SSL_CTX *ctx);
 int SSL_CTX_disable_mb(SSL_CTX *ctx);
+int SSL_CTX_set_server_side(SSL_CTX *ctx);
+int SSL_CTX_set_client_side(SSL_CTX *ctx);
+int SSL_CTX_use_proof_file(SSL_CTX *ctx, const char *file);
 #endif /* OPENSSL_NO_MATLS */
 
 const SSL_METHOD *SSL_get_ssl_method(SSL *s);
@@ -2344,6 +2364,8 @@ void ERR_load_SSL_strings(void);
 #define SSL_F_SSL_PARSE_CLIENTHELLO_MB_EXT      702
 #define SSL_F_SSL_ADD_SERVERHELLO_MB_EXT        703
 #define SSL_F_SSL_PARSE_SERVERHELLO_MB_EXT      704
+#define SSL_F_SSL_USE_PROOF_FILE				705
+#define SSL_F_SSL_CTX_USE_PROOF_FILE			706
 #endif /* OPENSSL_NO_MATLS */
 
 #define SSL_F_SSL_CTX_CHECK_PRIVATE_KEY			 168

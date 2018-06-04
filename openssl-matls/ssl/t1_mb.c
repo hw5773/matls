@@ -267,6 +267,11 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
     }
 
     MA_LOG1d("Length", len);
+
+    SSL_register_id(s);
+
+    MA_LOG2s("Register ID", s->id->data, s->id->length);
+
     if (s->middlebox)
     {
       MA_LOG("Copy this extension message to my SSL struct (not to pair)");

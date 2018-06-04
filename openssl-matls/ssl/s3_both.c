@@ -1272,8 +1272,7 @@ int SSL_register_id(SSL *s)
   STACK_OF(X509) *extra_certs;
   X509_STORE *chain_store;
 
-  s->id = BUF_MEM_new();
-  buf = s->id;
+  buf = BUF_MEM_new();
 
   if (s->cert)
   {
@@ -1337,6 +1336,8 @@ int SSL_register_id(SSL *s)
       if (!ssl3_add_cert_to_buf(buf, &l, x))
         return 0;
     }
+
+    digest_message(buf->data, buf->length, &(s->id), &(s->id_length));
   }
   
   return 1;

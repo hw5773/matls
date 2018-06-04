@@ -1450,7 +1450,10 @@ struct ssl_st
   int server_side;
   unsigned char mb_enabled;
   unsigned char matls_received;
-  BUF_MEM *id;
+
+  unsigned char *id;
+  int id_length;
+
   unsigned char *proof;
   int proof_length;
   struct mb_st mb_info;

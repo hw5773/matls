@@ -11,6 +11,7 @@
 #include <sys/time.h>
 #include <sys/socket.h>
 #include "mssl.h"
+#include "table.h"
 #include "../common/logs.h"
 
 #define FAIL    -1
@@ -124,7 +125,7 @@ void *mb_run(void *data)
     MA_LOG("complete handshake");
   MA_LOG1d("end matls handshake", ret);
 
-  while (!(SSL_is_init_finished(ssl) && SSL_is_init_finished(ssl->pair))) {}
+  while (!(ssl->pair && SSL_is_init_finished(ssl) && SSL_is_init_finished(ssl->pair))) {}
 
   while (1)
   {

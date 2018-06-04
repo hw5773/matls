@@ -1449,6 +1449,7 @@ struct ssl_st
   int middlebox;
   int server_side;
   unsigned char mb_enabled;
+  unsigned char matls_received;
   BUF_MEM *id;
   unsigned char *proof;
   int proof_length;

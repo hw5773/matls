@@ -344,6 +344,8 @@ SSL *SSL_new(SSL_CTX *ctx)
 	if (ctx->mb_enabled)
 		s->mb_enabled = 1;
 
+  s->matls_received = 0;
+
   if (ctx->middlebox)
     s->middlebox = 1;
 
@@ -2452,7 +2454,7 @@ CERT_PKEY *ssl_get_server_send_pkey(const SSL *s)
 
 	c=s->cert;
 	ssl_set_cert_masks(c, s->s3->tmp.new_cipher);
-	
+
 	alg_k = s->s3->tmp.new_cipher->algorithm_mkey;
 	alg_a = s->s3->tmp.new_cipher->algorithm_auth;
 

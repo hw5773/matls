@@ -453,7 +453,7 @@ unsigned char *ssl_add_clienthello_tlsext(SSL *s, unsigned char *buf, unsigned c
 #endif /* OPENSSL_NO_TTPA */
 
 #ifndef OPENSSL_NO_MATLS
-		if (s->mb_enabled)
+		if (s->mb_enabled && s->matls_received)
 		{
 			int el;
       unsigned char *tmp;
@@ -1410,6 +1410,7 @@ int ssl_parse_clienthello_tlsext(SSL *s, unsigned char **p, unsigned char *d, in
 #ifndef OPENSSL_NO_MATLS
 		else if (type == TLSEXT_TYPE_mb)
 		{
+      s->matls_received = 1;
       if (s->mb_enabled)
   		  if(!ssl_parse_clienthello_mb_ext(s, data, size, al))
 	  		  return 0;

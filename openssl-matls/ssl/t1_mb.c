@@ -612,11 +612,9 @@ int ssl_parse_serverhello_mb_ext(SSL *s, unsigned char *d, int size, int *al)
   }
 
   keypair = s->pair->mb_info.keypair;
-  MA_LOG1d("Parse serverhello matls", size);
-  s->extension_from_srvr_msg = (unsigned char *)malloc(size);
-  memcpy(s->extension_from_srvr_msg, d, size);
-  s->extension_from_srvr_msg_len = size;
-  MA_LOG("after memcpy");
+//  s->extension_from_srvr_msg = (unsigned char *)malloc(size);
+//  memcpy(s->extension_from_srvr_msg, d, size);
+//  s->extension_from_srvr_msg_len = size;
 
   p = d;
   n2s(p, ext_len);
@@ -663,6 +661,10 @@ int ssl_parse_serverhello_mb_ext(SSL *s, unsigned char *d, int size, int *al)
   secret_str = (unsigned char *)malloc((klen-1)/2);
   BN_bn2bin(x, secret_str);
   s->pair->mb_info.secret[SERVER] = secret_str;
+
+  s->extension_from_srvr_msg = (unsigned char *)malloc(size);
+  memcpy(s->extension_from_srvr_msg, d, size);
+  s->extension_from_srvr_msg_len = size;
 
   free(peer_str);
   EC_POINT_free(secret);

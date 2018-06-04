@@ -1264,13 +1264,16 @@ int SSL_register_id(SSL *s)
 {
   CERT_PKEY *cpk;
   BUF_MEM *buf;
-  buf = BUF_MEM_new();
+
   unsigned long l = 0;
   int i, no_chain;
 
   X509 *x;
   STACK_OF(X509) *extra_certs;
   X509_STORE *chain_store;
+
+  s->id = BUF_MEM_new();
+  buf = s->id;
 
   if (s->cert)
   {
@@ -1334,8 +1337,6 @@ int SSL_register_id(SSL *s)
       if (!ssl3_add_cert_to_buf(buf, &l, x))
         return 0;
     }
-
-    s->id = buf;
   }
   
   return 1;

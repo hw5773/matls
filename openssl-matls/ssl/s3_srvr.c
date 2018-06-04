@@ -415,7 +415,7 @@ int ssl3_accept(SSL *s)
 				&& !(s->s3->tmp.new_cipher->algorithm_mkey & SSL_kPSK))
 				{
 #ifndef OPENSSL_NO_MATLS
-                if (s->mb_enabled)
+                if (s->mb_enabled && s->matls_received)
                 {
                   printf("[matls] invoke matls send server certificate\n");
                   ret = matls_send_server_certificate(s);
@@ -794,7 +794,7 @@ int ssl3_accept(SSL *s)
 			else
 #ifndef OPENSSL_NO_MATLS
       {
-        if (s->mb_enabled)
+        if (s->mb_enabled && s->matls_received)
         {
           s->s3->tmp.next_state = SSL3_ST_SW_EXTENDED_FINISHED_A;
         }

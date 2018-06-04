@@ -43,7 +43,9 @@ void ssl_client_init(struct ssl_client *p)
   p->rbio = BIO_new(BIO_s_mem());
   p->wbio = BIO_new(BIO_s_mem());
 
+  printf("here 1\n");
   p->ssl = SSL_new(ctx);
+  printf("here 2\n");
   p->ssl->lock = (int *)calloc(1, sizeof(int));
 
   SSL_set_accept_state(p->ssl); /* sets ssl to work in server mode. */
@@ -226,6 +228,7 @@ int do_sock_write()
 
 void sni_callback(unsigned char *buf, int len, SSL *ssl)
 {
+  printf("sni_callback\n");
   int index, ilen, port, rc, tidx;
   unsigned char *ip; 
   void *status;

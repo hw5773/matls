@@ -1045,12 +1045,13 @@ struct ssl_ctx_st
 #endif
 
 #ifndef OPENSSL_NO_MATLS
-    int middlebox; // if 1, this is a middlebox
-	int server_side;
+  int middlebox; // if 1, this is a middlebox
+	int server_side;	
+  BUF_MEM *id;
+  unsigned char *proof;
 	int proof_length;
-	unsigned char *proof;
 	unsigned char mb_enabled;
-    struct mb_st mb_info;
+  struct mb_st mb_info;
 #endif /* OPENSSL_NO_MATLS */
 	};
 
@@ -1448,6 +1449,7 @@ struct ssl_st
   int middlebox;
   int server_side;
   unsigned char mb_enabled;
+  BUF_MEM *id;
   unsigned char *proof;
   int proof_length;
   struct mb_st mb_info;
@@ -2036,6 +2038,7 @@ int SSL_enable_mb(SSL *s);
 int SSL_disable_mb(SSL *s);
 int SSL_set_server_side(SSL *s);
 int SSL_set_client_side(SSL *s);
+int SSL_register_id(SSL *s);
 int SSL_use_proof_file(SSL *s, const char *file);
 
 void SSL_CTX_is_middlebox(SSL_CTX *ctx);
@@ -2043,6 +2046,7 @@ int SSL_CTX_enable_mb(SSL_CTX *ctx);
 int SSL_CTX_disable_mb(SSL_CTX *ctx);
 int SSL_CTX_set_server_side(SSL_CTX *ctx);
 int SSL_CTX_set_client_side(SSL_CTX *ctx);
+int SSL_CTX_register_id(SSL_CTX *ctx);
 int SSL_CTX_use_proof_file(SSL_CTX *ctx, const char *file);
 #endif /* OPENSSL_NO_MATLS */
 

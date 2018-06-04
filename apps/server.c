@@ -65,11 +65,11 @@ int main(int count, char *strings[])
 	while ((client = accept(server, (struct sockaddr *)&addr, &len)))
 	{
 		ssl = SSL_new(ctx);/* get new SSL state with context */
-		SSL_set_msg_callback(ssl, msg_callback);
+		SSL_register_id(ssl);
 		BIO_printf(outbio, "SSL_new() Success\n");
 		SSL_set_fd(ssl, client);      /* set connection socket to SSL state */
 		BIO_printf(outbio, "SSL_set_fd() Success\n");
-		//SSL_enable_mb(ssl);
+		SSL_enable_mb(ssl);
 
 		unsigned long hs_start, hs_end;
 		BIO_printf(outbio, "PROGRESS: TLS Handshake Start\n");
@@ -188,7 +188,7 @@ SSL_CTX* init_server_CTX(BIO *outbio)
 		abort();
 	}
 
-	SSL_CTX_set_info_callback(ctx, apps_ssl_info_callback);
+//	SSL_CTX_set_info_callback(ctx, apps_ssl_info_callback);
 	SSL_CTX_set_msg_callback(ctx, msg_callback);
 
 	return ctx;

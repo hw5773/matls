@@ -534,7 +534,9 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
       *len = META_LENGTH + META_LENGTH + 1 + TYPE_LENGTH + META_LENGTH + pub_length;
 	  }
 
+    MA_LOG("Before register ID");
     SSL_register_id(s);
+    MA_LOG("After register ID");
     PRINTK("Identifier", s->id->data, s->id->length);
 
     PRINTK("MB Pubkey", pub_str, pub_length);

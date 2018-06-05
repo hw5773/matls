@@ -4276,17 +4276,17 @@ int ssl3_write(SSL *s, const void *buf, int len)
         p = mr;
         s2n(mrlen, p);
         printf("1\n");
-        digest_message(buf, len, &hash, &hlen);
-        printf("2\n");
+        digest_message((unsigned char *)buf, len, &hash, &hlen);
+        printf("2: %d\n", hlen);
         memcpy(p, s->id, s->id_length);
         printf("3\n");
         p += s->id_length;
         printf("4\n");
         memcpy(p, hash, hlen);
         printf("5\n");
-        memmove(buf, (unsigned char *)buf + 2 + mrlen, len);
+        memmove((unsigned char *)buf, (unsigned char *)buf + 2 + mrlen, len);
         printf("6\n");
-        memcpy(buf, mr, mrlen + 2);
+        memcpy((unsigned char *)buf, mr, mrlen + 2);
         printf("7\n");
         len += (2 + mrlen);
       }

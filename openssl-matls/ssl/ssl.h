@@ -220,9 +220,9 @@ extern "C" {
 #define SSL_MIN_RSA_MODULUS_LENGTH_IN_BYTES	(512/8)
 #define SSL_MAX_KEY_ARG_LENGTH			8
 #define SSL_MAX_MASTER_KEY_LENGTH		48
-#define SSL_MAX_GLOBAL_MAC_KEY_LENGTH        32
+
 #ifndef OPENSSL_NO_MATLS
-#define SSL_MAX_ACCOUNTABILITY_KEY_LENGTH        32
+#include "matls.h"
 #endif /* OPENSSL_NO_MATLS */
 
 
@@ -1047,11 +1047,15 @@ struct ssl_ctx_st
 #ifndef OPENSSL_NO_MATLS
   int middlebox; // if 1, this is a middlebox
 	int server_side;	
-  BUF_MEM *id;
   unsigned char *proof;
-	int proof_length;
+  int proof_length;
+
+  unsigned char *id;
+  int id_length;
+
 	unsigned char mb_enabled;
   struct mb_st mb_info;
+  X509 *x509;
 #endif /* OPENSSL_NO_MATLS */
 	};
 
@@ -1448,6 +1452,7 @@ struct ssl_st
 #ifndef OPENSSL_NO_MATLS
   int middlebox;
   int server_side;
+  X509 *x509;
   unsigned char mb_enabled;
   unsigned char matls_received;
 
@@ -1469,6 +1474,8 @@ struct ssl_st
   volatile int extended_finished_msg_len;
 
   volatile int *lock;
+
+  unsigned char phash[TLS_MD_HASH_SIZE];
 #endif /* OPENSSL_NO_MATLS */
 
 #ifndef OPENSSL_NO_SPLIT_TLS
@@ -2052,6 +2059,8 @@ int SSL_CTX_set_server_side(SSL_CTX *ctx);
 int SSL_CTX_set_client_side(SSL_CTX *ctx);
 int SSL_CTX_register_id(SSL_CTX *ctx);
 int SSL_CTX_use_proof_file(SSL_CTX *ctx, const char *file);
+
+int digest_message(unsigned char *message, size_t message_len, unsigned char **digest, unsigned int *digest_len);
 #endif /* OPENSSL_NO_MATLS */
 
 const SSL_METHOD *SSL_get_ssl_method(SSL *s);

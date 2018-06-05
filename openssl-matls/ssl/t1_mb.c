@@ -23,24 +23,6 @@
 #include <openssl/sha.h>
 #include <openssl/bn.h>
 
-#define SSL_CURVE_SECP256R1 23
-#define SECP256r1_PUBKEY_LENGTH    64;
-#define SECRET_LENGTH 32
-#define CLIENT 0
-#define SERVER 1
-
-int idx;
-
-#define PRINTK(msg, arg1, arg2) \
-  fprintf(stderr, "[matls] %s: %s (%d bytes) \n", __func__, msg, arg2); \
-  for (idx=0;idx<arg2;idx++) \
-  { \
-    if (idx % 10 == 0) \
-      fprintf(stderr, "\n"); \
-    fprintf(stderr, "%02X ", arg1[idx]); \
-  } \
-  fprintf(stderr, "\n");
-
 int make_keypair(struct keypair **pair, EC_GROUP *group, BN_CTX *ctx) {
   MA_LOG("make keypair");
   BIGNUM *n = BN_new();
@@ -124,7 +106,6 @@ int pub_to_char(EC_POINT *secret, unsigned char **secret_str, int *slen, EC_GROU
 	
 	return 1;
 }
-
 
 int handle_parse_errors() {
     //SSLerr(SSL_F_SSL_PARSE_CLIENTHELLO_MB_EXT, SSL_R_MB_ENCODING_ERR);
@@ -318,7 +299,7 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
 
     for (i=0; i<nk; i++)
     {
-      s->mb_info.mac_array[i] = (unsigned char *)malloc(SSL_MAX_GLOBAL_MAC_KEY_LENGTH);
+      s->mb_info.mac_array[i] = (unsigned char *)malloc(SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
     }
     MA_LOG1d("Number of Keys (nk, revised?)", nk);
 
@@ -534,17 +515,11 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
       *len = META_LENGTH + META_LENGTH + 1 + TYPE_LENGTH + META_LENGTH + pub_length;
 	  }
 
-    MA_LOG("Before register ID");
-    SSL_register_id(s);
-    MA_LOG("After register ID");
-    PRINTK("Identifier", s->id, s->id_length);
-
     PRINTK("MB Pubkey", pub_str, pub_length);
     unsigned char *tmp = (unsigned char *)malloc(SECRET_LENGTH);
 
     if (s->middlebox)
     {
-      SSL *tssl;
       for (i=0; i<2; i++)
       {
         if (i==0)

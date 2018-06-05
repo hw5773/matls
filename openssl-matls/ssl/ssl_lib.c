@@ -350,14 +350,14 @@ SSL *SSL_new(SSL_CTX *ctx)
     s->middlebox = 1;
 
   if (ctx->server_side)
-	s->server_side = 1;
+	  s->server_side = 1;
   else
-	s->server_side = 0;
+	  s->server_side = 0;
 
   if (ctx->proof)
   {
-	memcpy(s->proof, ctx->proof, ctx->proof_length);
-	s->proof_length = ctx->proof_length;
+	  memcpy(s->proof, ctx->proof, ctx->proof_length);
+	  s->proof_length = ctx->proof_length;
   }
 
   s->lock = (int *)malloc(sizeof(int));
@@ -373,6 +373,14 @@ SSL *SSL_new(SSL_CTX *ctx)
   s->cert_msg = NULL;
   s->extended_finished_msg = NULL;
 
+  if (ctx->x509)
+    s->x509 = ctx->x509;
+
+  if (ctx->id)
+  {
+    s->id = ctx->id;
+    s->id_length = ctx->id_length;
+  }
 #endif /* OPENSSL_NO_MATLS */
 
 	s->read_ahead=ctx->read_ahead;

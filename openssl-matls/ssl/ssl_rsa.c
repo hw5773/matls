@@ -64,6 +64,17 @@
 #include <openssl/x509.h>
 #include <openssl/pem.h>
 
+int idx;
+#define PRINTK(msg, arg1, arg2) \
+  printf("[matls] %s: %s (%d bytes) ", __func__, msg, arg2); \
+  for (idx = 0; idx<arg2; idx++) \
+  {\
+    if (idx % 10 == 0) \
+      printf("\n"); \
+    printf("%02X ", arg1[idx]); \
+  }\
+  printf("\n");
+
 static int ssl_set_cert(CERT *c, X509 *x509);
 static int ssl_set_pkey(CERT *c, EVP_PKEY *pkey);
 int SSL_use_certificate(SSL *ssl, X509 *x)
@@ -122,6 +133,10 @@ int SSL_use_certificate_file(SSL *ssl, const char *file, int type)
 		SSLerr(SSL_F_SSL_USE_CERTIFICATE_FILE,j);
 		goto end;
 		}
+
+#ifndef OPENSSL_NO_MATLS
+  ssl->x509 = x;
+#endif /* OPENSSL_NO_MATLS */
 
 	ret=SSL_use_certificate(ssl,x);
 end:
@@ -439,7 +454,7 @@ int SSL_CTX_use_orig_certificate_file(SSL_CTX *ctx, const char *file, int type)
 int SSL_use_proof_file(SSL *s, const char *file)
 {
 #ifdef MB_DEBUG
-	printf("[DEBUG] %s:%s:%s: Load proof file\n", __FILE__, __func__, __LINE__);
+	printf("[DEBUG] %s:%s:%d: Load proof file\n", __FILE__, __func__, __LINE__);
 #endif
 	int offset = 0;
 	BIO *in;
@@ -470,10 +485,31 @@ end:
 	return 1;
 }
 
+int SSL_register_id(SSL *s)
+{
+  int klen;
+  unsigned char *key;
+  EVP_PKEY *pkey;
+
+  if (s->x509)
+  {
+    pkey = X509_get_pubkey(s->x509);
+    klen = i2d_PUBKEY(pkey, &key);
+
+    digest_message(key, klen, &(s->id), &(s->id_length));
+
+    PRINTK("Identifier in Function", s->id, s->id_length);
+
+    return 1;
+  }
+
+  return 0;
+}
+
 int SSL_CTX_use_proof_file(SSL_CTX *ctx, const char *file)
 {
 #ifdef MB_DEBUG
-	printf("[DEBUG] %s:%s:%s: Load proof file\n", __FILE__, __func__, __LINE__);
+	printf("[DEBUG] %s:%s:%d: Load proof file\n", __FILE__, __func__, __LINE__);
 #endif
 	int offset = 0;
 	BIO *in;
@@ -502,6 +538,27 @@ int SSL_CTX_use_proof_file(SSL_CTX *ctx, const char *file)
 end:
 	BIO_free(in);
 	return 1;
+}
+
+int SSL_CTX_register_id(SSL_CTX *ctx)
+{
+  int klen;
+  unsigned char *key;
+  EVP_PKEY *pkey;
+
+  if (ctx->x509)
+  {
+    pkey = X509_get_pubkey(ctx->x509);
+    klen = i2d_PUBKEY(pkey, &key);
+
+    digest_message(key, klen, &(ctx->id), &(ctx->id_length));
+
+    PRINTK("Identifier in Function", ctx->id, ctx->id_length);
+
+    return 1;
+  }
+
+  return 0;
 }
 #endif /* OPENSSL_NO_MATLS */
 
@@ -817,6 +874,10 @@ int SSL_CTX_use_certificate_file(SSL_CTX *ctx, const char *file, int type)
 		SSLerr(SSL_F_SSL_CTX_USE_CERTIFICATE_FILE,j);
 		goto end;
 		}
+
+#ifndef OPENSSL_NO_MATLS
+  ctx->x509 = x;
+#endif /* OPENSSL_NO_MATLS */
 
 	ret=SSL_CTX_use_certificate(ctx,x);
 end:

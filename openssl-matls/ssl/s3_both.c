@@ -1302,7 +1302,7 @@ int SSL_register_id(SSL *s)
     {
       if (no_chain)
       {
-        if (!ssl3_add_cert_to_buf(buf, &l, x))
+        if (ssl3_add_cert_to_buf(buf, &l, x))
           return 0;
       }
       else
@@ -1320,7 +1320,7 @@ int SSL_register_id(SSL *s)
         {
           x = sk_X509_value(xs_ctx.chain, i);
 
-          if (!ssl3_add_cert_to_buf(buf, &l, x))
+          if (ssl3_add_cert_to_buf(buf, &l, x))
           {
             X509_STORE_CTX_cleanup(&xs_ctx);
             return 0;
@@ -1333,7 +1333,7 @@ int SSL_register_id(SSL *s)
     for (i=0; i<sk_X509_num(extra_certs); i++)
     {
       x = sk_X509_value(extra_certs, i);
-      if (!ssl3_add_cert_to_buf(buf, &l, x))
+      if (ssl3_add_cert_to_buf(buf, &l, x))
         return 0;
     }
 

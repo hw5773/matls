@@ -549,8 +549,9 @@ int SSL_CTX_register_id(SSL_CTX *ctx)
   if (ctx->x509)
   {
     pkey = X509_get_pubkey(ctx->x509);
-    klen = i2d_PUBKEY(pkey, &key);
-
+    klen = i2d_PUBKEY(pkey, NULL);
+    key = (unsigned char *)malloc(klen);
+    i2d_PUBKEY(pkey, &key);
     digest_message(key, klen, &(ctx->id), &(ctx->id_length));
 
     PRINTK("Identifier in Function", ctx->id, ctx->id_length);

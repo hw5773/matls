@@ -4195,12 +4195,15 @@ int ssl3_shutdown(SSL *s)
 		return(0);
 	}
 
-int ssl3_write(SSL *s, const void *buf, int len)
+int ssl3_write(SSL *s, const void *b, int len)
 {
 	int ret, n, mrlen, hlen, hmlen, write;
   unsigned char *mr;
   unsigned char *hash, *hmac, *p;
   unsigned char pmac[TLS_MD_HMAC_SIZE];
+  unsigned char *buf;
+  buf = (unsigned char *)malloc(len);
+  memcpy(buf, b, len);
 
 #if 0
 	if (s->shutdown & SSL_SEND_SHUTDOWN)
@@ -4275,19 +4278,12 @@ int ssl3_write(SSL *s, const void *buf, int len)
         mr = (unsigned char *)malloc(2 + mrlen);
         p = mr;
         s2n(mrlen, p);
-        printf("1\n");
         digest_message(buf, len, &hash, &hlen);
-        printf("2: %d\n", hlen);
         memcpy(p, s->id, s->id_length);
-        printf("3\n");
         p += s->id_length;
-        printf("4\n");
         memcpy(p, hash, hlen);
-        printf("5\n");
         memmove(buf, buf + 2 + mrlen, len);
-        printf("6\n");
         memcpy(buf, mr, mrlen + 2);
-        printf("7\n");
         len += (2 + mrlen);
       }
     }

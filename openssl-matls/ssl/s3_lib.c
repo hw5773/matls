@@ -4265,18 +4265,29 @@ int ssl3_write(SSL *s, const void *buf, int len)
     }
     else // Server
     {
+      printf("[matls] %s:%s:%d: This is the server\n", __FILE__, __func__, __LINE__);
       if (s->matls_received)
       {
+        printf("[matls] %s:%s:%d: Making the modification record\n", __FILE__, __func__, __LINE__);
         mrlen = TLS_MD_ID_SIZE + TLS_MD_HMAC_SIZE;
+
+        printf("[matls] %s:%s:%d: Length of modification record: %d\n", __FILE__, __func__, __LINE__, mrlen);
         mr = (unsigned char *)malloc(2 + mrlen);
         p = mr;
         s2n(mrlen, p);
+        printf("1\n");
         digest_message(buf, len, &hash, &hlen);
+        printf("2\n");
         memcpy(p, s->id, s->id_length);
+        printf("3\n");
         p += s->id_length;
+        printf("4\n");
         memcpy(p, hash, hlen);
+        printf("5\n");
         memmove(buf, (unsigned char *)buf + 2 + mrlen, len);
+        printf("6\n");
         memcpy(buf, mr, mrlen + 2);
+        printf("7\n");
         len += (2 + mrlen);
       }
     }

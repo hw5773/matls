@@ -33,13 +33,13 @@ struct info
 // Origin Server Implementation
 int main(int count, char *strings[])
 {  
-	int server, client, rc, tidx = 0, i, server_side;
+	int server, client, rc, tidx = 0, i, server_side, modification;
 	char *portnum, *cert, *key, *forward_file;
   void *status;
 
-	if ( count != 6 )
+	if ( count != 7 )
 	{
-		printf("Usage: %s <portnum> <cert_file> <key_file> <forward_file>\n", strings[0]);
+		printf("Usage: %s <portnum> <cert_file> <key_file> <forward_file> <server side> <modification>\n", strings[0]);
 		exit(0);
 	}
 	SSL_library_init();
@@ -50,6 +50,7 @@ int main(int count, char *strings[])
 	key = strings[3];
   forward_file = strings[4];
   server_side = atoi(strings[5]);
+  modification = atoi(strings[6]);
 
 	ctx = init_middlebox_ctx(server_side);        /* initialize SSL */
 	load_certificates(ctx, cert, key);
@@ -105,6 +106,13 @@ void *mb_run(void *data)
   struct info *info;
   int client, ret, rcvd, sent, tot_len = -1, head_len = -1, body_len = -1;
   unsigned char buf[BUF_SIZE];
+  const char *modified =
+    "HTTP/1.1 200 OK\r\n"
+    "Content-Type: text/html\r\n"
+    "Content-Length: 70\r\n"
+    "\r\n"
+    "<html><title>Test</title><body><h1>Test Bob's Page!</h1></body></html>";
+  int modified_len = strlen(modified);
 
   SSL *ssl;
 
@@ -112,7 +120,6 @@ void *mb_run(void *data)
   client = info->sock;
   ssl = SSL_new(ctx);
   SSL_set_fd(ssl, client);
-  SSL_register_id(ssl);
 
 #ifdef MATLS
   SSL_enable_mb(ssl);
@@ -143,7 +150,11 @@ void *mb_run(void *data)
       MA_LOG1d("Received from Server-side", rcvd);
       MA_LOG1s("Message", buf);
       
-      sent = SSL_write(ssl, buf, rcvd);
+      if (modification)
+        sent = SSL_write(ssl, modified, modified_len);
+      else
+        sent = SSL_write(ssl, buf, rcvd);
+
       MA_LOG1d("Sent to Client-side", sent);
 
       if (tot_len < 0)
@@ -164,12 +175,21 @@ void *mb_run(void *data)
 //  close(client);
 }
 
-int get_total_length(char *buf, int rcvd)
+int get_total_length(char *b, int rcvd)
 {
-  int tot_len, head_len, body_len, index, tok_len;
+  char *buf, *p;
+  int tot_len, head_len, body_len, index, tok_len, mrlen, len;
   const char *clen = "Content-Length";
   char *token = NULL;
   char val[4];
+
+  p = b;
+  mrlen = ((*(p++) & 0xff) << 8) | (*(p++) & 0xff);
+  printf("Modification Length: %d\n", mrlen);
+  p += mrlen;
+  len = rcvd - 2 - mrlen;
+  buf = p;
+
 
   head_len = strstr(buf, "\r\n\r\n") - buf + 4;
   MA_LOG1d("Header Length", head_len);
@@ -312,6 +332,13 @@ void load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file)
 	}
 	else
 		printf("SSL_CTX_use_certificate_file success\n");
+
+  if ( SSL_CTX_register_id(ctx) <= 0 )
+  {
+    abort();
+  }
+  else
+    printf("SSL_CTX_register_id success\n");
 
 	/* Set the private key from KeyFile (may be the same as CertFile) */
 	if ( SSL_CTX_use_PrivateKey_file(ctx, key_file, SSL_FILETYPE_PEM) <= 0 )

@@ -65,7 +65,6 @@ int main(int count, char *strings[])
 	while ((client = accept(server, (struct sockaddr *)&addr, &len)))
 	{
 		ssl = SSL_new(ctx);/* get new SSL state with context */
-		SSL_register_id(ssl);
 		BIO_printf(outbio, "SSL_new() Success\n");
 		SSL_set_fd(ssl, client);      /* set connection socket to SSL state */
 		BIO_printf(outbio, "SSL_set_fd() Success\n");
@@ -86,11 +85,7 @@ int main(int count, char *strings[])
 		SSL_read(ssl, buf, sizeof(buf));
 		sent = SSL_write(ssl, response, response_len);
 
-		if (sent != response_len)
-		{
-			BIO_printf(outbio, "SERVER: Send the HTTP Test Page Failed: %d\n", sent);
-			//abort();
-		}
+		BIO_printf(outbio, "SERVER: HTTP Response Length: %d\n", response_len);
 		BIO_printf(outbio, "SERVER: Send the HTTP Test Page Success: %d\n", sent);
 
 		//close(client);
@@ -222,6 +217,13 @@ void load_certificates(BIO *outbio, SSL_CTX* ctx, char* cacert_file, char* cert_
 	}
 	else
 		BIO_printf(outbio, "SSL_CTX_use_certificate_file success\n");
+
+	if ( SSL_CTX_register_id(ctx) <= 0 )
+	{
+		abort();
+	}
+	else
+		BIO_printf(outbio, "SSL_CTX_register_id success\n");
 
 	/* Set the private key from KeyFile (may be the same as CertFile) */
 	if ( SSL_CTX_use_PrivateKey_file(ctx, key_file, SSL_FILETYPE_PEM) <= 0 )

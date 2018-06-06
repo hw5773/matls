@@ -4417,14 +4417,15 @@ static int ssl3_read_internal(SSL *s, void *buf, int len, int peek)
     int mlen, mrlen, phlen;
     p = (unsigned char *)buf;
     n2s(p, mrlen);
+    printf("[matls] %s:%s:%d: Length of Received Message: %d\n", __FILE__, __func__, __LINE__, ret);
     printf("[matls] %s:%s:%d: Length of Modification Record: %d\n", __FILE__, __func__, __LINE__, mrlen);
     p += mrlen;
 
-    mlen = get_total_length(p, ret);
-    digest_message(p, mlen, &(s->pair->phash), &phlen);
+    //mlen = get_total_length(p, ret);
+    digest_message(p, ret - mrlen - 2, &(s->pair->phash), &phlen);
     printf("[matls] %s:%s:%d: Length of Prior Hash: %d\n", __FILE__, __func__, __LINE__, phlen);
 
-    PRINTK("Message Received", p, mlen);
+    PRINTK("Message Received", p, ret);
     PRINTK("Hash of Received Message", s->pair->phash, phlen);
   }
 #endif /* OPENSSL_NO_MATLS */

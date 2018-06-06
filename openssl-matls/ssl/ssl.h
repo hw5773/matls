@@ -1475,7 +1475,7 @@ struct ssl_st
 
   volatile int *lock;
 
-  unsigned char phash[TLS_MD_HASH_SIZE];
+  unsigned char *phash;
 #endif /* OPENSSL_NO_MATLS */
 
 #ifndef OPENSSL_NO_SPLIT_TLS

@@ -4220,50 +4220,60 @@ int ssl3_write(SSL *s, const void *b, int len)
   {
     if (s->middlebox)
     {
-      unsigned char *tmp;
-      p = (unsigned char *)buf;
-      n2s(p, mrlen);
-      printf("[matls] %s:%s:%d: Modification Record Length: %d\n", __FILE__, __func__, __LINE__, mrlen);
-      tmp = (unsigned char *)malloc(len - mrlen - 2);
-      memcpy(tmp, p + mrlen, len - mrlen - 2);
-      digest_message(tmp, len - mrlen - 2, &hash, hlen);
-
-      write = strncmp(s->phash, hash, TLS_MD_HMAC_SIZE);
-
-      if (write)
+      if (s->server && SSL_is_init_finished(s))
       {
-        unsigned char *msg;
-        int mlen;
-
-        p += mrlen;
-        mr = (unsigned char *)malloc(TLS_MD_ID_SIZE + TLS_MD_HASH_SIZE + TLS_MD_HMAC_SIZE);
-        memmove(buf + 2 + mrlen, (unsigned char *)buf + 2 + mrlen + TLS_MD_ID_SIZE + TLS_MD_HASH_SIZE + TLS_MD_HMAC_SIZE, len - mrlen - 2);
-        memcpy(mr, s->id, TLS_MD_ID_SIZE);
-        memcpy(mr + TLS_MD_ID_SIZE, s->phash, TLS_MD_HASH_SIZE);
-
-        msg = (unsigned char *)malloc(2 * TLS_MD_HASH_SIZE);
-        mlen = 2 * TLS_MD_HASH_SIZE;
-        memcpy(msg, s->phash, TLS_MD_HASH_SIZE);
-        memcpy(msg + TLS_MD_HASH_SIZE, hash, TLS_MD_HASH_SIZE);
-
-        hmac = HMAC(EVP_sha256(), s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, mlen, NULL, &hmlen);
-
-        memcpy(mr + TLS_MD_ID_SIZE + TLS_MD_HASH_SIZE, hmac, TLS_MD_HMAC_SIZE);
-        memcpy(buf + 2, mr, TLS_MD_ID_SIZE + TLS_MD_HASH_SIZE + TLS_MD_HMAC_SIZE);
-
-        mrlen += (TLS_MD_ID_SIZE + TLS_MD_HASH_SIZE + TLS_MD_HMAC_SIZE);
-
+        unsigned char *tmp;
         p = (unsigned char *)buf;
-        s2n(mrlen, p);
+        n2s(p, mrlen);
+        printf("[matls] %s:%s:%d: Modification Record Length: %d\n", __FILE__, __func__, __LINE__, mrlen);
+        tmp = (unsigned char *)malloc(len - mrlen - 2);
+        memcpy(tmp, p + mrlen, len - mrlen - 2);
+        digest_message(tmp, len - mrlen - 2, &hash, &hlen);
 
-        PRINTK("Added HMAC", hmac, TLS_MD_HMAC_SIZE);
-      }
-      else
-      {
-        memcpy(pmac, p + mrlen - TLS_MD_HMAC_SIZE, TLS_MD_HMAC_SIZE);
-        PRINTK("Prior HMAC", pmac, TLS_MD_HMAC_SIZE);
-        hmac = HMAC(EVP_sha256(), s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, pmac, TLS_MD_HMAC_SIZE, NULL, &hmlen);
-        memcpy(p + mrlen - TLS_MD_HMAC_SIZE, hmac, hmlen);
+        printf("[matls] %s:%s:%d: Before strncmp\n", __FILE__, __func__, __LINE__);
+        write = strncmp(s->phash, hash, TLS_MD_HMAC_SIZE);
+        printf("[matls] %s:%s:%d: Write: %d\n", __FILE__, __func__, __LINE__, write);
+
+        if (write)
+        {
+          printf("[matls] %s:%s:%d: In write\n", __FILE__, __func__, __LINE__, write);
+          unsigned char *msg;
+          int mlen;
+
+          p += mrlen;
+          mr = (unsigned char *)malloc(TLS_MD_ID_SIZE + TLS_MD_HASH_SIZE + TLS_MD_HMAC_SIZE);
+          memmove(buf + 2 + mrlen, (unsigned char *)buf + 2 + mrlen + TLS_MD_ID_SIZE + TLS_MD_HASH_SIZE + TLS_MD_HMAC_SIZE, len - mrlen - 2);
+          memcpy(mr, s->id, TLS_MD_ID_SIZE);
+          memcpy(mr + TLS_MD_ID_SIZE, s->phash, TLS_MD_HASH_SIZE);
+
+          msg = (unsigned char *)malloc(2 * TLS_MD_HASH_SIZE);
+          mlen = 2 * TLS_MD_HASH_SIZE;
+          memcpy(msg, s->phash, TLS_MD_HASH_SIZE);
+          memcpy(msg + TLS_MD_HASH_SIZE, hash, TLS_MD_HASH_SIZE);
+
+          hmac = HMAC(EVP_sha256(), s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, mlen, NULL, &hmlen);
+
+          memcpy(mr + TLS_MD_ID_SIZE + TLS_MD_HASH_SIZE, hmac, TLS_MD_HMAC_SIZE);
+          memcpy(buf + 2, mr, TLS_MD_ID_SIZE + TLS_MD_HASH_SIZE + TLS_MD_HMAC_SIZE);
+
+          mrlen += (TLS_MD_ID_SIZE + TLS_MD_HASH_SIZE + TLS_MD_HMAC_SIZE);
+
+          printf("[matls] %s:%s:%d: Changed Modification Record Length: %d\n", mrlen);
+
+          p = (unsigned char *)buf;
+          s2n(mrlen, p);
+
+          PRINTK("Added HMAC", hmac, TLS_MD_HMAC_SIZE);
+          len += (TLS_MD_ID_SIZE + TLS_MD_HASH_SIZE + TLS_MD_HMAC_SIZE);
+        }
+        else
+        {
+          printf("[matls] %s:%s:%d: Not in write\n", __FILE__, __func__, __LINE__, write);
+          memcpy(pmac, p + mrlen - TLS_MD_HMAC_SIZE, TLS_MD_HMAC_SIZE);
+          PRINTK("Prior HMAC", pmac, TLS_MD_HMAC_SIZE);
+          hmac = HMAC(EVP_sha256(), s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, pmac, TLS_MD_HMAC_SIZE, NULL, &hmlen);
+          memcpy(p + mrlen - TLS_MD_HMAC_SIZE, hmac, hmlen);
+        }
       }
     }
     else // Server
@@ -4278,9 +4288,18 @@ int ssl3_write(SSL *s, const void *b, int len)
         mr = (unsigned char *)malloc(2 + mrlen);
         p = mr;
         s2n(mrlen, p);
-        digest_message(buf, len, &hash, &hlen);
         memcpy(p, s->id, s->id_length);
         p += s->id_length;
+        digest_message(buf, len, &hash, &hlen);
+
+        PRINTK("Message for Hash", buf, len);
+        PRINTK("Hash for Source HMAC", hash, hlen);
+
+        hmac = HMAC(EVP_sha256(), s->mb_info.mac_array[CLIENT], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, hash, hlen, NULL, &hmlen);
+
+        PRINTK("Used Accountability Key", s->mb_info.mac_array[CLIENT], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
+        PRINTK("Source MAC", hmac, hmlen);
+
         memcpy(p, hash, hlen);
         memmove(buf, buf + 2 + mrlen, len);
         memcpy(buf, mr, mrlen + 2);
@@ -4330,7 +4349,7 @@ int ssl3_write(SSL *s, const void *b, int len)
 }
 
 static int ssl3_read_internal(SSL *s, void *buf, int len, int peek)
-	{
+{
 	int ret;
 	
 	clear_sys_error();
@@ -4351,13 +4370,27 @@ static int ssl3_read_internal(SSL *s, void *buf, int len, int peek)
 	else
 		s->s3->in_read_app_data=0;
 
+#ifndef OPENSSL_NO_MATLS
+  if (!s->server)
+  {
+    unsigned char *p;
+    int mrlen, phlen;
+    p = (unsigned char *)buf;
+    n2s(p, mrlen);
+    printf("[matls] %s:%s:%d: Length of Modification Record: %d\n", __FILE__, __func__, __LINE__, mrlen);
+    p += mrlen;
+    digest_message(p, len - mrlen - 2, &(s->pair->phash), &phlen);
+    printf("[matls] %s:%s:%d: Length of Prior Hash: %d\n", __FILE__, __func__, __LINE__, phlen);
+  }
+#endif /* OPENSSL_NO_MATLS */
+
 	return(ret);
-	}
+}
 
 int ssl3_read(SSL *s, void *buf, int len)
-	{
+{
 	return ssl3_read_internal(s, buf, len, 0);
-	}
+}
 
 int ssl3_peek(SSL *s, void *buf, int len)
 	{

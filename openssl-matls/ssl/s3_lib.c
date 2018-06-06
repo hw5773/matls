@@ -4243,7 +4243,7 @@ int ssl3_write(SSL *s, const void *b, int len)
 
           p += mrlen;
           mr = (unsigned char *)malloc(TLS_MD_ID_SIZE + TLS_MD_HASH_SIZE + TLS_MD_HMAC_SIZE);
-          memmove(buf + 2 + mrlen, (unsigned char *)buf + 2 + mrlen + TLS_MD_ID_SIZE + TLS_MD_HASH_SIZE + TLS_MD_HMAC_SIZE, len - mrlen - 2);
+          memmove(buf + 2 + mrlen + TLS_MD_ID_SIZE + TLS_MD_HASH_SIZE + TLS_MD_HMAC_SIZE, buf + 2 + mrlen, len - mrlen - 2);
           memcpy(mr, s->id, TLS_MD_ID_SIZE);
           memcpy(mr + TLS_MD_ID_SIZE, s->phash, TLS_MD_HASH_SIZE);
 
@@ -4304,9 +4304,12 @@ int ssl3_write(SSL *s, const void *b, int len)
         PRINTK("Source MAC", hmac, hmlen);
 
         memcpy(p, hmac, hmlen);
-        memmove(buf, buf + 2 + mrlen, len);
+        memmove(buf + 2 + mrlen, buf, len);
         memcpy(buf, mr, mrlen + 2);
+		free(mr);
         len += (2 + mrlen);
+
+		PRINTK("Message Sent", buf, len);
       }
     }
   }

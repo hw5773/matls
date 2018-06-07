@@ -4254,6 +4254,7 @@ int ssl3_write(SSL *s, const void *b, int len)
 
           hmac = HMAC(EVP_sha256(), s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, mlen, NULL, &hmlen);
 
+          realloc(buf, len + 2 + mrlen);
           memmove(buf + 2 + mrlen, buf, len);
           memcpy(q, hmac, TLS_MD_HMAC_SIZE);
           s2n(mrlen, p);
@@ -4278,6 +4279,7 @@ int ssl3_write(SSL *s, const void *b, int len)
           hmac = HMAC(EVP_sha256(), s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, pmac, TLS_MD_HMAC_SIZE, NULL, &hmlen);
           PRINTK("Modified HMAC", hmac, TLS_MD_HMAC_SIZE);
           memcpy(s->pmr + s->pmr_length - TLS_MD_HMAC_SIZE, hmac, hmlen);
+          realloc(buf, len + s->pmr_length + 2);
           memmove(buf + s->pmr_length + 2, buf, len);
           s2n(s->pmr_length, p);
           memcpy(p, s->pmr, s->pmr_length);
@@ -4288,6 +4290,7 @@ int ssl3_write(SSL *s, const void *b, int len)
           free(pmac);
           s->pmr_length = 0;
         }
+        free(hash);
       }
     }
     else // Server
@@ -4315,9 +4318,12 @@ int ssl3_write(SSL *s, const void *b, int len)
         PRINTK("Source MAC", hmac, hmlen);
 
         memcpy(p, hmac, hmlen);
+        realloc(buf, len + 2 + mrlen);
         memmove(buf, buf + 2 + mrlen, len);
         memcpy(buf, mr, mrlen + 2);
         len += (2 + mrlen);
+
+        free(hash);
       }
     }
   }

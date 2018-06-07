@@ -4319,7 +4319,7 @@ int ssl3_write(SSL *s, const void *b, int len)
 
         memcpy(p, hmac, hmlen);
         realloc(buf, len + 2 + mrlen);
-        memmove(buf, buf + 2 + mrlen, len);
+        memmove(buf + 2 + mrlen, buf, len);
         memcpy(buf, mr, mrlen + 2);
         len += (2 + mrlen);
 

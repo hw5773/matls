@@ -159,7 +159,12 @@ void *mb_run(void *data)
       MA_LOG1d("Sent to Client-side", sent);
 
       if (tot_len < 0)
-        tot_len = get_total_length(buf, rcvd);
+      {
+        if (modification)
+          tot_len = get_total_length(modified, modified_len);
+        else
+          tot_len = get_total_length(buf, rcvd);
+      }
 
       MA_LOG1d("Total Length", tot_len);
 

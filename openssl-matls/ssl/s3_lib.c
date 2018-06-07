@@ -4266,6 +4266,7 @@ int ssl3_write(SSL *s, const void *b, int len)
           memmove(buf + 2 + mrlen, buf, len);
           printf("buf after memmove: %p\n", buf);
           memcpy(q, hmac, TLS_MD_HMAC_SIZE);
+          p = buf;
           s2n(mrlen, p);
           memcpy(p, mr, mrlen);
 
@@ -4274,10 +4275,14 @@ int ssl3_write(SSL *s, const void *b, int len)
 
           len += (2 + mrlen);
 
-          free(s->pmr);
+          //free(s->pmr);
+          printf("free s->pmr\n");
           free(mr);
+          printf("free mr\n");
           free(msg);
+          printf("free msg\n");
           s->pmr_length = 0;
+          printf("free s->pmr, free->mr, free->msg\n");
         }
         else
         {
@@ -4361,7 +4366,7 @@ int ssl3_write(SSL *s, const void *b, int len)
         memcpy(buf, mr, mrlen + 2);
         len += (2 + mrlen);
 
-        printf("mr before free: %p\n");
+        printf("mr before free: %p\n", mr);
         free(mr);
       }
     }

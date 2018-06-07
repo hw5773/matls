@@ -4202,6 +4202,7 @@ int ssl3_write(SSL *s, const void *b, int len)
   unsigned char *hash, *hmac, *pmac, *p, *q;
   unsigned char *buf;
   buf = (unsigned char *)malloc(len);
+  printf("the first buf in ssl3_write: %p\n");
   memcpy(buf, b, len);
 
 #if 0
@@ -4261,7 +4262,9 @@ int ssl3_write(SSL *s, const void *b, int len)
           else
             printf("[matls] %s:%s:%d Realloc Success\n", __FILE__, __func__, __LINE__);
 
+          printf("buf before memmove: %p\n", buf);
           memmove(buf + 2 + mrlen, buf, len);
+          printf("buf after memmove: %p\n", buf);
           memcpy(q, hmac, TLS_MD_HMAC_SIZE);
           s2n(mrlen, p);
           memcpy(p, mr, mrlen);
@@ -4292,17 +4295,30 @@ int ssl3_write(SSL *s, const void *b, int len)
           else
             printf("[matls] %s:%s:%d Realloc Success\n", __FILE__, __func__, __LINE__);
 
-          memmove(buf + s->pmr_length + 2, buf, len);
+          printf("s->pmr_length: %d\n", s->pmr_length);
+
+          PRINTK("Before memmove", buf, len);
+
+          unsigned char *tmp;
+          printf("[matls] %s:%s:%d: Length of message: %d\n", __FILE__, __func__, __LINE__, len);
+          tmp = memmove(buf + s->pmr_length + 2, buf, len);
+
+          if (!tmp)
+            printf("[matls] %s:%s:%d: Memmove Failure\n", __FILE__, __func__, __LINE__);
+          else
+            printf("[matls[ %s:%s:%d: Memmove Success\n", __FILE__, __func__, __LINE__);
+
+          p = buf;
           s2n(s->pmr_length, p);
           memcpy(p, s->pmr, s->pmr_length);
-
           len += (2 + s->pmr_length);
+          PRINTK("After memmove and set", buf, len);
 
           free(s->pmr);
           free(pmac);
           s->pmr_length = 0;
+          printf("free s->pmr / free pmac\n");
         }
-        free(hash);
       }
     }
     else // Server
@@ -4315,6 +4331,7 @@ int ssl3_write(SSL *s, const void *b, int len)
 
         printf("[matls] %s:%s:%d: Length of modification record: %d\n", __FILE__, __func__, __LINE__, mrlen);
         mr = (unsigned char *)malloc(2 + mrlen);
+        printf("first mr: %p\n", mr);
         p = mr;
         s2n(mrlen, p);
         memcpy(p, s->id, s->id_length);
@@ -4338,11 +4355,14 @@ int ssl3_write(SSL *s, const void *b, int len)
         else
           printf("[matls] %s:%s:%d Realloc Success\n", __FILE__, __func__, __LINE__);
 
+        printf("buf before memmove: %p\n", buf);
         memmove(buf + 2 + mrlen, buf, len);
+        printf("buf after memmove: %p\n", buf);
         memcpy(buf, mr, mrlen + 2);
         len += (2 + mrlen);
 
-        free(hash);
+        printf("mr before free: %p\n");
+        free(mr);
       }
     }
   }
@@ -4433,7 +4453,7 @@ static int ssl3_read_internal(SSL *s, void *buf, int len, int peek)
 
     PRINTK("Message Received", p, ret);
     PRINTK("Hash of Received Message", s->pair->phash, phlen);
-    memmove(buf, buf + mrlen + 2, ret);
+    buf = memmove(buf, buf + mrlen + 2, ret);
   }
 #endif /* OPENSSL_NO_MATLS */
 

@@ -362,7 +362,6 @@ int matls_send_extended_finished(SSL *s)
       tmp1 = (unsigned char *)malloc(s->pair->extended_finished_msg_len);
       memcpy(tmp1, s->pair->extended_finished_msg, s->pair->extended_finished_msg_len);
       free(s->pair->extended_finished_msg);
-      s->pair->extended_finished_msg_len = 0;
       num_msg = *(tmp1++);
       printf("num keys: %d\n", num_msg);
 
@@ -385,6 +384,7 @@ int matls_send_extended_finished(SSL *s)
       plen = MATLS_H_LENGTH + MATLS_M_LENGTH;
       printf("mlen: %d, slen: %d, plen: %d\n", mlen, slen, plen);
       num_msg++;
+      s->pair->extended_finished_msg_len = 0;
     }
     else // Server
     {
@@ -499,6 +499,7 @@ int matls_send_extended_finished(SSL *s)
     /* put the prior signatures */
     if (s->middlebox)
     {
+      printf("problem? tmp1: %p / mlen: %d / MATLS_H_LENGTH: %d / slen: %d\n", tmp1, mlen, MATLS_H_LENGTH, slen);
       memcpy(p, tmp1 + mlen + MATLS_H_LENGTH, slen);
       PRINTK("Previous Signature", p, slen);
       p += slen;

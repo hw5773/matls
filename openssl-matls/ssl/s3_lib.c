@@ -4199,7 +4199,7 @@ int ssl3_write(SSL *s, const void *b, int len)
 {
 	int ret, n, mrlen, hlen, hmlen, write;
   unsigned char *mr;
-  unsigned char *hash, *hmac, *pmac, *p;
+  unsigned char *hash, *hmac, *pmac, *p, *q;
   unsigned char *buf;
   buf = (unsigned char *)malloc(len);
   memcpy(buf, b, len);
@@ -4223,59 +4223,70 @@ int ssl3_write(SSL *s, const void *b, int len)
       {
         unsigned char *tmp;
         p = (unsigned char *)buf;
-        n2s(p, mrlen);
-        printf("[matls] %s:%s:%d: Modification Record Length: %d\n", __FILE__, __func__, __LINE__, mrlen);
-        tmp = (unsigned char *)malloc(len - mrlen - 2);
-        memcpy(tmp, p + mrlen, len - mrlen - 2);
-        digest_message(tmp, len - mrlen - 2, &hash, &hlen);
-        PRINTK("Message to be sent", tmp, len - mrlen - 2);
+        digest_message(buf, len, &hash, &hlen);
+        PRINTK("Message to be sent", buf, len);
         PRINTK("Hash of Sent Message", hash, hlen);
 
         printf("[matls] %s:%s:%d: Before strncmp\n", __FILE__, __func__, __LINE__);
-        write = strncmp(s->phash, hash, TLS_MD_HMAC_SIZE);
+        write = strncmp((const char *)s->phash, (const char *)hash, TLS_MD_HMAC_SIZE);
         printf("[matls] %s:%s:%d: Write: %d\n", __FILE__, __func__, __LINE__, write);
 
         if (write)
         {
-          printf("[matls] %s:%s:%d: In write\n", __FILE__, __func__, __LINE__, write);
+          printf("[matls] %s:%s:%d: In write\n", __FILE__, __func__, __LINE__);
           unsigned char *msg;
           int mlen;
+          mrlen = s->pmr_length + TLS_MD_ID_SIZE + TLS_MD_HASH_SIZE + TLS_MD_HMAC_SIZE;
+          mr = (unsigned char *)malloc(mrlen);
+          q = mr;
 
-          p += mrlen;
-          mr = (unsigned char *)malloc(TLS_MD_ID_SIZE + TLS_MD_HASH_SIZE + TLS_MD_HMAC_SIZE);
-          memmove(buf + 2 + mrlen + TLS_MD_ID_SIZE + TLS_MD_HASH_SIZE + TLS_MD_HMAC_SIZE, buf + 2 + mrlen, len - mrlen - 2);
-          memcpy(mr, s->id, TLS_MD_ID_SIZE);
-          memcpy(mr + TLS_MD_ID_SIZE, s->phash, TLS_MD_HASH_SIZE);
+          memcpy(q, s->pmr, s->pmr_length);
+          q += s->pmr_length;
+          memcpy(q, s->id, TLS_MD_ID_SIZE);
+          q += TLS_MD_ID_SIZE;
+          memcpy(q, s->phash, TLS_MD_HASH_SIZE);
+          q += TLS_MD_HASH_SIZE;
 
-          msg = (unsigned char *)malloc(2 * TLS_MD_HASH_SIZE);
           mlen = 2 * TLS_MD_HASH_SIZE;
+          msg = (unsigned char *)malloc(mlen);
           memcpy(msg, s->phash, TLS_MD_HASH_SIZE);
           memcpy(msg + TLS_MD_HASH_SIZE, hash, TLS_MD_HASH_SIZE);
 
           hmac = HMAC(EVP_sha256(), s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, mlen, NULL, &hmlen);
 
-          memcpy(mr + TLS_MD_ID_SIZE + TLS_MD_HASH_SIZE, hmac, TLS_MD_HMAC_SIZE);
-          memcpy(buf + 2, mr, TLS_MD_ID_SIZE + TLS_MD_HASH_SIZE + TLS_MD_HMAC_SIZE);
-
-          mrlen += (TLS_MD_ID_SIZE + TLS_MD_HASH_SIZE + TLS_MD_HMAC_SIZE);
-
-          printf("[matls] %s:%s:%d: Changed Modification Record Length: %d\n", mrlen);
-
-          p = (unsigned char *)buf;
+          memmove(buf + 2 + mrlen, buf, len);
+          memcpy(q, hmac, TLS_MD_HMAC_SIZE);
           s2n(mrlen, p);
+          memcpy(p, mr, mrlen);
 
+          printf("[matls] %s:%s:%d: Changed Modification Record Length: %d\n", __FILE__, __func__, __LINE__, mrlen);
           PRINTK("Added HMAC", hmac, TLS_MD_HMAC_SIZE);
-          len += (TLS_MD_ID_SIZE + TLS_MD_HASH_SIZE + TLS_MD_HMAC_SIZE);
+
+          len += (2 + mrlen);
+
+          free(s->pmr);
+          free(mr);
+          free(msg);
+          s->pmr_length = 0;
         }
         else
         {
           printf("[matls] %s:%s:%d: Not in write\n", __FILE__, __func__, __LINE__, write);
           pmac = (unsigned char *)malloc(TLS_MD_HMAC_SIZE);
-          memcpy(pmac, p + mrlen - TLS_MD_HMAC_SIZE, TLS_MD_HMAC_SIZE);
+          memcpy(pmac, s->pmr + s->pmr_length - TLS_MD_HMAC_SIZE, TLS_MD_HMAC_SIZE);
           PRINTK("Prior HMAC", pmac, TLS_MD_HMAC_SIZE);
           hmac = HMAC(EVP_sha256(), s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, pmac, TLS_MD_HMAC_SIZE, NULL, &hmlen);
-          memcpy(p + mrlen - TLS_MD_HMAC_SIZE, hmac, hmlen);
+          PRINTK("Modified HMAC", hmac, TLS_MD_HMAC_SIZE);
+          memcpy(s->pmr + s->pmr_length - TLS_MD_HMAC_SIZE, hmac, hmlen);
+          memmove(buf + s->pmr_length + 2, buf, len);
+          s2n(s->pmr_length, p);
+          memcpy(p, s->pmr, s->pmr_length);
+
+          len += (2 + s->pmr_length);
+
+          free(s->pmr);
           free(pmac);
+          s->pmr_length = 0;
         }
       }
     }
@@ -4304,12 +4315,9 @@ int ssl3_write(SSL *s, const void *b, int len)
         PRINTK("Source MAC", hmac, hmlen);
 
         memcpy(p, hmac, hmlen);
-        memmove(buf + 2 + mrlen, buf, len);
+        memmove(buf, buf + 2 + mrlen, len);
         memcpy(buf, mr, mrlen + 2);
-		free(mr);
         len += (2 + mrlen);
-
-		PRINTK("Message Sent", buf, len);
       }
     }
   }
@@ -4354,43 +4362,6 @@ int ssl3_write(SSL *s, const void *b, int len)
 	return(ret);
 }
 
-static int get_total_length(char *b, int rcvd)
-{
-  char *buf, *p;
-  int tot_len, head_len, body_len, index, tok_len;
-  const char *clen = "Content-Length";
-  char *token = NULL;
-  char val[4];
-
-  p = b;
-  buf = p;
-
-  head_len = strstr(buf, "\r\n\r\n") - buf + 4;
-  printf("Header Length: %d\n", head_len);
-  
-  token = strtok(buf, "\n");
-
-  while (token)
-  {
-    tok_len = strlen(token);
-    index = strstr(token, ":") - token;
-
-    if (strncmp(token, clen, index - 1) == 0)
-    {
-      memcpy(val, token + index + 1, tok_len - index - 1);
-      body_len = atoi(val);
-      printf("Body Length: %d\n", body_len);
-      break;
-    }
-
-    token = strtok(NULL, "\n");
-  }
-
-  tot_len = head_len + body_len;
-
-  return tot_len;
-}
-
 static int ssl3_read_internal(SSL *s, void *buf, int len, int peek)
 {
 	int ret;
@@ -4422,14 +4393,22 @@ static int ssl3_read_internal(SSL *s, void *buf, int len, int peek)
     n2s(p, mrlen);
     printf("[matls] %s:%s:%d: Length of Received Message: %d\n", __FILE__, __func__, __LINE__, ret);
     printf("[matls] %s:%s:%d: Length of Modification Record: %d\n", __FILE__, __func__, __LINE__, mrlen);
+    s->pair->pmr = (unsigned char *)malloc(mrlen);
+    memcpy(s->pair->pmr, p, mrlen);
+    s->pair->pmr_length = mrlen;
+
+    PRINTK("Previous Modification Record", s->pair->pmr, s->pair->pmr_length);
+
     p += mrlen;
+    ret -= (mrlen + 2);
 
     //mlen = get_total_length(p, ret);
-    digest_message(p, ret - mrlen - 2, &(s->pair->phash), &phlen);
+    digest_message(p, ret, &(s->pair->phash), &phlen);
     printf("[matls] %s:%s:%d: Length of Prior Hash: %d\n", __FILE__, __func__, __LINE__, phlen);
 
     PRINTK("Message Received", p, ret);
     PRINTK("Hash of Received Message", s->pair->phash, phlen);
+    memmove(buf, buf + mrlen + 2, ret);
   }
 #endif /* OPENSSL_NO_MATLS */
 

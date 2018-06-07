@@ -1473,9 +1473,11 @@ struct ssl_st
   volatile int cert_msg_len;
   volatile int extended_finished_msg_len;
 
-  volatile int *lock;
+  volatile int *lock; // Lock
 
-  unsigned char *phash;
+  unsigned char *phash; // Previous Hash of the Content
+  unsigned char *pmr; // Previous Modification Record
+  int pmr_length;
 #endif /* OPENSSL_NO_MATLS */
 
 #ifndef OPENSSL_NO_SPLIT_TLS

@@ -336,212 +336,6 @@ int ssl3_send_finished(SSL *s, int a, int b, const char *sender, int slen)
 	}
 
 #ifndef OPENSSL_NO_MATLS
-int matls_send_finished(SSL *s, int a, int b, const char *sender, int slen)
-{
-	unsigned char *p,*d;
-	int i, ret;
-	unsigned long l;
-	int num_msg = 1;
-
-	if (s->state == a)
-	{
-		d=(unsigned char *)s->init_buf->data;
-		p= &(d[4]);
-
-		i=s->method->ssl3_enc->final_finish_mac(s,
-					sender,slen,s->s3->tmp.finish_md);
-		if (i == 0)
-			return 0;
-		PRINTK("verify_data", s->s3->tmp.finish_md, i);
-		s->s3->tmp.finish_md_len = i;
-		memcpy(p, s->s3->tmp.finish_md, i);
-		p+=i;
-		l=i;
-
-		/* Copy the finished so we can use it for
-		   renegotiation checks */
-		if(s->type == SSL_ST_CONNECT)
-		{
-			OPENSSL_assert(i <= EVP_MAX_MD_SIZE);
-			memcpy(s->s3->previous_client_finished,
-					s->s3->tmp.finish_md, i);
-			s->s3->previous_client_finished_len=i;
-		}
-		else
-		{
-			OPENSSL_assert(i <= EVP_MAX_MD_SIZE);
-			memcpy(s->s3->previous_server_finished,
-					s->s3->tmp.finish_md, i);
-			s->s3->previous_server_finished_len=i;
-		}
-
-#ifdef OPENSSL_SYS_WIN16
-		/* MSVC 1.5 does not clear the top bytes of the word unless
-		 * I do this.
-		 */
-		l&=0xffff;
-#endif
-
-		*(d++)=SSL3_MT_FINISHED; //0x14
-		
-		if (!s->mb_enabled)
-		{
-			l2n3(l,d); 
-			s->init_num=(int)l+4;
-			s->init_off=0;
-		}
-
-		s->state=b;
-
-		//PRINTK("init_buf->data", s->init_buf->data, 20)
-		
-		/* extended finish */
-		if (s->mb_enabled)
-		{
-			/* num_msg (1byte) + [msg: mac_key(32) + version(2) + cipher(2) + ti(12)] (32byte) + sig_len (2)  + signature */
-
-      unsigned char *tmp;         /* for prior message */
-      unsigned char *pp;          /* for pointer */
-      unsigned char *msg;         /* for hash */
-      unsigned char *parameters;  /* for parameters */
-      int mlen, slen, plen, poff = 0;
-
-      if (s->middlebox)
-      {
-        printf("waiting for extended finished message from the server-side entity\n");
-        while(!(s->pair->extended_finished_msg)) { printf(""); }
-        printf("get the message from the server-side entity\n");
-        tmp = (unsigned char *)malloc(s->pair->extended_finished_msg_len);
-        memcpy(tmp, s->pair->extended_finished_msg, s->pair->extended_finished_msg_len);
-        num_msg = *tmp;
-        printf("num keys: %d\n", num_msg);
-
-        if (num_msg < 1)
-        {
-          perror("Error: invalid number of keys\n");
-          exit(1);
-        }
-
-        mlen = (num_msg-1) * MATLS_M_LENGTH;
-        slen = s->pair->extended_finished_msg_len - 1 - mlen - MATLS_H_LENGTH;
-        plen = SSL_MAX_ACCOUNTABILITY_KEY_LENGTH + MATLS_M_LENGTH + MATLS_H_LENGTH;
-        printf("mlen: %d, slen: %d, plen: %d\n", mlen, slen, plen);
-        num_msg++;
-      }
-      else // Server
-      {
-        mlen = 0; slen = 0;
-        plen = SSL_MAX_ACCOUNTABILITY_KEY_LENGTH + MATLS_M_LENGTH;
-      }
-
-		msg = (unsigned char *)malloc(plen); //mac, version, cipher, ti
-      	parameters = (unsigned char *)malloc(MATLS_M_LENGTH + 1);
-
-		pp = msg;
-		/* mac_key (32) */
-		if (s->middlebox)
-		{
-			printf("server: %d\n", s->server);
-			PRINTK("accountability key used", s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
-			memcpy(msg, s->mb_info.mac_array[s->server], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
-		}
-		else
-			memcpy(msg, s->mb_info.mac_array[0], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
-		pp += SSL_MAX_ACCOUNTABILITY_KEY_LENGTH;
-		PRINTK("mac_key", s->mb_info.mac_array[0], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
-
-			/* version (2) */
-      parameters[poff++] = s->version >> 8;
-      parameters[poff++] = s->version & 0xff;
-
-			/* ciphersuit (2) */
-			ssl3_put_cipher_by_char(s->s3->tmp.new_cipher, &(parameters[poff]));
-      poff += MATLS_CIPHERSUITE_LENGTH;
-			PRINTK("version and ciphersuite", parameters, poff);
-
-			/* ti (12) */
-			memcpy(parameters + poff, s->s3->tmp.finish_md, MATLS_TRANSCRIPT_LENGTH);
-			poff += MATLS_TRANSCRIPT_LENGTH;
-			l = MATLS_TRANSCRIPT_LENGTH; // length of verify_data
-
-      memcpy(pp, parameters, MATLS_M_LENGTH);
-      pp += MATLS_M_LENGTH;
-
-      if (s->middlebox)
-      {
-        memcpy(pp, tmp + mlen + 1, MATLS_H_LENGTH);
-        pp += MATLS_H_LENGTH;
-      }
-
-			PRINTK("before hash", msg, plen);
-
-			/* hash the msg (48) */
-			unsigned char *digest;
-			unsigned int digest_len;
-			ret = digest_message(msg, plen, &digest, &digest_len);
-			if (ret == 0)
-				return 0;
-
-			/* make signature block */
-			unsigned char *sigblk;
-			int sigblk_len;
-			if (!make_signature_block2(&sigblk, digest, digest_len, (s->cert->key->privatekey), NID_sha256, &sigblk_len))
-			{
-				printf("ERROR: make the signature block failed\n");
-				return 0;
-			}
-			printf("PROGRESS: make the signature block\n");
-
-			/* put num_msg */
-			*(p++) = num_msg;
-			printf("num_msg\n%02X\n", num_msg);
-      l += 1;
-			
-      /* put message */
-      if (s->middlebox)
-      {
-        memcpy(p, parameters, MATLS_M_LENGTH);
-        p += MATLS_M_LENGTH;
-        memcpy(p, tmp + 1, mlen);
-        p += mlen;
-
-        l += (MATLS_M_LENGTH + mlen);
-      }
-
-			/* put hashed msg */
-			memcpy(p, digest, digest_len);
-			p += digest_len;
-      l += digest_len;
-			PRINTK("hashed msg", digest, digest_len);
-
-			/* put the signature length */
-			printf("sigblk_len: %d\n\n", sigblk_len);
-			s2n(sigblk_len, p);
-      l += 2;
-			
-			/* put the signature block */
-			memcpy(p, sigblk, sigblk_len);
-      p += sigblk_len;
-      l += sigblk_len;
-			PRINTK("signature block", sigblk, sigblk_len);
-
-      if (s->middlebox)
-      {
-        memcpy(p, tmp + 1 + mlen + MATLS_H_LENGTH, slen);
-        p += slen;
-        l += slen;
-      }
-
-			l2n3(l,d); 
-			s->init_num=(int)l+4; // total length including the message type
-			s->init_off=0;
-		}
-	}
-
-	/* SSL3_ST_SEND_xxxxxx_HELLO_B */
-	return(ssl3_do_write(s,SSL3_RT_HANDSHAKE));
-}
-
 int matls_send_extended_finished(SSL *s)
 {
 	unsigned char *p, *d, *pp, *tmp1, *tmp2, *msg, *parameters;
@@ -567,6 +361,8 @@ int matls_send_extended_finished(SSL *s)
       printf("get the message from the server-side entity\n");
       tmp1 = (unsigned char *)malloc(s->pair->extended_finished_msg_len);
       memcpy(tmp1, s->pair->extended_finished_msg, s->pair->extended_finished_msg_len);
+      free(s->pair->extended_finished_msg);
+      s->pair->extended_finished_msg_len = 0;
       num_msg = *(tmp1++);
       printf("num keys: %d\n", num_msg);
 
@@ -624,21 +420,24 @@ int matls_send_extended_finished(SSL *s)
 //		l = MATLS_TRANSCRIPT_LENGTH; // length of verify_data
 
     memcpy(pp, parameters, MATLS_M_LENGTH);
+    free(parameters);
     pp += MATLS_M_LENGTH;
 
 		PRINTK("before hmac", msg, plen);
 
     if (s->middlebox)
-	{
-		printf("s->server: %d\n", s->server);
-		PRINTK("used accountability key", s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
+	  {
+		  printf("s->server: %d\n", s->server);
+		  PRINTK("used accountability key", s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
       digest = HMAC(EVP_sha256(), s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, plen, NULL, &digest_len);
-	}
+	  }
     else
-	{
-		PRINTK("used accountability key", s->mb_info.mac_array[0], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
+	  {
+		  PRINTK("used accountability key", s->mb_info.mac_array[0], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
       digest = HMAC(EVP_sha256(), s->mb_info.mac_array[0], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, plen, NULL, &digest_len);
-	}
+	  }
+
+    free(msg);
 
     printf("after hmac: %ld\n", digest_len);
 	  PRINTK("hmac", digest, digest_len);
@@ -651,11 +450,20 @@ int matls_send_extended_finished(SSL *s)
 		}
 		printf("PROGRESS: make the signature block\n");
 
+
 		/* put num_msg */
 		*(p++) = num_msg;
 		printf("num_msg\n%02X\n", num_msg);
+
+    if (s->middlebox)
+      tlen = 4 + 1 + MATLS_M_PAIR_LENGTH + mlen + 1 + digest_len + slen + 2 + sigblk_len;
+    else
+      tlen = 4 + 1 + digest_len + 2 + sigblk_len;
+
+    BUF_MEM_grow(s->init_buf, tlen);
+
     l = 1;
-			
+
     /* put message */
     if (s->middlebox)
     {
@@ -679,7 +487,7 @@ int matls_send_extended_finished(SSL *s)
       l += (MATLS_M_PAIR_LENGTH + mlen + 1);
 
       PRINTK("Pair Finished", s->pair->s3->tmp.peer_finish_md, s->pair->s3->tmp.peer_finish_md_len);
-      PRINTK("Appended parameters", tmp2, MATLS_M_PAIR_LENGTH + 1);
+      PRINTK("Appended parameters", tmp2, MATLS_M_PAIR_LENGTH + mlen + 1);
     }
 
 		/* put hashed msg */
@@ -695,6 +503,7 @@ int matls_send_extended_finished(SSL *s)
       PRINTK("Previous Signature", p, slen);
       p += slen;
       l += slen;
+      free(tmp1);
     }
 
 		/* put the signature length */

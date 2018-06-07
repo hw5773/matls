@@ -356,8 +356,9 @@ SSL *SSL_new(SSL_CTX *ctx)
 
   if (ctx->proof)
   {
-	  memcpy(s->proof, ctx->proof, ctx->proof_length);
 	  s->proof_length = ctx->proof_length;
+    s->proof = (unsigned char *)malloc(s->proof_length);
+	  memcpy(s->proof, ctx->proof, ctx->proof_length);
   }
 
   s->lock = (int *)malloc(sizeof(int));
@@ -374,12 +375,15 @@ SSL *SSL_new(SSL_CTX *ctx)
   s->extended_finished_msg = NULL;
 
   if (ctx->x509)
-    s->x509 = ctx->x509;
+  {
+    s->x509 = X509_dup(ctx->x509);
+  }
 
   if (ctx->id)
   {
-    s->id = ctx->id;
     s->id_length = ctx->id_length;
+    s->id = (unsigned char *)malloc(s->id_length);
+    memcpy(s->id, ctx->id, s->id_length);
   }
 #endif /* OPENSSL_NO_MATLS */
 
@@ -693,7 +697,13 @@ void SSL_free(SSL *s)
 #ifndef OPENSSL_NO_MATLS
 	if (s->proof)
 		OPENSSL_free(s->proof);
-#endif
+
+  if (s->id)
+    OPENSSL_free(s->id);
+
+  if (s->x509)
+    X509_free(s->x509);
+#endif /* OPENSSL_NO_MATLS */
 
 	OPENSSL_free(s);
 	}
@@ -2139,7 +2149,13 @@ void SSL_CTX_free(SSL_CTX *a)
 #ifndef OPENSSL_NO_MATLS
 	if (a->proof)
 		OPENSSL_free(a->proof);
-#endif
+
+  if (a->id)
+    OPENSSL_free(a->id);
+
+  if (a->x509)
+    X509_free(a->x509);
+#endif /* OPENSSL_NO_MATLS */
 
 	OPENSSL_free(a);
 	}

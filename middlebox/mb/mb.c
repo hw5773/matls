@@ -24,6 +24,7 @@ void print_pubkey(EVP_PKEY *pkey);
 BIO *bio_err;
 void *mb_run(void *data);
 int get_total_length(char *buf, int rcvd);
+int modification;
 
 struct info
 {
@@ -33,7 +34,7 @@ struct info
 // Origin Server Implementation
 int main(int count, char *strings[])
 {  
-	int server, client, rc, tidx = 0, i, server_side, modification;
+	int server, client, rc, tidx = 0, i, server_side;
 	char *portnum, *cert, *key, *forward_file;
   void *status;
 
@@ -175,21 +176,12 @@ void *mb_run(void *data)
 //  close(client);
 }
 
-int get_total_length(char *b, int rcvd)
+int get_total_length(char *buf, int rcvd)
 {
-  char *buf, *p;
   int tot_len, head_len, body_len, index, tok_len, mrlen, len;
   const char *clen = "Content-Length";
   char *token = NULL;
   char val[4];
-
-  p = b;
-  mrlen = ((*(p++) & 0xff) << 8) | (*(p++) & 0xff);
-  printf("Modification Length: %d\n", mrlen);
-  p += mrlen;
-  len = rcvd - 2 - mrlen;
-  buf = p;
-
 
   head_len = strstr(buf, "\r\n\r\n") - buf + 4;
   MA_LOG1d("Header Length", head_len);

@@ -548,23 +548,43 @@ end:
 
 int SSL_CTX_register_id(SSL_CTX *ctx)
 {
-  BIO *key;
+  BIO *key, *id;
   EVP_PKEY *pkey;
 
   if (ctx->x509)
   {
-    key = BIO_new(BIO_f_md());
-    BIO_set_md(key, EVP_sha256());
+    if (!(id = BIO_new(BIO_s_mem())))
+      printf("Error making memory\n");
+    else
+      printf("Making memory success\n");
 
-    pkey = X509_get_pubkey(ctx->x509);
-    PEM_write_bio_PUBKEY(key, pkey);
+    if (!(key = BIO_new(BIO_f_md())))
+      printf("Error making md filter\n");
+    else
+      printf("Making md filter success\n");
+
+    if (!BIO_set_md(key, EVP_sha256()))
+      printf("Error setting sha256\n");
+    else
+      printf("Setting sha256 success\n");
+
+    BIO_push(key, id);
+
+    if (!(pkey = X509_get_pubkey(ctx->x509)))
+      printf("Error getting public key from certificate\n");
+    else
+      printf("Getting public key from certificate\n");
+
+    if (!PEM_write_bio_PUBKEY(key, pkey))
+      printf("Error writing public key data in PEM format\n");
+    else
+      printf("Writing public key data in PEM format\n");
 
     ctx->id_length = TLS_MD_ID_SIZE;
     ctx->id = (unsigned char *)malloc(ctx->id_length);
+    BIO_gets(key, ctx->id, TLS_MD_ID_SIZE);
 
-    BIO_gets(key, ctx->id, ctx->id_length);
-
-    PRINTK("Identifier in Function", ctx->id, ctx->id_length);
+    PRINTK("ID", ctx->id, ctx->id_length);
 
     BIO_free_all(key);
     EVP_PKEY_free(pkey);

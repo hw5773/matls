@@ -161,7 +161,7 @@ void *mb_run(void *data)
       if (tot_len < 0)
       {
         if (modification)
-          tot_len = get_total_length(modified, modified_len);
+          tot_len = get_total_length((char *)modified, modified_len);
         else
           tot_len = get_total_length(buf, rcvd);
       }
@@ -336,7 +336,6 @@ void load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file)
   }
   else
     printf("SSL_CTX_register_id success\n");
-
 	/* Set the private key from KeyFile (may be the same as CertFile) */
 	if ( SSL_CTX_use_PrivateKey_file(ctx, key_file, SSL_FILETYPE_PEM) <= 0 )
 	{

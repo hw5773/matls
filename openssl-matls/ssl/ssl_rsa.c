@@ -574,11 +574,16 @@ int SSL_CTX_register_id(SSL_CTX *ctx)
       printf("Error getting public key from certificate\n");
     else
       printf("Getting public key from certificate\n");
-
+/*
     if (!PEM_write_bio_PUBKEY(key, pkey))
       printf("Error writing public key data in PEM format\n");
     else
       printf("Writing public key data in PEM format\n");
+*/
+    if (!i2d_PUBKEY_bio(key, pkey))
+      printf("Error writing public key data in DER format\n");
+    else
+      printf("Writing public key data in DER format\n");
 
     ctx->id_length = TLS_MD_ID_SIZE;
     ctx->id = (unsigned char *)malloc(ctx->id_length);

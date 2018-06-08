@@ -497,10 +497,14 @@ int SSL_register_id(SSL *s)
 
     pkey = X509_get_pubkey(s->x509);
     PEM_write_bio_PUBKEY(key, pkey);
+
     s->id_length = TLS_MD_ID_SIZE;
     BIO_gets(key, s->id, s->id_length);
 
     PRINTK("Identifier in Function", s->id, s->id_length);
+
+    BIO_free_all(key);
+    EVP_PKEY_free(pkey);
 
     return 1;
   }
@@ -561,6 +565,9 @@ int SSL_CTX_register_id(SSL_CTX *ctx)
     BIO_gets(key, ctx->id, ctx->id_length);
 
     PRINTK("Identifier in Function", ctx->id, ctx->id_length);
+
+    BIO_free_all(key);
+    EVP_PKEY_free(pkey);
 
     return 1;
   }

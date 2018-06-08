@@ -487,16 +487,18 @@ end:
 
 int SSL_register_id(SSL *s)
 {
-  int klen;
-  unsigned char *key;
+  BIO *key;
   EVP_PKEY *pkey;
 
   if (s->x509)
   {
-    pkey = X509_get_pubkey(s->x509);
-    klen = i2d_PUBKEY(pkey, &key);
+    key = BIO_new(BIO_f_md());
+    BIO_set_md(key, EVP_sha256());
 
-    digest_message(key, klen, &(s->id), &(s->id_length));
+    pkey = X509_get_pubkey(s->x509);
+    PEM_write_bio_PUBKEY(key, pkey);
+    s->id_length = TLS_MD_ID_SIZE;
+    BIO_gets(key, s->id, s->id_length);
 
     PRINTK("Identifier in Function", s->id, s->id_length);
 
@@ -542,17 +544,21 @@ end:
 
 int SSL_CTX_register_id(SSL_CTX *ctx)
 {
-  int klen;
-  unsigned char *key;
+  BIO *key;
   EVP_PKEY *pkey;
 
   if (ctx->x509)
   {
+    key = BIO_new(BIO_f_md());
+    BIO_set_md(key, EVP_sha256());
+
     pkey = X509_get_pubkey(ctx->x509);
-    klen = i2d_PUBKEY(pkey, NULL);
-    key = (unsigned char *)malloc(klen);
-    i2d_PUBKEY(pkey, &key);
-    digest_message(key, klen, &(ctx->id), &(ctx->id_length));
+    PEM_write_bio_PUBKEY(key, pkey);
+
+    ctx->id_length = TLS_MD_ID_SIZE;
+    ctx->id = (unsigned char *)malloc(ctx->id_length);
+
+    BIO_gets(key, ctx->id, ctx->id_length);
 
     PRINTK("Identifier in Function", ctx->id, ctx->id_length);
 

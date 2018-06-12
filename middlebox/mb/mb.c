@@ -107,7 +107,7 @@ void *mb_run(void *data)
   struct info *info;
   int client, ret, rcvd, sent, tot_len = -1, head_len = -1, body_len = -1;
   unsigned char buf[BUF_SIZE];
-  const char *modified =
+  char modified[134] =
     "HTTP/1.1 200 OK\r\n"
     "Content-Type: text/html\r\n"
     "Content-Length: 70\r\n"

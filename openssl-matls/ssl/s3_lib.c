@@ -4435,30 +4435,33 @@ static int ssl3_read_internal(SSL *s, void *buf, int len, int peek)
 		s->s3->in_read_app_data=0;
 
 #ifndef OPENSSL_NO_MATLS
-  if (!s->server)
+  if (s->mb_enabled)
   {
-    unsigned char *p;
-    int mlen, mrlen, phlen;
-    p = (unsigned char *)buf;
-    n2s(p, mrlen);
-    printf("[matls] %s:%s:%d: Length of Received Message: %d\n", __FILE__, __func__, __LINE__, ret);
-    printf("[matls] %s:%s:%d: Length of Modification Record: %d\n", __FILE__, __func__, __LINE__, mrlen);
-    s->pair->pmr = (unsigned char *)malloc(mrlen);
-    memcpy(s->pair->pmr, p, mrlen);
-    s->pair->pmr_length = mrlen;
+    if (!s->server)
+    {
+      unsigned char *p;
+      int mlen, mrlen, phlen;
+      p = (unsigned char *)buf;
+      n2s(p, mrlen);
+      printf("[matls] %s:%s:%d: Length of Received Message: %d\n", __FILE__, __func__, __LINE__, ret);
+      printf("[matls] %s:%s:%d: Length of Modification Record: %d\n", __FILE__, __func__, __LINE__, mrlen);
+      s->pair->pmr = (unsigned char *)malloc(mrlen);
+      memcpy(s->pair->pmr, p, mrlen);
+      s->pair->pmr_length = mrlen;
 
-    PRINTK("Previous Modification Record", s->pair->pmr, s->pair->pmr_length);
+      PRINTK("Previous Modification Record", s->pair->pmr, s->pair->pmr_length);
 
-    p += mrlen;
-    ret -= (mrlen + 2);
+      p += mrlen;
+      ret -= (mrlen + 2);
 
-    //mlen = get_total_length(p, ret);
-    digest_message(p, ret, &(s->pair->phash), &phlen);
-    printf("[matls] %s:%s:%d: Length of Prior Hash: %d\n", __FILE__, __func__, __LINE__, phlen);
+      //mlen = get_total_length(p, ret);
+      digest_message(p, ret, &(s->pair->phash), &phlen);
+      printf("[matls] %s:%s:%d: Length of Prior Hash: %d\n", __FILE__, __func__, __LINE__, phlen);
 
-    PRINTK("Message Received", p, ret);
-    PRINTK("Hash of Received Message", s->pair->phash, phlen);
-    buf = memmove(buf, buf + mrlen + 2, ret);
+      PRINTK("Message Received", p, ret);
+      PRINTK("Hash of Received Message", s->pair->phash, phlen);
+      buf = memmove(buf, buf + mrlen + 2, ret);
+    }
   }
 #endif /* OPENSSL_NO_MATLS */
 

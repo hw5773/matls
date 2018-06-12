@@ -448,7 +448,7 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
     {
       int tmp1;
       MA_LOG("Before waiting the message");
-      while (!(s->pair && s->pair->extension_from_srvr_msg_len > 0)) {}
+      while (!(s->pair && (s->pair->extension_from_srvr_msg_len > 0))) {}
       MA_LOG("The server side pair has the extension message");
 
       MA_LOG1d("before memcpy", s->pair->extension_from_srvr_msg_len);

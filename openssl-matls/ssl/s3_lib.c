@@ -4437,7 +4437,7 @@ static int ssl3_read_internal(SSL *s, void *buf, int len, int peek)
 #ifndef OPENSSL_NO_MATLS
   if (s->mb_enabled)
   {
-    if (!s->server)
+    if (!s->server) // TODO: if not client authentication (need to revise this)
     {
       unsigned char *p;
       int mlen, mrlen, phlen;

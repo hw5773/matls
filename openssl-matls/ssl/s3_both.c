@@ -338,7 +338,7 @@ int ssl3_send_finished(SSL *s, int a, int b, const char *sender, int slen)
 #ifndef OPENSSL_NO_MATLS
 int matls_send_extended_finished(SSL *s)
 {
-	unsigned char *p, *d, *pp, *tmp, *tmp1, *tmp2, *msg, *parameters;
+	unsigned char *p, *d, *pp, *tmp1, *tmp2, *msg, *parameters;
 	int i, mlen, slen, plen, tlen, poff = 0;
 	unsigned long l;
 	int num_msg = 1;
@@ -359,8 +359,7 @@ int matls_send_extended_finished(SSL *s)
       printf("waiting for extended finished message from the server-side entity\n");
       while(!(s->pair->extended_finished_msg)) { printf(""); }
       printf("get the message from the server-side entity\n");
-      tmp = tmp1 = (unsigned char *)malloc(s->pair->extended_finished_msg_len);
-      printf("tmp1: %p\n", tmp1);
+      tmp1 = (unsigned char *)malloc(s->pair->extended_finished_msg_len);
       memcpy(tmp1, s->pair->extended_finished_msg, s->pair->extended_finished_msg_len);
       free(s->pair->extended_finished_msg);
       num_msg = *(tmp1++);
@@ -500,11 +499,12 @@ int matls_send_extended_finished(SSL *s)
     /* put the prior signatures */
     if (s->middlebox)
     {
+      printf("problem? tmp1: %p / mlen: %d / MATLS_H_LENGTH: %d / slen: %d\n", tmp1, mlen, MATLS_H_LENGTH, slen);
       memcpy(p, tmp1 + mlen + MATLS_H_LENGTH, slen);
       PRINTK("Previous Signature", p, slen);
       p += slen;
       l += slen;
-      free(tmp);
+      free(tmp1);
     }
 
 		/* put the signature length */

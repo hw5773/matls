@@ -134,7 +134,7 @@ int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len,
     if (p)
     {
       MA_LOG("Before waiting the message");
-      while (!(s->pair && (s->pair->extension_from_clnt_msg > 0))) { asm(""); }
+      while (!(s->pair && (s->pair->extension_from_clnt_msg > 0))) {}
       MA_LOG("The client side pair has the extension message");
       memcpy(&(s->mb_info), &(s->pair->mb_info), sizeof(struct mb_st));
       group_id = s->mb_info.group_id;
@@ -158,7 +158,7 @@ int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len,
       MA_LOG("after free");
 
       MA_LOG1p("s->lock", s->lock);
-      while (*(s->lock)) { asm(""); }
+      while (*(s->lock)) {}
       *(s->lock) = 1;
       if (!(s->mb_info.keypair))
       {
@@ -252,7 +252,7 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
     if (s->middlebox)
     {
       MA_LOG("Copy this extension message to my SSL struct (not to pair)");
-      s->extension_from_clnt_msg = (unsigned char *)malloc(len);
+      s->extension_from_clnt_msg = (volatile unsigned char *)malloc(len);
       MA_LOG1p("after malloc", s->extension_from_clnt_msg);
       memcpy(s->extension_from_clnt_msg, d, len);
       MA_LOG1d("after memcpy", len);
@@ -287,13 +287,13 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
     {
       nk = 2;
       s->mb_info.key_length = (int *)calloc(2, sizeof(int));
-      s->mb_info.secret = (unsigned char **)calloc(2, sizeof(unsigned char *));
+      s->mb_info.secret = (volatile unsigned char **)calloc(2, sizeof(unsigned char *));
       s->mb_info.mac_array = (unsigned char **)calloc(2, sizeof(unsigned char *));
     }
     else
     {
       s->mb_info.key_length = (int *)calloc(nk, sizeof(int));
-      s->mb_info.secret = (unsigned char **)calloc(nk, sizeof(unsigned char *));
+      s->mb_info.secret = (volatile unsigned char **)calloc(nk, sizeof(unsigned char *));
       s->mb_info.mac_array = (unsigned char **)calloc(nk, sizeof(unsigned char *));
     }
 
@@ -314,7 +314,7 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
 
     if (s->middlebox)
     {
-      while ((s->lock) && *(s->lock)) { asm(""); }
+      while ((s->lock) && *(s->lock)) {}
       *(s->lock) = 1;
       if (!(s->mb_info.keypair))
       {
@@ -372,7 +372,7 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
       EC_POINT_get_affine_coordinates_GFp(group, secret, x, y, ctx);
       secret_str = (unsigned char *)malloc((klen-1)/2);
       BN_bn2bin(x, secret_str);
-      s->mb_info.secret[i] = secret_str;
+      s->mb_info.secret[i] = (volatile unsigned char *)secret_str;
 
       free(peer_str);
       EC_POINT_free(secret);
@@ -421,7 +421,7 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
 
   if (p) {
     MA_LOG1p("s->lock", s->lock);
-    while (*(s->lock)) { asm(""); }
+    while (*(s->lock)) {}
     *(s->lock) = 1;
     if (!(s->mb_info.keypair))
     {
@@ -448,7 +448,7 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
     {
       int tmp1;
       MA_LOG("Before waiting the message");
-      while (!(s->pair && s->pair->extension_from_srvr_msg_len > 0)) { asm(" ");}
+      while (!(s->pair && s->pair->extension_from_srvr_msg_len > 0)) {}
       MA_LOG("The server side pair has the extension message");
 
       MA_LOG1d("before memcpy", s->pair->extension_from_srvr_msg_len);
@@ -527,7 +527,7 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
         else
           MA_LOG("Server");
 
-        while (!s->mb_info.secret[i]) { asm(""); }
+        while (!s->mb_info.secret[i]) {}
         memcpy(tmp, s->mb_info.secret[i], SECRET_LENGTH);
 
         t1_prf(TLS_MD_ACCOUNTABILITY_KEY_CONST, TLS_MD_ACCOUNTABILITY_KEY_CONST_SIZE,
@@ -645,7 +645,7 @@ int ssl_parse_serverhello_mb_ext(SSL *s, unsigned char *d, int size, int *al)
   s->pair->mb_info.secret[SERVER] = secret_str;
 
   printf("Before malloc for extension from srvr msg\n");
-  s->extension_from_srvr_msg = (unsigned char *)malloc(size);
+  s->extension_from_srvr_msg = (volatile unsigned char *)malloc(size);
   memcpy(s->extension_from_srvr_msg, d, size);
   printf("After malloc: %d\n", size);
   s->extension_from_srvr_msg_len = size;

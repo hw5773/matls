@@ -807,7 +807,7 @@ struct mb_st {
     int num_keys;
     int *key_length; //ECDH key length
     unsigned char **mac_array;
-    unsigned char **secret;
+    volatile unsigned char **secret;
     struct keypair *keypair;
     unsigned char lock;
     unsigned char *random[2];

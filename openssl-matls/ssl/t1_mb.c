@@ -644,9 +644,12 @@ int ssl_parse_serverhello_mb_ext(SSL *s, unsigned char *d, int size, int *al)
   BN_bn2bin(x, secret_str);
   s->pair->mb_info.secret[SERVER] = secret_str;
 
+  printf("Before malloc for extension from srvr msg\n");
   s->extension_from_srvr_msg = (unsigned char *)malloc(size);
   memcpy(s->extension_from_srvr_msg, d, size);
+  printf("After malloc: %d\n", size);
   s->extension_from_srvr_msg_len = size;
+  printf("Assign size\n");
 
   free(peer_str);
   EC_POINT_free(secret);

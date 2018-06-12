@@ -638,6 +638,7 @@ int ssl3_connect(SSL *s)
       ret = matls_get_extended_finished(s);
       if (ret <= 0) goto end;
       
+      printf("Finished matls_get_extended_finished\n");
       if (s->hit)
         s->state = SSL3_ST_CW_CHANGE_A;
       else

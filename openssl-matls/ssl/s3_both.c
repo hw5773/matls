@@ -357,7 +357,7 @@ int matls_send_extended_finished(SSL *s)
     if (s->middlebox)
     {
       printf("waiting for extended finished message from the server-side entity\n");
-      while(!(s->pair->extended_finished_msg)) { printf(""); }
+      while(!(s->pair->extended_finished_msg)) { asm(""); }
       printf("get the message from the server-side entity\n");
       tmp1 = (unsigned char *)malloc(s->pair->extended_finished_msg_len);
       memcpy(tmp1, s->pair->extended_finished_msg, s->pair->extended_finished_msg_len);
@@ -504,6 +504,7 @@ int matls_send_extended_finished(SSL *s)
       PRINTK("Previous Signature", p, slen);
       p += slen;
       l += slen;
+      tmp1--;
       free(tmp1);
     }
 

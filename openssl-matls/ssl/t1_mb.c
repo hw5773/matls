@@ -134,7 +134,7 @@ int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len,
     if (p)
     {
       MA_LOG("Before waiting the message");
-      while (!(s->pair && (s->pair->extension_from_clnt_msg > 0))) { printf(""); }
+      while (!(s->pair && (s->pair->extension_from_clnt_msg > 0))) { asm(""); }
       MA_LOG("The client side pair has the extension message");
       memcpy(&(s->mb_info), &(s->pair->mb_info), sizeof(struct mb_st));
       group_id = s->mb_info.group_id;
@@ -158,7 +158,7 @@ int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len,
       MA_LOG("after free");
 
       MA_LOG1p("s->lock", s->lock);
-      while (*(s->lock)) { printf(""); }
+      while (*(s->lock)) { asm(""); }
       *(s->lock) = 1;
       if (!(s->mb_info.keypair))
       {
@@ -314,7 +314,7 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
 
     if (s->middlebox)
     {
-      while ((s->lock) && *(s->lock)) { printf(""); }
+      while ((s->lock) && *(s->lock)) { asm(""); }
       *(s->lock) = 1;
       if (!(s->mb_info.keypair))
       {
@@ -421,7 +421,7 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
 
   if (p) {
     MA_LOG1p("s->lock", s->lock);
-    while (*(s->lock)) { printf(""); }
+    while (*(s->lock)) { asm(""); }
     *(s->lock) = 1;
     if (!(s->mb_info.keypair))
     {
@@ -448,7 +448,7 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
     {
       int tmp1;
       MA_LOG("Before waiting the message");
-      while (!(s->pair && (s->pair->extension_from_srvr_msg_len > 0))) { printf(""); }
+      while (!(s->pair && s->pair->extension_from_srvr_msg_len > 0)) { asm(" ");}
       MA_LOG("The server side pair has the extension message");
 
       MA_LOG1d("before memcpy", s->pair->extension_from_srvr_msg_len);
@@ -527,7 +527,7 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
         else
           MA_LOG("Server");
 
-        while (!s->mb_info.secret[i]) { printf(""); }
+        while (!s->mb_info.secret[i]) { asm(""); }
         memcpy(tmp, s->mb_info.secret[i], SECRET_LENGTH);
 
         t1_prf(TLS_MD_ACCOUNTABILITY_KEY_CONST, TLS_MD_ACCOUNTABILITY_KEY_CONST_SIZE,

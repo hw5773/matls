@@ -64,6 +64,7 @@ int main(int count, char *strings[])
 
 	while ((client = accept(server, (struct sockaddr *)&addr, &len)))
 	{
+		BIO_printf(outbio, "New Connection\n");
 		ssl = SSL_new(ctx);/* get new SSL state with context */
 		BIO_printf(outbio, "SSL_new() Success\n");
 		SSL_set_fd(ssl, client);      /* set connection socket to SSL state */
@@ -89,6 +90,9 @@ int main(int count, char *strings[])
 		BIO_printf(outbio, "SERVER: Send the HTTP Test Page Success: %d\n", sent);
 
 		//close(client);
+		//printf("free client\n");
+		//SSL_free(ssl);
+		//printf("free ssl\n");
 	}
 
 	SSL_free(ssl);

@@ -810,7 +810,9 @@ int ssl3_accept(SSL *s)
 #ifndef OPENSSL_NO_MATLS
     case SSL3_ST_SW_EXTENDED_FINISHED_A:
     case SSL3_ST_SW_EXTENDED_FINISHED_B:
+      printf("waiting extended finished message\n");
       while (s->pair->extended_finished_msg_len <= 0) {}
+      printf("get extended finished message\n");
       ret = matls_send_extended_finished(s);
       if (ret <= 0) goto end;
       s->state = SSL3_ST_SW_FLUSH;

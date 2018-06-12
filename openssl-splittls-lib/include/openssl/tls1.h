@@ -715,6 +715,13 @@ SSL_CTX_callback_ctrl(ssl,SSL_CTRL_SET_TLSEXT_TICKET_KEY_CB,(void (*)(void))cb)
 #define TLS_MD_MASTER_SECRET_CONST		"master secret"
 #define TLS_MD_MASTER_SECRET_CONST_SIZE		13
 
+#ifndef OPENSSL_NO_MATLS 
+#define TLS_MD_GLOBAL_MAC_KEY_CONST      "global mac key"
+#define TLS_MD_GLOBAL_MAC_KEY_CONST_SIZE         14
+#define TLS_MD_ACCOUNTABILITY_KEY_CONST      "accountability key"
+#define TLS_MD_ACCOUNTABILITY_KEY_CONST_SIZE         18
+#endif /* OPENSSL_NO_MATLS */
+
 #ifdef CHARSET_EBCDIC
 #undef TLS_MD_CLIENT_FINISH_CONST
 #define TLS_MD_CLIENT_FINISH_CONST    "\x63\x6c\x69\x65\x6e\x74\x20\x66\x69\x6e\x69\x73\x68\x65\x64"  /*client finished*/

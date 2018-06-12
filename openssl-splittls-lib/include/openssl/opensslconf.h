@@ -94,8 +94,8 @@ extern "C" {
 
 #if !(defined(VMS) || defined(__VMS)) /* VMS uses logical names instead */
 #if defined(HEADER_CRYPTLIB_H) && !defined(OPENSSLDIR)
-#define ENGINESDIR "/home/hwlee/openssl-splittls-lib/lib/engines"
-#define OPENSSLDIR "/home/hwlee/openssl-splittls-lib/ssl"
+#define ENGINESDIR "/home/hwlee/openssl-matls-lib/lib/engines"
+#define OPENSSLDIR "/home/hwlee/openssl-matls-lib/ssl"
 #endif
 #endif
 

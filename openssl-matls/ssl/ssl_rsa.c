@@ -487,18 +487,24 @@ end:
 
 int SSL_register_id(SSL *s)
 {
-  int klen;
-  unsigned char *key;
+  BIO *key;
   EVP_PKEY *pkey;
 
   if (s->x509)
   {
-    pkey = X509_get_pubkey(s->x509);
-    klen = i2d_PUBKEY(pkey, &key);
+    key = BIO_new(BIO_f_md());
+    BIO_set_md(key, EVP_sha256());
 
-    digest_message(key, klen, &(s->id), &(s->id_length));
+    pkey = X509_get_pubkey(s->x509);
+    PEM_write_bio_PUBKEY(key, pkey);
+
+    s->id_length = TLS_MD_ID_SIZE;
+    BIO_gets(key, s->id, s->id_length);
 
     PRINTK("Identifier in Function", s->id, s->id_length);
+    
+    BIO_free_all(key);
+    EVP_PKEY_free(pkey);
 
     return 1;
   }
@@ -542,19 +548,51 @@ end:
 
 int SSL_CTX_register_id(SSL_CTX *ctx)
 {
-  int klen;
-  unsigned char *key;
+  BIO *key, *id;
   EVP_PKEY *pkey;
 
   if (ctx->x509)
   {
-    pkey = X509_get_pubkey(ctx->x509);
-    klen = i2d_PUBKEY(pkey, NULL);
-    key = (unsigned char *)malloc(klen);
-    i2d_PUBKEY(pkey, &key);
-    digest_message(key, klen, &(ctx->id), &(ctx->id_length));
+    if (!(id = BIO_new(BIO_s_mem())))
+      printf("Error making memory\n");
+    else
+      printf("Making memory success\n");
 
-    PRINTK("Identifier in Function", ctx->id, ctx->id_length);
+    if (!(key = BIO_new(BIO_f_md())))
+      printf("Error making md filter\n");
+    else
+      printf("Making md filter success\n");
+
+    if (!BIO_set_md(key, EVP_sha256()))
+      printf("Error setting sha256\n");
+    else
+      printf("Setting sha256 success\n");
+
+    BIO_push(key, id);
+
+    if (!(pkey = X509_get_pubkey(ctx->x509)))
+      printf("Error getting public key from certificate\n");
+    else
+      printf("Getting public key from certificate\n");
+/*
+    if (!PEM_write_bio_PUBKEY(key, pkey))
+      printf("Error writing public key data in PEM format\n");
+    else
+      printf("Writing public key data in PEM format\n");
+*/
+    if (!i2d_PUBKEY_bio(key, pkey))
+      printf("Error writing public key data in DER format\n");
+    else
+      printf("Writing public key data in DER format\n");
+
+    ctx->id_length = TLS_MD_ID_SIZE;
+    ctx->id = (unsigned char *)malloc(ctx->id_length);
+    BIO_gets(key, ctx->id, TLS_MD_ID_SIZE);
+
+    PRINTK("ID", ctx->id, ctx->id_length);
+
+    BIO_free_all(key);
+    EVP_PKEY_free(pkey);
 
     return 1;
   }

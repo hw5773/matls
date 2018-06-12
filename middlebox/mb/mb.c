@@ -24,6 +24,7 @@ void print_pubkey(EVP_PKEY *pkey);
 BIO *bio_err;
 void *mb_run(void *data);
 int get_total_length(char *buf, int rcvd);
+int modification;
 
 struct info
 {
@@ -33,7 +34,7 @@ struct info
 // Origin Server Implementation
 int main(int count, char *strings[])
 {  
-	int server, client, rc, tidx = 0, i, server_side, modification;
+	int server, client, rc, tidx = 0, i, server_side;
 	char *portnum, *cert, *key, *forward_file;
   void *status;
 
@@ -106,7 +107,7 @@ void *mb_run(void *data)
   struct info *info;
   int client, ret, rcvd, sent, tot_len = -1, head_len = -1, body_len = -1;
   unsigned char buf[BUF_SIZE];
-  const char *modified =
+  char modified[134] =
     "HTTP/1.1 200 OK\r\n"
     "Content-Type: text/html\r\n"
     "Content-Length: 70\r\n"
@@ -158,7 +159,12 @@ void *mb_run(void *data)
       MA_LOG1d("Sent to Client-side", sent);
 
       if (tot_len < 0)
-        tot_len = get_total_length(buf, rcvd);
+      {
+        if (modification)
+          tot_len = get_total_length((char *)modified, modified_len);
+        else
+          tot_len = get_total_length(buf, rcvd);
+      }
 
       MA_LOG1d("Total Length", tot_len);
 
@@ -175,21 +181,12 @@ void *mb_run(void *data)
 //  close(client);
 }
 
-int get_total_length(char *b, int rcvd)
+int get_total_length(char *buf, int rcvd)
 {
-  char *buf, *p;
   int tot_len, head_len, body_len, index, tok_len, mrlen, len;
   const char *clen = "Content-Length";
   char *token = NULL;
   char val[4];
-
-  p = b;
-  mrlen = ((*(p++) & 0xff) << 8) | (*(p++) & 0xff);
-  printf("Modification Length: %d\n", mrlen);
-  p += mrlen;
-  len = rcvd - 2 - mrlen;
-  buf = p;
-
 
   head_len = strstr(buf, "\r\n\r\n") - buf + 4;
   MA_LOG1d("Header Length", head_len);
@@ -339,7 +336,6 @@ void load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file)
   }
   else
     printf("SSL_CTX_register_id success\n");
-
 	/* Set the private key from KeyFile (may be the same as CertFile) */
 	if ( SSL_CTX_use_PrivateKey_file(ctx, key_file, SSL_FILETYPE_PEM) <= 0 )
 	{

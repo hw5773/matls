@@ -24,7 +24,9 @@ int send_to_pair(SSL *ssl, char *buf, size_t len)
 {
   MA_LOG("Send the following data to the pair");
   int ret = 0;
+#ifdef DEBUG
   printf("%.*s", (int)len, buf);
+#endif /* DEBUG */
 
   while (!ssl->pair) {}
 
@@ -43,9 +45,7 @@ void ssl_client_init(struct ssl_client *p)
   p->rbio = BIO_new(BIO_s_mem());
   p->wbio = BIO_new(BIO_s_mem());
 
-  printf("here 1\n");
   p->ssl = SSL_new(ctx);
-  printf("here 2\n");
   p->ssl->lock = (int *)calloc(1, sizeof(int));
 
   SSL_set_accept_state(p->ssl); /* sets ssl to work in server mode. */
@@ -100,11 +100,11 @@ int on_read_cb(char* src, size_t len)
   char buf[DEFAULT_BUF_SIZE];
   enum sslstatus status;
   int n;
-  printf("len: %lu\n", len);
+  //printf("len: %lu\n", len);
 
   while (len > 0) {
     n = BIO_write(client.rbio, src, len);
-    printf("after BIO_write: %d\n", n);
+    //printf("after BIO_write: %d\n", n);
 
     if (n<=0)
       return -1; /* if BIO write fails, assume unrecoverable */
@@ -114,14 +114,14 @@ int on_read_cb(char* src, size_t len)
 
     if (!SSL_is_init_finished(client.ssl)) {
       n = SSL_accept(client.ssl);
-      printf("after accept: %d\n", n);
+      //printf("after accept: %d\n", n);
       status = get_sslstatus(client.ssl, n);
 
       /* Did SSL request to write bytes? */
       if (status == SSLSTATUS_WANT_IO)
         do {
           n = BIO_read(client.wbio, buf, sizeof(buf));
-          printf("after BIO_read: %d\n", n);
+          //printf("after BIO_read: %d\n", n);
           if (n > 0)
             queue_encrypted_bytes(buf, n);
           else if (!BIO_should_retry(client.wbio))
@@ -131,7 +131,7 @@ int on_read_cb(char* src, size_t len)
       if (status == SSLSTATUS_FAIL)
         return -1;
 
-      printf("SSL_is_init_finished accept: %d\n", SSL_is_init_finished(client.ssl));
+      //printf("SSL_is_init_finished accept: %d\n", SSL_is_init_finished(client.ssl));
       if (!SSL_is_init_finished(client.ssl))
         return 0;
     }
@@ -141,7 +141,7 @@ int on_read_cb(char* src, size_t len)
 
     do {
       n = SSL_read(client.ssl, buf, sizeof(buf));
-      printf("SSL_read bytes: %d\n", n);
+      //printf("SSL_read bytes: %d\n", n);
       if (n > 0)
         client.io_on_read(client.ssl, buf, (size_t)n);
     } while (n > 0);
@@ -214,7 +214,7 @@ int do_sock_read()
 int do_sock_write()
 {
   ssize_t n = write(client.fd, client.write_buf, client.write_len);
-  printf("after write: %lu\n", n);
+  //printf("after write: %lu\n", n);
   if (n>0) {
     if ((size_t)n<client.write_len)
       memmove(client.write_buf, client.write_buf+n, client.write_len-n);
@@ -228,17 +228,17 @@ int do_sock_write()
 
 void sni_callback(unsigned char *buf, int len, SSL *ssl)
 {
-  printf("sni_callback\n");
+  //printf("sni_callback\n");
   int index, ilen, port, rc, tidx;
   unsigned char *ip; 
   void *status;
   struct forward_info *args;
   
-  printf("server name: %s\n", buf);
+  //printf("server name: %s\n", buf);
   index = find_by_name(buf, len);
   ip = get_ip_by_index(index);
   port = get_port_by_index(index);
-  printf("forward to: %s:%d\n", ip, port);
+  //printf("forward to: %s:%d\n", ip, port);
 
   args = (struct forward_info *)malloc(sizeof(struct forward_info));
   args->index = index;
@@ -253,10 +253,10 @@ void msg_callback(int write, int version, int content_type, const void *buf, siz
   unsigned char *p;
   p = (unsigned char *)buf;
 
-  printf("write operation? %d\n", write);
-  printf("version? 0x%x\n", version);
-  printf("content type? ");
-
+  //printf("write operation? %d\n", write);
+  //printf("version? 0x%x\n", version);
+  //printf("content type? ");
+/*
   switch(content_type)
   {
     case 20:
@@ -274,6 +274,7 @@ void msg_callback(int write, int version, int content_type, const void *buf, siz
     default:
       printf("invalid\n");
   }
+*/
 /*
   for (i=0; i<len; i++)
   {
@@ -376,7 +377,7 @@ void *run(void *data)
 }
 
 void ssl_init(char *cert, char *priv) {
-  printf("initialising SSL\n");
+  //printf("initialising SSL\n");
 
   /* SSL library initialisation */
   SSL_library_init();
@@ -396,20 +397,32 @@ void ssl_init(char *cert, char *priv) {
   if (err != 1)
     int_error("SSL_CTX_use_certificate_file failed");
   else
+  {
+#ifdef DEBUG
     printf("certificate file loaded ok\n");
+#endif /* DEBUG */
+  }
 
   /* Indicate the key file to be used */
   err = SSL_CTX_use_PrivateKey_file(ctx, priv, SSL_FILETYPE_PEM);
   if (err != 1)
     int_error("SSL_CTX_use_PrivateKey_file failed");
   else
+  {
+#ifdef DEBUG
     printf("private-key file loaded ok\n");
+#endif /* DEBUG */
+  }
 
   /* Make sure the key and certificate file match. */
   if (SSL_CTX_check_private_key(ctx) != 1)
     int_error("SSL_CTX_check_private_key failed");
   else
+  {
+#ifdef DEBUG
     printf("private key verified ok\n");
+#endif /* DEBUG */
+  }
 
   /* Recommended to avoid SSLv2 & SSLv3 */
   SSL_CTX_set_options(ctx, SSL_OP_ALL|SSL_OP_NO_SSLv2|SSL_OP_NO_SSLv3);

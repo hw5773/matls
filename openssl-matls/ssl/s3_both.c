@@ -139,7 +139,7 @@ int make_signature_block2(unsigned char **sigblk, unsigned char *msg, int msg_le
 	ctx = EVP_MD_CTX_create();
 	if (ctx == NULL)
 	{
-		printf("EVP_MD_CTX_create failed\n");
+		//printf("EVP_MD_CTX_create failed\n");
 		goto err;
 	}
 
@@ -151,47 +151,47 @@ int make_signature_block2(unsigned char **sigblk, unsigned char *msg, int msg_le
 			rc2 = EVP_DigestSignInit(ctx, NULL, EVP_sha256(), NULL, priv);
 			break;
 		default:
-			printf("Unknown Hash algorithm\n");
+			//printf("Unknown Hash algorithm\n");
 			goto err;
 	}
 
 	// Make the signature
 	if (rc1 != 1)
 	{
-		printf("PROGRESS: Digest Init Failed\n");
+		//printf("PROGRESS: Digest Init Failed\n");
 		goto err;
 	}
 	if (rc2 != 1)
 	{
-		printf("PROGRESS: DigestSign Init Failed\n");
+		//printf("PROGRESS: DigestSign Init Failed\n");
 		goto err;
 	}
 
 	rc = EVP_DigestSignUpdate(ctx, msg, msg_len);
 	if (rc != 1)
 	{
-		printf("PROGRESS: DigestSign Update Failed\n");
+		//printf("PROGRESS: DigestSign Update Failed\n");
 		goto err;
 	}
 
 	rc = EVP_DigestSignFinal(ctx, NULL, &sig_len);
 	if (rc != 1)
 	{
-		printf("PROGRESS: DigestSign Final Failed\n");
+		//printf("PROGRESS: DigestSign Final Failed\n");
 		goto err;
 	}
 	sig = OPENSSL_malloc(sig_len);
 
 	if (sig == NULL)
 	{
-		printf("PROGRESS: OPENSSL_malloc error\n");
+		//printf("PROGRESS: OPENSSL_malloc error\n");
 		goto err;
 	}
 
 	rc = EVP_DigestSignFinal(ctx, sig, &sig_len);
 	if (rc != 1)
 	{
-		printf("PROGRESS: DigestSign Final Failed\n");
+		//printf("PROGRESS: DigestSign Final Failed\n");
 		goto err;
 	}
 
@@ -219,28 +219,28 @@ int digest_message(unsigned char *message, size_t message_len, unsigned char **d
 
 	if(ctx == NULL)
 	{
-		printf("EVP_MD_CTX_create failed\n");
+		//printf("EVP_MD_CTX_create failed\n");
 		goto err;
 	}
 	if(1 != EVP_DigestInit_ex(ctx, EVP_sha256(), NULL))
 	{
-		printf("EVP_DigestInit failed\n");
+		//printf("EVP_DigestInit failed\n");
 		goto err;
 	}
 	// what is EVP_DigestSignInit in ttpa_func.c
 	if(1 != EVP_DigestUpdate(ctx, message, message_len))
 	{
-		printf("EVP_DigestUpdate failed\n");
+		//printf("EVP_DigestUpdate failed\n");
 		goto err;
 	}
 	if((*digest = (unsigned char *)OPENSSL_malloc(EVP_MD_size(EVP_sha256()))) == NULL)
 	{
-		printf("OPENSSL_malloc failed\n");
+		//printf("OPENSSL_malloc failed\n");
 		goto err;
 	}
 	if(1 != EVP_DigestFinal_ex(ctx, *digest, digest_len))
 	{
-		printf("EVP_DigestFinal_ex failed\n");
+		//printf("EVP_DigestFinal_ex failed\n");
 		goto err;
 	}
 	EVP_MD_CTX_destroy(ctx);
@@ -356,14 +356,20 @@ int matls_send_extended_finished(SSL *s)
 
     if (s->middlebox)
     {
+#ifdef DEBUG
       printf("waiting for extended finished message from the server-side entity\n");
-      while(!(s->pair->extended_finished_msg)) {}
+#endif /* DEBUG */
+      while(!(s->pair->extended_finished_msg)) { __sync_synchronize(); }
+#ifdef DEBUG
       printf("get the message from the server-side entity\n");
+#endif /* DEBUG */
       tmp1 = (unsigned char *)malloc(s->pair->extended_finished_msg_len);
       memcpy(tmp1, s->pair->extended_finished_msg, s->pair->extended_finished_msg_len);
       free(s->pair->extended_finished_msg);
       num_msg = *(tmp1++);
+#ifdef DEBUG
       printf("num keys: %d\n", num_msg);
+#endif /* DEBUG */
 
       if (num_msg < 1)
       {
@@ -382,7 +388,9 @@ int matls_send_extended_finished(SSL *s)
       mlen += (num_msg - 1);
       slen = s->pair->extended_finished_msg_len - 1 - mlen - MATLS_H_LENGTH;
       plen = MATLS_H_LENGTH + MATLS_M_LENGTH;
+#ifdef DEBUG 
       printf("mlen: %d, slen: %d, plen: %d\n", mlen, slen, plen);
+#endif /* DEBUG */
       num_msg++;
       s->pair->extended_finished_msg_len = 0;
     }
@@ -390,7 +398,9 @@ int matls_send_extended_finished(SSL *s)
     {
       mlen = 0; slen = 0;
       plen = MATLS_M_LENGTH;
+#ifdef DEBUG
       printf("mlen: %d, slen: %d, plen: %d\n", mlen, slen, plen);
+#endif /* DEBUG */
     }
 
 		msg = (unsigned char *)malloc(plen); //mac, version, cipher, ti
@@ -427,7 +437,6 @@ int matls_send_extended_finished(SSL *s)
 
     if (s->middlebox)
 	  {
-		  printf("s->server: %d\n", s->server);
 		  PRINTK("used accountability key", s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
       digest = HMAC(EVP_sha256(), s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, plen, NULL, &digest_len);
 	  }
@@ -439,7 +448,6 @@ int matls_send_extended_finished(SSL *s)
 
     free(msg);
 
-    printf("after hmac: %ld\n", digest_len);
 	  PRINTK("hmac", digest, digest_len);
 
 		/* make signature block */
@@ -448,12 +456,13 @@ int matls_send_extended_finished(SSL *s)
 			printf("ERROR: make the signature block failed\n");
 			return 0;
 		}
+#ifdef DEBUG
 		printf("PROGRESS: make the signature block\n");
+#endif /* DEBUG */
 
 
 		/* put num_msg */
 		*(p++) = num_msg;
-		printf("num_msg\n%02X\n", num_msg);
 
     if (s->middlebox)
       tlen = 4 + 1 + MATLS_M_PAIR_LENGTH + mlen + 1 + digest_len + slen + 2 + sigblk_len;
@@ -499,7 +508,6 @@ int matls_send_extended_finished(SSL *s)
     /* put the prior signatures */
     if (s->middlebox)
     {
-      printf("problem? tmp1: %p / mlen: %d / MATLS_H_LENGTH: %d / slen: %d\n", tmp1, mlen, MATLS_H_LENGTH, slen);
       memcpy(p, tmp1 + mlen + MATLS_H_LENGTH, slen);
       PRINTK("Previous Signature", p, slen);
       p += slen;
@@ -509,7 +517,6 @@ int matls_send_extended_finished(SSL *s)
     }
 
 		/* put the signature length */
-		printf("sigblk_len: %d\n\n", sigblk_len);
 		s2n(sigblk_len, p);
     l += 2;
 			
@@ -527,7 +534,6 @@ int matls_send_extended_finished(SSL *s)
 
 	PRINTK("Extended Finished Message", d, l);
 
-	printf("Message Length: %lu\n", l);
 	/* SSL3_ST_SEND_xxxxxx_HELLO_B */
 	return(ssl3_do_write(s,SSL3_RT_HANDSHAKE));
 }
@@ -574,7 +580,9 @@ int matls_get_extended_finished(SSL *s)
 	 */ 
 #endif
 
-  printf("matls get extended finished\n");
+#ifdef DEBUG
+  printf("[matls] %s:%s:%d: matls get extended finished\n", __FILE__, __func__, __LINE__);
+#endif /* DEBUG */
 	n=s->method->ssl_get_message(s,
 		SSL3_ST_CR_EXTENDED_FINISHED_A,
 		SSL3_ST_CR_EXTENDED_FINISHED_B,
@@ -589,7 +597,9 @@ int matls_get_extended_finished(SSL *s)
   s->extended_finished_msg = (volatile unsigned char *)malloc(n);
   memcpy(s->extended_finished_msg, p, n);
   s->extended_finished_msg_len = n;
-  printf("Length of extended finished message: %ld\n", n);
+#ifdef DEBUG
+  printf("[matls] %s:%s:%d: Length of extended finished message: %ld\n", __FILE__, __func__, __LINE__, n);
+#endif /* DEBUG */
 
 	return(1);
 }
@@ -608,14 +618,12 @@ int ssl3_get_finished(SSL *s, int a, int b)
 	 */ 
 #endif
 
-  printf("before get message in get finished\n");
 	n=s->method->ssl_get_message(s,
 		a,
 		b,
 		SSL3_MT_FINISHED,
 		20000, /* should actually be 36+4 :-) */
 		&ok);
-  printf("after get message in get finished: %d\n", (int) n);
 
 	if (!ok) return((int)n);
 
@@ -955,14 +963,15 @@ unsigned long matls_output_cert_chain(SSL *s, X509 *x)
 		p = (unsigned char *)&(buf->data[len_pos]);
   		len = l - init;
   		l2n3(len, p);
-  		printf("length of the newly added certificate chain: %ld\n", len);
+#ifdef DEBUG
+  		printf("[matls] %s:%s:%d: length of the newly added certificate chain: %ld\n", __FILE__, __func__, __LINE__, len);
+#endif /* DEBUG */
 		l -= 4;
 	}
 
 	p = (unsigned char *)&(buf->data[0]);
 	*(p++) = SSL3_MT_CERTIFICATE;
 	l2n3(l,p);
- 	printf("total length: %ld\n", l);
 	l += 4;
 
 	return(l);

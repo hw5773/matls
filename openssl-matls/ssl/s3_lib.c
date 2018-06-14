@@ -4228,13 +4228,19 @@ int ssl3_write(SSL *s, const void *b, int len)
         PRINTK("Message to be sent", buf, len);
         PRINTK("Hash of Sent Message", hash, hlen);
 
+#ifdef DEBUG
         printf("[matls] %s:%s:%d: Before strncmp\n", __FILE__, __func__, __LINE__);
+#endif /* DEBUG */
         write = strncmp((const char *)s->phash, (const char *)hash, TLS_MD_HMAC_SIZE);
+#ifdef DEBUG
         printf("[matls] %s:%s:%d: Write: %d\n", __FILE__, __func__, __LINE__, write);
+#endif /* DEBUG */
 
         if (write)
         {
+#ifdef DEBUG
           printf("[matls] %s:%s:%d: In write\n", __FILE__, __func__, __LINE__);
+#endif /* DEBUG */
           unsigned char *msg;
           int mlen;
           mrlen = s->pmr_length + TLS_MD_ID_SIZE + TLS_MD_HASH_SIZE + TLS_MD_HMAC_SIZE;
@@ -4258,35 +4264,47 @@ int ssl3_write(SSL *s, const void *b, int len)
           buf = (unsigned char *)realloc(buf, len + 2 + mrlen);
   
           if (!buf)
+          {
+#ifdef DEBUG
             printf("[matls] %s:%s:%d Realloc Failed\n", __FILE__, __func__, __LINE__);
+#endif /* DEBUG */
+          }
           else
+          {
+#ifdef DEBUG
             printf("[matls] %s:%s:%d Realloc Success\n", __FILE__, __func__, __LINE__);
+#endif /* DEBUG */
+          }
 
+#ifdef DEBUG
           printf("buf before memmove: %p\n", buf);
+#endif /* DEBUG */
           memmove(buf + 2 + mrlen, buf, len);
+#ifdef DEBUG
           printf("buf after memmove: %p\n", buf);
+#endif
           memcpy(q, hmac, TLS_MD_HMAC_SIZE);
           p = buf;
           s2n(mrlen, p);
           memcpy(p, mr, mrlen);
 
+#ifdef DEBUG
           printf("[matls] %s:%s:%d: Changed Modification Record Length: %d\n", __FILE__, __func__, __LINE__, mrlen);
           PRINTK("Added HMAC", hmac, TLS_MD_HMAC_SIZE);
+#endif /* DEBUG */
 
           len += (2 + mrlen);
 
           //free(s->pmr);
-          printf("free s->pmr\n");
           free(mr);
-          printf("free mr\n");
           free(msg);
-          printf("free msg\n");
           s->pmr_length = 0;
-          printf("free s->pmr, free->mr, free->msg\n");
         }
         else
         {
+#ifdef DEBUG
           printf("[matls] %s:%s:%d: Not in write\n", __FILE__, __func__, __LINE__, write);
+#endif /* DEBUG */
           pmac = (unsigned char *)malloc(TLS_MD_HMAC_SIZE);
           memcpy(pmac, s->pmr + s->pmr_length - TLS_MD_HMAC_SIZE, TLS_MD_HMAC_SIZE);
           PRINTK("Prior HMAC", pmac, TLS_MD_HMAC_SIZE);
@@ -4295,24 +4313,25 @@ int ssl3_write(SSL *s, const void *b, int len)
           memcpy(s->pmr + s->pmr_length - TLS_MD_HMAC_SIZE, hmac, hmlen);
           buf = (unsigned char *)realloc(buf, len + s->pmr_length + 2);
 
+#ifdef DEBUG
           if (!buf)
             printf("[matls] %s:%s:%d Realloc Failed\n", __FILE__, __func__, __LINE__);
           else
             printf("[matls] %s:%s:%d Realloc Success\n", __FILE__, __func__, __LINE__);
-
-          printf("s->pmr_length: %d\n", s->pmr_length);
-
+#endif /* DEBUG */
           PRINTK("Before memmove", buf, len);
 
           unsigned char *tmp;
+#ifdef DEBUG
           printf("[matls] %s:%s:%d: Length of message: %d\n", __FILE__, __func__, __LINE__, len);
+#endif /* DEBUG */
           tmp = memmove(buf + s->pmr_length + 2, buf, len);
-
+#ifdef DEBUG
           if (!tmp)
             printf("[matls] %s:%s:%d: Memmove Failure\n", __FILE__, __func__, __LINE__);
           else
             printf("[matls[ %s:%s:%d: Memmove Success\n", __FILE__, __func__, __LINE__);
-
+#endif /* DEBUG */
           p = buf;
           s2n(s->pmr_length, p);
           memcpy(p, s->pmr, s->pmr_length);
@@ -4322,21 +4341,25 @@ int ssl3_write(SSL *s, const void *b, int len)
           free(s->pmr);
           free(pmac);
           s->pmr_length = 0;
-          printf("free s->pmr / free pmac\n");
         }
       }
     }
     else // Server
     {
+#ifdef DEBUG
       printf("[matls] %s:%s:%d: This is the server\n", __FILE__, __func__, __LINE__);
+#endif /* DEBUG */
       if (s->matls_received)
       {
+#ifdef DEBUG
         printf("[matls] %s:%s:%d: Making the modification record\n", __FILE__, __func__, __LINE__);
+#endif /* DEBUG */
         mrlen = TLS_MD_ID_SIZE + TLS_MD_HMAC_SIZE;
 
+#ifdef DEBUG
         printf("[matls] %s:%s:%d: Length of modification record: %d\n", __FILE__, __func__, __LINE__, mrlen);
+#endif /* DEBUG */
         mr = (unsigned char *)malloc(2 + mrlen);
-        printf("first mr: %p\n", mr);
         p = mr;
         s2n(mrlen, p);
         memcpy(p, s->id, s->id_length);
@@ -4355,18 +4378,17 @@ int ssl3_write(SSL *s, const void *b, int len)
 
         buf = realloc(buf, len + 2 + mrlen);
 
+#ifdef DEBUG
         if (!buf)
           printf("[matls] %s:%s:%d Realloc Failed\n", __FILE__, __func__, __LINE__);
         else
           printf("[matls] %s:%s:%d Realloc Success\n", __FILE__, __func__, __LINE__);
+#endif /* DEBUG */
 
-        printf("buf before memmove: %p\n", buf);
         memmove(buf + 2 + mrlen, buf, len);
-        printf("buf after memmove: %p\n", buf);
         memcpy(buf, mr, mrlen + 2);
         len += (2 + mrlen);
 
-        printf("mr before free: %p\n", mr);
         free(mr);
       }
     }
@@ -4443,8 +4465,10 @@ static int ssl3_read_internal(SSL *s, void *buf, int len, int peek)
       int mlen, mrlen, phlen;
       p = (unsigned char *)buf;
       n2s(p, mrlen);
+#ifdef DEBUG
       printf("[matls] %s:%s:%d: Length of Received Message: %d\n", __FILE__, __func__, __LINE__, ret);
       printf("[matls] %s:%s:%d: Length of Modification Record: %d\n", __FILE__, __func__, __LINE__, mrlen);
+#endif /* DEBUG */
       s->pair->pmr = (unsigned char *)malloc(mrlen);
       memcpy(s->pair->pmr, p, mrlen);
       s->pair->pmr_length = mrlen;
@@ -4456,7 +4480,9 @@ static int ssl3_read_internal(SSL *s, void *buf, int len, int peek)
 
       //mlen = get_total_length(p, ret);
       digest_message(p, ret, &(s->pair->phash), &phlen);
+#ifdef DEBUG
       printf("[matls] %s:%s:%d: Length of Prior Hash: %d\n", __FILE__, __func__, __LINE__, phlen);
+#endif /* DEBUG */
 
       PRINTK("Message Received", p, ret);
       PRINTK("Hash of Received Message", s->pair->phash, phlen);

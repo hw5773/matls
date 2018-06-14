@@ -2670,7 +2670,6 @@ int SSL_set_client_side(SSL *s)
 
 int SSL_enable_mb(SSL *s)
 {
-  printf("ssl enable mb\n");
 #ifdef MB_DEBUG
 	printf("[DEBUG] %s:%s:%d: mb enabled\n", __FILE__, __func__, __LINE__);
 #endif
@@ -2680,7 +2679,6 @@ int SSL_enable_mb(SSL *s)
 
 int SSL_disable_mb(SSL *s)
 {
-  printf("ssl disable mb\n");
 #ifdef MB_DEBUG
 	printf("[DEBUG] %s:%s:%d: mb disabled\n", __FILE__, __func__, __LINE__);
 #endif
@@ -2693,9 +2691,7 @@ void SSL_CTX_is_middlebox(SSL_CTX *ctx)
 #ifdef MB_DEBUG
   printf("[DEBUG] %s:%s:%d: This is set to a middlebox\n", __FILE__, __func__, __LINE__);
 #endif
-  printf("Before setting as a middlebox\n");
   ctx->middlebox = 1;
-  printf("After setting as a middlebox\n");
 }
 
 int SSL_CTX_set_server_side(SSL_CTX *ctx)

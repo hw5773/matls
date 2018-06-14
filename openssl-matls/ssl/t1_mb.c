@@ -134,7 +134,7 @@ int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len,
     if (p)
     {
       MA_LOG("Before waiting the message");
-      while (!(s->pair && (s->pair->extension_from_clnt_msg_len > 0))) { __sync_synchronize(); }
+      while (!(s->pair && (s->pair->extension_from_clnt_msg_len > 0))) {}
       MA_LOG("The client side pair has the extension message");
       memcpy(&(s->mb_info), &(s->pair->mb_info), sizeof(struct mb_st));
       group_id = s->mb_info.group_id;
@@ -448,7 +448,7 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
     {
       int tmp1;
       MA_LOG("Before waiting the message");
-      while (!(s->pair && (s->pair->extension_from_srvr_msg_len > 0))) { __sync_synchronize(); }
+      while (!(s->pair && (s->pair->extension_from_srvr_msg_len > 0))) {}
       MA_LOG("The server side pair has the extension message");
 
       MA_LOG1d("before memcpy", s->pair->extension_from_srvr_msg_len);
@@ -644,12 +644,15 @@ int ssl_parse_serverhello_mb_ext(SSL *s, unsigned char *d, int size, int *al)
   BN_bn2bin(x, secret_str);
   s->pair->mb_info.secret[SERVER] = secret_str;
 
-  printf("Before malloc for extension from srvr msg\n");
+#ifdef DEBUG
+  printf("[matls] %s:%s:%d: Before malloc for extension from srvr msg\n", __FILE__, __func__, __LINE__);
+#endif /* DEBUG */
   s->extension_from_srvr_msg = (volatile unsigned char *)malloc(size);
+#ifdef DEBUG
+  printf("[matls] %s:%s:%d: After malloc for extension from srvr msg\n", __FILE__, __func__, __LINE__);
+#endif /* DEBUG */
   memcpy(s->extension_from_srvr_msg, d, size);
-  printf("After malloc: %d\n", size);
   s->extension_from_srvr_msg_len = size;
-  printf("Assign size\n");
 
   free(peer_str);
   EC_POINT_free(secret);

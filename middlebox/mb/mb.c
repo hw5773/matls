@@ -289,7 +289,7 @@ SSL_CTX* init_middlebox_ctx(int server_side)
 	//SSL_CTX_set_info_callback(ctx, apps_ssl_info_callback);
 	//SSL_CTX_set_msg_callback(ctx, msg_callback);
   SSL_CTX_set_sni_callback(ctx, sni_callback);
-  printf("set info callback, msg callback, sni callback complete\n");
+  //printf("set info callback, msg callback, sni callback complete\n");
 
   SSL_CTX_is_middlebox(ctx);
 
@@ -310,7 +310,11 @@ void load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file)
 		abort();
 	}
 	else
+  {
+#ifdef DEBUG
 		printf("SSL_CTX_load_verify_locations success\n");
+#endif /* DEBUG */
+  }
 
 	/* Set default paths for certificate verifications */
 	if (SSL_CTX_set_default_verify_paths(ctx) != 1)
@@ -319,7 +323,11 @@ void load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file)
 		abort();
 	}
 	else
+  {
+#ifdef DEBUG
 		printf("SSL_CTX_set_default_verify_paths success\n");
+#endif /* DEBUG */
+  }
 
 	/* Set the local certificate from CertFile */
 	if ( SSL_CTX_use_certificate_file(ctx, cert_file, SSL_FILETYPE_PEM) <= 0 )
@@ -328,14 +336,22 @@ void load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file)
 		abort();
 	}
 	else
-		printf("SSL_CTX_use_certificate_file success\n");
+  {
+#ifdef DEBUG
+	  printf("SSL_CTX_use_certificate_file success\n");
+#endif /* DEBUG */
+  }
 
   if ( SSL_CTX_register_id(ctx) <= 0 )
   {
     abort();
   }
   else
+  {
+#ifdef DEBUG
     printf("SSL_CTX_register_id success\n");
+#endif /* DEBUG */
+  }
 	/* Set the private key from KeyFile (may be the same as CertFile) */
 	if ( SSL_CTX_use_PrivateKey_file(ctx, key_file, SSL_FILETYPE_PEM) <= 0 )
 	{
@@ -343,7 +359,11 @@ void load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file)
 		abort();
 	}
 	else
+  {
+#ifdef DEBUG
 		printf("SSL_CTX_use_PrivateKey_file success\n");
+#endif /* DEBUG */
+  }
 
 	/* Verify private key */
 	if ( !SSL_CTX_check_private_key(ctx) )
@@ -352,7 +372,11 @@ void load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file)
 		abort();
 	}
 	else
+  {
+#ifdef DEBUG
 		printf("SSL_CTX_check_private_key success\n");
+#endif /* DEBUG */
+  }
 
 	ERR_print_errors_fp(stderr);
 	ERR_print_errors_fp(stderr);

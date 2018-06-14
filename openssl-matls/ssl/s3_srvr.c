@@ -417,7 +417,9 @@ int ssl3_accept(SSL *s)
 #ifndef OPENSSL_NO_MATLS
                 if (s->mb_enabled && s->matls_received)
                 {
-                  printf("[matls] invoke matls send server certificate\n");
+#ifdef DEBUG
+                  printf("[matls] %s:%s:%d: invoke matls send server certificate\n", __FILE__, __func__, __LINE__);
+#endif /* DEBUG */
                   ret = matls_send_server_certificate(s);
                 }
                 else
@@ -797,10 +799,18 @@ int ssl3_accept(SSL *s)
         if (s->mb_enabled && s->matls_received)
         {
           s->s3->tmp.next_state = SSL3_ST_SW_EXTENDED_FINISHED_A;
+#ifdef DEBUG
+          printf("[matls] %s:%s:%d: next state is extended_finished_a\n", __FILE__, __func__, __LINE__);
+#endif /* DEBUG */
         }
         else
 #endif /* OPENSSL_NO_MATLS */
+        {
 				s->s3->tmp.next_state=SSL_ST_OK;
+#ifdef DEBUG
+        printf("[matls] %s:%s:%d: next state is ssl_st_ok\n", __FILE__, __func__, __LINE__);
+#endif
+        }
 #ifndef OPENSSL_NO_MATLS
       }
 #endif /* OPENSSL_NO_MATLS */
@@ -810,25 +820,26 @@ int ssl3_accept(SSL *s)
 #ifndef OPENSSL_NO_MATLS
     case SSL3_ST_SW_EXTENDED_FINISHED_A:
     case SSL3_ST_SW_EXTENDED_FINISHED_B:
-		if (s->middlebox && s->mb_enabled)
-		{
-    		printf("waiting extended finished message\n");
-      		while (s->pair->extended_finished_msg_len <= 0) { __sync_synchronize(); }
-      		printf("get extended finished message\n");
-		}
-     	ret = matls_send_extended_finished(s);
-      	if (ret <= 0) goto end;
-      	s->state = SSL3_ST_SW_FLUSH;
+#ifdef DEBUG
+      printf("[matls] %s:%s:%d: waiting extended finished message\n", __FILE__, __func__, __LINE__);
+#endif /* DEBUG */
+      while ((s->middlebox) && (s->pair->extended_finished_msg_len <= 0)) {}
+#ifdef DEBUG
+      printf("[matls] %s:%s:%d: get extended finished message\n", __FILE__, __func__, __LINE__);
+#endif /* DEBUG */
+      ret = matls_send_extended_finished(s);
+      if (ret <= 0) goto end;
+      s->state = SSL3_ST_SW_FLUSH;
 
-      	if (s->hit)
-      	{
-        	s->s3->tmp.next_state = SSL3_ST_SR_FINISHED_A;
-      	}
-      	else
-        	s->s3->tmp.next_state = SSL_ST_OK;
+      if (s->hit)
+      {
+        s->s3->tmp.next_state = SSL3_ST_SR_FINISHED_A;
+      }
+      else
+        s->s3->tmp.next_state = SSL_ST_OK;
 
-      	s->init_num = 0;
-      	break;
+      s->init_num = 0;
+      break;
 #endif /* OPENSSL_NO_MATLS */
 
 		case SSL_ST_OK:
@@ -3418,7 +3429,9 @@ int ssl3_send_server_certificate(SSL *s)
 #ifndef OPENSSL_NO_MATLS
 int matls_send_server_certificate(SSL *s)
 	{
-    printf("[matls] %s: Send Certificate in maTLS\n", __func__);
+#ifdef DEBUG
+    printf("[matls] %s:%s:%d: Send Certificate in maTLS\n", __FILE__, __func__, __LINE__);
+#endif /* DEBUG */
 	unsigned long l;
 	X509 *x;
 

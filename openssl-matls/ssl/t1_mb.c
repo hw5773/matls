@@ -134,7 +134,7 @@ int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len,
     if (p)
     {
       MA_LOG("Before waiting the message");
-      while (!(s->pair && (s->pair->extension_from_clnt_msg_len > 0))) {}
+      while (!(s->pair && (s->pair->extension_from_clnt_msg_len > 0))) { __sync_synchronize(); }
       MA_LOG("The client side pair has the extension message");
       memcpy(&(s->mb_info), &(s->pair->mb_info), sizeof(struct mb_st));
       group_id = s->mb_info.group_id;
@@ -448,7 +448,7 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
     {
       int tmp1;
       MA_LOG("Before waiting the message");
-      while (!(s->pair && (s->pair->extension_from_srvr_msg_len > 0))) {}
+      while (!(s->pair && (s->pair->extension_from_srvr_msg_len > 0))) { __sync_synchronize(); }
       MA_LOG("The server side pair has the extension message");
 
       MA_LOG1d("before memcpy", s->pair->extension_from_srvr_msg_len);

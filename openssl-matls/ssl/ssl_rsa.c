@@ -58,22 +58,12 @@
 
 #include <stdio.h>
 #include "ssl_locl.h"
+#include "matls.h"
 #include <openssl/bio.h>
 #include <openssl/objects.h>
 #include <openssl/evp.h>
 #include <openssl/x509.h>
 #include <openssl/pem.h>
-
-int idx;
-#define PRINTK(msg, arg1, arg2) \
-  printf("[matls] %s: %s (%d bytes) ", __func__, msg, arg2); \
-  for (idx = 0; idx<arg2; idx++) \
-  {\
-    if (idx % 10 == 0) \
-      printf("\n"); \
-    printf("%02X ", arg1[idx]); \
-  }\
-  printf("\n");
 
 static int ssl_set_cert(CERT *c, X509 *x509);
 static int ssl_set_pkey(CERT *c, EVP_PKEY *pkey);

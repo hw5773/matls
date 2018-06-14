@@ -4202,7 +4202,6 @@ int ssl3_write(SSL *s, const void *b, int len)
   unsigned char *hash, *hmac, *pmac, *p, *q;
   unsigned char *buf;
   buf = (unsigned char *)malloc(len);
-  printf("the first buf in ssl3_write: %p\n");
   memcpy(buf, b, len);
 
 #if 0

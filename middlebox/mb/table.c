@@ -16,7 +16,9 @@ int init_forward_table(unsigned char *filename)
   while (!feof(fp))
   {
     fscanf(fp, "%s %s %d\n", name, ip, &port);
+#ifdef DEBUG
     printf("%s (%lu), %s (%lu), %d\n", name, strlen(name), ip, strlen(ip), port);
+#endif /* DEBUG */
     if (insert_entry(name, (int) strlen(name), ip, (int) strlen(ip), port) < 0) goto err;
   }
 

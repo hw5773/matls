@@ -1219,12 +1219,16 @@ int ssl_parse_clienthello_tlsext(SSL *s, unsigned char **p, unsigned char *d, in
 #ifndef OPENSSL_NO_SPLIT_TLS
                         if (s->sni_callback)
                         {
-                          printf("server name indicator call back\n");
+#ifdef DEBUG
+                          printf("[matls] %s:%s:%d: server name indicator call back\n", __FILE__, __func__, __LINE__);
+#endif /* DEBUG */
                           s->sni_callback(s->session->tlsext_hostname, len, s);
                         }
                         else
                         {
-                          printf("no server name indicator call back\n");
+#ifdef DEBUG
+                          printf("[matls] %s:%s:%d: no server name indicator call back\n", __FILE__, __func__, __LINE__);
+#endif /* DEBUG */
                         }
 #endif /* OPENSSL_NO_SPLIT_TLS */
 						if (strlen(s->session->tlsext_hostname) != len) {

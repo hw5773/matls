@@ -5,8 +5,8 @@ FORWARD_FILE=forward.txt
 
 SERVER=mb
 GCC=gcc
-#CFLAGS=-DDEBUG -o
-CFLAGS=-o
+CFLAGS=-DDEBUG -o
+#CFLAGS=-o
 SERVER_SRC=mb.c mssl.c table.c common.c
 SERVER_OBJ=mb.o mssl.o table.o common.o
 FLAGS=-I../../openssl-matls-lib/include -L../../openssl-matls-lib/lib

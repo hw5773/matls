@@ -134,7 +134,9 @@ int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len,
     if (p)
     {
       MA_LOG("Before waiting the message");
-      while (!(s->pair && (s->pair->extension_from_clnt_msg_len > 0))) {}
+	  MSTART("Before waiting the message from the client", "server-side");
+      while (!(s->pair && (s->pair->extension_from_clnt_msg_len > 0))) { __sync_synchronize(); }
+	  MEND("After waiting the message from the client", "server-side");
       MA_LOG("The client side pair has the extension message");
       memcpy(&(s->mb_info), &(s->pair->mb_info), sizeof(struct mb_st));
       group_id = s->mb_info.group_id;
@@ -158,7 +160,9 @@ int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len,
       MA_LOG("after free");
 
       MA_LOG1p("s->lock", s->lock);
+	  MSTART("Before busy waiting for lock", "client-side");
       while (*(s->lock)) {}
+	  MEND("After busy waiting for lock", "client-side");
       *(s->lock) = 1;
       if (!(s->mb_info.keypair))
       {
@@ -253,10 +257,10 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
     {
       MA_LOG("Copy this extension message to my SSL struct (not to pair)");
       s->extension_from_clnt_msg = (volatile unsigned char *)malloc(len);
-      MA_LOG1p("after malloc", s->extension_from_clnt_msg);
+	  MSTART("Copy the extension message to my SSL struct (not to pair)", "client-side");
       memcpy(s->extension_from_clnt_msg, d, len);
-      MA_LOG1d("after memcpy", len);
       s->extension_from_clnt_msg_len = len;
+	  MEND("Complete to copy the extension message to my SSL struct (not to pair)", "client-side");
     }
     p = d;
     int ext_len;
@@ -314,7 +318,9 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
 
     if (s->middlebox)
     {
+	  MSTART("Before busy waiting for lock", "client-side");
       while ((s->lock) && *(s->lock)) {}
+	  MEND("After busy waiting for lock", "client-side");
       *(s->lock) = 1;
       if (!(s->mb_info.keypair))
       {
@@ -421,7 +427,9 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
 
   if (p) {
     MA_LOG1p("s->lock", s->lock);
+	MSTART("Before busy waiting for lock", "client-side");
     while (*(s->lock)) {}
+	MEND("After busy waiting for lock", "client-side");
     *(s->lock) = 1;
     if (!(s->mb_info.keypair))
     {
@@ -448,7 +456,9 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
     {
       int tmp1;
       MA_LOG("Before waiting the message");
-      while (!(s->pair && (s->pair->extension_from_srvr_msg_len > 0))) {}
+      MSTART("Before waiting the message", "client-side");
+      while (!(s->pair && (s->pair->extension_from_srvr_msg_len > 0))) { __sync_synchronize(); }
+      MEND("The server side pair has the extension message", "client-side");
       MA_LOG("The server side pair has the extension message");
 
       MA_LOG1d("before memcpy", s->pair->extension_from_srvr_msg_len);
@@ -527,7 +537,9 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
         else
           MA_LOG("Server");
 
+		MSTART("Before busy waiting for accountability key", "client-side");
         while (!s->mb_info.secret[i]) {}
+		MEND("After busy waiting for accountability key", "client-side");
         memcpy(tmp, s->mb_info.secret[i], SECRET_LENGTH);
 
         t1_prf(TLS_MD_ACCOUNTABILITY_KEY_CONST, TLS_MD_ACCOUNTABILITY_KEY_CONST_SIZE,
@@ -644,13 +656,11 @@ int ssl_parse_serverhello_mb_ext(SSL *s, unsigned char *d, int size, int *al)
   BN_bn2bin(x, secret_str);
   s->pair->mb_info.secret[SERVER] = secret_str;
 
-#ifdef DEBUG
-  printf("[matls] %s:%s:%d: Before malloc for extension from srvr msg\n", __FILE__, __func__, __LINE__);
-#endif /* DEBUG */
+  MA_LOG("Before malloc for extension from srvr msg");
+  MSTART("Before malloc for extension from server message", "client-side");
   s->extension_from_srvr_msg = (volatile unsigned char *)malloc(size);
-#ifdef DEBUG
-  printf("[matls] %s:%s:%d: After malloc for extension from srvr msg\n", __FILE__, __func__, __LINE__);
-#endif /* DEBUG */
+  MEND("After malloc for extension from server message", "client-side");
+  MA_LOG("After malloc for extension from srvr msg");
   memcpy(s->extension_from_srvr_msg, d, size);
   s->extension_from_srvr_msg_len = size;
 

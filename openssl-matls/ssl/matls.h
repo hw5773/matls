@@ -33,21 +33,6 @@
 #define MATLS_H_LENGTH 32
 
 int idx;
-
-#ifdef DEBUG
-#define PRINTK(msg, arg1, arg2) \
-  fprintf(stderr, "[matls] %s: %s (%d bytes) \n", __func__, msg, arg2); \
-  for (idx=0; idx<arg2; idx++) \
-  { \
-    if (idx % 10 == 0) \
-      fprintf(stderr, "\n"); \
-    fprintf(stderr, "%02X ", arg1[idx]); \
-  } \
-  fprintf(stderr, "\n");
-#else
-#define PRINTK(msg, arg1, arg2)
-#endif /* DEBUG */
-
 extern int lock;
 
 #endif /* __MATLS_H__ */

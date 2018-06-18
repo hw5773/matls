@@ -168,6 +168,7 @@
 #endif
 
 #include "logs.h"
+unsigned long mstart1, mend1;
 
 static const SSL_METHOD *ssl3_get_client_method(int ver);
 static int ca_dn_cmp(const X509_NAME * const *a,const X509_NAME * const *b);
@@ -281,9 +282,9 @@ int ssl3_connect(SSL *s)
 
 			s->shutdown=0;
 
-			MEASURE("Before send_client_hello", "server-side");
+			MSTART("Before send_client_hello", "server-side");
 			ret=ssl3_client_hello(s);
-			MEASURE("After send_client_hello", "server-side");
+			MEND("After send_client_hello", "server-side");
 			if (ret <= 0) goto end;
 			s->state=SSL3_ST_CR_SRVR_HELLO_A;
 			s->init_num=0;
@@ -296,9 +297,9 @@ int ssl3_connect(SSL *s)
 
 		case SSL3_ST_CR_SRVR_HELLO_A:
 		case SSL3_ST_CR_SRVR_HELLO_B:
-			MEASURE("Before get_server_hello", "server-side");
+			MSTART("Before get_server_hello", "server-side");
 			ret=ssl3_get_server_hello(s);
-			MEASURE("After get_server_hello", "server-side");
+			MEND("After get_server_hello", "server-side");
 
 			if (ret <= 0) goto end;
 
@@ -552,12 +553,12 @@ int ssl3_connect(SSL *s)
 
 		case SSL3_ST_CW_FINISHED_A:
 		case SSL3_ST_CW_FINISHED_B:
-			MEASURE("Before send_finished", "server-side");
+			MSTART("Before send_finished", "server-side");
 			ret=ssl3_send_finished(s,
 				SSL3_ST_CW_FINISHED_A,SSL3_ST_CW_FINISHED_B,
 				s->method->ssl3_enc->client_finished_label,
 				s->method->ssl3_enc->client_finished_label_len);
-			MEASURE("After send_finished", "server-side");
+			MEND("After send_finished", "server-side");
 			if (ret <= 0) goto end;
 			s->s3->flags |= SSL3_FLAGS_CCS_OK;
 			s->state=SSL3_ST_CW_FLUSH;
@@ -610,10 +611,10 @@ int ssl3_connect(SSL *s)
 		case SSL3_ST_CR_FINISHED_B:
 
 			s->s3->flags |= SSL3_FLAGS_CCS_OK;
-			MEASURE("Before clnt's get_finished", "server-side");
+			MSTART("Before clnt's get_finished", "server-side");
 			ret=ssl3_get_finished(s,SSL3_ST_CR_FINISHED_A,
 				SSL3_ST_CR_FINISHED_B);
-			MEASURE("After clnt's get_finished", "server-side");
+			MEND("After clnt's get_finished", "server-side");
 
 			if (ret <= 0) goto end;
 
@@ -636,9 +637,11 @@ int ssl3_connect(SSL *s)
 #ifndef OPENSSL_NO_MATLS
     case SSL3_ST_CR_EXTENDED_FINISHED_A:
     case SSL3_ST_CR_EXTENDED_FINISHED_B:
-	  MEASURE("Before clnt's get_extended_fini", "server-side");
+	  mstart1 = get_current_microseconds();
+	  printf("[TT] %s:%s:%d: server-side) Before matls_get_extended_finished start\n", __FILE__, __func__, __LINE__);
       ret = matls_get_extended_finished(s);
-	  MEASURE("After clnt's get_extended_fini", "server-side");
+	  mend1 = get_current_microseconds();
+	  printf("[TT] %s:%s:%d: server-side) After matls_get_extended_finished end: %lu us\n", __FILE__, __func__, __LINE__, mend1 - mstart1);
       if (ret <= 0) goto end;
       
       if (s->hit)

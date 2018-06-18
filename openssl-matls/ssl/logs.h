@@ -67,4 +67,11 @@ unsigned char ipb[4];
 
 unsigned long get_current_microseconds();
 
+#ifdef TIME_LOG
+#define MEASURE(msg, side) \
+	printf("[TT] %s:%s:%d: %s) %s: %lu\n", __FILE__, __func__, __LINE__, side, get_current_microseconds());
+#else
+#define MEASURE(msg) 
+#endif /* TIME_MEASURE */
+
 #endif /* __MB_LOG__ */

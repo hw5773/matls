@@ -167,6 +167,8 @@
 #include <openssl/engine.h>
 #endif
 
+#include "logs.h"
+
 static const SSL_METHOD *ssl3_get_client_method(int ver);
 static int ca_dn_cmp(const X509_NAME * const *a,const X509_NAME * const *b);
 
@@ -278,7 +280,10 @@ int ssl3_connect(SSL *s)
 		case SSL3_ST_CW_CLNT_HELLO_B:
 
 			s->shutdown=0;
+
+			MEASURE("Before send_client_hello", "server-side");
 			ret=ssl3_client_hello(s);
+			MEASURE("After send_client_hello", "server-side");
 			if (ret <= 0) goto end;
 			s->state=SSL3_ST_CR_SRVR_HELLO_A;
 			s->init_num=0;
@@ -291,7 +296,10 @@ int ssl3_connect(SSL *s)
 
 		case SSL3_ST_CR_SRVR_HELLO_A:
 		case SSL3_ST_CR_SRVR_HELLO_B:
+			MEASURE("Before get_server_hello", "server-side");
 			ret=ssl3_get_server_hello(s);
+			MEASURE("After get_server_hello", "server-side");
+
 			if (ret <= 0) goto end;
 
 			if (s->hit)
@@ -544,10 +552,12 @@ int ssl3_connect(SSL *s)
 
 		case SSL3_ST_CW_FINISHED_A:
 		case SSL3_ST_CW_FINISHED_B:
+			MEASURE("Before send_finished", "server-side");
 			ret=ssl3_send_finished(s,
 				SSL3_ST_CW_FINISHED_A,SSL3_ST_CW_FINISHED_B,
 				s->method->ssl3_enc->client_finished_label,
 				s->method->ssl3_enc->client_finished_label_len);
+			MEASURE("After send_finished", "server-side");
 			if (ret <= 0) goto end;
 			s->s3->flags |= SSL3_FLAGS_CCS_OK;
 			s->state=SSL3_ST_CW_FLUSH;
@@ -600,8 +610,10 @@ int ssl3_connect(SSL *s)
 		case SSL3_ST_CR_FINISHED_B:
 
 			s->s3->flags |= SSL3_FLAGS_CCS_OK;
+			MEASURE("Before clnt's get_finished", "server-side");
 			ret=ssl3_get_finished(s,SSL3_ST_CR_FINISHED_A,
 				SSL3_ST_CR_FINISHED_B);
+			MEASURE("After clnt's get_finished", "server-side");
 
 			if (ret <= 0) goto end;
 
@@ -624,7 +636,9 @@ int ssl3_connect(SSL *s)
 #ifndef OPENSSL_NO_MATLS
     case SSL3_ST_CR_EXTENDED_FINISHED_A:
     case SSL3_ST_CR_EXTENDED_FINISHED_B:
+	  MEASURE("Before clnt's get_extended_fini", "server-side");
       ret = matls_get_extended_finished(s);
+	  MEASURE("After clnt's get_extended_fini", "server-side");
       if (ret <= 0) goto end;
       
       if (s->hit)
@@ -632,9 +646,7 @@ int ssl3_connect(SSL *s)
       else
         s->state = SSL_ST_OK;
 
-#ifdef DEBUG
-      printf("[matls] %s:%s:%d: extended finished finished\n", __FILE__, __func__, __LINE__);
-#endif /* DEBUG */
+      MA_LOG("extended finished finished");
       break;
 #endif /* OPENSSL_NO_MATLS */
 
@@ -1156,9 +1168,7 @@ int matls_get_server_certificate(SSL *s)
 	{
   // num of chains (1 byte) || total length (3 bytes) 
   // || 1st chain length (3 bytes) || leaf length (3 bytes) || leaf cert || ...
-#ifdef DEBUG
-  printf("[matls] %s:%s:%d: matls_get_server_certificate\n", __FILE__, __func__, __LINE__);
-#endif /* DEBUG */
+  	MA_LOG("matls_get_server_certificate");
 	int al,i,ok,ret= -1, num_certs, tmp, offset = 0;
 	unsigned long n,nc,llen,l;
 	X509 *x=NULL;
@@ -1224,11 +1234,9 @@ int matls_get_server_certificate(SSL *s)
   /////////////////////////
 
 	n2l3(p,llen);
-#ifdef DEBUG
-  printf("cert chain length: %d\n", llen);
-  printf("n: %d\n", n);
-  printf("offset: %d\n", offset);
-#endif /* DEBUG */
+  MA_LOG1d("cert chain length: %d\n", llen);
+  MA_LOG1d("n: %d\n", n);
+  MA_LOG1d("offset: %d\n", offset);
 	if (llen+3 != n - offset)
 		{
 		al=SSL_AD_DECODE_ERROR;

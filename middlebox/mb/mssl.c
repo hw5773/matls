@@ -1,6 +1,7 @@
 #include "mssl.h"
 #include "table.h"
 #include "common.h"
+#include "logger.h"
 #include "../common/logs.h"
 
 void handle_error(const char *file, int lineno, const char *msg) {
@@ -321,6 +322,9 @@ void *run(void *data)
   MA_LOG1d("matls disabled", ssl->mb_enabled);
 #endif
 
+  unsigned long start, end;
+
+  start = get_current_microseconds();
   if ((ret = SSL_connect(ssl)) != 1)
   {
     ERR_print_errors_fp(stderr);
@@ -330,7 +334,9 @@ void *run(void *data)
   }
   else
   {
+    end = get_current_microseconds();
     MA_LOG1s("Succeed to connect to", ip);
+    MA_LOG1lu("SSL_connect time", end - start);
   }
 /*
   FD_ZERO(&reads);

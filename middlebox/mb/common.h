@@ -16,6 +16,7 @@
 #include <resolv.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <netinet/tcp.h>
 #include <resolv.h>
 #include <netdb.h>
 

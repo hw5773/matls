@@ -788,7 +788,20 @@ int ssl3_accept(SSL *s)
 				s->method->ssl3_enc->server_finished_label_len);
 
 			if (ret <= 0) goto end;
+
+#ifndef OPENSSL_NO_MATLS
+      if (s->mb_enabled && s->matls_received)
+      {
+        s->state = SSL3_ST_SW_EXTENDED_FINISHED_A;
+      }
+      else
+      {
+#endif /* OPENSSL_NO_MATLS */
 			s->state=SSL3_ST_SW_FLUSH;
+#ifndef OPENSSL_NO_MATLS
+      }
+#endif /* OPENSSL_NO_MATLS */
+
 			if (s->hit)
 				{
 #if defined(OPENSSL_NO_TLSEXT) || defined(OPENSSL_NO_NEXTPROTONEG)
@@ -804,26 +817,7 @@ int ssl3_accept(SSL *s)
 #endif
 				}
 			else
-#ifndef OPENSSL_NO_MATLS
-      {
-        if (s->mb_enabled && s->matls_received)
-        {
-          s->s3->tmp.next_state = SSL3_ST_SW_EXTENDED_FINISHED_A;
-#ifdef DEBUG
-          printf("[matls] %s:%s:%d: next state is extended_finished_a\n", __FILE__, __func__, __LINE__);
-#endif /* DEBUG */
-        }
-        else
-#endif /* OPENSSL_NO_MATLS */
-        {
 				s->s3->tmp.next_state=SSL_ST_OK;
-#ifdef DEBUG
-        printf("[matls] %s:%s:%d: next state is ssl_st_ok\n", __FILE__, __func__, __LINE__);
-#endif
-        }
-#ifndef OPENSSL_NO_MATLS
-      }
-#endif /* OPENSSL_NO_MATLS */
 			s->init_num=0;
 			break;
 

@@ -998,7 +998,7 @@ long ssl3_get_message(SSL *s, int st1, int stn, int mt, long max, int *ok)
 	int i,al;
 
 	/////
-	unsigned long st, et;
+	unsigned long st, et, st2, et2;
 	/////
 
 	if (s->s3->tmp.reuse_message)
@@ -1026,12 +1026,17 @@ long ssl3_get_message(SSL *s, int st1, int stn, int mt, long max, int *ok)
 			{
 
 			/////
+      if (mt == SSL3_MT_EXTENDED_FINISHED)
+        printf("\n========== Start reading for SSL3_MT_EXTENDED_FINISHED Bottleneck ===========\n");
 			st = get_current_microseconds();
 			/////
 			while (s->init_num < 4)
 				{
+        st2 = get_current_microseconds();
 				i=s->method->ssl_read_bytes(s,SSL3_RT_HANDSHAKE,
 					&p[s->init_num],4 - s->init_num, 0);
+        et2 = get_current_microseconds();
+
 				if (i <= 0)
 					{
 					s->rwstate=SSL_READING;
@@ -1045,8 +1050,8 @@ long ssl3_get_message(SSL *s, int st1, int stn, int mt, long max, int *ok)
 			et = get_current_microseconds();
 			if (mt == SSL3_MT_EXTENDED_FINISHED)
 			{
-				printf("s->init_num: %d\n", s->init_num);
-				printf("time for read init_num: %lu\n", et - st);
+				printf("time for read init_num: %lu us\n", et - st);
+        printf("========== End reading for SSL3_MT_EXTENDED_FINISHED Bottleneck ===========\n\n");
 			}
 			/////
 

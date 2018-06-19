@@ -10,9 +10,11 @@
 #include <openssl/err.h>
 #include <sys/time.h>
 #include <sys/socket.h>
+#include <netinet/tcp.h>
 #include "mssl.h"
 #include "table.h"
 #include "../common/logs.h"
+#include "logger.h"
 
 #define FAIL    -1
 #define BUF_SIZE 1024
@@ -107,6 +109,8 @@ void *mb_run(void *data)
   struct info *info;
   int client, ret, rcvd, sent, tot_len = -1, head_len = -1, body_len = -1;
   unsigned char buf[BUF_SIZE];
+  unsigned long start, end;
+
   char modified[134] =
     "HTTP/1.1 200 OK\r\n"
     "Content-Type: text/html\r\n"
@@ -130,7 +134,9 @@ void *mb_run(void *data)
   MA_LOG("split tls enabled");
 #endif
 
+  start = get_current_microseconds();
   ret = SSL_accept(ssl);
+
   if (SSL_is_init_finished(ssl))
     MA_LOG("complete handshake");
   MA_LOG1d("end matls handshake", ret);
@@ -176,6 +182,8 @@ void *mb_run(void *data)
 
     break;
   }
+  end = get_current_microseconds();
+  MA_LOG1lu("Middlebox Execution Time", end - start);
 
 //  SSL_free(ssl);
 //  close(client);
@@ -219,6 +227,11 @@ int open_listener(int port)
 	struct sockaddr_in addr;
 
 	sd = socket(PF_INET, SOCK_STREAM, 0);
+
+  /////
+  //int flag = 1;
+  //setsockopt(sd, IPPROTO_TCP, TCP_NODELAY, (char *)&flag, sizeof(int));
+  /////
 	
 	bzero(&addr, sizeof(addr));
 	addr.sin_family = AF_INET;

@@ -344,8 +344,22 @@ SSL *SSL_new(SSL_CTX *ctx)
 	if (ctx->mb_enabled)
 		s->mb_enabled = 1;
 
+  s->matls_received = 0;
+
   if (ctx->middlebox)
     s->middlebox = 1;
+
+  if (ctx->server_side)
+	  s->server_side = 1;
+  else
+	  s->server_side = 0;
+
+  if (ctx->proof)
+  {
+	  s->proof_length = ctx->proof_length;
+    s->proof = (unsigned char *)malloc(s->proof_length);
+	  memcpy(s->proof, ctx->proof, ctx->proof_length);
+  }
 
   s->lock = (int *)malloc(sizeof(int));
   *(s->lock) = 0;
@@ -360,6 +374,17 @@ SSL *SSL_new(SSL_CTX *ctx)
   s->cert_msg = NULL;
   s->extended_finished_msg = NULL;
 
+  if (ctx->x509)
+  {
+    s->x509 = X509_dup(ctx->x509);
+  }
+
+  if (ctx->id)
+  {
+    s->id_length = ctx->id_length;
+    s->id = (unsigned char *)malloc(s->id_length);
+    memcpy(s->id, ctx->id, s->id_length);
+  }
 #endif /* OPENSSL_NO_MATLS */
 
 	s->read_ahead=ctx->read_ahead;
@@ -668,6 +693,17 @@ void SSL_free(SSL *s)
 	ssl_cert_free(s->orig_cert);
 	BUF_MEM_free(s->orig_cert_buf);
 #endif
+
+#ifndef OPENSSL_NO_MATLS
+	if (s->proof)
+		OPENSSL_free(s->proof);
+
+  if (s->id)
+    OPENSSL_free(s->id);
+
+  if (s->x509)
+    X509_free(s->x509);
+#endif /* OPENSSL_NO_MATLS */
 
 	OPENSSL_free(s);
 	}
@@ -1996,6 +2032,9 @@ SSL_CTX *SSL_CTX_new(const SSL_METHOD *meth)
 
 #ifndef OPENSSL_NO_MATLS
   ret->middlebox = 0;
+  ret->server_side = 0;
+  ret->proof = NULL;
+  ret->proof_length = 0;
 #endif /* OPENSSL_NO_MATLS */
 
 	return(ret);
@@ -2106,6 +2145,17 @@ void SSL_CTX_free(SSL_CTX *a)
 	if (a->rbuf_freelist)
 		ssl_buf_freelist_free(a->rbuf_freelist);
 #endif
+
+#ifndef OPENSSL_NO_MATLS
+	if (a->proof)
+		OPENSSL_free(a->proof);
+
+  if (a->id)
+    OPENSSL_free(a->id);
+
+  if (a->x509)
+    X509_free(a->x509);
+#endif /* OPENSSL_NO_MATLS */
 
 	OPENSSL_free(a);
 	}
@@ -2428,7 +2478,7 @@ CERT_PKEY *ssl_get_server_send_pkey(const SSL *s)
 
 	c=s->cert;
 	ssl_set_cert_masks(c, s->s3->tmp.new_cipher);
-	
+
 	alg_k = s->s3->tmp.new_cipher->algorithm_mkey;
 	alg_a = s->s3->tmp.new_cipher->algorithm_auth;
 
@@ -2593,15 +2643,35 @@ int SSL_CTX_disable_ttpa(SSL_CTX *ctx)
 void SSL_is_middlebox(SSL *s)
 {
 #ifdef MB_DEBUG
-  printf("[DEBUG] This is set to a middlebox\n");
+  printf("[DEBUG] %s:%s:%d: This is set to a middlebox\n", __FILE__, __func__, __LINE__);
 #endif
   s->middlebox = 1;
+}
+
+int SSL_set_server_side(SSL *s)
+{
+#ifdef MB_DEBUG
+  printf("[DEBUG] %s:%s:%d: This is set to a server side middlebox\n", __FILE__, __func__, __LINE__);
+#endif
+  s->server_side = 1;
+
+  return 1;
+}
+
+int SSL_set_client_side(SSL *s)
+{
+#ifdef MB_DEBUG
+  printf("[DEBUG] %s:%s:%d: This is set to a client side middlebox\n", __FILE__, __func__, __LINE__);
+#endif
+  s->server_side = 0;
+
+  return 1;
 }
 
 int SSL_enable_mb(SSL *s)
 {
 #ifdef MB_DEBUG
-	printf("[DEBUG] mb enabled\n");
+	printf("[DEBUG] %s:%s:%d: mb enabled\n", __FILE__, __func__, __LINE__);
 #endif
 	s->mb_enabled = 1;
 	return 1;
@@ -2610,7 +2680,7 @@ int SSL_enable_mb(SSL *s)
 int SSL_disable_mb(SSL *s)
 {
 #ifdef MB_DEBUG
-	printf("[DEBUG] mb disabled\n");
+	printf("[DEBUG] %s:%s:%d: mb disabled\n", __FILE__, __func__, __LINE__);
 #endif
 	s->mb_enabled = 0;
 	return 1;
@@ -2619,11 +2689,29 @@ int SSL_disable_mb(SSL *s)
 void SSL_CTX_is_middlebox(SSL_CTX *ctx)
 {
 #ifdef MB_DEBUG
-  printf("[DEBUG] %s:%s:%s: This is set to a middlebox\n", __FILE__, __func__, __LINE__);
+  printf("[DEBUG] %s:%s:%d: This is set to a middlebox\n", __FILE__, __func__, __LINE__);
 #endif
-  printf("Before setting as a middlebox\n");
   ctx->middlebox = 1;
-  printf("After setting as a middlebox\n");
+}
+
+int SSL_CTX_set_server_side(SSL_CTX *ctx)
+{
+#ifdef MB_DEBUG
+  printf("[DEBUG] %s:%s:%d: This is set to a server-side middlebox\n", __FILE__, __func__, __LINE__);
+#endif
+  ctx->server_side = 1;
+
+  return 1;
+}
+
+int SSL_CTX_set_client_side(SSL_CTX *ctx)
+{
+#ifdef MB_DEBUG
+  printf("[DEBUG] %s:%s:%d: This is set to a client-side middlebox\n", __FILE__, __func__, __LINE__);
+#endif
+  ctx->server_side = 0;
+
+  return 1;
 }
 
 int SSL_CTX_enable_mb(SSL_CTX *ctx)

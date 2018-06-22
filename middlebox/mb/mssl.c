@@ -24,7 +24,9 @@ int send_to_pair(SSL *ssl, char *buf, size_t len)
 {
   MA_LOG("Send the following data to the pair");
   int ret = 0;
+#ifdef DEBUG
   printf("%.*s", (int)len, buf);
+#endif /* DEBUG */
 
   while (!ssl->pair) {}
 
@@ -98,11 +100,11 @@ int on_read_cb(char* src, size_t len)
   char buf[DEFAULT_BUF_SIZE];
   enum sslstatus status;
   int n;
-  printf("len: %lu\n", len);
+  //printf("len: %lu\n", len);
 
   while (len > 0) {
     n = BIO_write(client.rbio, src, len);
-    printf("after BIO_write: %d\n", n);
+    //printf("after BIO_write: %d\n", n);
 
     if (n<=0)
       return -1; /* if BIO write fails, assume unrecoverable */
@@ -112,14 +114,14 @@ int on_read_cb(char* src, size_t len)
 
     if (!SSL_is_init_finished(client.ssl)) {
       n = SSL_accept(client.ssl);
-      printf("after accept: %d\n", n);
+      //printf("after accept: %d\n", n);
       status = get_sslstatus(client.ssl, n);
 
       /* Did SSL request to write bytes? */
       if (status == SSLSTATUS_WANT_IO)
         do {
           n = BIO_read(client.wbio, buf, sizeof(buf));
-          printf("after BIO_read: %d\n", n);
+          //printf("after BIO_read: %d\n", n);
           if (n > 0)
             queue_encrypted_bytes(buf, n);
           else if (!BIO_should_retry(client.wbio))
@@ -129,7 +131,7 @@ int on_read_cb(char* src, size_t len)
       if (status == SSLSTATUS_FAIL)
         return -1;
 
-      printf("SSL_is_init_finished accept: %d\n", SSL_is_init_finished(client.ssl));
+      //printf("SSL_is_init_finished accept: %d\n", SSL_is_init_finished(client.ssl));
       if (!SSL_is_init_finished(client.ssl))
         return 0;
     }
@@ -139,7 +141,7 @@ int on_read_cb(char* src, size_t len)
 
     do {
       n = SSL_read(client.ssl, buf, sizeof(buf));
-      printf("SSL_read bytes: %d\n", n);
+      //printf("SSL_read bytes: %d\n", n);
       if (n > 0)
         client.io_on_read(client.ssl, buf, (size_t)n);
     } while (n > 0);
@@ -212,7 +214,7 @@ int do_sock_read()
 int do_sock_write()
 {
   ssize_t n = write(client.fd, client.write_buf, client.write_len);
-  printf("after write: %lu\n", n);
+  //printf("after write: %lu\n", n);
   if (n>0) {
     if ((size_t)n<client.write_len)
       memmove(client.write_buf, client.write_buf+n, client.write_len-n);
@@ -226,16 +228,17 @@ int do_sock_write()
 
 void sni_callback(unsigned char *buf, int len, SSL *ssl)
 {
+  //printf("sni_callback\n");
   int index, ilen, port, rc, tidx;
   unsigned char *ip; 
   void *status;
   struct forward_info *args;
   
-  printf("server name: %s\n", buf);
+  //printf("server name: %s\n", buf);
   index = find_by_name(buf, len);
   ip = get_ip_by_index(index);
   port = get_port_by_index(index);
-  printf("forward to: %s:%d\n", ip, port);
+  //printf("forward to: %s:%d\n", ip, port);
 
   args = (struct forward_info *)malloc(sizeof(struct forward_info));
   args->index = index;
@@ -250,10 +253,10 @@ void msg_callback(int write, int version, int content_type, const void *buf, siz
   unsigned char *p;
   p = (unsigned char *)buf;
 
-  printf("write operation? %d\n", write);
-  printf("version? 0x%x\n", version);
-  printf("content type? ");
-
+  //printf("write operation? %d\n", write);
+  //printf("version? 0x%x\n", version);
+  //printf("content type? ");
+/*
   switch(content_type)
   {
     case 20:
@@ -271,6 +274,7 @@ void msg_callback(int write, int version, int content_type, const void *buf, siz
     default:
       printf("invalid\n");
   }
+*/
 /*
   for (i=0; i<len; i++)
   {
@@ -288,7 +292,7 @@ void *run(void *data)
   struct timeval tv;
   unsigned char *ip;
   unsigned char buf[DEFAULT_BUF_SIZE];
-  int server, port, ret;
+  int server, port, ret, rcvd, sent;
   SSL *ssl, *pair;
   fd_set reads, temps;
 
@@ -309,16 +313,13 @@ void *run(void *data)
   ssl->middlebox = 1;
   ssl->pair->middlebox = 1;
 
-  if (ssl->pair->mb_enabled)
-  {
-    SSL_enable_mb(ssl);
-    MA_LOG1d("matls enabled", ssl->mb_enabled);
-  }
-  else
-  {
-    SSL_disable_mb(ssl);
-    MA_LOG1d("matls disabled", ssl->mb_enabled);
-  }
+#ifdef MATLS
+  SSL_enable_mb(ssl);
+  MA_LOG1d("matls enabled", ssl->mb_enabled);
+#else
+  SSL_disable_mb(ssl);
+  MA_LOG1d("matls disabled", ssl->mb_enabled);
+#endif
 
   if ((ret = SSL_connect(ssl)) != 1)
   {
@@ -331,7 +332,7 @@ void *run(void *data)
   {
     MA_LOG1s("Succeed to connect to", ip);
   }
-
+/*
   FD_ZERO(&reads);
   FD_SET(server, &reads);
   tv.tv_sec = 10;
@@ -355,26 +356,28 @@ void *run(void *data)
     {
       if (FD_ISSET(server, &reads))
       {
-        ret = SSL_read(ssl, buf, DEFAULT_BUF_SIZE);
-        if (ret > 0)
+        rcvd = SSL_read(ssl, buf, DEFAULT_BUF_SIZE);
+        if (rcvd > 0)
         {
-          MA_LOG1d("Read bytes", ret);
+          MA_LOG1d("Received from Server-side", ret);
           printf("%.*s\n", (int)ret, buf);
         }
-        send_unencrypted_bytes(buf, ret);
+        //send_unencrypted_bytes(buf, ret);
+        sent = SSL_write(ssl->pair, buf, rcvd);
+        MA_LOG1d("Sent to Client-side", ret);
       }
     }
   }
 
   MA_LOG("Succeed to establish the secure session with the server-side entity");
-  while(1) {}
   MA_LOG("Close the session with the server");
   SSL_free(ssl);
   close(server);
+*/
 }
 
 void ssl_init(char *cert, char *priv) {
-  printf("initialising SSL\n");
+  //printf("initialising SSL\n");
 
   /* SSL library initialisation */
   SSL_library_init();
@@ -394,20 +397,32 @@ void ssl_init(char *cert, char *priv) {
   if (err != 1)
     int_error("SSL_CTX_use_certificate_file failed");
   else
+  {
+#ifdef DEBUG
     printf("certificate file loaded ok\n");
+#endif /* DEBUG */
+  }
 
   /* Indicate the key file to be used */
   err = SSL_CTX_use_PrivateKey_file(ctx, priv, SSL_FILETYPE_PEM);
   if (err != 1)
     int_error("SSL_CTX_use_PrivateKey_file failed");
   else
+  {
+#ifdef DEBUG
     printf("private-key file loaded ok\n");
+#endif /* DEBUG */
+  }
 
   /* Make sure the key and certificate file match. */
   if (SSL_CTX_check_private_key(ctx) != 1)
     int_error("SSL_CTX_check_private_key failed");
   else
+  {
+#ifdef DEBUG
     printf("private key verified ok\n");
+#endif /* DEBUG */
+  }
 
   /* Recommended to avoid SSLv2 & SSLv3 */
   SSL_CTX_set_options(ctx, SSL_OP_ALL|SSL_OP_NO_SSLv2|SSL_OP_NO_SSLv3);

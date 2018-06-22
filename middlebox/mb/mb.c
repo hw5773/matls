@@ -11,16 +11,20 @@
 #include <sys/time.h>
 #include <sys/socket.h>
 #include "mssl.h"
+#include "table.h"
 #include "../common/logs.h"
 
 #define FAIL    -1
+#define BUF_SIZE 1024
 
 int open_listener(int port);
-SSL_CTX* init_middlebox_ctx();
+SSL_CTX* init_middlebox_ctx(int server_side);
 void load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file);
 void print_pubkey(EVP_PKEY *pkey);
 BIO *bio_err;
 void *mb_run(void *data);
+int get_total_length(char *buf, int rcvd);
+int modification;
 
 struct info
 {
@@ -30,13 +34,13 @@ struct info
 // Origin Server Implementation
 int main(int count, char *strings[])
 {  
-	int server, client, rc, tidx = 0, i;
+	int server, client, rc, tidx = 0, i, server_side;
 	char *portnum, *cert, *key, *forward_file;
   void *status;
 
-	if ( count != 5 )
+	if ( count != 7 )
 	{
-		printf("Usage: %s <portnum> <cert_file> <key_file> <forward_file>\n", strings[0]);
+		printf("Usage: %s <portnum> <cert_file> <key_file> <forward_file> <server side> <modification>\n", strings[0]);
 		exit(0);
 	}
 	SSL_library_init();
@@ -46,8 +50,10 @@ int main(int count, char *strings[])
 	cert = strings[2];
 	key = strings[3];
   forward_file = strings[4];
+  server_side = atoi(strings[5]);
+  modification = atoi(strings[6]);
 
-	ctx = init_middlebox_ctx();        /* initialize SSL */
+	ctx = init_middlebox_ctx(server_side);        /* initialize SSL */
 	load_certificates(ctx, cert, key);
   init_forward_table(forward_file);
   init_thread_config();
@@ -79,15 +85,12 @@ int main(int count, char *strings[])
 
     pthread_attr_destroy(&attr);
 
-    for (i=0; i<MAX_THREADS; i++)
-    {
-      rc = pthread_join(threads[i], &status);
+    rc = pthread_join(threads[tidx], &status);
 
-      if (rc)
-      {
-        MA_LOG("error in join");
-        return 1;
-      }
+    if (rc)
+    {
+      MA_LOG1d("error in join", rc);
+      return 1;
     }
 	}
 
@@ -102,24 +105,113 @@ void *mb_run(void *data)
 {
   MA_LOG("start server loop\n");
   struct info *info;
-  int client, ret;
+  int client, ret, rcvd, sent, tot_len = -1, head_len = -1, body_len = -1;
+  unsigned char buf[BUF_SIZE];
+  char modified[134] =
+    "HTTP/1.1 200 OK\r\n"
+    "Content-Type: text/html\r\n"
+    "Content-Length: 70\r\n"
+    "\r\n"
+    "<html><title>Test</title><body><h1>Test Bob's Page!</h1></body></html>";
+  int modified_len = strlen(modified);
+
   SSL *ssl;
 
   info = (struct info *)data;
   client = info->sock;
   ssl = SSL_new(ctx);
   SSL_set_fd(ssl, client);
-//  SSL_enable_mb(ssl);
 
-  MA_LOG("start matls handshake");
+#ifdef MATLS
+  SSL_enable_mb(ssl);
+  MA_LOG("matls enabled");
+#else
+  SSL_disable_mb(ssl);
+  MA_LOG("split tls enabled");
+#endif
+
   ret = SSL_accept(ssl);
   if (SSL_is_init_finished(ssl))
     MA_LOG("complete handshake");
-  
   MA_LOG1d("end matls handshake", ret);
 
-  SSL_free(ssl);
-  close(client);
+  while (!(ssl->pair && SSL_is_init_finished(ssl) && SSL_is_init_finished(ssl->pair))) {}
+
+  while (1)
+  {
+    rcvd = SSL_read(ssl, buf, BUF_SIZE);
+    MA_LOG1d("Received from Client-side", rcvd);
+    MA_LOG1s("Message from Client-side", buf);
+
+    sent = SSL_write(ssl->pair, buf, rcvd);
+    MA_LOG1d("Sent to Server-side", sent);
+
+    do {
+      rcvd = SSL_read(ssl->pair, buf, BUF_SIZE);
+      MA_LOG1d("Received from Server-side", rcvd);
+      MA_LOG1s("Message", buf);
+      
+      if (modification)
+        sent = SSL_write(ssl, modified, modified_len);
+      else
+        sent = SSL_write(ssl, buf, rcvd);
+
+      MA_LOG1d("Sent to Client-side", sent);
+
+      if (tot_len < 0)
+      {
+        if (modification)
+          tot_len = get_total_length((char *)modified, modified_len);
+        else
+          tot_len = get_total_length(buf, rcvd);
+      }
+
+      MA_LOG1d("Total Length", tot_len);
+
+      tot_len -= rcvd;
+
+      if (tot_len <= 0)
+        break;
+    } while(1);
+
+    break;
+  }
+
+//  SSL_free(ssl);
+//  close(client);
+}
+
+int get_total_length(char *buf, int rcvd)
+{
+  int tot_len, head_len, body_len, index, tok_len, mrlen, len;
+  const char *clen = "Content-Length";
+  char *token = NULL;
+  char val[4];
+
+  head_len = strstr(buf, "\r\n\r\n") - buf + 4;
+  MA_LOG1d("Header Length", head_len);
+  
+  token = strtok(buf, "\n");
+
+  while (token)
+  {
+    tok_len = strlen(token);
+    index = strstr(token, ":") - token;
+
+    if (strncmp(token, clen, index - 1) == 0)
+    {
+      memcpy(val, token + index + 1, tok_len - index - 1);
+      body_len = atoi(val);
+      MA_LOG1d("Body Length", body_len);
+      break;
+    }
+
+    token = strtok(NULL, "\n");
+  }
+
+  tot_len = head_len + body_len;
+
+  return tot_len;
 }
 
 int open_listener(int port)
@@ -181,7 +273,7 @@ void apps_ssl_info_callback(const SSL *s, int where, int ret)
 	}
 }
 
-SSL_CTX* init_middlebox_ctx()
+SSL_CTX* init_middlebox_ctx(int server_side)
 {   
 	SSL_METHOD *method;
 
@@ -194,12 +286,17 @@ SSL_CTX* init_middlebox_ctx()
 		abort();
 	}
 
-	SSL_CTX_set_info_callback(ctx, apps_ssl_info_callback);
-	SSL_CTX_set_msg_callback(ctx, msg_callback);
+	//SSL_CTX_set_info_callback(ctx, apps_ssl_info_callback);
+	//SSL_CTX_set_msg_callback(ctx, msg_callback);
   SSL_CTX_set_sni_callback(ctx, sni_callback);
-  printf("set info callback, msg callback, sni callback complete\n");
-  ctx->middlebox = 1;
-  //SSL_CTX_is_middlebox(ctx);
+  //printf("set info callback, msg callback, sni callback complete\n");
+
+  SSL_CTX_is_middlebox(ctx);
+
+  if (server_side)
+    SSL_CTX_set_server_side(ctx);
+  else
+    SSL_CTX_set_client_side(ctx);
 
 	return ctx;
 }
@@ -213,7 +310,11 @@ void load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file)
 		abort();
 	}
 	else
+  {
+#ifdef DEBUG
 		printf("SSL_CTX_load_verify_locations success\n");
+#endif /* DEBUG */
+  }
 
 	/* Set default paths for certificate verifications */
 	if (SSL_CTX_set_default_verify_paths(ctx) != 1)
@@ -222,7 +323,11 @@ void load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file)
 		abort();
 	}
 	else
+  {
+#ifdef DEBUG
 		printf("SSL_CTX_set_default_verify_paths success\n");
+#endif /* DEBUG */
+  }
 
 	/* Set the local certificate from CertFile */
 	if ( SSL_CTX_use_certificate_file(ctx, cert_file, SSL_FILETYPE_PEM) <= 0 )
@@ -231,8 +336,22 @@ void load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file)
 		abort();
 	}
 	else
-		printf("SSL_CTX_use_certificate_file success\n");
+  {
+#ifdef DEBUG
+	  printf("SSL_CTX_use_certificate_file success\n");
+#endif /* DEBUG */
+  }
 
+  if ( SSL_CTX_register_id(ctx) <= 0 )
+  {
+    abort();
+  }
+  else
+  {
+#ifdef DEBUG
+    printf("SSL_CTX_register_id success\n");
+#endif /* DEBUG */
+  }
 	/* Set the private key from KeyFile (may be the same as CertFile) */
 	if ( SSL_CTX_use_PrivateKey_file(ctx, key_file, SSL_FILETYPE_PEM) <= 0 )
 	{
@@ -240,7 +359,11 @@ void load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file)
 		abort();
 	}
 	else
+  {
+#ifdef DEBUG
 		printf("SSL_CTX_use_PrivateKey_file success\n");
+#endif /* DEBUG */
+  }
 
 	/* Verify private key */
 	if ( !SSL_CTX_check_private_key(ctx) )
@@ -249,7 +372,11 @@ void load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file)
 		abort();
 	}
 	else
+  {
+#ifdef DEBUG
 		printf("SSL_CTX_check_private_key success\n");
+#endif /* DEBUG */
+  }
 
 	ERR_print_errors_fp(stderr);
 	ERR_print_errors_fp(stderr);

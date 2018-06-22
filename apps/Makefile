@@ -5,10 +5,10 @@ KEY_FILE=carol_priv.key
 CLIENT=client
 SERVER=server
 GCC=gcc
-CFLAGS=-o
+CFLAGS=-DMB_DEBUG -DDEBUG -o 
 CLIENT_SRC=client.c
 SERVER_SRC=server.c
-FLAGS=-I/home/jhlim/openssl-mb-lib/include -L/home/jhlim/openssl-mb-lib/lib
+FLAGS=-I../openssl-matls-lib/include -L../openssl-matls-lib/lib
 #FLAGS=-I/home/hwlee/openssl_lib/include -L/home/hwlee/openssl_lib/lib
 #FLAGS=-I/usr/local/include -L/usr/local/lib
 LDFLAGS=-lssl -lcrypto -ldl -lpthread
@@ -18,14 +18,10 @@ HOST=127.0.0.1
 PORT=443
 NUM_OF_THREADS=1
 
-client:
-	${GCC} ${CFLAGS} ${CLIENT} ${CLIENT_SRC} ${FLAGS} ${LDFLAGS}
+default: server
 
 server:
 	${GCC} ${CFLAGS} ${SERVER} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
-
-cstart:
-	./${CLIENT} ${HOST} ${PORT} ${NUM_OF_THREADS}
 
 sstart:
 	./${SERVER} ${PORT} ${CERT_FILE} ${CA_CERT_FILE} ${KEY_FILE}
@@ -34,4 +30,4 @@ debug:
 	${GDB} ./${EXEC} ${PORT} ${CERT_FILE} ${CA_CERT_FILE} ${KEY_FILE} ${ORIG_CERT_FILE} ${WARRANT_FILE} -tui
 
 clean:
-	rm ${CLIENT} ${SERVER}
+	rm ${SERVER}

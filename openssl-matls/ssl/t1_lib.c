@@ -800,7 +800,7 @@ unsigned char *ssl_add_serverhello_tlsext(SSL *s, unsigned char *buf, unsigned c
 #endif /* OPENSSL_NO_TTPA */
 
 #ifndef OPENSSL_NO_MATLS
-	if (s->mb_enabled)
+	if (s->mb_enabled && s->matls_received)
 	{
 #ifdef MB_DEBUG
 		printf("[MB] Add TLS extension for middlebox start\n");
@@ -1219,12 +1219,16 @@ int ssl_parse_clienthello_tlsext(SSL *s, unsigned char **p, unsigned char *d, in
 #ifndef OPENSSL_NO_SPLIT_TLS
                         if (s->sni_callback)
                         {
-                          printf("server name indicator call back\n");
+#ifdef DEBUG
+                          printf("[matls] %s:%s:%d: server name indicator call back\n", __FILE__, __func__, __LINE__);
+#endif /* DEBUG */
                           s->sni_callback(s->session->tlsext_hostname, len, s);
                         }
                         else
                         {
-                          printf("no server name indicator call back\n");
+#ifdef DEBUG
+                          printf("[matls] %s:%s:%d: no server name indicator call back\n", __FILE__, __func__, __LINE__);
+#endif /* DEBUG */
                         }
 #endif /* OPENSSL_NO_SPLIT_TLS */
 						if (strlen(s->session->tlsext_hostname) != len) {
@@ -1410,8 +1414,10 @@ int ssl_parse_clienthello_tlsext(SSL *s, unsigned char **p, unsigned char *d, in
 #ifndef OPENSSL_NO_MATLS
 		else if (type == TLSEXT_TYPE_mb)
 		{
-			if(!ssl_parse_clienthello_mb_ext(s, data, size, al))
-				return 0;
+      s->matls_received = 1;
+      if (s->mb_enabled)
+  		  if(!ssl_parse_clienthello_mb_ext(s, data, size, al))
+	  		  return 0;
 		}
 #endif /* OPENSSL_NO_MATLS */
 		else if (type == TLSEXT_TYPE_signature_algorithms)
@@ -1837,8 +1843,8 @@ int ssl_parse_serverhello_tlsext(SSL *s, unsigned char **p, unsigned char *d, in
 #ifndef OPENSSL_NO_MATLS
 		else if (type == TLSEXT_TYPE_mb)
 		{
-			if(!ssl_parse_serverhello_mb_ext(s, data, size, al))
-				return 0;
+  		if(!ssl_parse_serverhello_mb_ext(s, data, size, al))
+	  		return 0;
 		}
 #endif /* OPENSSL_NO_MATLS */
 #ifndef OPENSSL_NO_HEARTBEATS

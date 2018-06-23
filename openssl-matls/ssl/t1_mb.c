@@ -46,77 +46,22 @@ int make_keypair(struct keypair **pair, EC_GROUP *group, BN_CTX *ctx) {
 int char_to_pub(unsigned char *input, int key_length, EC_POINT *pubkey, EC_GROUP *group, BN_CTX *ctx)
 {
   EC_POINT_oct2point(group, pubkey, input, key_length, ctx);
-/*
-    int klen = (key_length - 1)/ 2;
-    unsigned char *xstr = (unsigned char *)malloc(klen); //klen+1?
-    unsigned char *ystr = (unsigned char *)malloc(klen); //klen+1?
-
-    BIGNUM *x, *y;
-    
-    memcpy(xstr, input + 1, klen);
-    memcpy(ystr, input + klen + 1, klen);
-
-    x = BN_new();
-    y = BN_new();
-
-    BN_bin2bn(xstr, klen, x);
-    BN_bin2bn(ystr, klen, y);
-
-    EC_POINT_set_affine_coordinates_GFp(group, pubkey, x, y, ctx);
-
-    free(xstr);
-    free(ystr);
-
-    BN_free(x);
-    BN_free(y);
-*/
-    return 1;
+  return 1;
 }
 
 int pub_to_char(EC_POINT *secret, unsigned char **secret_str, int *slen, EC_GROUP *group, BN_CTX *ctx)
 {
-  int key_bytes, ret;
-  unsigned char *xstr, *ystr;
+  int key_bytes;
 
-  printf("[error] %s:%s:%d: 1\n", __FILE__, __func__, __LINE__);
   if (EC_GROUP_get_curve_name(group) == NID_X9_62_prime256v1)
     key_bytes = 256 / 8;
   else
     return -1;
 
-  printf("[error] %s:%s:%d: 2\n", __FILE__, __func__, __LINE__);
 	*slen = 2 * key_bytes + 1;
   (*secret_str) = (unsigned char *)malloc(*slen);
-/*
-  printf("[error] %s:%s:%d: 3\n", __FILE__, __func__, __LINE__);
-
-	BIGNUM *x = BN_new();
-	BIGNUM *y = BN_new();
-
-	EC_POINT_get_affine_coordinates_GFp(group, secret, x, y, ctx);
-
-  xstr = (unsigned char *)malloc(key_bytes);
-  ystr = (unsigned char *)malloc(key_bytes);
-	ret = BN_bn2bin(x, xstr);
-	ret = BN_bn2bin(y, ystr);
-
-  printf("[error] %s:%s:%d: 4\n", __FILE__, __func__, __LINE__);
-	BN_free(x);
-	BN_free(y);
-
-  printf("[error] %s:%s:%d: 5\n", __FILE__, __func__, __LINE__);
-  
-  memset((*secret_str), 0x04, 1);
-	memcpy((*secret_str) + 1, xstr, key_bytes);
-	memcpy((*secret_str) + key_bytes + 1, ystr, key_bytes);
-*/
   EC_POINT_point2oct(group, secret, POINT_CONVERSION_UNCOMPRESSED, (*secret_str), (*slen), ctx);
 
-  printf("[error] %s:%s:%d: 6\n", __FILE__, __func__, __LINE__);
-//	OPENSSL_free(xstr);
-//	OPENSSL_free(ystr);
-  printf("[error] %s:%s:%d: 7\n", __FILE__, __func__, __LINE__);
-	
 	return 1;
 }
 
@@ -138,7 +83,7 @@ int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len,
     EC_GROUP *group;
     BN_CTX *ctx;
     unsigned char *pub_str;
-    int pub_length, plen;
+    int pub_length;
     int ext_len;
     struct keypair *keypair;
 
@@ -163,10 +108,10 @@ int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len,
       {
       case SSL_CURVE_SECP256R1:
         group = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
-        plen = pub_length = 2 * 256 / 8 + 1;
+        pub_length = 2 * 256 / 8 + 1;
       default:
         group = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
-        plen = pub_length = 2 * 256 / 8 + 1;
+        pub_length = 2 * 256 / 8 + 1;
       }
 
       MA_LOG1d("before memcpy", s->pair->extension_from_clnt_msg_len);
@@ -252,7 +197,7 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
     // SSL_F_SSL_PARSE_CLIENTHELLO_MB_EXT
 
     unsigned char *p;
-    int i, j, diff, slen, klen, nk, plen, len, xlen;  // klen: key length, nk: number of keys, plen: EC point length
+    int i, j, diff, slen, klen, nk, l, xlen;  // klen: key length, nk: number of keys, plen: EC point length
     unsigned char *secret_str, *peer_str;
     struct keypair *keypair;
     EC_GROUP *group;
@@ -279,9 +224,11 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
 	  MEND("Complete to copy the extension message to my SSL struct (not to pair)", "client-side");
     }
     p = d;
+#ifdef DEBUG
     int ext_len;
     n2s(p, ext_len);
     MA_LOG1d("Received Extension Length", ext_len);
+#endif /* DEBUG */
 
     /* message: group_id(2bytes) + num_keys(1byte) + (key length(1byte) and key value) list */
 
@@ -293,10 +240,8 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
     {
     case SSL_CURVE_SECP256R1:
       group = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
-      plen = 2 * 256 / 8 + 1;
     default:
       group = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
-      plen = 2 * 256 / 8 + 1;
     }
 
     /* Check num_keys */
@@ -394,11 +339,11 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
       EC_POINT_get_affine_coordinates_GFp(group, secret, x, y, ctx);
       xlen = (klen - 1) / 2;
       secret_str = (unsigned char *)malloc(xlen);
-      len = BN_bn2bin(x, secret_str);
+      l = BN_bn2bin(x, secret_str);
 
-      if (len < xlen)
+      if (l < xlen)
       {
-        diff = xlen - len;
+        diff = xlen - l;
         for (j=xlen-1; j>=diff; j--)
           secret_str[j] = secret_str[j-diff];
         for (j=diff-1; j>=0; j--)
@@ -437,17 +382,15 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
 	EC_GROUP *group;
 	BN_CTX *ctx;
 	unsigned char *pub_str;
-	int i, pub_length, plen, ext_len;
+	int i, pub_length, ext_len;
   struct keypair *keypair;
 
   switch(group_id)
   {
   case SSL_CURVE_SECP256R1:
     group = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
-    plen = pub_length = 2 * 256 / 8 + 1;
   default:
     group = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
-    plen = pub_length = 2 * 256 / 8 + 1;
   }
 
   ctx = BN_CTX_new();
@@ -624,7 +567,7 @@ int ssl_parse_serverhello_mb_ext(SSL *s, unsigned char *d, int size, int *al)
   unsigned char *p;
   unsigned char *secret_str, *peer_str;
   struct keypair *keypair;
-  int i, diff, plen, klen, ext_len, group_id, num_keys, type, xlen, len;
+  int i, diff, klen, ext_len, group_id, num_keys, type, xlen, len;
   EC_GROUP *group;
   BIGNUM *x, *y;
   EC_POINT *secret, *peer_pub;
@@ -652,11 +595,9 @@ int ssl_parse_serverhello_mb_ext(SSL *s, unsigned char *d, int size, int *al)
   {
     case SSL_CURVE_SECP256R1:
       group = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
-      plen = 2 * 256 / 8 + 1;
       break;
     default:
       group = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
-      plen = 2 * 256 / 8 + 1;
   }
 
   ctx = BN_CTX_new();

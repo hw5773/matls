@@ -168,6 +168,8 @@
 #define TLS_MD_HMAC_SIZE 32
 #endif /* OPENSSL_NO_MATLS */
 
+#include "logs.h"
+
 const char ssl3_version_str[]="SSLv3" OPENSSL_VERSION_PTEXT;
 
 #define SSL3_NUM_CIPHERS	(sizeof(ssl3_ciphers)/sizeof(SSL_CIPHER))

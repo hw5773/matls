@@ -357,9 +357,9 @@ int ssl3_accept(SSL *s)
 			s->shutdown=0;
 			if (s->rwstate != SSL_X509_LOOKUP)
 			{
-				MEASURE("Before get_client_hello", "client-side");
+				MSTART("Before get_client_hello", "client-side");
 				ret=ssl3_get_client_hello(s);
-				MEASURE("After get_client_hello", "client-side");
+				MEND("After get_client_hello", "client-side");
 				if (ret <= 0) goto end;
 			}
 #ifndef OPENSSL_NO_SRP
@@ -392,9 +392,9 @@ int ssl3_accept(SSL *s)
 
 		case SSL3_ST_SW_SRVR_HELLO_A:
 		case SSL3_ST_SW_SRVR_HELLO_B:
-			MEASURE("Before send_server_hello", "client-side");
+			MSTART("Before send_server_hello", "client-side");
 			ret=ssl3_send_server_hello(s);
-			MEASURE("After send_server_hello", "client-side");
+			MEND("After send_server_hello", "client-side");
 			if (ret <= 0) goto end;
 #ifndef OPENSSL_NO_TLSEXT
 			if (s->hit)
@@ -419,32 +419,46 @@ int ssl3_accept(SSL *s)
 			/* normal PSK or KRB5 or SRP */
 			if (!(s->s3->tmp.new_cipher->algorithm_auth & (SSL_aNULL|SSL_aKRB5|SSL_aSRP))
 				&& !(s->s3->tmp.new_cipher->algorithm_mkey & SSL_kPSK))
-				{
+			{
 #ifndef OPENSSL_NO_MATLS
                 if (s->mb_enabled && s->matls_received)
                 {
 #ifdef DEBUG
                   printf("[matls] %s:%s:%d: invoke matls send server certificate\n", __FILE__, __func__, __LINE__);
 #endif /* DEBUG */
+                  MSTART("Before waiting the certificate", "client-side");
+                  while ((s->middlebox) && (!((s->pair->cert_msg) && (s->pair->cert_msg_len > 0)))) { __sync_synchronize(); }
+
+#ifdef STEP_CHECK
+                  printf("[step] Receive certificate from server-side: %lu\n", get_current_microseconds());
+#endif /* STEP_CHECK */
+
+                  MEND("After waiting the certificate", "client-side");
+                  MSTART("Before matls send server certificate", "client-side");
                   ret = matls_send_server_certificate(s);
+                  MEND("After matls send server certificate", "client-side");
                 }
                 else
 #endif /* OPENSSL_NO_MATLS */
+                {
+                  MSTART("Before send server certificate", "client-side");
 				ret=ssl3_send_server_certificate(s);
+                  MEND("After send server certificate", "client-side");
+                }
 				if (ret <= 0) goto end;
 #ifndef OPENSSL_NO_TLSEXT
 				if (s->tlsext_status_expected)
 					s->state=SSL3_ST_SW_CERT_STATUS_A;
 				else
 					s->state=SSL3_ST_SW_KEY_EXCH_A;
-				}
+			}
 			else
-				{
+			{
 				skip = 1;
 				s->state=SSL3_ST_SW_KEY_EXCH_A;
-				}
+			}
 #else
-				}
+			}
 			else
 				skip=1;
 
@@ -505,7 +519,9 @@ int ssl3_accept(SSL *s)
 				)
 			    )
 				{
+          MSTART("Before ssl3_send_server_key_exchange", "client-side");
 				ret=ssl3_send_server_key_exchange(s);
+          MEND("After ssl3_send_server_key_exchange", "client-side");
 				if (ret <= 0) goto end;
 				}
 			else
@@ -563,7 +579,9 @@ int ssl3_accept(SSL *s)
 
 		case SSL3_ST_SW_SRVR_DONE_A:
 		case SSL3_ST_SW_SRVR_DONE_B:
+      MSTART("Before ssl3_send_server_done", "client-side");
 			ret=ssl3_send_server_done(s);
+      MEND("After ssl3_send_server_done", "client-side");
 			if (ret <= 0) goto end;
 			s->s3->tmp.next_state=SSL3_ST_SR_CERT_A;
 			s->state=SSL3_ST_SW_FLUSH;
@@ -604,9 +622,9 @@ int ssl3_accept(SSL *s)
 			else {
 				if (s->s3->tmp.cert_request)
 					{
-					MEASURE("Before get_client_cert", "client-side");
+					MSTART("Before get_client_cert", "client-side");
 					ret=ssl3_get_client_certificate(s);
-					MEAUSRE("After get_client_cert", "client-side");
+					MEND("After get_client_cert", "client-side");
 					if (ret <= 0) goto end;
 					}
 				s->init_num=0;
@@ -616,7 +634,9 @@ int ssl3_accept(SSL *s)
 
 		case SSL3_ST_SR_KEY_EXCH_A:
 		case SSL3_ST_SR_KEY_EXCH_B:
+      MSTART("Before ssl3_get_client_key_exchange", "client-side");
 			ret=ssl3_get_client_key_exchange(s);
+      MEND("After ssl3_get_client_key_exchange", "client-side");
 			if (ret <= 0)
 				goto end;
 			if (ret == 2)
@@ -722,10 +742,10 @@ int ssl3_accept(SSL *s)
 		case SSL3_ST_SR_FINISHED_A:
 		case SSL3_ST_SR_FINISHED_B:
 			s->s3->flags |= SSL3_FLAGS_CCS_OK;
-			MEASURE("Before get_finished", "client-side");
+			MSTART("Before get_finished", "client-side");
 			ret=ssl3_get_finished(s,SSL3_ST_SR_FINISHED_A,
 				SSL3_ST_SR_FINISHED_B);
-			MEASURE("After get_finished", "client-side");
+			MEND("After get_finished", "client-side");
 			if (ret <= 0) goto end;
 			if (s->hit)
 				s->state=SSL_ST_OK;
@@ -764,8 +784,10 @@ int ssl3_accept(SSL *s)
 			if (!s->method->ssl3_enc->setup_key_block(s))
 				{ ret= -1; goto end; }
 
+      MSTART("Before ssl3_send_change_cipher_spec", "client-side");
 			ret=ssl3_send_change_cipher_spec(s,
 				SSL3_ST_SW_CHANGE_A,SSL3_ST_SW_CHANGE_B);
+      MEND("After ssl3_send_change_cipher_spec", "client-side");
 
 			if (ret <= 0) goto end;
 			s->state=SSL3_ST_SW_FINISHED_A;
@@ -782,13 +804,28 @@ int ssl3_accept(SSL *s)
 
 		case SSL3_ST_SW_FINISHED_A:
 		case SSL3_ST_SW_FINISHED_B:
+      MSTART("Before ssl3_send_finished", "client-side");
 			ret=ssl3_send_finished(s,
 				SSL3_ST_SW_FINISHED_A,SSL3_ST_SW_FINISHED_B,
 				s->method->ssl3_enc->server_finished_label,
 				s->method->ssl3_enc->server_finished_label_len);
+      MEND("After ssl3_send_finished", "client-side");
 
 			if (ret <= 0) goto end;
+
+#ifndef OPENSSL_NO_MATLS
+      if (s->mb_enabled && s->matls_received)
+      {
+        s->state = SSL3_ST_SW_EXTENDED_FINISHED_A;
+      }
+      else
+      {
+#endif /* OPENSSL_NO_MATLS */
 			s->state=SSL3_ST_SW_FLUSH;
+#ifndef OPENSSL_NO_MATLS
+      }
+#endif /* OPENSSL_NO_MATLS */
+
 			if (s->hit)
 				{
 #if defined(OPENSSL_NO_TLSEXT) || defined(OPENSSL_NO_NEXTPROTONEG)
@@ -804,26 +841,7 @@ int ssl3_accept(SSL *s)
 #endif
 				}
 			else
-#ifndef OPENSSL_NO_MATLS
-      {
-        if (s->mb_enabled && s->matls_received)
-        {
-          s->s3->tmp.next_state = SSL3_ST_SW_EXTENDED_FINISHED_A;
-#ifdef DEBUG
-          printf("[matls] %s:%s:%d: next state is extended_finished_a\n", __FILE__, __func__, __LINE__);
-#endif /* DEBUG */
-        }
-        else
-#endif /* OPENSSL_NO_MATLS */
-        {
 				s->s3->tmp.next_state=SSL_ST_OK;
-#ifdef DEBUG
-        printf("[matls] %s:%s:%d: next state is ssl_st_ok\n", __FILE__, __func__, __LINE__);
-#endif
-        }
-#ifndef OPENSSL_NO_MATLS
-      }
-#endif /* OPENSSL_NO_MATLS */
 			s->init_num=0;
 			break;
 
@@ -831,14 +849,17 @@ int ssl3_accept(SSL *s)
     case SSL3_ST_SW_EXTENDED_FINISHED_A:
     case SSL3_ST_SW_EXTENDED_FINISHED_B:
       MA_LOG("waiting extended finished message");
-	  MEASURE("Before srvr's get_extended_fin", "client-side");
-      while ((s->middlebox) && (s->pair->extended_finished_msg_len <= 0)) { __sync_synchronize(); }
-	  MEASURE("After srvr's get_extended_fin", "client-side");
+	  MSTART("Before srvr's get_extended_fin", "client-side");
+      while ((s->middlebox) && (!(s->pair->extended_finished_msg && s->pair->extended_finished_msg_len > 0))) { __sync_synchronize(); }
+#ifdef STEP_CHECK
+      printf("[step] after received extended_finished_msg: %lu\n", get_current_microseconds());
+#endif
+	  MEND("After srvr's get_extended_fin", "client-side");
       MA_LOG("get extended finished message");
 
-	  MEASURE("Before srvr's send_extended_fin", "client-side");
+	  MSTART("Before matls_send_extended_finished", "client-side");
       ret = matls_send_extended_finished(s);
-	  MEASURE("After srvr's send_extended_fin", "client-side");
+	  MEND("After matls_send_extended_finished", "client-side");
 
       if (ret <= 0) goto end;
       s->state = SSL3_ST_SW_FLUSH;

@@ -58,12 +58,13 @@
 
 #include <stdio.h>
 #include "ssl_locl.h"
-#include "matls.h"
 #include <openssl/bio.h>
 #include <openssl/objects.h>
 #include <openssl/evp.h>
 #include <openssl/x509.h>
 #include <openssl/pem.h>
+
+#include "logs.h"
 
 static int ssl_set_cert(CERT *c, X509 *x509);
 static int ssl_set_pkey(CERT *c, EVP_PKEY *pkey);
@@ -545,56 +546,40 @@ int SSL_CTX_register_id(SSL_CTX *ctx)
   {
     if (!(id = BIO_new(BIO_s_mem())))
     {
-#ifdef DEBUG
-      printf("Error making memory\n");
-#endif /* DEBUG */
+      MA_LOG("Error making memory\n");
     }
     else
     {
-#ifdef DEBUG
-      printf("Making memory success\n");
-#endif /* DEBUG */
+      MA_LOG("Making memory success\n");
     }
 
     if (!(key = BIO_new(BIO_f_md())))
     {
-#ifdef DEBUG
-      printf("Error making md filter\n");
-#endif /* DEBUG */
+      MA_LOG("Error making md filter\n");
     }
     else
     {
-#ifdef DEBUG
-      printf("Making md filter success\n");
-#endif /* DEBUG */
+      MA_LOG("Making md filter success\n");
     }
 
     if (!BIO_set_md(key, EVP_sha256()))
     {
-#ifdef DEBUG
-      printf("Error setting sha256\n");
-#endif /* DEBUG */
+      MA_LOG("Error setting sha256\n");
     }
     else
     {
-#ifdef DEBUG
-      printf("Setting sha256 success\n");
-#endif /* DEBUG */
+      MA_LOG("Setting sha256 success\n");
     }
 
     BIO_push(key, id);
 
     if (!(pkey = X509_get_pubkey(ctx->x509)))
     {
-#ifdef DEBUG
-      printf("Error getting public key from certificate\n");
-#endif /* DEBUG */
+      MA_LOG("Error getting public key from certificate\n");
     }
     else
     {
-#ifdef DEBUG
-      printf("Getting public key from certificate\n");
-#endif /* DEBUG */
+      MA_LOG("Getting public key from certificate\n");
     }
 /*
     if (!PEM_write_bio_PUBKEY(key, pkey))
@@ -604,15 +589,11 @@ int SSL_CTX_register_id(SSL_CTX *ctx)
 */
     if (!i2d_PUBKEY_bio(key, pkey))
     {
-#ifdef DEBUG
-      printf("Error writing public key data in DER format\n");
-#endif /* DEBUG */
+      MA_LOG("Error writing public key data in DER format\n");
     }
     else
     {
-#ifdef DEBUG
-      printf("Writing public key data in DER format\n");
-#endif /* DEBUG */
+      MA_LOG("Writing public key data in DER format\n");
     }
 
     ctx->id_length = TLS_MD_ID_SIZE;

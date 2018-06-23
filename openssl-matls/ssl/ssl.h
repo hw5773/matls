@@ -1481,7 +1481,7 @@ struct ssl_st
 #endif /* OPENSSL_NO_MATLS */
 
 #ifndef OPENSSL_NO_SPLIT_TLS
-  volatile SSL *pair;
+  SSL *pair;
 #endif /* OPENSSL_NO_SPLIT_TLS */
 	};
 

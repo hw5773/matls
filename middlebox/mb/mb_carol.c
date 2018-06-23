@@ -111,12 +111,12 @@ void *mb_run(void *data)
   unsigned char buf[BUF_SIZE];
   unsigned long start, end;
 
-  char modified[134] =
+  char modified[136] =
     "HTTP/1.1 200 OK\r\n"
     "Content-Type: text/html\r\n"
-    "Content-Length: 70\r\n"
+    "Content-Length: 72\r\n"
     "\r\n"
-    "<html><title>Test</title><body><h1>Test Bob's Page!</h1></body></html>";
+    "<html><title>Test</title><body><h1>Test Carol's Page!</h1></body></html>";
   int modified_len = strlen(modified);
 
   SSL *ssl;

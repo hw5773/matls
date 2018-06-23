@@ -116,7 +116,7 @@ void *mb_run(void *data)
     "Content-Type: text/html\r\n"
     "Content-Length: 70\r\n"
     "\r\n"
-    "<html><title>Test</title><body><h1>Test Bob's Page!</h1></body></html>";
+    "<html><title>Test</title><body><h1>Test Amy's Page!</h1></body></html>";
   int modified_len = strlen(modified);
 
   SSL *ssl;

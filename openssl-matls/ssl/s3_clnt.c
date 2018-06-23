@@ -168,6 +168,7 @@
 #endif
 
 #include "logs.h"
+unsigned long mstart1, mend1;
 
 static const SSL_METHOD *ssl3_get_client_method(int ver);
 static int ca_dn_cmp(const X509_NAME * const *a,const X509_NAME * const *b);
@@ -281,9 +282,9 @@ int ssl3_connect(SSL *s)
 
 			s->shutdown=0;
 
-			MEASURE("Before send_client_hello", "server-side");
+			MSTART("Before send_client_hello", "server-side");
 			ret=ssl3_client_hello(s);
-			MEASURE("After send_client_hello", "server-side");
+			MEND("After send_client_hello", "server-side");
 			if (ret <= 0) goto end;
 			s->state=SSL3_ST_CR_SRVR_HELLO_A;
 			s->init_num=0;
@@ -296,9 +297,9 @@ int ssl3_connect(SSL *s)
 
 		case SSL3_ST_CR_SRVR_HELLO_A:
 		case SSL3_ST_CR_SRVR_HELLO_B:
-			MEASURE("Before get_server_hello", "server-side");
+			MSTART("Before get_server_hello", "server-side");
 			ret=ssl3_get_server_hello(s);
-			MEASURE("After get_server_hello", "server-side");
+			MEND("After get_server_hello", "server-side");
 
 			if (ret <= 0) goto end;
 
@@ -340,9 +341,17 @@ int ssl3_connect(SSL *s)
 			    !(s->s3->tmp.new_cipher->algorithm_mkey & SSL_kPSK))
 				{
           if (s->mb_enabled && s->middlebox)
+          {
+            MSTART("Before matls_get_server_certificate", "server-side");
             ret = matls_get_server_certificate(s);
+            MEND("After matls_get_server_certificate", "server-side");
+          }
           else
+          {
+            MSTART("Before ssl3_get_server_certificate", "server-side");
     				ret=ssl3_get_server_certificate(s);
+            MEND("After ssl3_get_server_certificate", "server-side");
+          }
 				if (ret <= 0) goto end;
 
 #ifndef OPENSSL_NO_MATLS
@@ -402,7 +411,9 @@ int ssl3_connect(SSL *s)
 
 		case SSL3_ST_CR_KEY_EXCH_A:
 		case SSL3_ST_CR_KEY_EXCH_B:
+      MSTART("Before ssl3_get_key_exchange", "server-side");
 			ret=ssl3_get_key_exchange(s);
+      MEND("After ssl3_get_key_exchange", "server-side");
 			if (ret <= 0) goto end;
 			s->state=SSL3_ST_CR_CERT_REQ_A;
 			s->init_num=0;
@@ -427,7 +438,9 @@ int ssl3_connect(SSL *s)
 
 		case SSL3_ST_CR_SRVR_DONE_A:
 		case SSL3_ST_CR_SRVR_DONE_B:
+      MSTART("Before ssl3_get_server_done", "server-side");
 			ret=ssl3_get_server_done(s);
+      MEND("After ssl3_get_server_done", "server-side");
 			if (ret <= 0) goto end;
 #ifndef OPENSSL_NO_SRP
 			if (s->s3->tmp.new_cipher->algorithm_mkey & SSL_kSRP)
@@ -452,7 +465,9 @@ int ssl3_connect(SSL *s)
 		case SSL3_ST_CW_CERT_B:
 		case SSL3_ST_CW_CERT_C:
 		case SSL3_ST_CW_CERT_D:
+      MSTART("Before ssl3_send_client_certificate", "server-side");
 			ret=ssl3_send_client_certificate(s);
+      MEND("After ssl3_send_client_certificate", "server-side");
 			if (ret <= 0) goto end;
 			s->state=SSL3_ST_CW_KEY_EXCH_A;
 			s->init_num=0;
@@ -460,7 +475,9 @@ int ssl3_connect(SSL *s)
 
 		case SSL3_ST_CW_KEY_EXCH_A:
 		case SSL3_ST_CW_KEY_EXCH_B:
+      MSTART("Before ssl3_send_client_key_exchange", "server-side");
 			ret=ssl3_send_client_key_exchange(s);
+      MEND("After ssl3_send_client_key_exchange", "server-side");
 			if (ret <= 0) goto end;
 			/* EAY EAY EAY need to check for DH fix cert
 			 * sent back */
@@ -493,7 +510,9 @@ int ssl3_connect(SSL *s)
 
 		case SSL3_ST_CW_CERT_VRFY_A:
 		case SSL3_ST_CW_CERT_VRFY_B:
+      MSTART("Before ssl3_send_client_verify", "server-side");
 			ret=ssl3_send_client_verify(s);
+      MEND("After ssl3_send_client_verify", "server-side");
 			if (ret <= 0) goto end;
 			s->state=SSL3_ST_CW_CHANGE_A;
 			s->init_num=0;
@@ -502,8 +521,10 @@ int ssl3_connect(SSL *s)
 
 		case SSL3_ST_CW_CHANGE_A:
 		case SSL3_ST_CW_CHANGE_B:
+      MSTART("Before ssl3_send_change_cipher_spec", "server-side");
 			ret=ssl3_send_change_cipher_spec(s,
 				SSL3_ST_CW_CHANGE_A,SSL3_ST_CW_CHANGE_B);
+      MEND("After ssl3_send_change_cipher_spec", "server-side");
 			if (ret <= 0) goto end;
 
 #if defined(OPENSSL_NO_TLSEXT) || defined(OPENSSL_NO_NEXTPROTONEG)
@@ -552,12 +573,12 @@ int ssl3_connect(SSL *s)
 
 		case SSL3_ST_CW_FINISHED_A:
 		case SSL3_ST_CW_FINISHED_B:
-			MEASURE("Before send_finished", "server-side");
+			MSTART("Before send_finished", "server-side");
 			ret=ssl3_send_finished(s,
 				SSL3_ST_CW_FINISHED_A,SSL3_ST_CW_FINISHED_B,
 				s->method->ssl3_enc->client_finished_label,
 				s->method->ssl3_enc->client_finished_label_len);
-			MEASURE("After send_finished", "server-side");
+			MEND("After send_finished", "server-side");
 			if (ret <= 0) goto end;
 			s->s3->flags |= SSL3_FLAGS_CCS_OK;
 			s->state=SSL3_ST_CW_FLUSH;
@@ -610,10 +631,10 @@ int ssl3_connect(SSL *s)
 		case SSL3_ST_CR_FINISHED_B:
 
 			s->s3->flags |= SSL3_FLAGS_CCS_OK;
-			MEASURE("Before clnt's get_finished", "server-side");
+			MSTART("Before clnt's get_finished", "server-side");
 			ret=ssl3_get_finished(s,SSL3_ST_CR_FINISHED_A,
 				SSL3_ST_CR_FINISHED_B);
-			MEASURE("After clnt's get_finished", "server-side");
+			MEND("After clnt's get_finished", "server-side");
 
 			if (ret <= 0) goto end;
 
@@ -636,9 +657,11 @@ int ssl3_connect(SSL *s)
 #ifndef OPENSSL_NO_MATLS
     case SSL3_ST_CR_EXTENDED_FINISHED_A:
     case SSL3_ST_CR_EXTENDED_FINISHED_B:
-	  MEASURE("Before clnt's get_extended_fini", "server-side");
+	  //mstart1 = get_current_microseconds();
+	  //printf("[TT] %s:%s:%d: server-side) Before matls_get_extended_finished start\n", __FILE__, __func__, __LINE__);
       ret = matls_get_extended_finished(s);
-	  MEASURE("After clnt's get_extended_fini", "server-side");
+	  //mend1 = get_current_microseconds();
+	  //printf("[TT] %s:%s:%d: server-side) After matls_get_extended_finished end: %lu us\n", __FILE__, __func__, __LINE__, mend1 - mstart1);
       if (ret <= 0) goto end;
       
       if (s->hit)

@@ -65,13 +65,36 @@ unsigned char ipb[4];
 #define MA_LOGmac(msg, mac)
 #endif /* DEBUG */
 
+#ifdef DEBUG
+#define PRINTK(msg, arg1, arg2) \
+  fprintf(stderr, "[matls] %s: %s (%d bytes) \n", __func__, msg, arg2); \
+  for (idx=0; idx<arg2; idx++) \
+  { \
+    if (idx % 10 == 0) \
+      fprintf(stderr, "\n"); \
+    fprintf(stderr, "%02X ", arg1[idx]); \
+  } \
+  fprintf(stderr, "\n");
+#else
+#define PRINTK(msg, arg1, arg2) 
+#endif /* DEBUG */
+
 unsigned long get_current_microseconds();
 
 #ifdef TIME_LOG
+unsigned long mstart, mend;
+#define MSTART(msg, side) \
+	mstart = get_current_microseconds(); \
+	printf("[TT] %s:%s:%d: %s) %s start\n", __FILE__, __func__, __LINE__, side, msg);
+#define MEND(msg, side) \
+	mend = get_current_microseconds(); \
+	printf("[TT] %s:%s:%d: %s) %s end: %lu us\n", __FILE__, __func__, __LINE__, side, msg, mend - mstart);
 #define MEASURE(msg, side) \
-	printf("[TT] %s:%s:%d: %s) %s: %lu\n", __FILE__, __func__, __LINE__, side, get_current_microseconds());
+	printf("[TT] %s:%s:%d: %s) %s: %lu\n", __FILE__, __func__, __LINE__, side, msg, get_current_microseconds());
 #else
-#define MEASURE(msg) 
+#define MSTART(msg, side)
+#define MEND(msg, side)
+#define MEASURE(msg, side) 
 #endif /* TIME_MEASURE */
 
 #endif /* __MB_LOG__ */

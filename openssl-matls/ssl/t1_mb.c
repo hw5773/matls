@@ -45,6 +45,8 @@ int make_keypair(struct keypair **pair, EC_GROUP *group, BN_CTX *ctx) {
 
 int char_to_pub(unsigned char *input, int key_length, EC_POINT *pubkey, EC_GROUP *group, BN_CTX *ctx)
 {
+  EC_POINT_oct2point(group, pubkey, input, key_length, ctx);
+/*
     int klen = (key_length - 1)/ 2;
     unsigned char *xstr = (unsigned char *)malloc(klen); //klen+1?
     unsigned char *ystr = (unsigned char *)malloc(klen); //klen+1?
@@ -67,7 +69,7 @@ int char_to_pub(unsigned char *input, int key_length, EC_POINT *pubkey, EC_GROUP
 
     BN_free(x);
     BN_free(y);
-
+*/
     return 1;
 }
 
@@ -76,13 +78,17 @@ int pub_to_char(EC_POINT *secret, unsigned char **secret_str, int *slen, EC_GROU
   int key_bytes, ret;
   unsigned char *xstr, *ystr;
 
+  printf("[error] %s:%s:%d: 1\n", __FILE__, __func__, __LINE__);
   if (EC_GROUP_get_curve_name(group) == NID_X9_62_prime256v1)
     key_bytes = 256 / 8;
   else
     return -1;
 
+  printf("[error] %s:%s:%d: 2\n", __FILE__, __func__, __LINE__);
 	*slen = 2 * key_bytes + 1;
-    (*secret_str) = (unsigned char *)malloc(*slen);
+  (*secret_str) = (unsigned char *)malloc(*slen);
+/*
+  printf("[error] %s:%s:%d: 3\n", __FILE__, __func__, __LINE__);
 
 	BIGNUM *x = BN_new();
 	BIGNUM *y = BN_new();
@@ -94,15 +100,22 @@ int pub_to_char(EC_POINT *secret, unsigned char **secret_str, int *slen, EC_GROU
 	ret = BN_bn2bin(x, xstr);
 	ret = BN_bn2bin(y, ystr);
 
+  printf("[error] %s:%s:%d: 4\n", __FILE__, __func__, __LINE__);
 	BN_free(x);
 	BN_free(y);
 
+  printf("[error] %s:%s:%d: 5\n", __FILE__, __func__, __LINE__);
+  
   memset((*secret_str), 0x04, 1);
 	memcpy((*secret_str) + 1, xstr, key_bytes);
 	memcpy((*secret_str) + key_bytes + 1, ystr, key_bytes);
+*/
+  EC_POINT_point2oct(group, secret, POINT_CONVERSION_UNCOMPRESSED, (*secret_str), (*slen), ctx);
 
-	OPENSSL_free(xstr);
-	OPENSSL_free(ystr);
+  printf("[error] %s:%s:%d: 6\n", __FILE__, __func__, __LINE__);
+//	OPENSSL_free(xstr);
+//	OPENSSL_free(ystr);
+  printf("[error] %s:%s:%d: 7\n", __FILE__, __func__, __LINE__);
 	
 	return 1;
 }
@@ -239,7 +252,7 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
     // SSL_F_SSL_PARSE_CLIENTHELLO_MB_EXT
 
     unsigned char *p;
-    int i, slen, klen, nk, plen;  // klen: key length, nk: number of keys, plen: EC point length
+    int i, j, diff, slen, klen, nk, plen, len, xlen;  // klen: key length, nk: number of keys, plen: EC point length
     unsigned char *secret_str, *peer_str;
     struct keypair *keypair;
     EC_GROUP *group;
@@ -379,8 +392,19 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
       char_to_pub(peer_str, klen, peer_pub, group, ctx);
       EC_POINT_mul(group, secret, NULL, peer_pub, keypair->pri, ctx);
       EC_POINT_get_affine_coordinates_GFp(group, secret, x, y, ctx);
-      secret_str = (unsigned char *)malloc((klen-1)/2);
-      BN_bn2bin(x, secret_str);
+      xlen = (klen - 1) / 2;
+      secret_str = (unsigned char *)malloc(xlen);
+      len = BN_bn2bin(x, secret_str);
+
+      if (len < xlen)
+      {
+        diff = xlen - len;
+        for (j=xlen-1; j>=diff; j--)
+          secret_str[j] = secret_str[j-diff];
+        for (j=diff-1; j>=0; j--)
+          secret_str[j] = 0;
+      }
+
       s->mb_info.secret[i] = (volatile unsigned char *)secret_str;
 
       free(peer_str);
@@ -600,7 +624,7 @@ int ssl_parse_serverhello_mb_ext(SSL *s, unsigned char *d, int size, int *al)
   unsigned char *p;
   unsigned char *secret_str, *peer_str;
   struct keypair *keypair;
-  int plen, klen, ext_len, group_id, num_keys, type;
+  int i, diff, plen, klen, ext_len, group_id, num_keys, type, xlen, len;
   EC_GROUP *group;
   BIGNUM *x, *y;
   EC_POINT *secret, *peer_pub;
@@ -658,8 +682,21 @@ int ssl_parse_serverhello_mb_ext(SSL *s, unsigned char *d, int size, int *al)
   char_to_pub(peer_str, klen, peer_pub, group, ctx);
   EC_POINT_mul(group, secret, NULL, peer_pub, keypair->pri, ctx);
   EC_POINT_get_affine_coordinates_GFp(group, secret, x, y, ctx);
-  secret_str = (unsigned char *)malloc((klen-1)/2);
-  BN_bn2bin(x, secret_str);
+  xlen = (klen - 1) / 2;
+  secret_str = (unsigned char *)malloc(xlen);
+  len = BN_bn2bin(x, secret_str);
+
+  if (len < xlen)
+  {
+    diff = xlen - len;
+
+    for (i=xlen-1; i>=diff; i--)
+      secret_str[i] = secret_str[i-diff];
+
+    for (i=diff-1; i>=0; i--)
+      secret_str[i] = 0;
+  }
+
   s->pair->mb_info.secret[SERVER] = secret_str;
 
   MA_LOG("Before malloc for extension from srvr msg");

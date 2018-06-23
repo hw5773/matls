@@ -5,8 +5,8 @@ KEY_FILE=carol_priv.key
 CLIENT=client
 SERVER=server
 GCC=gcc
-CFLAGS=-DMB_DEBUG -DDEBUG -o 
-#CFLAGS=-o 
+#CFLAGS=-DMB_DEBUG -DDEBUG -o 
+CFLAGS=-o 
 CLIENT_SRC=client.c
 SERVER_SRC=server.c
 FLAGS=-I/home/hwlee/openssl-matls-lib/include -L/home/hwlee/openssl-matls-lib/lib
@@ -16,7 +16,7 @@ LDFLAGS=-lssl -lcrypto -ldl -lpthread
 GDB=gdb
 
 HOST=127.0.0.1
-PORT=5500
+PORT=5017
 NUM_OF_THREADS=1
 
 default: server

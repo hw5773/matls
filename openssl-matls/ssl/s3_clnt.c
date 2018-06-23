@@ -1257,9 +1257,9 @@ int matls_get_server_certificate(SSL *s)
   /////////////////////////
 
 	n2l3(p,llen);
-  MA_LOG1d("cert chain length: %d\n", llen);
-  MA_LOG1d("n: %d\n", n);
-  MA_LOG1d("offset: %d\n", offset);
+  MA_LOG1d("cert chain length", llen);
+  MA_LOG1d("n", n);
+  MA_LOG1d("offset", offset);
 	if (llen+3 != n - offset)
 		{
 		al=SSL_AD_DECODE_ERROR;

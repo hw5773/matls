@@ -358,13 +358,6 @@ int matls_send_extended_finished(SSL *s)
 
     if (s->middlebox)
     {
-#ifdef DEBUG
-      printf("waiting for extended finished message from the server-side entity\n");
-#endif /* DEBUG */
-      while(!(s->pair->extended_finished_msg)) { __sync_synchronize(); }
-#ifdef DEBUG
-      printf("get the message from the server-side entity\n");
-#endif /* DEBUG */
       tmp1 = (unsigned char *)malloc(s->pair->extended_finished_msg_len);
       memcpy(tmp1, s->pair->extended_finished_msg, s->pair->extended_finished_msg_len);
       free(s->pair->extended_finished_msg);
@@ -583,29 +576,25 @@ int matls_get_extended_finished(SSL *s)
 #endif
 
   MA_LOG("matls get extended finished");
-	//MSTART("Get extended finished message", "server-side");
   unsigned long start, end;
-  printf("[TT] %s:%s:%d: server-side) Get extended finished message\n", __FILE__, __func__, __LINE__);
-  start = get_current_microseconds();
+  //printf("[TT] %s:%s:%d: server-side) Get extended finished message\n", __FILE__, __func__, __LINE__);
+  //start = get_current_microseconds();
 	n=s->method->ssl_get_message(s,
 		SSL3_ST_CR_EXTENDED_FINISHED_A,
 		SSL3_ST_CR_EXTENDED_FINISHED_B,
 		SSL3_MT_EXTENDED_FINISHED,
 		20000, /* should actually be 36+4 :-) */
 		&ok);
-	end = get_current_microseconds();
-	printf("[TT] %s:%s:%d: server-side) Get extended finished message end: %lu us\n", __FILE__, __func__, __LINE__, end - start);
-	//MEND("Get extended finished message", "server-side");
+	//end = get_current_microseconds();
+	//printf("[TT] %s:%s:%d: server-side) Get extended finished message end: %lu us\n", __FILE__, __func__, __LINE__, end - start);
 
 	if (!ok) return((int)n);
 
 	p = (unsigned char *)s->init_msg;
 
-	MSTART("Copy extended finished message", "server-side");
   s->extended_finished_msg = (volatile unsigned char *)malloc(n);
   memcpy(s->extended_finished_msg, p, n);
   s->extended_finished_msg_len = n;
-	MEND("Copy extended finished message", "server-side");
 
 	return(1);
 }
@@ -1025,11 +1014,13 @@ long ssl3_get_message(SSL *s, int st1, int stn, int mt, long max, int *ok)
 		do
 			{
 
+      /*
 			/////
       if (mt == SSL3_MT_EXTENDED_FINISHED)
         printf("\n========== Start reading for SSL3_MT_EXTENDED_FINISHED Bottleneck ===========\n");
 			st = get_current_microseconds();
 			/////
+      */
 			while (s->init_num < 4)
 				{
         st2 = get_current_microseconds();
@@ -1046,6 +1037,7 @@ long ssl3_get_message(SSL *s, int st1, int stn, int mt, long max, int *ok)
 				s->init_num+=i;
 				}
 			
+      /*
 			/////
 			et = get_current_microseconds();
 			if (mt == SSL3_MT_EXTENDED_FINISHED)
@@ -1054,6 +1046,7 @@ long ssl3_get_message(SSL *s, int st1, int stn, int mt, long max, int *ok)
         printf("========== End reading for SSL3_MT_EXTENDED_FINISHED Bottleneck ===========\n\n");
 			}
 			/////
+      */
 
 			skip_message = 0;
 			if (!s->server)
@@ -1096,10 +1089,12 @@ long ssl3_get_message(SSL *s, int st1, int stn, int mt, long max, int *ok)
 		s->s3->tmp.message_type= *(p++);
 
 		n2l3(p,l);
+    /*
 		//////
 		if (mt == SSL3_MT_EXTENDED_FINISHED)
 			printf("length: %lu\n", l);
 		/////
+    */
 
 		if (l > (unsigned long)max)
 			{
@@ -1129,9 +1124,12 @@ long ssl3_get_message(SSL *s, int st1, int stn, int mt, long max, int *ok)
 	p = s->init_msg;
 	n = s->s3->tmp.message_size - s->init_num;
 
+  /*
 	/////
 	st = get_current_microseconds();
 	/////
+  */
+
 	while (n > 0)
 		{
 		i=s->method->ssl_read_bytes(s,SSL3_RT_HANDSHAKE,&p[s->init_num],n,0);
@@ -1144,11 +1142,14 @@ long ssl3_get_message(SSL *s, int st1, int stn, int mt, long max, int *ok)
 		s->init_num += i;
 		n -= i;
 		}
+
+  /*
 	/////
 	et = get_current_microseconds();
 	if (mt == SSL3_MT_EXTENDED_FINISHED)
 		printf("time for read bytes: %lu\n", et - st);
 	/////
+  */
 
 #ifndef OPENSSL_NO_NEXTPROTONEG
 	/* If receiving Finished, record MAC of prior handshake messages for
@@ -1158,15 +1159,20 @@ long ssl3_get_message(SSL *s, int st1, int stn, int mt, long max, int *ok)
 #endif
 
 	/* Feed this message into MAC computation. */
+  /*
 	/////
 	st = get_current_microseconds();
 	/////
+  */
 	ssl3_finish_mac(s, (unsigned char *)s->init_buf->data, s->init_num + 4);
+  /*
 	/////
 	et = get_current_microseconds();
 	if (mt == SSL3_MT_EXTENDED_FINISHED)
 		printf("time for ssl3_finish_mac: %lu\n", et - st);
 	/////
+  */
+
 	if (s->msg_callback)
 		s->msg_callback(0, s->version, SSL3_RT_HANDSHAKE, s->init_buf->data, (size_t)s->init_num + 4, s, s->msg_callback_arg);
 	*ok=1;

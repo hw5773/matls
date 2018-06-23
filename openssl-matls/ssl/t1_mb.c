@@ -135,7 +135,10 @@ int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len,
     {
       MA_LOG("Before waiting the message");
 	  MSTART("Before waiting the message from the client", "server-side");
-      while (!(s->pair && (s->pair->extension_from_clnt_msg_len > 0))) { __sync_synchronize(); }
+      while (!(s->pair && s->pair->extension_from_clnt_msg && (s->pair->extension_from_clnt_msg_len > 0))) { __sync_synchronize(); }
+#ifdef STEP_CHECK
+      printf("[step] after receiving extension message from the client: %lu\n", get_current_microseconds());
+#endif /* STEP_CHECK */
 	  MEND("After waiting the message from the client", "server-side");
       MA_LOG("The client side pair has the extension message");
       memcpy(&(s->mb_info), &(s->pair->mb_info), sizeof(struct mb_st));
@@ -458,6 +461,9 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
       MA_LOG("Before waiting the message");
       MSTART("Before waiting the message", "client-side");
       while (!(s->pair && (s->pair->extension_from_srvr_msg_len > 0))) { __sync_synchronize(); }
+#ifdef STEP_CHECK
+      printf("[step] after receiving extension message from the server: %lu\n", get_current_microseconds());
+#endif /* STEP_CHECK */
       MEND("The server side pair has the extension message", "client-side");
       MA_LOG("The server side pair has the extension message");
 

@@ -317,9 +317,11 @@ void *run(void *data)
 #ifdef MATLS
   SSL_enable_mb(ssl);
   MA_LOG1d("matls enabled", ssl->mb_enabled);
+//  printf("========== matls enabled ==========\n");
 #else
   SSL_disable_mb(ssl);
   MA_LOG1d("matls disabled", ssl->mb_enabled);
+//  printf("========== matls disabled ==========\n");
 #endif
 
   unsigned long start, end;

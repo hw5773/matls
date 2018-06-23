@@ -5,9 +5,10 @@ FORWARD_FILE=forward.txt
 
 SERVER=mb
 GCC=gcc
-CFLAGS=-DDEBUG -o
-#CFLAGS=-o
+#CFLAGS=-DDEBUG -o
+CFLAGS=-o
 SERVER_SRC=mb.c mssl.c table.c common.c logger.c
+SRC=mssl.c table.c common.c logger.c
 SERVER_OBJ=mb.o mssl.o table.o common.o logger.o
 #FLAGS=-I../../openssl-matls-lib/include -L../../openssl-matls-lib/lib
 FLAGS=-I/home/hwlee/openssl-matls-lib/include -L/home/hwlee/openssl-matls-lib/lib
@@ -23,26 +24,51 @@ NUM_OF_THREADS=1
 SERVER_1=mb1
 SERVER_2=mb2
 SERVER_3=mb3
-PORT_1=5555
-PORT_2=5555
-PORT_3=443
+SERVER_4=mb4
+SERVER_5=mb5
+SERVER_6=mb6
+PORT_1=5550
+PORT_2=5551
+PORT_3=5552
+PORT_4=5553
+PORT_5=5554
+PORT_6=5555
 FORWARD_FILE_1=forward_1.txt
 FORWARD_FILE_2=forward_2.txt
 FORWARD_FILE_3=forward_3.txt
+FORWARD_FILE_4=forward_4.txt
+FORWARD_FILE_5=forward_5.txt
+FORWARD_FILE_6=forward_6.txt
 
-default: matls
+default: amy bob carol david
+
+amy:
+	${GCC} -DMATLS ${CFLAGS} $@ mb_$@.c ${SRC} ${FLAGS} ${LDFLAGS}
+
+bob:
+	${GCC} -DMATLS ${CFLAGS} $@ mb_$@.c ${SRC} ${FLAGS} ${LDFLAGS}
+
+carol:
+	${GCC} -DMATLS ${CFLAGS} $@ mb_$@.c ${SRC} ${FLAGS} ${LDFLAGS}
+
+david:
+	${GCC} -DMATLS ${CFLAGS} $@ mb_$@.c ${SRC} ${FLAGS} ${LDFLAGS}
 
 matls:
 	${GCC} -DMATLS ${CFLAGS} ${SERVER} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
 	${GCC} -DMATLS ${CFLAGS} ${SERVER_1} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
 	${GCC} -DMATLS ${CFLAGS} ${SERVER_2} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
 	${GCC} -DMATLS ${CFLAGS} ${SERVER_3} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} -DMATLS ${CFLAGS} ${SERVER_4} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} -DMATLS ${CFLAGS} ${SERVER_5} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} -DMATLS ${CFLAGS} ${SERVER_6} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
 
 split:
 	${GCC} ${CFLAGS} ${SERVER} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
 	${GCC} ${CFLAGS} ${SERVER_1} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
 	${GCC} ${CFLAGS} ${SERVER_2} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
 	${GCC} ${CFLAGS} ${SERVER_3} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} ${CFLAGS} ${SERVER_4} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
 
 mstart:
 	sudo ./${SERVER} ${PORT} ${CERT_FILE} ${KEY_FILE} ${FORWARD_FILE} 0 0
@@ -53,11 +79,26 @@ read:
 write:
 	./${SERVER_2} ${PORT_2} ${CERT_FILE} ${KEY_FILE} ${FORWARD_FILE_2} 0 1
 
+mstart1:
+	./${SERVER_1} ${PORT_1} ${CERT_FILE} ${KEY_FILE} ${FORWARD_FILE_1} 0 0
+
+mstart2:
+	./${SERVER_2} ${PORT_2} ${CERT_FILE} ${KEY_FILE} ${FORWARD_FILE_2} 0 0
+
 mstart3:
 	./${SERVER_3} ${PORT_3} ${CERT_FILE} ${KEY_FILE} ${FORWARD_FILE_3} 0 0
+
+mstart4:
+	./${SERVER_4} ${PORT_4} ${CERT_FILE} ${KEY_FILE} ${FORWARD_FILE_4} 0 0
+
+mstart5:
+	./${SERVER_5} ${PORT_5} ${CERT_FILE} ${KEY_FILE} ${FORWARD_FILE_5} 0 0
+
+mstart6:
+	./${SERVER_6} ${PORT_6} ${CERT_FILE} ${KEY_FILE} ${FORWARD_FILE_6} 0 0
 
 debug:
 	${GDB} ./${EXEC} ${PORT} ${CERT_FILE} ${CA_CERT_FILE} ${KEY_FILE} ${ORIG_CERT_FILE} ${WARRANT_FILE} -tui
 
 clean:
-	rm ${SERVER} ${SERVER_1} ${SERVER_2} ${SERVER_3}
+	rm ${SERVER} ${SERVER_1} ${SERVER_2} ${SERVER_3} ${SERVER_4} ${SERVER_5} ${SERVER_6}

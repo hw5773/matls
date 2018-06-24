@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 #include "ssl_locl.h"
 #include "tls1.h"
@@ -20,6 +21,7 @@
 #include <openssl/ssl.h>
 #include <openssl/evp.h>
 #include <openssl/ec.h>
+#include <openssl/err.h>
 #include <openssl/sha.h>
 #include <openssl/bn.h>
 
@@ -45,7 +47,8 @@ int make_keypair(struct keypair **pair, EC_GROUP *group, BN_CTX *ctx) {
 
 int char_to_pub(unsigned char *input, int key_length, EC_POINT *pubkey, EC_GROUP *group, BN_CTX *ctx)
 {
-  EC_POINT_oct2point(group, pubkey, input, key_length, ctx);
+  int ret;
+  ret = EC_POINT_oct2point(group, pubkey, input, key_length, ctx);
   return 1;
 }
 
@@ -122,25 +125,30 @@ int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len,
 
       MA_LOG1p("s->lock", s->lock);
 	  MSTART("Before busy waiting for lock", "client-side");
-      while (*(s->lock)) {}
+//      while (*(s->lock)) {}
+      pthread_mutex_lock(s->lockp);
 	  MEND("After busy waiting for lock", "client-side");
-      *(s->lock) = 1;
+//      *(s->lock) = 1;
       if (!(s->mb_info.keypair))
       {
         if (s->pair && s->pair->mb_info.keypair)
           s->mb_info.keypair = s->pair->mb_info.keypair;
         else
         {
-          MA_LOG("before keypair");
+          MA_LOG1d("before keypair in add client hello", s->server);
           make_keypair(&keypair, group, ctx);
-          MA_LOG("after keypair");
+          MA_LOG1d("after keypair in add client hello", s->server);
           s->mb_info.keypair = keypair;
           if (s->pair)
+          {
             s->pair->mb_info.keypair = keypair;
+            MA_LOG("pair gets keypair in add client hello");
+          }
         }
       }
-      *(s->lock) = 0;
-      MA_LOG1d("lock value", *(s->lock));
+//      *(s->lock) = 0;
+//      MA_LOG1d("lock value", *(s->lock));
+      pthread_mutex_unlock(s->lockp);
 
       MA_LOG1p("keypair->pub", s->mb_info.keypair->pub);
       pub_to_char(s->mb_info.keypair->pub, &pub_str, &pub_length, group, ctx);
@@ -228,6 +236,8 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
     int ext_len;
     n2s(p, ext_len);
     MA_LOG1d("Received Extension Length", ext_len);
+#else
+    p += 2;
 #endif /* DEBUG */
 
     /* message: group_id(2bytes) + num_keys(1byte) + (key length(1byte) and key value) list */
@@ -280,28 +290,39 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
     if (s->middlebox)
     {
 	  MSTART("Before busy waiting for lock", "client-side");
-      while ((s->lock) && *(s->lock)) {}
+//      while ((s->lock) && *(s->lock)) {}
 	  MEND("After busy waiting for lock", "client-side");
-      *(s->lock) = 1;
+//      *(s->lock) = 1;
+      pthread_mutex_lock(s->lockp);
       if (!(s->mb_info.keypair))
       {
         if (s->pair && s->pair->mb_info.keypair)
           s->mb_info.keypair = s->pair->mb_info.keypair;
         else
         {
+          MA_LOG1d("before make_keypair in parse client hello as a middlebox", s->server);
           make_keypair(&keypair, group, ctx);
+          MA_LOG1d("before make_keypair in parse client hello as a middlebox", s->server);
           s->mb_info.keypair = keypair;
           if (s->pair)
+          {
             s->pair->mb_info.keypair = keypair;
+            MA_LOG("pair gets keypair in parse client hello");
+          }
         }
       }
-      *(s->lock) = 0;
+      //*(s->lock) = 0;
+      pthread_mutex_unlock(s->lockp);
     }
     else
     {
+          MA_LOG1d("before make_keypair in parse client hello as an endpoint", s->server);
       make_keypair(&keypair, group, ctx);
+          MA_LOG1d("before make_keypair in parse client hello as an endpoint", s->server);
       s->mb_info.keypair = keypair;
     }
+
+    keypair = s->mb_info.keypair;
 
     int end;
     if (s->middlebox)
@@ -398,25 +419,30 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
   if (p) {
     MA_LOG1p("s->lock", s->lock);
 	MSTART("Before busy waiting for lock", "client-side");
-    while (*(s->lock)) {}
+//    while (*(s->lock)) {}
 	MEND("After busy waiting for lock", "client-side");
-    *(s->lock) = 1;
+//    *(s->lock) = 1;
+    pthread_mutex_lock(s->lockp);
     if (!(s->mb_info.keypair))
     {
       if (s->pair && s->pair->mb_info.keypair)
         s->mb_info.keypair = s->pair->mb_info.keypair;
       else
       {
-        MA_LOG("before keypair");
+        MA_LOG1d("before keypair in add server hello", s->server);
         make_keypair(&keypair, group, ctx);
-        MA_LOG("after keypair");
+        MA_LOG1d("after keypair in add server hello", s->server);
         s->mb_info.keypair = keypair;
         if (s->pair)
+        {
           s->pair->mb_info.keypair = keypair;
+          MA_LOG("pair gets key pair in add_server_hello");
+        }
       }
     }
-    *(s->lock) = 0;
-    MA_LOG1d("lock value", *(s->lock));
+//    *(s->lock) = 0;
+//    MA_LOG1d("lock value", *(s->lock));
+    pthread_mutex_unlock(s->lockp);
 
     MA_LOG1p("keypair->pub", s->mb_info.keypair->pub);
     pub_to_char(s->mb_info.keypair->pub, &pub_str, &pub_length, group, ctx);

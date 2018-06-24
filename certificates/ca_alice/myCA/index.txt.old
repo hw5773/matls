@@ -3,3 +3,19 @@ V	180413124225Z		D929CB9B45A3BB90	unknown	/C=US/ST=California/L=California/O=Ali
 V	180430104354Z		D929CB9B45A3BB91	unknown	/C=US/ST=California/L=California/O=Alice Ltd./OU=Alice Ltd./CN=*.alice.com/emailAddress=alice@alice.com
 V	180430104423Z		D929CB9B45A3BB92	unknown	/C=US/ST=California/L=California/O=Alice Ltd./OU=Alice Ltd./CN=*.alice.com/emailAddress=4096@alice.com
 V	180516105200Z		D929CB9B45A3BB93	unknown	/C=US/ST=California/L=California/O=Alice Origin/OU=Origin/CN=www.alice.com/emailAddress=origin@alice.com
+V	190425065432Z		D929CB9B45A3BB94	unknown	/C=KR/ST=Seoul/L=Seoul/O=Middlebox-aware TLS/OU=SNU/CN=matls@matls.com/emailAddress=matls@matls.com
+V	190624074135Z		D929CB9B45A3BB95	unknown	/C=KR/ST=Seoul/L=Seoul/O=Middlebox-Aware TLS/OU=MMLAB/CN=a.matls.com/emailAddress=a@matls.com
+V	190624074150Z		D929CB9B45A3BB96	unknown	/C=KR/ST=Seoul/L=Seoul/O=SNU/OU=MMLAB/CN=b.matls.com/emailAddress=b@matls.com
+V	190624075040Z		D929CB9B45A3BB97	unknown	/C=KR/ST=Seoul/L=Seoul/O=SNU/OU=MMLAB/CN=c.matls.com/emailAddress=c@matls.com
+V	190624075048Z		D929CB9B45A3BB98	unknown	/C=KR/ST=Seoul/L=Seoul/O=SNU/OU=MMLAB/CN=d.matls.com/emailAddress=d@matls.com
+V	190624075819Z		D929CB9B45A3BB9A	unknown	/C=KR/ST=Seoul/L=Seoul/O=SNU/OU=MMLAB/CN=f.matls.com/emailAddress=f@matls.com
+V	190624075826Z		D929CB9B45A3BB9B	unknown	/C=KR/ST=SNU/L=Seoul/O=SNU/OU=MMLAB/CN=g.matls.com/emailAddress=g@matls.com
+V	190624075833Z		D929CB9B45A3BB9C	unknown	/C=KR/ST=Seoul/L=Seoul/O=SNU/OU=MMLAB/CN=h.matls.com/emailAddress=h@matls.com
+V	190624075840Z		D929CB9B45A3BB9D	unknown	/C=KR/ST=Seoul/L=Seoul/O=SNU/OU=MMLAB/CN=i.matls.com/emailAddress=i@matls.com
+V	190624075847Z		D929CB9B45A3BB9E	unknown	/C=KR/ST=Seoul/L=Seoul/O=SNU/OU=MMLAB/CN=j.matls.com/emailAddress=j@matls.com
+V	190624075857Z		D929CB9B45A3BB9F	unknown	/C=KR/ST=Seoul/L=Seoul/O=SNU/OU=MMLAB/CN=k.matls.com/emailAddress=k@matls.com
+V	190624075903Z		D929CB9B45A3BBA0	unknown	/C=KR/ST=Seoul/L=Seoul/O=SNU/OU=MMLAB/CN=l.matls.com/emailAddress=l@matls.com
+V	190624075909Z		D929CB9B45A3BBA1	unknown	/C=KR/ST=Seoul/L=Seoul/O=SNU/OU=MMLAB/CN=m.matls.com/emailAddress=m@matls.com
+V	190624075915Z		D929CB9B45A3BBA2	unknown	/C=KR/ST=Seoul/L=Seoul/O=SNU/OU=MMLAB/CN=n.matls.com/emailAddress=n@matls.com
+V	190624075922Z		D929CB9B45A3BBA3	unknown	/C=KR/ST=Seoul/L=Seoul/O=SNU/OU=MMLAB/CN=o.matls.com/emailAddress=o@matls.com
+V	190624075928Z		D929CB9B45A3BBA4	unknown	/C=KR/ST=Seoul/L=Seoul/O=SNU/OU=MMLAB/CN=p.matls.com/emailAddress=p@matls.com

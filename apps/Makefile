@@ -1,6 +1,6 @@
-CERT_FILE=new_carol.crt
+CERT_FILE=matls_cert.crt
 CA_CERT_FILE=ca_carol.pem
-KEY_FILE=carol_priv.key
+KEY_FILE=matls_priv.pem
 
 CLIENT=client
 SERVER=server
@@ -25,10 +25,10 @@ server:
 	${GCC} ${CFLAGS} ${SERVER} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
 
 sstart:
-	./${SERVER} ${PORT} ${CERT_FILE} ${CA_CERT_FILE} ${KEY_FILE}
+	./${SERVER} ${PORT} ${CERT_FILE} ${KEY_FILE}
 
 debug:
-	${GDB} ./${EXEC} ${PORT} ${CERT_FILE} ${CA_CERT_FILE} ${KEY_FILE} ${ORIG_CERT_FILE} ${WARRANT_FILE} -tui
+	${GDB} ./${EXEC} ${PORT} ${CERT_FILE} ${KEY_FILE} ${ORIG_CERT_FILE} ${WARRANT_FILE} -tui
 
 clean:
 	rm ${SERVER}

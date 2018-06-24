@@ -144,6 +144,7 @@
 #define HEADER_SSL_H 
 
 #include <openssl/e_os2.h>
+#include <pthread.h>
 
 #ifndef OPENSSL_NO_COMP
 #include <openssl/comp.h>
@@ -1473,7 +1474,9 @@ struct ssl_st
   volatile int cert_msg_len;
   volatile int extended_finished_msg_len;
 
-  volatile int *lock; // Lock
+  //volatile int *lock; // Lock
+  pthread_mutex_t lock;
+  pthread_mutex_t *lockp; // lock pointer
 
   unsigned char *phash; // Previous Hash of the Content
   unsigned char *pmr; // Previous Modification Record

@@ -889,6 +889,22 @@ unsigned long matls_output_cert_chain(SSL *s, X509 *x)
     }
     p = &(buf->data[4]);
     memcpy(p, s->pair->cert_msg, s->pair->cert_msg_len);
+#ifdef CERT_LOG
+    unsigned char *t;
+    int num_certs, k, tmp;
+    t = p;
+    num_certs = *(t++);
+    printf("[matls] %s:%s:%d: maximum length of buf: %ld\n", __FILE__, __func__, __LINE__, buf->max);
+    printf("[matls] %s:%s:%d: certificate message length to be copied: %d\n", __FILE__, __func__, __LINE__, s->pair->cert_msg_len);
+    printf("[matls] %s:%s:%d: # of Certs: %d\n", __FILE__, __func__, __LINE__, num_certs);
+    for (k=num_certs; k>1; k--)
+    {
+      n2l3(t, tmp);
+      t += tmp;
+      printf("[matls] %s:%s:%d: Length of Certs: %ld\n", __FILE__, __func__, __LINE__, tmp);
+    }
+    printf("\n");
+#endif /* CERT_LOG */
   }
   else
   {
@@ -944,22 +960,36 @@ unsigned long matls_output_cert_chain(SSL *s, X509 *x)
 	{
     	nk = *p;
     	*(p++) = nk + 1;
-  	}
-  	else
-  	{
-    	*(p++) = 1;
+  }
+  else
+  {
+    *(p++) = 1;
 		l -= 8;
 		l2n3(l, p);
 		l += 4;
-  	}
+  }
 
 	if (s->middlebox)
 	{
 		p = (unsigned char *)&(buf->data[len_pos]);
-  		len = l - init;
-  		l2n3(len, p);
-#ifdef DEBUG
-  		printf("[matls] %s:%s:%d: length of the newly added certificate chain: %ld\n", __FILE__, __func__, __LINE__, len);
+  	len = l - init;
+  	l2n3(len, p);
+#if defined(DEBUG) || defined(CERT_LOG)
+    p = (unsigned char *)&(buf->data[4]);
+    printf("\n");
+    int cert_idx, num_certs, tlen;
+    num_certs = (*p++);
+    printf("[matls] %s:%s:%d: # of certs written: %d\n", __FILE__, __func__, __LINE__, num_certs);
+
+    for (cert_idx = num_certs; cert_idx > 0; cert_idx--)
+    {
+      n2l3(p, tlen);
+      p += tlen;
+      printf("[matls] %s:%s:%d: Length of Certs written: %d\n", __FILE__, __func__, __LINE__, tlen);
+    }
+
+    printf("[matls] %s:%s:%d: position to describe the length: %d\n", __FILE__, __func__, __LINE__, len_pos);
+  	printf("[matls] %s:%s:%d: length of the newly added certificate chain: %ld\n", __FILE__, __func__, __LINE__, len);
 #endif /* DEBUG */
 		l -= 4;
 	}
@@ -968,6 +998,10 @@ unsigned long matls_output_cert_chain(SSL *s, X509 *x)
 	*(p++) = SSL3_MT_CERTIFICATE;
 	l2n3(l,p);
 	l += 4;
+
+#ifdef CERT_LOG
+  printf("[matls] %s:%s:%d: total length of certificates: %ld\n", __FILE__, __func__, __LINE__, l);
+#endif /* CERT_LOG */
 
 	return(l);
 }

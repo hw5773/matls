@@ -16,7 +16,7 @@
 
 int open_listener(int port);
 SSL_CTX* init_server_CTX(BIO *outbio);
-void load_certificates(BIO *outbio, SSL_CTX* ctx, char* cacert_file, char* cert_file, char* key_file);
+void load_certificates(BIO *outbio, SSL_CTX* ctx, char* cert_file, char* key_file);
 void print_pubkey(BIO *outbio, EVP_PKEY *pkey);
 void msg_callback(int, int, int, const void *, size_t, SSL *, void *);
 BIO *bio_err;
@@ -28,7 +28,7 @@ int main(int count, char *strings[])
 	SSL_CTX *ctx;
 	BIO *outbio = NULL;
 	int server, client;
-	char *portnum, *cert, *key, *cacert;
+	char *portnum, *cert, *key;
 	const char *response = 	
 		"HTTP/1.1 200 OK\r\n"
 		"Content-Type: text/html\r\n"
@@ -39,9 +39,9 @@ int main(int count, char *strings[])
 	outbio = BIO_new_fp(stdout, BIO_NOCLOSE);
 	bio_err = BIO_new_fp(stdout, BIO_NOCLOSE);
 
-	if ( count != 5 )
+	if ( count != 4 )
 	{
-		BIO_printf(outbio, "Usage: %s <portnum> <cert_file> <ca_cert_file> <key_file>\n", strings[0]);
+		BIO_printf(outbio, "Usage: %s <portnum> <cert_file> <key_file>\n", strings[0]);
 		exit(0);
 	}
 	SSL_library_init();
@@ -49,11 +49,10 @@ int main(int count, char *strings[])
 
 	portnum = strings[1];
 	cert = strings[2];
-	cacert = strings[3];
-	key = strings[4];
+	key = strings[3];
 
 	ctx = init_server_CTX(outbio);        /* initialize SSL */
-	load_certificates(outbio, ctx, cacert, cert, key);
+	load_certificates(outbio, ctx, cert, key);
 	BIO_printf(outbio, "load_certificates success\n");
 
 	server = open_listener(atoi(portnum));    /* create server socket */
@@ -193,7 +192,7 @@ SSL_CTX* init_server_CTX(BIO *outbio)
 	return ctx;
 }
 
-void load_certificates(BIO *outbio, SSL_CTX* ctx, char* cacert_file, char* cert_file, char* key_file)
+void load_certificates(BIO *outbio, SSL_CTX* ctx, char* cert_file, char* key_file)
 {
 	/* Load certificates for verification purpose*/
 	if (SSL_CTX_load_verify_locations(ctx, NULL, "/etc/ssl/certs") != 1)

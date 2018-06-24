@@ -361,8 +361,10 @@ SSL *SSL_new(SSL_CTX *ctx)
 	  memcpy(s->proof, ctx->proof, ctx->proof_length);
   }
 
+/*
   s->lock = (int *)malloc(sizeof(int));
   *(s->lock) = 0;
+*/
 
   s->extension_from_srvr_msg_len = 0;
   s->extension_from_clnt_msg_len = 0;
@@ -461,6 +463,14 @@ SSL *SSL_new(SSL_CTX *ctx)
 		s->cc_len = s->ctx->cc_len;
 	}
 #endif /* OPENSSL_NO_TTPA */
+
+#ifndef OPENSSL_NO_MATLS
+  if (s->server)
+  {
+    pthread_mutex_init(&(s->lock), NULL);
+    s->lockp = &(s->lock);
+  }
+#endif /* OPENSSL_NO_MATLS */
 
 #ifndef OPENSSL_NO_PSK
 	s->psk_client_callback=ctx->psk_client_callback;
@@ -703,6 +713,11 @@ void SSL_free(SSL *s)
 
   if (s->x509)
     X509_free(s->x509);
+
+/*
+  if (s->lock)
+    free(s->lock);
+*/
 #endif /* OPENSSL_NO_MATLS */
 
 	OPENSSL_free(s);

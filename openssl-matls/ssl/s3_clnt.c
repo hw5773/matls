@@ -1248,15 +1248,40 @@ int matls_get_server_certificate(SSL *s)
   if (s->middlebox)
   {
     s->cert_msg = (unsigned char *)malloc(n);
-    s->cert_msg_len = n;
     /* add the number of certificates by one. 
      * The pair only needs to append one certificate to the server certificate message */
-    //*d = num_certs + 1; 
+#ifdef CERT_LOG
+    p = d;
+    num_certs = *(p++);
+    printf("[matls] %s:%s:%d: Pointer to be copied before retrieval: %p\n", __FILE__, __func__, __LINE__, d);
+    printf("[matls] %s:%s:%d: Length to be copied: %d\n", __FILE__, __func__, __LINE__, n);
+    printf("[matls] %s:%s:%d: Length inserted: %d\n", __FILE__, __func__, __LINE__, s->cert_msg_len);
+    printf("[matls] %s:%s:%d: # of Certs: %d\n", __FILE__, __func__, __LINE__, num_certs);
+    for (i=num_certs; i>1; i--)
+    {
+      n2l3(p, tmp);
+      p += tmp;
+      printf("[matls] %s:%s:%d: Length of Certs: %ld\n", __FILE__, __func__, __LINE__, tmp);
+    }
+    printf("[matls] %s:%s:%d: Pointer to be copied after retrieval: %p\n", __FILE__, __func__, __LINE__, d);
+#endif /* CERT_LOG */
     memcpy(s->cert_msg, d, n);
+    s->cert_msg_len = n;
+#ifdef CERT_LOG
+    printf("[matls] %s:%s:%d: Copy message to the s->cert_msg with: %d\n", __FILE__, __func__, __LINE__, *d);
+#endif /* CERT_LOG */
   }
   /////////////////////////
 
 	n2l3(p,llen);
+/*
+#ifdef CERT_LOG
+  printf("[matls] %s:%s:%d: (llen) Length of the peer's certificate: %ld\n", __FILE__, __func__, __LINE__, llen);
+  printf("[matls] %s:%s:%d: (n) Length of the received message: %d\n", __FILE__, __func__, __LINE__, n);
+  printf("[matls] %s:%s:%d: (offset) Offset to the last certificate: %d\n", __FILE__, __func__, __LINE__, offset);
+  printf("[matls] %s:%s:%d: llen + 3 == n - offset: %d\n", __FILE__, __func__, __LINE__, (llen+3 == n-offset));
+#endif 
+*/
   MA_LOG1d("cert chain length", llen);
   MA_LOG1d("n", n);
   MA_LOG1d("offset", offset);

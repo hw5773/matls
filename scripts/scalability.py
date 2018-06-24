@@ -36,9 +36,11 @@ def main():
         usage()
 
     for i in range(17):
-        cmd = "/home/kjchoi/chromium/src/multirun.sh https://www.matls.com 50%02d %d 2>/dev/null" % (17-i, i)
-        print (cmd)
-        os.system(cmd)
+        cmd1 = "/home/kjchoi/chromium/src/multirun.sh https://www.matls.com 50%02d %d 2>/dev/null" % (17-i, i)
+        print (cmd1)
+        os.system(cmd1)
+        cmd2 = "python3 /home/kjchoi/log/calc_stat.py client /home/kjchoi/log/mb_%d_read > /home/kjchoi/log/mb_%d_read_result.csv" % (i, i)
+        os.system(cmd2)
         title = "[matls] The experiment is on going with %d middleboxes" % i
         msg = "The experiment is on going with %d middleboxes" % i
         send_email(title, msg)

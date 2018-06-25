@@ -1474,12 +1474,16 @@ OPENSSL_EXPORT STACK_OF(CRYPTO_BUFFER) *
 
 ///// Add for MB /////
 OPENSSL_EXPORT uint8_t SSL_get0_mb_enabled(const SSL *ssl);
-
 OPENSSL_EXPORT uint8_t SSL_get0_num_keys(const SSL *ssl);
-
 OPENSSL_EXPORT STACK_OF(CRYPTO_BUFFER) *
     SSL_get0_peer_certificates_mb(const SSL *ssl, size_t idx);
 
+#define CLIENT_CERT_VALIDATION_END 4
+#define CLIENT_CERT_VALIDATION_START 3
+#define CLIENT_TCP_CONNECT_START 9
+#define CLIENT_TCP_CONNECT_END 10
+#define printLogChromium(var) insertLogChromium(var, #var); 
+OPENSSL_EXPORT void insertLogChromium(int var, const char* tag);
 
 // SSL_get0_signed_cert_timestamp_list sets |*out| and |*out_len| to point to
 // |*out_len| bytes of SCT information from the server. This is only valid if

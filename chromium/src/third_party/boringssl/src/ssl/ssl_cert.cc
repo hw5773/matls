@@ -454,11 +454,12 @@ bool ssl_parse_cert_chain_mb(uint8_t *out_alert,
 
   CBS certificate_list;
   if (!CBS_get_u24_length_prefixed(cbs, &certificate_list)) {
-    *out_alert = SSL_AD_DECODE_ERROR;
-    OPENSSL_PUT_ERROR(SSL, SSL_R_DECODE_ERROR);
-    printf("[MB] error on decoding certificate\n");
-    return false; 
+    *out_alert = SSL_AD_INTERNAL_ERROR;
+    OPENSSL_PUT_ERROR(SSL, ERR_R_MALLOC_FAILURE);
+    return false;
   }
+
+  //printf("certificate length %zu\n", CBS_len(&certificate_list));
 
   if (CBS_len(&certificate_list) == 0) {
     return true;

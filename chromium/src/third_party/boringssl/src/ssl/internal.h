@@ -2200,8 +2200,16 @@ struct SSLConnection {
   uint8_t num_keys;
   Array<MAC_TABLE_ENTRY> mac_table;
   Array<ID_TABLE_ENTRY> id_table;
+  Array<CBS> proof_table;
+  Array<uint8_t> middlebox_type_table;
+  Array<ID_TABLE_ENTRY> cert_id_table;
 
+  uint8_t client_key[CLIENT_MAX_MB_KEY_SIZE];
+  uint8_t client_key_len;
   uint8_t client_id[MODIFICATION_RECORD_HASH_SIZE];
+
+  uint8_t verify_data[EVP_MAX_MD_SIZE];
+  size_t verify_data_len;
 };
 
 // From draft-ietf-tls-tls13-18, used in determining PSK modes.
@@ -2314,7 +2322,8 @@ void ssl_update_cache(SSL_HANDSHAKE *hs, int mode);
 
 enum ssl_hs_wait_t ssl_get_finished(SSL_HANDSHAKE *hs);
 ///// Add for MB /////
-enum ssl_hs_wait_t ssl_get_finished_mb(SSL_HANDSHAKE *hs);
+// enum ssl_hs_wait_t ssl_get_finished_mb(SSL_HANDSHAKE *hs);
+enum ssl_hs_wait_t ssl_get_extended_finished(SSL_HANDSHAKE *hs);
 int ssl3_send_alert(SSL *ssl, int level, int desc);
 bool ssl3_get_message(SSL *ssl, SSLMessage *out);
 int ssl3_read_message(SSL *ssl);
@@ -2494,6 +2503,13 @@ void ssl_ctx_get_current_time(const SSL_CTX *ctx,
 // ssl_reset_error_state resets state for |SSL_get_error|.
 void ssl_reset_error_state(SSL *ssl);
 
+///// Add for MB /////
+int log_init(const char *filen);
+unsigned long getMicroSecond();
+void insertLog(int var, const char *tag);
+void write_to_file();
+void log_close();
+
 }  // namespace bssl
 
 
@@ -2647,6 +2663,28 @@ struct ssl_x509_method_st {
 struct ssl_st : public bssl::SSLConnection {};
 
 struct cert_st : public bssl::SSLCertConfig {};
+
+
+///// Add for MB /////
+#define CLIENT_HANDSHAKE_START  1
+#define CLIENT_HANDSHAKE_END    2
+#define CLIENT_FETCH_HTML_START 5
+#define CLIENT_FETCH_HTML_END 6
+#define CLIENT_EXTENDED_FINISHED_START 7
+#define CLIENT_EXTENDED_FINISHED_END 8
+#define CLIENT_TCP_CONNECT_START 9
+#define CLIENT_TCP_CONNECT_END 10
+#define CLIENT_MODIFICATION_RECORD_START 11
+#define CLIENT_MODIFICATION_RECORD_END 12
+
+// extern FILE *fp;
+// extern char *filename;
+
+//#define printLog(var) fprintf(fp, "%lu, %d, "#var"\n", getMicroSecond(), var); fflush(fp);
+
+#define printLog(var) insertLog(var, #var);
+// #define log_close() fclose(fp);
+
 
 
 #endif  // OPENSSL_HEADER_SSL_INTERNAL_H

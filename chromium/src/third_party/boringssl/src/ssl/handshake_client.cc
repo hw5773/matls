@@ -172,7 +172,7 @@
 
 ///// Add for MB //////
 #include <vector>
-#include "mb_logger.h"
+// #include "logger.h"
 
 // Note: below this is only for test, must be removed on deploy
 // static unsigned long mb_handshake_start_time;
@@ -200,6 +200,8 @@ enum ssl_client_hs_state_t {
   state_read_session_ticket,
   state_process_change_cipher_spec,
   state_read_server_finished,
+  ///// Add for MB /////
+  state_read_server_extended_finished,
   state_finish_client_handshake,
   state_done,
 };
@@ -827,6 +829,43 @@ static enum ssl_hs_wait_t do_read_server_certificate(SSL_HANDSHAKE *hs) {
 }
 
 ///// Add for MB /////
+int verify_proof(unsigned char *msg, int msg_len, unsigned char *sig, uint16_t sig_len, EVP_PKEY *pub) {
+  int rc;
+  EVP_MD_CTX *ctx;
+
+  ctx = EVP_MD_CTX_create();
+  if (ctx == NULL) {
+    printf("ERROR: EVP_MD_CTX_create_error\n");
+    return 0;
+  }
+
+  rc = EVP_DigestVerifyInit(ctx, NULL, EVP_sha256(), NULL, pub);
+  if (rc != 1) {
+    printf("ERROR: EVP_DigestVerifyInit error\n");
+    goto err;
+  }
+
+  rc = EVP_DigestVerifyUpdate(ctx, msg, msg_len);
+  if (rc != 1) {
+    printf("ERROR: EVP_DigestVerifyUpdate error\n");
+    goto err;
+  }
+
+  rc = EVP_DigestVerifyFinal(ctx, sig, sig_len);
+  if (rc != 1) {
+    printf("ERROR: EVP_DigestVerifyFinal error\n");
+    goto err;
+  }
+
+  EVP_MD_CTX_free(ctx);
+  return 1;
+
+err:
+  EVP_MD_CTX_free(ctx);
+  return 0;
+}
+
+///// Add for MB /////
 static enum ssl_hs_wait_t do_read_server_certificate_mb(SSL_HANDSHAKE *hs) {
   SSL *const ssl = hs->ssl;
 
@@ -850,6 +889,8 @@ static enum ssl_hs_wait_t do_read_server_certificate_mb(SSL_HANDSHAKE *hs) {
   uint8_t num_keys = ssl->num_keys;
   uint8_t num_keys_body;
 
+  // printf("total server response len: %zu\n", CBS_len(&body));
+
   if (!CBS_get_u8(&body, &num_keys_body) ||
       num_keys_body != num_keys) {
     printf("body: %d, nk: %d\n", num_keys_body, num_keys);
@@ -857,33 +898,28 @@ static enum ssl_hs_wait_t do_read_server_certificate_mb(SSL_HANDSHAKE *hs) {
     return ssl_hs_error;
   }
 
-  // maybe better solution...?
-  /*
-  std::vector<STACK_OF(CRYPTO_BUFFER) *> certs_mb(num_keys);
-  std::vector<STACK_OF(X509) *> x509_chain_mb(num_keys);
-  std::vector<STACK_OF(X509) *> x509_chain_without_leaf_mb(num_keys);
-  std::vector<X509 *> x509_peer_mb(num_keys);
- 
-  hs->new_session->certs_mb = MakeSpan(certs_mb);
-  hs->new_session->x509_chain_mb = MakeSpan(x509_chain_mb);
-  hs->new_session->x509_chain_without_leaf_mb = MakeSpan(x509_chain_without_leaf_mb);
-  hs->new_session->x509_peer_mb = MakeSpan(x509_peer_mb);
-  */
-
   hs->new_session->num_keys = num_keys;
   hs->new_session->certs_mb = (STACK_OF(CRYPTO_BUFFER) **)malloc(num_keys * sizeof(STACK_OF(CRYPTO_BUFFER) *));
-  hs->new_session->x509_chain_mb = (STACK_OF(X509) **)malloc(num_keys * sizeof(STACK_OF(X509) *));
-  hs->new_session->x509_chain_without_leaf_mb =  (STACK_OF(X509) **)malloc(num_keys * sizeof(STACK_OF(X509) *));
-  hs->new_session->x509_peer_mb = (X509 **)malloc(num_keys * sizeof(X509 *));
+
+  // Note: chromium does not use these attributes
+  //       but if boringssl is used outside of chromium, you might need these.
+  // hs->new_session->x509_chain_mb = (STACK_OF(X509) **)malloc(num_keys * sizeof(STACK_OF(X509) *));
+  // hs->new_session->x509_chain_without_leaf_mb =  (STACK_OF(X509) **)malloc(num_keys * sizeof(STACK_OF(X509) *));
+  // hs->new_session->x509_peer_mb = (X509 **)malloc(num_keys * sizeof(X509 *));
 
   for (size_t i = 0; i < num_keys; i++) {
     hs->new_session->certs_mb[i] = sk_CRYPTO_BUFFER_new_null();
-    hs->new_session->x509_chain_mb[i] = sk_X509_new_null();
-    hs->new_session->x509_chain_without_leaf_mb[i] = sk_X509_new_null();
+    // hs->new_session->x509_chain_mb[i] = sk_X509_new_null();
+    // hs->new_session->x509_chain_without_leaf_mb[i] = sk_X509_new_null();
   }
 
   if (!ssl->id_table.Init(num_keys)) {
     printf("[MB] id_table array initialization failed\n");
+    return ssl_hs_error;
+  }
+
+  if(!ssl->cert_id_table.Init(num_keys)) {
+    printf("[MB] cert_id_table array initialization failed\n");
     return ssl_hs_error;
   }
 
@@ -892,7 +928,9 @@ static enum ssl_hs_wait_t do_read_server_certificate_mb(SSL_HANDSHAKE *hs) {
     return ssl_hs_error;
   }
 
+  CRYPTO_BUFFER *cert;
   for (size_t i=0; i<num_keys; i++) {
+
     UniquePtr<STACK_OF(CRYPTO_BUFFER)> chain;
     if (!ssl_parse_cert_chain_mb(&alert, &chain, &hs->peer_pubkey_mb[i],
                                  NULL, ssl->id_table[i].data, &body, ssl->ctx->pool)) {
@@ -900,14 +938,32 @@ static enum ssl_hs_wait_t do_read_server_certificate_mb(SSL_HANDSHAKE *hs) {
       ssl3_send_alert(ssl, SSL3_AL_FATAL, alert);
       return ssl_hs_error;
     }
+
+    PRINTK("pubkey hash", ssl->id_table[i].data, 32);
     
     sk_CRYPTO_BUFFER_pop_free(hs->new_session->certs_mb[i], CRYPTO_BUFFER_free);
     hs->new_session->certs_mb[i] = chain.release();
-  } 
 
+    // calculate hash(prrof) of certificate
+    if (ssl->middlebox_type_table[i] == MB_MIDDLEBOX_TYPE_SERVER || ssl->middlebox_type_table[i] == MB_MIDDLEBOX_TYPE_SERVER_WITH_SCT) {
+      cert = sk_CRYPTO_BUFFER_value(hs->new_session->certs_mb[i], 0);
+      SHA256(CRYPTO_BUFFER_data(cert), CRYPTO_BUFFER_len(cert), ssl->cert_id_table[i].data);
+
+      // check proof
+      if(!verify_proof(ssl->cert_id_table[i].data, SHA256_DIGEST_LENGTH,
+                       (unsigned char*)(CBS_data(&ssl->proof_table[i])), CBS_len(&ssl->proof_table[i]),
+                       hs->peer_pubkey_mb[0].get())) {
+        printf("[MB] wrong proof on %zu'th certificate\n", i);
+        return ssl_hs_error;
+      }
+
+      printf("verification success %zu\n", i);
+    }
+  } 
 
   if (CBS_len(&body) != 0) {
     printf("[MB] CBS_len != 0 on read_server_certificate\n");
+    PRINTK("read_server_certificate leftover", CBS_data(&body), (int)CBS_len(&body));
     OPENSSL_PUT_ERROR(SSL, SSL_R_DECODE_ERROR);
     ssl3_send_alert(ssl, SSL3_AL_FATAL, SSL_AD_DECODE_ERROR);
     return ssl_hs_error;
@@ -1012,7 +1068,7 @@ static enum ssl_hs_wait_t do_verify_server_certificate(SSL_HANDSHAKE *hs) {
 
 ///// Add for MB /////
 static enum ssl_hs_wait_t do_verify_server_certificate_mb(SSL_HANDSHAKE *hs) {
-
+  SSL *const ssl = hs->ssl;
   // printf("[MB] start verifying server cert\n");  
 
   if (!ssl_cipher_uses_certificate_auth(hs->new_cipher)) {
@@ -1808,11 +1864,40 @@ static enum ssl_hs_wait_t do_read_server_finished(SSL_HANDSHAKE *hs) {
 
   ///// Add for MB /////
   enum ssl_hs_wait_t wait;
-  if (ssl->mb_enabled) {
-    wait = ssl_get_finished_mb(hs);
-  } else {
+  // if (ssl->mb_enabled) {
+  //   wait = ssl_get_finished_mb(hs);
+  // } else {
     wait = ssl_get_finished(hs);
+  // }
+
+  if (wait != ssl_hs_ok) {
+    return wait;
   }
+
+  if(ssl->mb_enabled) {
+    hs->state = state_read_server_extended_finished;
+    return ssl_hs_ok;
+  }
+
+  if (ssl->session != NULL) {
+    hs->state = state_send_client_finished;
+    return ssl_hs_ok;
+  }
+
+  hs->state = state_finish_client_handshake;
+  return ssl_hs_ok;
+}
+
+///// Add for MB /////
+static enum ssl_hs_wait_t do_read_server_extended_finished(SSL_HANDSHAKE *hs) {
+  SSL *const ssl = hs->ssl;
+  /* [jhlim] Add for log */
+  // struct timeval tv;
+  // gettimeofday(&tv, NULL);
+  // printf("before extended finished: %lu\n", 1000000*(tv.tv_sec) + tv.tv_usec);
+
+  enum ssl_hs_wait_t wait;
+  wait = ssl_get_extended_finished(hs);
 
   if (wait != ssl_hs_ok) {
     return wait;
@@ -1824,6 +1909,11 @@ static enum ssl_hs_wait_t do_read_server_finished(SSL_HANDSHAKE *hs) {
   }
 
   hs->state = state_finish_client_handshake;
+  
+  /* [jhlim] */
+  // gettimeofday(&tv, NULL);
+  // printf("after extended finished: %lu\n", 1000000*(tv.tv_sec) + tv.tv_usec);
+  
   return ssl_hs_ok;
 }
 
@@ -1862,13 +1952,20 @@ static enum ssl_hs_wait_t do_finish_client_handshake(SSL_HANDSHAKE *hs) {
 }
 
 enum ssl_hs_wait_t ssl_client_handshake(SSL_HANDSHAKE *hs) {
+
+  ///// Add for MB /////
+  const char *fn = "/home/kjchoi/client_log.txt";
+
   while (hs->state != state_done) {
     enum ssl_hs_wait_t ret = ssl_hs_error;
     enum ssl_client_hs_state_t state =
         static_cast<enum ssl_client_hs_state_t>(hs->state);
     switch (state) {
       case state_start_connect:
-        mb_handshake_start_time = get_current_microseconds();
+        ///// Add for MB /////
+        log_init(fn);
+        printLog(CLIENT_HANDSHAKE_START);
+
         ret = do_start_connect(hs);
         break;
       case state_enter_early_data:
@@ -1933,10 +2030,12 @@ enum ssl_hs_wait_t ssl_client_handshake(SSL_HANDSHAKE *hs) {
       case state_read_server_finished:
         ret = do_read_server_finished(hs);
         break;
+      ///// Add for MB /////
+      case state_read_server_extended_finished:
+        ret = do_read_server_extended_finished(hs);
+        break;
       case state_finish_client_handshake:
-        ret = do_finish_client_handshake(hs); 
-        mb_handshake_end_time = get_current_microseconds();
-        printf("%ld\n", mb_handshake_end_time - mb_handshake_start_time);
+        ret = do_finish_client_handshake(hs);
         break;
       case state_done:
         ret = ssl_hs_ok;
@@ -1950,6 +2049,11 @@ enum ssl_hs_wait_t ssl_client_handshake(SSL_HANDSHAKE *hs) {
     if (ret != ssl_hs_ok) {
       return ret;
     }
+  }
+
+  ///// Add for MB /////
+  if (hs->state == state_done) {
+    printLog(CLIENT_HANDSHAKE_END);
   }
 
   ssl_do_info_callback(hs->ssl, SSL_CB_HANDSHAKE_DONE, 1);
@@ -1998,6 +2102,9 @@ const char *ssl_client_handshake_state(SSL_HANDSHAKE *hs) {
       return "TLS client process_change_cipher_spec";
     case state_read_server_finished:
       return "TLS client read_server_finished";
+    ///// Add for MB /////
+    case state_read_server_extended_finished:
+      return "TLS client read_server_extended_finished";
     case state_finish_client_handshake:
       return "TLS client finish_client_handshake";
     case state_done:

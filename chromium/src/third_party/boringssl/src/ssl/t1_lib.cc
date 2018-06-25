@@ -132,6 +132,7 @@
 
 namespace bssl {
 
+
 static int ssl_check_clienthello_tlsext(SSL_HANDSHAKE *hs);
 
 static int compare_uint16_t(const void *p1, const void *p2) {
@@ -310,7 +311,7 @@ Span<const uint16_t> tls1_get_grouplist(const SSL *ssl) {
 ///// Add for MB /////
 ///// Modified /////
 Span<const uint16_t> tls1_get_mb_grouplist(const SSL *ssl) {
-   if (ssl->supported_group_list != nullptr) {
+  if (ssl->supported_group_list != nullptr) {
     return MakeConstSpan(ssl->supported_group_list,
                          ssl->supported_group_list_len);
   }
@@ -2544,25 +2545,26 @@ static int ext_mb_add_clienthello(SSL_HANDSHAKE *hs, CBB *out) {
   if(!hs->mb_key_share ||
      !CBB_add_u16(&kse_bytes, group_id) ||
      !CBB_add_u8(&kse_bytes, num_keys) ||
+     !CBB_add_u8(&kse_bytes, MB_MIDDLEBOX_TYPE_CLIENT) ||
      !CBB_add_u16_length_prefixed(&kse_bytes, &key_exchange) ||
      !hs->mb_key_share->Offer(&key_exchange)) {
     printf("[MB] Error on composing extension message\n");
     return 0;
   }
 
-  size_t client_key_len = CBB_len(&key_exchange);
-  uint8_t* client_key = (uint8_t *)OPENSSL_malloc(client_key_len);
-  SHA256(client_key, client_key_len, ssl->client_id);
-  OPENSSL_free(client_key);
+  ssl->client_key_len = CBB_len(&key_exchange);
+  memcpy(ssl->client_key, CBB_data(&key_exchange), ssl->client_key_len);
+  SHA256(ssl->client_key, ssl->client_key_len, ssl->client_id);
 
-  printf("client key: ");
-  for(int i = 0; i < 32; i++) printf("%02X", ssl->client_id[i]);
-  printf("\n");
+  // printf("client key: ");
+  // for(int i = 0; i < 32; i++) printf("%02X", ssl->client_id[i]);
+  // printf("\n");
 
   if(!CBB_flush(&kse_bytes)) {
     return 0;
   }
 
+  // printf("done client hello\n");
   if(!CBB_flush(out)){
     printf("[MB] Error on flushing final CBB\n");
     return 0;
@@ -2587,13 +2589,21 @@ static int ext_mb_parse_serverhello(SSL_HANDSHAKE *hs, uint8_t *out_alert, CBS *
   uint16_t group_id;
   uint8_t num_keys;
 
+  // printf("start parse serverhello\n");
   if (contents == NULL) {
     // printf("[MB] Content is NULL\n");
     return 1;
   }
 
-  if (!CBS_get_u16(contents, &group_id) ||
-      !CBS_get_u8(contents, &num_keys)) {
+  CBS mb_contents;
+  if (!CBS_get_u16_length_prefixed(contents, &mb_contents)) {
+    printf("[MB] Decoded error on contents\n");
+    *out_alert = SSL_AD_DECODE_ERROR;
+    return 0;
+  }
+
+  if (!CBS_get_u16(&mb_contents, &group_id) ||
+      !CBS_get_u8(&mb_contents, &num_keys)) {
     printf("[MB] Decode error on group_id or num_keys\n");
     *out_alert = SSL_AD_DECODE_ERROR;
     return 0;
@@ -2611,17 +2621,76 @@ static int ext_mb_parse_serverhello(SSL_HANDSHAKE *hs, uint8_t *out_alert, CBS *
     return 0;
   }
 
-  // CBS peer_keys[5];
+  if(!ssl->proof_table.Init(num_keys)) {
+    printf("[MB] proof_table array intialize failed\n");
+    return 0;
+  }
+
+  if(!ssl->middlebox_type_table.Init(num_keys)) {
+    printf("[MB] middlebox_type_table array initialize failed\n");
+    return 0;
+  }
 
   uint8_t num_peer_keys = 0;
-  while (CBS_len(contents) > 0) {
-    if (num_peer_keys >= num_keys ||
-        !CBS_get_u16_length_prefixed(contents, &peer_keys[num_peer_keys]) ||
+  uint8_t middlebox_type;
+  CBS middlebox_sct;
+  while (CBS_len(&mb_contents) > 0) {
+    if (num_peer_keys >= num_keys) {
+      printf("[MB] Too many keys while decoding peer_key\n");
+      return 0;
+    }
+    
+    if (!CBS_get_u8(&mb_contents, &middlebox_type)) {
+      printf("[MB] Decoded error on middlebox_type\n");
+      return 0;
+    }
+
+    if (middlebox_type == MB_MIDDLEBOX_TYPE_DUMMY) {
+      printf("[MB] found dummy middlebox\n");
+      return 0;
+    }
+
+    if (!CBS_get_u16_length_prefixed(&mb_contents, &peer_keys[num_peer_keys]) ||
         CBS_len(&peer_keys[num_peer_keys]) == 0) {
       printf("[MB] Decode error on peer_key\n");
       return 0;
     }
 
+    switch (middlebox_type) {
+      case MB_MIDDLEBOX_TYPE_CLIENT:
+        break;
+      case MB_MIDDLEBOX_TYPE_SERVER:
+        if (!CBS_get_u16_length_prefixed(&mb_contents, &ssl->proof_table[num_peer_keys]) ||
+            CBS_len(&ssl->proof_table[num_peer_keys]) == 0) {
+          printf("[MB] Decode error on MB_MIDDLEBOX_TYPE_SERVER\n");
+          return 0;
+        }
+        break;
+      case MB_MIDDLEBOX_TYPE_CLIENT_WITH_SCT:
+        if (!CBS_get_u16_length_prefixed(&mb_contents, &middlebox_sct) ||
+            CBS_len(&middlebox_sct) == 0) {
+          printf("[MB] Decode error on MB_MIDDLEBOX_TYPE_CLIENT_WITH_SCT\n");
+          return 0;
+        }
+        break;
+      case MB_MIDDLEBOX_TYPE_SERVER_WITH_SCT:
+        if (!CBS_get_u16_length_prefixed(&mb_contents, &ssl->proof_table[num_peer_keys]) ||
+            CBS_len(&ssl->proof_table[num_peer_keys]) == 0) {
+          printf("[MB] Decode error on MB_MIDDLEBOX_TYPE_SERVER_WITH_SCT\n");
+          return 0;
+        }
+        if (!CBS_get_u16_length_prefixed(&mb_contents, &middlebox_sct) ||
+            CBS_len(&middlebox_sct) == 0) {
+          printf("[MB] Decode error on MB_MIDDLEBOX_TYPE_SERVER_WITH_SCT\n");
+          return 0;
+        }
+        break;
+      default:
+        printf("[MB] Undefined middlebox_type\n");
+        return 0;
+    }
+
+    ssl->middlebox_type_table[num_peer_keys] = middlebox_type;
     ++num_peer_keys;
   }
 
@@ -2649,20 +2718,29 @@ static int ext_mb_parse_serverhello(SSL_HANDSHAKE *hs, uint8_t *out_alert, CBS *
     printf("[MB] premaster secret initialization failed\n");
     return 0;
   }
-
+    
+  PRINTK("client key", ssl->client_key, ssl->client_key_len);
+  PRINTK("server key", CBS_data(&peer_keys[0]), (int)CBS_len(&peer_keys[0]));
+  
   for (size_t i = 0; i < num_keys; i++) {
+    PRINTK("peer_keys[i]", CBS_data(&peer_keys[i]), (int)CBS_len(&peer_keys[i]));
     if (!hs->mb_key_share->Finish(&secret, out_alert, peer_keys[i])) {
       *out_alert = SSL_AD_INTERNAL_ERROR;
-      printf("[MB] Finish() error\n");
+      printf("[MB] Finish() error and num keys: %d\n", num_keys);
       return 0;
     }
 
     if(!tls1_prf(digest, ssl->mac_table[i].data, SSL3_MASTER_SECRET_SIZE_MB, secret.data(), secret.size(),
                  TLS_MD_MB_MASTER_SECRET_CONST, TLS_MD_MB_MASTER_SECRET_CONST_SIZE,
-                 srandom, SSL3_RANDOM_SIZE, crandom, SSL3_RANDOM_SIZE)) {
+                 CBS_data(&peer_keys[0]), CBS_len(&peer_keys[0]), ssl->client_key, ssl->client_key_len)) {
       printf("[MB] Error on tls1_prf\n");
       return 0;
     }
+    
+    // printf("On key %zu\n", i);
+    PRINTK("pre global mac key", secret.data(), (int)secret.size());
+    PRINTK("global mac key", ssl->mac_table[i].data, (int)SSL3_MASTER_SECRET_SIZE_MB);
+    
 
     ssl->mac_table[i].len = SSL3_MASTER_SECRET_SIZE_MB;
   }

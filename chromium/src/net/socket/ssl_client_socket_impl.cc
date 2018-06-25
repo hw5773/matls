@@ -1415,6 +1415,7 @@ int SSLClientSocketImpl::DoHandshakeLoop(int last_io_result) {
         break;
       case STATE_VERIFY_CERT:
         DCHECK_EQ(OK, rv);
+        printLogChromium(CLIENT_CERT_VALIDATION_START);
         if (SSL_get0_mb_enabled(ssl_.get())) {
           // printf("[MB] verifying cert using DoVerifyCertMB\n");
           rv = DoVerifyCertMB(rv);
@@ -1424,6 +1425,7 @@ int SSLClientSocketImpl::DoHandshakeLoop(int last_io_result) {
         break;
       case STATE_VERIFY_CERT_COMPLETE:
         rv = DoVerifyCertComplete(rv);
+        printLogChromium(CLIENT_CERT_VALIDATION_END);
         break;
       case STATE_NONE:
       default:
@@ -1464,8 +1466,9 @@ int SSLClientSocketImpl::DoPayloadRead(IOBuffer* buf, int buf_len) {
   do {
     ssl_ret = SSL_read(ssl_.get(), buf->data() + total_bytes_read,
                        buf_len - total_bytes_read);
-    if (ssl_ret > 0)
+    if (ssl_ret > 0) {
       total_bytes_read += ssl_ret;
+    }
     // Continue processing records as long as there is more data available
     // synchronously.
   } while (total_bytes_read < buf_len && ssl_ret > 0 &&
@@ -1535,6 +1538,7 @@ int SSLClientSocketImpl::DoPayloadRead(IOBuffer* buf, int buf_len) {
     pending_read_ssl_error_ = SSL_ERROR_NONE;
     pending_read_error_info_ = OpenSSLErrorInfo();
   }
+
   return rv;
 }
 

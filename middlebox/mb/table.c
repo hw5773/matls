@@ -22,9 +22,11 @@ int init_forward_table(unsigned char *filename)
     if (insert_entry(name, (int) strlen(name), ip, (int) strlen(ip), port) < 0) goto err;
   }
 
+  fclose(fp);
   return 1;
 err:
   MA_LOG("Error happended in initializing the forward table"); 
+  fclose(fp);
   return -1;
 }
 

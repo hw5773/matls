@@ -167,6 +167,54 @@ mstart15:
 mstart16:
 	./${SERVER_16} ${PORT_16} 16.pem 16.key ${FORWARD_FILE_16} 0 0
 
+mstart1w:
+	./${SERVER_1} ${PORT_1} 1.pem 1.key ${FORWARD_FILE_1} 0 1
+
+mstart2w:
+	./${SERVER_2} ${PORT_2} 2.pem 2.key ${FORWARD_FILE_2} 0 1
+
+mstart3w:
+	./${SERVER_3} ${PORT_3} 3.pem 3.key ${FORWARD_FILE_3} 0 1
+
+mstart4w:
+	./${SERVER_4} ${PORT_4} 4.pem 4.key ${FORWARD_FILE_4} 0 1
+
+mstart5w:
+	./${SERVER_5} ${PORT_5} 5.pem 5.key ${FORWARD_FILE_5} 0 1
+
+mstart6w:
+	./${SERVER_6} ${PORT_6} 6.pem 6.key ${FORWARD_FILE_6} 0 1
+
+mstart7w:
+	./${SERVER_7} ${PORT_7} 7.pem 7.key ${FORWARD_FILE_7} 0 1
+
+mstart8w:
+	./${SERVER_8} ${PORT_8} 8.pem 8.key ${FORWARD_FILE_8} 0 1
+
+mstart9w:
+	./${SERVER_9} ${PORT_9} 9.pem 9.key ${FORWARD_FILE_9} 0 1
+
+mstart10w:
+	./${SERVER_10} ${PORT_10} 10.pem 10.key ${FORWARD_FILE_10} 0 1
+
+mstart11w:
+	./${SERVER_11} ${PORT_11} 11.pem 11.key ${FORWARD_FILE_11} 0 1
+
+mstart12w:
+	./${SERVER_12} ${PORT_12} 12.pem 12.key ${FORWARD_FILE_12} 0 1
+
+mstart13w:
+	./${SERVER_13} ${PORT_13} 13.pem 13.key ${FORWARD_FILE_13} 0 1
+
+mstart14w:
+	./${SERVER_14} ${PORT_14} 14.pem 14.key ${FORWARD_FILE_14} 0 1
+
+mstart15w:
+	./${SERVER_15} ${PORT_15} 15.pem 15.key ${FORWARD_FILE_15} 0 1
+
+mstart16w:
+	./${SERVER_16} ${PORT_16} 16.pem 16.key ${FORWARD_FILE_16} 0 1
+
 debug:
 	${GDB} ./${EXEC} ${PORT} ${CERT_FILE} ${CA_CERT_FILE} ${KEY_FILE} ${ORIG_CERT_FILE} ${WARRANT_FILE} -tui
 

@@ -9,12 +9,21 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define MB_MIDDLEBOX_TYPE_DUMMY 0
+#define MB_MIDDLEBOX_TYPE_CLIENT 1
+#define MB_MIDDLEBOX_TYPE_SERVER 2
+#define MB_MIDDLEBOX_TYPE_CLIENT_WITH_SCT 3
+#define MB_MIDDLEBOX_TYPE_SERVER_WITH_SCT 4
+
+#define CLIENT_MAX_MB_KEY_SIZE 65
 #define MODIFICATION_RECORD_HASH_SIZE 32
 #define EXTENDED_FINISHED_HASH_SIZE 32
 #define EXTENDED_FINISHED_MAX_BEFORE_HASH_SIZE (EVP_MAX_MD_SIZE + 4 + EVP_MAX_MD_SIZE + EXTENDED_FINISHED_HASH_SIZE) 
 
 #define SWAP16(s) (((((s)) << 8) | (((s) >> 8))))
 
+// #define DEBUG
+#ifdef DEBUG
 #define PRINTK(msg, arg1, arg2) \
  printf("[matls] %s: %s (%d bytes) ", __func__, msg, arg2); \
  for (int pk_idx=0;pk_idx<arg2;pk_idx++) \
@@ -24,6 +33,9 @@
    printf("%02X ", arg1[pk_idx]); \
  } \
  printf("\n");
+#else
+#define PRINTK(msg, arg1, arg2) ;
+#endif /* DEBUG */
 
 typedef struct mb_mac_table_entry_st {
   uint8_t data[EVP_MAX_MD_SIZE];

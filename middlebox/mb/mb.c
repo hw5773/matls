@@ -77,6 +77,10 @@ int main(int count, char *strings[])
 
     struct info *info = (struct info *)malloc(sizeof(struct info));
     info->sock = client;
+    /////
+    tidx = get_thread_index();
+    MA_LOG1d("Create thread with index", tidx);
+    /////
     rc = pthread_create(&threads[tidx], &attr, mb_run, info);
 
     if (rc < 0)
@@ -94,6 +98,7 @@ int main(int count, char *strings[])
       MA_LOG1d("error in join", rc);
       return 1;
     }
+    close(client);
 	}
 
   free_forward_table();
@@ -107,7 +112,7 @@ void *mb_run(void *data)
 {
   MA_LOG("start server loop\n");
   struct info *info;
-  int client, ret, rcvd, sent, tot_len = -1, head_len = -1, body_len = -1;
+  int client, ret, rcvd, sent, fd, tot_len = -1, head_len = -1, body_len = -1;
   unsigned char buf[BUF_SIZE];
   unsigned long start, end;
 
@@ -184,8 +189,14 @@ void *mb_run(void *data)
   }
   end = get_current_microseconds();
   MA_LOG1lu("Middlebox Execution Time", end - start);
-
-//  SSL_free(ssl);
+/////
+  fd = SSL_get_fd(ssl->pair);
+/////
+  SSL_free(ssl->pair);
+  SSL_free(ssl);
+/////
+  close(fd);
+/////
 //  close(client);
 }
 

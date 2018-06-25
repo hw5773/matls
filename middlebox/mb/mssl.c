@@ -245,7 +245,13 @@ void sni_callback(unsigned char *buf, int len, SSL *ssl)
   args->index = index;
   args->ssl = ssl;
   tidx = get_thread_index();
+  MA_LOG1d("tidx after get_thread_index() in sni_callback", tidx);
   rc = pthread_create(&threads[tidx], &attr, run, args);
+  if (rc < 0)
+  {
+    MA_LOG("error in pthread create");
+    exit(EXIT_FAILURE);
+  }
 }
 
 void msg_callback(int write, int version, int content_type, const void *buf, size_t len, SSL *ssl, void *arg)

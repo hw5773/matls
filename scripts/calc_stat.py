@@ -6,12 +6,16 @@ import time
 
 CSV = True
 
-def get_stats(data):
+def get_stats(data, strip=False):
+    if strip:
+        _data = data[10:-10]
+    else:
+        _data = data[:]
     return (
-        statistics.mean(data),
-        statistics.pstdev(data),
-        max(data),
-        min(data),
+        statistics.mean(_data),
+        statistics.pstdev(_data),
+        max(_data),
+        min(_data),
     )
 
 def align_log_by_tag(log, tags):
@@ -38,7 +42,7 @@ def align_log_by_tag(log, tags):
     return aligned_log, num_tags
 
 
-def calc_client(log):
+def calc_client(log, strip):
     tags = [
         'CLIENT_TCP_CONNECT_START',
         'CLIENT_TCP_CONNECT_END',
@@ -79,17 +83,17 @@ def calc_client(log):
         modification_record_times.append(_log['CLIENT_MODIFICATION_RECORD_END'] - _log['CLIENT_MODIFICATION_RECORD_START'])
 
     stats = OrderedDict()
-    stats['TCP_CONNECT_TIME'] = get_stats(tcp_times)
-    stats['HANDSHAKE_TIME'] = get_stats(hs_times) 
-    stats['FINISHED_VALIDATION_TIME'] = get_stats(finished_validation_times)
-    stats['CERT_VALIDATION_TIME'] = get_stats(cert_validation_times)
-    stats['MODIFICATION_RECORD_TIME'] = get_stats(modification_record_times)
-    stats['TOTAL_TIME'] = get_stats(total_times)
+    stats['TCP_CONNECT_TIME'] = get_stats(tcp_times, strip)
+    stats['HANDSHAKE_TIME'] = get_stats(hs_times, strip) 
+    stats['FINISHED_VALIDATION_TIME'] = get_stats(finished_validation_times, strip)
+    stats['CERT_VALIDATION_TIME'] = get_stats(cert_validation_times, strip)
+    stats['MODIFICATION_RECORD_TIME'] = get_stats(modification_record_times, strip)
+    stats['TOTAL_TIME'] = get_stats(total_times, strip)
 
     return stats
 
 
-def calc_server(log):
+def calc_server(log, strip):
     tags = [
         'SERVER_ACCEPT_START',
         'SERVER_ACCEPT_END',
@@ -117,12 +121,13 @@ def calc_server(log):
 def main():
 
     if len(sys.argv) < 3:
-        print('[*] usage python {} <client/server> <log file/log files directory>'.format(sys.argv[0]))
+        print('[*] usage python {} <client/server> <log file/log files directory> [--strip]'.format(sys.argv[0]))
         exit()
 
     log_file_name = sys.argv[2]
     log_type = sys.argv[1].upper()
-    
+    strip = '--strip' in sys.argv
+
     if os.path.isdir(log_file_name):
         log_lines = []
         for f in os.listdir(log_file_name):

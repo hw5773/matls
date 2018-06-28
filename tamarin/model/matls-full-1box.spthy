@@ -1,0 +1,405 @@
+/*
+ *  Author: Anonymous
+ *  Model Name: matls-1box
+ *
+ *  Comments: maTLS protocol with 1 middlebox
+ */
+
+theory matls_1box
+begin
+
+builtins: diffie-hellman
+functions: senc/2, sdec/2, h/1, mac/2, makeTLSKey/1, makeac/1, sign/2, verify/3, pk/1, true/0
+equations: sdec(senc(m, k), k) = m,
+           verify(msg, sign(msg, k), pk(k)) = true
+
+// ----------------------------------------------------------//
+// ------------------------- Rules --------------------------//
+// ----------------------------------------------------------//
+
+
+
+//----------------------- Setup Rules -----------------------//
+
+rule Create_Server:
+    [ Fr(~key) ]
+  --[ CreateServer($S, ~key) ]->
+    [ !PublicKey('server', $S, pk(~key)), !PrivateKey('server', $S, ~key) ]
+
+rule Create_Middlebox:
+    [ Fr(~key) ]
+  --[ CreateMiddlebox($M, ~key) ]->
+    [ !PublicKey('middlebox', $M, pk(~key)), !PrivateKey('middlebox', $M, ~key) ]
+
+//-------------------- Corruption Rules ---------------------//
+/*
+rule Corrupt_Server:
+    [ !PrivateKey('server', $S, key) ]
+  --[ CorruptServer($S) ]->
+    [ Out(key) ]
+
+
+rule Corrupt_Middlebox:
+    [ !PrivateKey('middlebox', $M, key) ]
+  --[ CorruptMiddlebox($S) ]->
+    [ Out(key) ]
+*/
+//-------------------- 'Handshake' Rules --------------------//
+
+
+// nc: nonce-client, used in establishment of encryption and mac keys
+// c_ac: client-accountability-contribution, used in establishment of accountability keys
+// details: miscellaneous details about the protocol preferences (we want this to be satisfied later)
+rule Client_Hello:
+  let
+    // Constructing outputs
+    client_hello_message = < ~nc, 'g_acc'^(~c_ac), ~details >
+  in
+    [
+     Fr(~nc),
+     Fr(~c_ac),
+     Fr(~details) // Details describes arbitrary things about the communication
+                  // This can be modelled more thoroughly later
+    ]
+  --[ REACH_TEST('1')
+    ]->
+    [ 
+    // Session data
+     ClientHello(~nc, ~c_ac, ~details),
+    // Things for others
+     Out( client_hello_message )
+    ]
+
+rule MB1_Hello:
+  let
+    // Bind group membership
+    cac_contribution = 'g_acc'^~x
+    // Deconstructing inputs
+    client_hello_message = < nc, cac_contribution , details >
+    // Creating session data
+    middlebox_client_acc_key = makeac( cac_contribution^~mb1_ac  )
+    // Constructing outputs
+    ac_keychain = < cac_contribution, 'g_acc'^(~mb1_ac) >
+      // - ac_keychain consists of the half-keys of every middlebox
+    middlebox_client_hello_message = < ~n_mb1_c, details  >
+  in
+    [ In(client_hello_message), 
+      Fr(~mb1_ac),
+      Fr(~n_mb1_c) // this nonce will bind all mbox session components
+    ]
+  --[ REACH_TEST('2') ]->
+    [ // Session data
+      MiddleboxHello(~n_mb1_c, middlebox_client_acc_key, ~mb1_ac,  details, nc),
+      // Outputs for others
+      Out(middlebox_client_hello_message),
+      KeyChain( ac_keychain )
+     ]
+
+
+rule Server_Hello:
+  let
+    // Bind group membership
+    cac_contribution = 'g_acc'^~x
+    mb1ac_contribution = 'g_acc'^~y
+    // Deconstructing inputs
+    ac_keychain = < cac_contribution, mb1ac_contribution >
+    in_msg = < nmb1, details >
+    // Creation of session data
+    server_client_acc_key = makeac(cac_contribution^~s_ac )
+    server_mb1_acc_key = makeac(mb1ac_contribution^~s_ac )
+    // Constructing outputs
+    certificate = <$S, pk(ltk) >
+    out_msg = < nmb1, ~nstls, 'g_tls'^~s_tls >
+    //signed_msg = revealingSign(out_msg, ltk)
+    signature = sign(out_msg, ltk)
+    signed_msg = < out_msg, signature >
+  in
+    [ !PrivateKey('server', $S, ltk),
+      Fr(~nstls),
+      Fr(~s_ac),
+      Fr(~s_tls),
+      In(in_msg),
+      KeyChain(ac_keychain)
+    ]
+  --[ REACH_TEST('3') ]->
+    [ Out(<signed_msg, 'g_acc'^~s_ac >),
+       ServerHello(server_client_acc_key, server_mb1_acc_key, ~nstls, ~s_tls, nmb1, details)
+    ]
+
+rule MB1_HelloForward:
+  let
+      // Bind group memberships
+      servertlscont = 'g_tls'^~x
+      sac_contribution = 'g_acc'^~y
+      // Deconstructing inputs
+      server_certificate = < $S, server_pubkey >
+      //in_msg = getMessage(signed_in_msg)
+      in_msg = <nmb1, nstls, servertlscont>
+      signed_in_msg = <in_msg, signature>
+      mb_certificate = < $M, pk(ltk) >
+      // Creating session data
+      tls_key = makeTLSKey( servertlscont^~g_mb1_c, nstls, n_mb1_c)
+      middlebox_server_acc_key = makeac( sac_contribution^~mb1_ac )
+      // Creating outputs
+      certificate_chain = < server_certificate, mb_certificate >
+      out_msg = < nc, ~n_mb1_s, 'g_tls'^~g_mb1_s >
+      signed_out_msg = <out_msg, sign(out_msg, ltk)>
+      acc_chain = < sac_contribution, 'g_acc'^~mb1_ac >
+  in
+    [ MiddleboxHello( n_mb1_c, middlebox_client_acc_key, ~mb1_ac, details, nc ),
+      In(<signed_in_msg, sac_contribution>), 
+      !PublicKey(types, $S, server_pubkey),
+      !PrivateKey('middlebox', $M, ltk ),
+      Fr(~n_mb1_s), // nonce for middlebox 1 in the server role
+      Fr(~g_mb1_s), // exponent for middlebox 1 in the server role
+      Fr(~g_mb1_c) // exponent for middlebox 1 in the client role (not used until the next round)
+    ]
+  --[ //Equal(revealingVerify(signed_in_msg, in_msg, server_pubkey), true),
+      Equal(verify(in_msg, signature, server_pubkey ), true),
+      REACH_TEST('4'),
+      CreateLoop(nc)
+    ]->
+    [ 
+      // Session data
+      MiddleboxAccountability( n_mb1_c, ~mb1_ac, middlebox_client_acc_key, middlebox_server_acc_key), // try and bind these together
+      MiddleboxServerTwo( n_mb1_c, nc, ~n_mb1_s, ~g_mb1_s ),
+      MiddleboxClientTwo( n_mb1_c, tls_key, ~g_mb1_c,  $S ),
+      // Outputs
+      Out( signed_out_msg ),
+      KeyChain(acc_chain),
+      CertificateChain(certificate_chain)
+    ]  
+
+rule Client_Finished:
+  let
+    // Bind group membership to exponent inputs
+    mbtlscont = 'g_tls'^~x
+    sac_contribution = 'g_acc'^~y
+    mb1ac_contribution = 'g_acc'^~z
+    // Deconstruct inputs
+    in_msg = <nc, n_mb1_s, mbtlscont>
+    signed_in_msg = <in_msg, signature>
+    // Created session data
+    client_TLS_key = makeTLSKey( mbtlscont^~g_c , n_mb1_s, nc)
+    // Retrieved certificates
+    server_certificate = <$S, pks>
+    mb_certificate = <$M, mbox_pubkey>
+    acc_chain = <sac_contribution, mb1ac_contribution>
+    certificate_chain = < server_certificate, mb_certificate >
+    // Create outputs
+    transcript = < nc, 'g_tls'^c_ac, n_mb1_s,  pks > 
+  in
+    [ 
+      // Session Data
+      ClientHello(nc, c_ac, details),
+      // Received inputs
+      In(signed_in_msg),
+      KeyChain(acc_chain),
+      CertificateChain(certificate_chain),
+      // Public keys of all people in the certificate chain
+      !PublicKey(type, $M, mbox_pubkey),
+      !PublicKey('server', $S, pks),
+      Fr(~g_c) // client tls exponent
+    ]
+  --[ Equal(verify(in_msg, signature, mbox_pubkey), true),
+      REACH_TEST('5'),
+      UseLoop(nc)
+   ]->
+    [ 
+      // New session data
+      ClientFinished(client_TLS_key, ~g_c, $M, $S),
+      ClientAccountability($M, mb1ac_contribution^c_ac ),
+      ClientAccountability($S,  sac_contribution^c_ac ),
+      // Outputs
+      Out( <'g_tls'^~g_c, transcript> ) // missing - transcript
+    ]
+
+rule MB1_Finished:
+  let
+    // Bind group membership
+    clienttlscont = 'g_tls'^~x
+    // Created things
+    server_TLS_key = makeTLSKey( clienttlscont^~g_mb1_s, ~n_mb1_s, nc ) 
+  in
+    [ In( clienttlscont ),
+      MiddleboxServerTwo( n_mb1_c, nc, ~n_mb1_s, ~g_mb1_s),
+      MiddleboxClientTwo( n_mb1_c, client_tls_key, ~g_mb1_c, $S )  // these are called this because the middlebox is the client in this split session
+    ]
+  --[ REACH_TEST('6') ]->
+    [ 
+      // Session data (note mboxclient/server are for the middlebox in that role)
+      MiddleboxServerThree( n_mb1_c, server_TLS_key, ~n_mb1_s, $M, $C ), 
+      MiddleboxClientThree( n_mb1_c, client_tls_key, ~g_mb1_c, $S ),
+      // Outputs
+      Out( 'g_tls'^~g_mb1_c ) // missing - transcript
+    ]
+
+
+rule Server_Finished:
+  let
+    // Bind group membership
+    clienttlscont = 'g_tls'^~x
+    // Session data
+    server_tls_key = makeTLSKey( clienttlscont^~s_tls, ~nstls, nc ) 
+    // Constructed outputs
+    server_transcript = 'hello'
+    log = < 'acc', 'emm', 'sig' > // need better understanding of these
+    transcript_segment = senc(server_transcript, server_tls_key )
+    matls_segment = senc(log, server_tls_key )
+  in
+    [ In( clienttlscont ),
+      ServerHello(server_client_acc_key, server_mb1_acc_key, ~nstls, ~s_tls, nc, details)
+    ]
+  --[ REACH_TEST('7') ]->
+    [ 
+      // Session data
+      ServerSession($S, $M, server_tls_key, server_client_acc_key, server_mb1_acc_key ),
+      // Outputs
+      Out(<transcript_segment, matls_segment> )
+    ]
+
+rule MB1_FinishedForward:
+  let
+    // Decoding inputs
+    in_transcript = 'hello'
+    transcript_in_segment = senc(in_transcript, client_tls_key )
+    matls_in_segment = senc(in_log, client_tls_key )
+    // Constructing outputs
+    out_transcript = 'howdy'
+    out_log = < 'acc', 'emm', 'sig' >
+    transcript_out_segment = senc(out_transcript, server_tls_key )
+    matls_out_segment = senc(out_log, server_tls_key )
+
+  in
+    [ In(<transcript_in_segment, matls_in_segment>),
+      MiddleboxServerThree( n_mb1_c, server_tls_key, ~n_mb1_s, $M, $C ), 
+      MiddleboxClientThree(  n_mb1_c, client_tls_key, ~g_mb1_c, $S ),
+      MiddleboxAccountability(  n_mb1_c, ~mb1_ac, middlebox_client_acc_key, middlebox_server_acc_key)
+    ]
+  --[ REACH_TEST('8') ]->
+    [ 
+      // Session data
+      MiddleboxClientReady( client_tls_key, ~g_mb1_c, $S ),
+      MiddleboxServerReady( server_tls_key, ~n_mb1_s, $M, $C ),
+      MiddleboxAccountabilityReady( ~mb1_ac, middlebox_client_acc_key, middlebox_server_acc_key ),
+      // Outputs
+      Out(< transcript_out_segment, matls_out_segment >)
+    ]
+
+/*
+// 'clientfinished' is the name of the tls rule, but this step is when the client is actually satisfied that the handshake was successful
+// after this rule, he will sart sending real messages (in client_request)
+rule Client_Complete:
+  let
+
+  in
+    [  ]
+  --[  ]->
+    [  ]
+//------------------ 'Communication' Rules ------------------//
+
+rule Client_Request:
+  let
+
+  in
+    [  ]
+  --[  ]->
+    [  ]
+
+rule MB1_Request:
+  let
+
+  in
+    [  ]
+  --[  ]->
+    [  ]
+
+rule Server_Reply:
+  let
+
+  in
+    [  ]
+  --[  ]->
+    [  ]
+
+rule MB1_Reply_NoModification:
+  let
+
+  in
+    [  ]
+  --[  ]->
+    [  ]
+
+rule MB1_Reply_Modification:
+  let
+
+  in
+    [  ]
+  --[  ]->
+    [  ]
+
+rule Client_Receive:
+  let
+
+  in
+    [  ]
+  --[  ]->
+    [  ]
+
+// ----------------------------------------------------------//
+// --------------------- Restrictions -----------------------//
+// ----------------------------------------------------------//
+
+*/
+
+restriction equal:
+  "
+  All a b #t1. Equal(a,b)@t1 ==> a = b
+  "
+
+restriction oneKey:
+  "
+  All A ka kb #t1 #t2. CreateMiddlebox(A, ka)@t1 & CreateMiddlebox(A, kb)@t2 ==> #t1 = #t2
+
+  "
+
+/*
+// ----------------------------------------------------------//
+// ------------------------- Lemmas -------------------------//
+// ----------------------------------------------------------//
+
+
+//---------------------- Helper Lemmas ----------------------//
+*/
+lemma loop_sources[use_induction, reuse]:
+    all-traces
+    "
+    All loopID #tloop. UseLoop(loopID)@tloop ==>
+      Ex #tsource. CreateLoop(loopID)@tsource
+    "
+
+
+
+
+
+/*
+//----------------------- Check Lemmas ----------------------//
+
+*/
+
+lemma reach_test:
+    exists-trace
+    "
+    Ex #t1. REACH_TEST('4')@t1
+    "
+
+
+/*
+
+//--------------------- Security Lemmas ---------------------//
+
+
+*/
+
+
+end

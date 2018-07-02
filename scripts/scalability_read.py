@@ -36,11 +36,13 @@ def main():
         usage()
 
     for i in range(17):
-        cmd1 = "/home/kjchoi/chromium/src/multirun.sh https://www.matls.com 50%02d %d 2>/dev/null" % (17-i, i)
+        cmd1 = "/home/mmlab/matls/scripts/multirun.sh https://www.matls.com 50%02d %d 2>/dev/null" % (17-i, i)
         print (cmd1)
         os.system(cmd1)
-        cmd2 = "python3 /home/kjchoi/log/calc_stat.py client /home/kjchoi/log/mb_%d_read > /home/kjchoi/log/mb_%d_read_result.csv" % (i, i)
+        cmd2 = "python3 /home/mmlab/matls/scripts/calc_stat.py client /home/mmlab/log/mb_%d_read > /home/mmlab/log/mb_%d_read_result.csv" % (i, i)
         os.system(cmd2)
+        cmd3 = "python3 /home/mmlab/matls/scripts/calc_stat.py client /home/mmlab/log/mb_%d_read --strip > /home/mmlab/log/mb_%d_read_strip_result.csv" % (i, i)
+        os.system(cmd3)
         title = "[matls] The experiment is on going with %d middleboxes" % i
         msg = "The experiment is on going with %d middleboxes" % i
         send_email(title, msg)
@@ -49,7 +51,7 @@ def main():
     msg = "The experiment is finished"
 
     # send the email to the receivers from sender.
-    #send_email(title, msg)    
+    send_email(title, msg)    
 
 if __name__ == "__main__":
     main()

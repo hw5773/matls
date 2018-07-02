@@ -6,8 +6,8 @@ import time
 
 CSV = True
 
-def get_stats(data, strip=False):
-    if strip:
+def get_stats(data, stripping=False):
+    if stripping:
         _data = data[10:-10]
     else:
         _data = data[:]
@@ -42,7 +42,7 @@ def align_log_by_tag(log, tags):
     return aligned_log, num_tags
 
 
-def calc_client(log, strip):
+def calc_client(log, stripping):
     tags = [
         'CLIENT_TCP_CONNECT_START',
         'CLIENT_TCP_CONNECT_END',
@@ -83,17 +83,17 @@ def calc_client(log, strip):
         modification_record_times.append(_log['CLIENT_MODIFICATION_RECORD_END'] - _log['CLIENT_MODIFICATION_RECORD_START'])
 
     stats = OrderedDict()
-    stats['TCP_CONNECT_TIME'] = get_stats(tcp_times, strip)
-    stats['HANDSHAKE_TIME'] = get_stats(hs_times, strip) 
-    stats['FINISHED_VALIDATION_TIME'] = get_stats(finished_validation_times, strip)
-    stats['CERT_VALIDATION_TIME'] = get_stats(cert_validation_times, strip)
-    stats['MODIFICATION_RECORD_TIME'] = get_stats(modification_record_times, strip)
-    stats['TOTAL_TIME'] = get_stats(total_times, strip)
+    stats['TCP_CONNECT_TIME'] = get_stats(tcp_times, stripping)
+    stats['HANDSHAKE_TIME'] = get_stats(hs_times, stripping) 
+    stats['FINISHED_VALIDATION_TIME'] = get_stats(finished_validation_times, stripping)
+    stats['CERT_VALIDATION_TIME'] = get_stats(cert_validation_times, stripping)
+    stats['MODIFICATION_RECORD_TIME'] = get_stats(modification_record_times, stripping)
+    stats['TOTAL_TIME'] = get_stats(total_times, stripping)
 
     return stats
 
 
-def calc_server(log, strip):
+def calc_server(log, stripping):
     tags = [
         'SERVER_ACCEPT_START',
         'SERVER_ACCEPT_END',
@@ -126,7 +126,7 @@ def main():
 
     log_file_name = sys.argv[2]
     log_type = sys.argv[1].upper()
-    strip = '--strip' in sys.argv
+    stripping = '--strip' in sys.argv
 
     if os.path.isdir(log_file_name):
         log_lines = []
@@ -152,9 +152,9 @@ def main():
         })
 
     if log_type == 'CLIENT':
-        stats = calc_client(log)
+        stats = calc_client(log, stripping)
     elif log_type == 'SERVER':
-        stats = calc_server(log)
+        stats = calc_server(log, stripping)
 
     if CSV:
         print('Tag,Mean,Stdev,Max,Min')

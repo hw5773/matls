@@ -6,11 +6,13 @@
  */
 
 #include "common.h"
+#include "../common/logs.h"
 
 int open_connection(const char *hostname, int port)
 {   int sd;
     struct hostent *host;
     struct sockaddr_in addr;
+    MA_LOG1s("hostname", hostname);
             
     if ( (host = gethostbyname(hostname)) == NULL )
     {

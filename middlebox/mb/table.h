@@ -27,6 +27,7 @@ void free_forward_table(void);
 int insert_entry(unsigned char *name, int nlen, unsigned char *ip, int ilen, int port);
 int find_by_name(unsigned char *buf, int len);
 unsigned char *get_name_by_index(int index);
+int get_name_length(int index);
 unsigned char *get_ip_by_index(int index);
 int get_port_by_index(int index);
 

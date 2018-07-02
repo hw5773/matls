@@ -33,16 +33,20 @@ err:
 int insert_entry(unsigned char *name, int nlen, unsigned char *ip, int ilen, int port)
 {
   int index = table->num_of_entries;
-  table->forward_names[index] = (unsigned char *)malloc(nlen);
-  table->forward_ips[index] = (unsigned char *)malloc(ilen);
+  table->forward_names[index] = (unsigned char *)malloc(nlen+1);
+  table->forward_ips[index] = (unsigned char *)malloc(ilen+1);
 
   memcpy(table->forward_names[index], name, nlen);
   memcpy(table->forward_ips[index], ip, ilen);
+  table->forward_names[index][nlen] = 0;
+  table->forward_ips[index][ilen] = 0;
   table->name_lengths[index] = nlen;
   table->ip_lengths[index] = ilen;
   table->forward_ports[index] = port;
 
   table->num_of_entries += 1;
+
+  return 1;
 }
 
 int find_by_name(unsigned char *buf, int len)
@@ -61,6 +65,11 @@ int find_by_name(unsigned char *buf, int len)
 unsigned char *get_name_by_index(int index)
 {
   return table->forward_names[index];
+}
+
+int get_name_length(int index)
+{
+  return table->name_lengths[index];
 }
 
 unsigned char *get_ip_by_index(int index)

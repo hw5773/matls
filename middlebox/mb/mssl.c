@@ -299,6 +299,7 @@ void *run(void *data)
   struct timeval tv;
   unsigned char *ip;
   unsigned char buf[DEFAULT_BUF_SIZE];
+  unsigned char *server_name;  
   int server, port, ret, rcvd, sent;
   SSL *ssl, *pair;
   fd_set reads, temps;
@@ -306,11 +307,12 @@ void *run(void *data)
   args = (struct forward_info *)data;
   ip = get_ip_by_index(args->index);
   port = get_port_by_index(args->index);
+  server_name = get_name_by_index(args->index);
 
   server = open_connection(ip, port);
   ssl = SSL_new(ctx);
   SSL_set_fd(ssl, server);
-  SSL_set_tlsext_host_name(ssl, "www.matls.com");
+  SSL_set_tlsext_host_name(ssl, server_name);
   
   MA_LOG1s("Start SSL connections to", ip);
 

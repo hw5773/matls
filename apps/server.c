@@ -68,7 +68,11 @@ int main(int count, char *strings[])
 		BIO_printf(outbio, "SSL_new() Success\n");
 		SSL_set_fd(ssl, client);      /* set connection socket to SSL state */
 		BIO_printf(outbio, "SSL_set_fd() Success\n");
+#ifdef MATLS
 		SSL_enable_mb(ssl);
+#else
+    SSL_disable_mb(ssl);
+#endif /* MATLS */
 
 		unsigned long hs_start, hs_end;
 		BIO_printf(outbio, "PROGRESS: TLS Handshake Start\n");
@@ -88,15 +92,11 @@ int main(int count, char *strings[])
 		BIO_printf(outbio, "SERVER: HTTP Response Length: %d\n", response_len);
 		BIO_printf(outbio, "SERVER: Send the HTTP Test Page Success: %d\n", sent);
 
-		//close(client);
-		//printf("free client\n");
-		//SSL_free(ssl);
-		//printf("free ssl\n");
+		close(client);
+		SSL_free(ssl);
 	}
 
-	SSL_free(ssl);
 	SSL_CTX_free(ctx);         /* release context */
-	close(client);
 	close(server);          /* close server socket */
 
 	return 0;

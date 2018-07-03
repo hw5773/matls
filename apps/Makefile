@@ -9,8 +9,8 @@ GCC=gcc
 CFLAGS=-o 
 CLIENT_SRC=client.c
 SERVER_SRC=server.c
-FLAGS=-I/home/hwlee/openssl-matls-lib/include -L/home/hwlee/openssl-matls-lib/lib
-#FLAGS=-I/home/hwlee/openssl_lib/include -L/home/hwlee/openssl_lib/lib
+FLAGS=-I/home/mmlab/openssl-matls-lib/include -L/home/mmlab/openssl-matls-lib/lib
+#FLAGS=-I/home/mmlab/openssl_lib/include -L/home/mmlab/openssl_lib/lib
 #FLAGS=-I/usr/local/include -L/usr/local/lib
 LDFLAGS=-lssl -lcrypto -ldl -lpthread
 GDB=gdb
@@ -19,9 +19,12 @@ HOST=127.0.0.1
 PORT=5017
 NUM_OF_THREADS=1
 
-default: server
+default: matls
 
-server:
+matls:
+	${GCC} -DMATLS ${CFLAGS} ${SERVER} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
+
+split:
 	${GCC} ${CFLAGS} ${SERVER} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
 
 sstart:

@@ -7,12 +7,12 @@ URL=$1
 PORT=$2
 ADDR=${URL}:${PORT}
 NUM=$3
-LOG_FILE=output_${NUM}w.log
-DIRECTORY=/home/mmlab/log/mb_${NUM}_write
+LOG_FILE=output_${NUM}s.log
+DIRECTORY=/home/mmlab/log/mb_${NUM}_split
 
 [ -d ${DIRECTORY} ] || mkdir ${DIRECTORY}
 
-FILE=${DIRECTORY}/mb_${NUM}_write.csv
+FILE=${DIRECTORY}/mb_${NUM}_split.csv
 touch ${FILE}
 
 #for i in {1..100}

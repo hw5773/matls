@@ -42,12 +42,14 @@ def main():
         usage()
 
     for i in range(start, end+1):
-        cmd1 = "/home/mmlab/matls/scripts/multirun.sh https://www.matls.com 50%02d %d 2>/dev/null" % (17-i, i)
+        cmd1 = "/home/mmlab/matls/scripts/multirun_s.sh https://www.matls.com 50%02d %d 2>/dev/null" % (17-i, i)
         print (cmd1)
         os.system(cmd1)
-        cmd2 = "python3 /home/mmlab/matls/scripts/calc_stat.py client /home/mmlab/log/mb_%d_read > /home/mmlab/log/mb_%d_read_result.csv" % (i, i)
+        cmd2 = "python3 /home/mmlab/matls/scripts/calc_split.py client /home/mmlab/log/mb_%d_split > /home/mmlab/log/mb_%d_split_result.csv" % (i, i)
+        print (cmd2)
         os.system(cmd2)
-        cmd3 = "python3 /home/mmlab/matls/scripts/calc_stat.py client /home/mmlab/log/mb_%d_read --strip > /home/mmlab/log/mb_%d_read_strip_result.csv" % (i, i)
+        cmd3 = "python3 /home/mmlab/matls/scripts/calc_split.py client /home/mmlab/log/mb_%d_split --strip > /home/mmlab/log/mb_%d_split_strip_result.csv" % (i, i)
+        print (cmd3)
         os.system(cmd3)
         title = "[matls] The experiment is on going with %d middleboxes" % i
         msg = "The experiment is on going with %d middleboxes" % i

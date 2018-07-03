@@ -32,10 +32,16 @@ The experiment is on going:
 
 def main():
     # check the number of arguments. change the number in the below statement according to the design.
-    if len(sys.argv) != 1:
+    if len(sys.argv) == 1:
+        start = 0
+        end = 16
+    elif len(sys.argv) == 3:
+        start = int(sys.argv[1])
+        end = int(sys.argv[2])
+    else:
         usage()
 
-    for i in range(17):
+    for i in range(start, end+1):
         cmd1 = "/home/mmlab/matls/scripts/multirun_w.sh https://www.matls.com 50%02d %d 2>/dev/null" % (17-i, i)
         print (cmd1)
         os.system(cmd1)
@@ -51,7 +57,7 @@ def main():
     msg = "The experiment is finished"
 
     # send the email to the receivers from sender.
-    #send_email(title, msg)    
+    send_email(title, msg)    
 
 if __name__ == "__main__":
     main()

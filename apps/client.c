@@ -26,14 +26,14 @@ SSL_CTX *ctx;
 char *hostname, *portnum;
 BIO *bio_err;
 
-// Warrant Client Implementation
+// Client Prototype Implementation
 int main(int count, char *strings[])
 {   
-    if ( count != 4 )
-    {
-        printf("usage: %s <hostname> <portnum> <num of threads>\n", strings[0]);
-        exit(0);
-    }
+  if ( count != 4 )
+  {
+    printf("usage: %s <hostname> <portnum> <num of threads>\n", strings[0]);
+    exit(0);
+  }
 
 	int i, rc, num_of_threads;
 
@@ -45,13 +45,13 @@ int main(int count, char *strings[])
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 	void *status;
 
-    SSL_library_init();
-    hostname = strings[1];
-    portnum = strings[2];
+  SSL_library_init();
+  hostname = strings[1];
+  portnum = strings[2];
 
 	bio_err = BIO_new_fp(stdout, BIO_NOCLOSE);
 
-    ctx = init_client_CTX();
+  ctx = init_client_CTX();
 
 	unsigned long start, end;
 
@@ -96,11 +96,11 @@ void *run(void *data)
 	SSL *ssl;
 
 	server = open_connection(hostname, atoi(portnum));
-    ssl = SSL_new(ctx);      /* create new SSL connection state */
-    SSL_set_fd(ssl, server);    /* attach the socket descriptor */
+  ssl = SSL_new(ctx);      /* create new SSL connection state */
+  SSL_set_fd(ssl, server);    /* attach the socket descriptor */
 
-    struct timeval tv;
-    gettimeofday( &tv, 0 );
+  struct timeval tv;
+  gettimeofday( &tv, 0 );
 
 	unsigned long hs_start, hs_end;
 	printf("PROGRESS: TLS Handshake Start\n");
@@ -110,7 +110,7 @@ void *run(void *data)
 	else
 	{
 		hs_end = get_current_microseconds();
-    	printf("PROGRESS: TLS Handshake Complete!\nConnected with %s encryption\n", SSL_get_cipher(ssl));
+    printf("PROGRESS: TLS Handshake Complete!\nConnected with %s encryption\n", SSL_get_cipher(ssl));
 		printf("ELAPSED TIME: %lu us\n", hs_end - hs_start);
 	}
         
@@ -120,27 +120,31 @@ void *run(void *data)
 }
 
 int open_connection(const char *hostname, int port)
-{   int sd;
-    struct hostent *host;
-    struct sockaddr_in addr;
+{   
+  int sd;
+  struct hostent *host;
+  struct sockaddr_in addr;
             
-    if ( (host = gethostbyname(hostname)) == NULL )
-    {
-          perror(hostname);
-          abort();
-    }
-    sd = socket(PF_INET, SOCK_STREAM, 0);
-    bzero(&addr, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(port);
-    addr.sin_addr.s_addr = *(long*)(host->h_addr);
-    if ( connect(sd, (struct sockaddr*)&addr, sizeof(addr)) != 0 )
-    {
-         close(sd);
-         perror(hostname);
-         abort();
-    }
-         return sd;
+  if ( (host = gethostbyname(hostname)) == NULL )
+  {
+    perror(hostname);
+    abort();
+  }
+    
+  sd = socket(PF_INET, SOCK_STREAM, 0);
+  bzero(&addr, sizeof(addr));
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(port);
+  addr.sin_addr.s_addr = *(long*)(host->h_addr);
+    
+  if ( connect(sd, (struct sockaddr*)&addr, sizeof(addr)) != 0 )
+  {
+    close(sd);
+    perror(hostname);
+    abort();
+  }
+         
+  return sd;
 }
 
 void msg_callback(int write_p, int version, int content_type, const void *buf, size_t len, SSL *ssl, void *arg)
@@ -200,25 +204,31 @@ void apps_ssl_info_callback(const SSL *s, int where, int ret)
 }
 
 SSL_CTX* init_client_CTX(void)
-{   SSL_METHOD *method;
-    SSL_CTX *ctx;
+{   
+  SSL_METHOD *method;
+  SSL_CTX *ctx;
         
-    OpenSSL_add_all_algorithms();  /* Load cryptos, et.al. */
-    SSL_load_error_strings();   /* Bring in and register error messages */
-    method = (SSL_METHOD *)TLSv1_2_client_method();  /* Create new client-method instance */
-    ctx = SSL_CTX_new(method);   /* Create new context */
-    if ( ctx == NULL )
-    {
-         ERR_print_errors_fp(stderr);
-         abort();
-    }
+  OpenSSL_add_all_algorithms();  /* Load cryptos, et.al. */
+  SSL_load_error_strings();   /* Bring in and register error messages */
+  method = (SSL_METHOD *)TLSv1_2_client_method();  /* Create new client-method instance */
+  ctx = SSL_CTX_new(method);   /* Create new context */
+  
+  if ( ctx == NULL )
+  {
+    ERR_print_errors_fp(stderr);
+    abort();
+  }
 
-	SSL_CTX_set_info_callback(ctx, apps_ssl_info_callback);
-	SSL_CTX_set_msg_callback(ctx, msg_callback);
+	//SSL_CTX_set_info_callback(ctx, apps_ssl_info_callback);
+	//SSL_CTX_set_msg_callback(ctx, msg_callback);
 
+#ifdef MATLS
 	SSL_CTX_enable_mb(ctx);
+#else
+  SSL_CTX_disable_mb(ctx);
+#endif /* MATLS */
 
-    return ctx;
+  return ctx;
 }
  
 void load_certificates(BIO *outbio, SSL_CTX* ctx, char* cert_file, char* key_file)
@@ -239,30 +249,30 @@ void load_certificates(BIO *outbio, SSL_CTX* ctx, char* cert_file, char* key_fil
 	else
 		BIO_printf(outbio, "SSL_CTX_set_default_verify_paths success\n");
 
-    /* set the local certificate from CertFile */
-    if ( SSL_CTX_use_certificate_file(ctx, cert_file, SSL_FILETYPE_PEM) <= 0 )
-    {
-       	ERR_print_errors_fp(stderr);
-       	abort();
+  /* set the local certificate from CertFile */
+  if ( SSL_CTX_use_certificate_file(ctx, cert_file, SSL_FILETYPE_PEM) <= 0 )
+  {
+    ERR_print_errors_fp(stderr);
+    abort();
 	}
-    else
+  else
 		BIO_printf(outbio, "SSL_CTX_use_certificate_file success\n");
 
 	/* set the private key from KeyFile (may be the same as CertFile) */
-    if ( SSL_CTX_use_PrivateKey_file(ctx, key_file, SSL_FILETYPE_PEM) <= 0 )
-    {
-       	ERR_print_errors_fp(stderr);
-       	abort();
-    }
+  if ( SSL_CTX_use_PrivateKey_file(ctx, key_file, SSL_FILETYPE_PEM) <= 0 )
+  {
+    ERR_print_errors_fp(stderr);
+    abort();
+  }
 	else
 		BIO_printf(outbio, "SSL_CTX_use_PrivateKey_file success\n");
     
 	/* verify private key */
-    if ( !SSL_CTX_check_private_key(ctx) )
-    {
-       	ERR_print_errors_fp(stderr);
-       	abort();
-    }
+  if ( !SSL_CTX_check_private_key(ctx) )
+  {
+    ERR_print_errors_fp(stderr);
+    abort();
+  }
 	else
 	   	BIO_printf(outbio, "Private key matches the public certificate\n");
 

@@ -133,7 +133,7 @@
 
 int make_signature_block2(unsigned char **sigblk, unsigned char *msg, int msg_len, EVP_PKEY *priv, int nid, int *sigblk_len)
 {
-	int rc, rc1, rc2;
+	int rc;
 	EVP_MD_CTX *ctx;
 	unsigned char *sig, *p;
 	size_t sig_len;
@@ -149,21 +149,14 @@ int make_signature_block2(unsigned char **sigblk, unsigned char *msg, int msg_le
 	switch (nid)
 	{
 		case NID_sha256:
-			rc1 = EVP_DigestInit_ex(ctx, EVP_sha256(), NULL);
-			rc2 = EVP_DigestSignInit(ctx, NULL, EVP_sha256(), NULL, priv);
+			rc = EVP_DigestSignInit(ctx, NULL, EVP_sha256(), NULL, priv);
 			break;
 		default:
 			//printf("Unknown Hash algorithm\n");
 			goto err;
 	}
 
-	// Make the signature
-	if (rc1 != 1)
-	{
-		//printf("PROGRESS: Digest Init Failed\n");
-		goto err;
-	}
-	if (rc2 != 1)
+	if (rc != 1)
 	{
 		//printf("PROGRESS: DigestSign Init Failed\n");
 		goto err;
@@ -356,6 +349,7 @@ int matls_send_extended_finished(SSL *s)
 
     *(d++) = SSL3_MT_EXTENDED_FINISHED;
 
+    RECORD_LOG(time_log, SERVER_SERVER_EXTENDED_1S);
     if (s->middlebox)
     {
       tmp1 = (unsigned char *)malloc(s->pair->extended_finished_msg_len);
@@ -397,7 +391,10 @@ int matls_send_extended_finished(SSL *s)
       printf("mlen: %d, slen: %d, plen: %d\n", mlen, slen, plen);
 #endif /* DEBUG */
     }
+    RECORD_LOG(time_log, SERVER_SERVER_EXTENDED_1E);
+    INTERVAL(time_log, SERVER_SERVER_EXTENDED_1S, SERVER_SERVER_EXTENDED_1E);
 
+    RECORD_LOG(time_log, SERVER_SERVER_EXTENDED_2S);
 		msg = (unsigned char *)malloc(plen); //mac, version, cipher, ti
     parameters = (unsigned char *)malloc(MATLS_M_LENGTH);
 
@@ -445,6 +442,10 @@ int matls_send_extended_finished(SSL *s)
 
 	  PRINTK("hmac", digest, digest_len);
 
+    RECORD_LOG(time_log, SERVER_SERVER_EXTENDED_2E);
+    INTERVAL(time_log, SERVER_SERVER_EXTENDED_2S, SERVER_SERVER_EXTENDED_2E);
+
+    RECORD_LOG(time_log, SERVER_SERVER_EXTENDED_3S);
 		/* make signature block */
 		if (!make_signature_block2(&sigblk, digest, digest_len, (s->cert->key->privatekey), NID_sha256, &sigblk_len))
 		{
@@ -454,7 +455,10 @@ int matls_send_extended_finished(SSL *s)
 #ifdef DEBUG
 		printf("PROGRESS: make the signature block\n");
 #endif /* DEBUG */
+    RECORD_LOG(time_log, SERVER_SERVER_EXTENDED_3E);
+    INTERVAL(time_log, SERVER_SERVER_EXTENDED_3S, SERVER_SERVER_EXTENDED_3E);
 
+    RECORD_LOG(time_log, SERVER_SERVER_EXTENDED_4S);
 
 		/* put num_msg */
 		*(p++) = num_msg;
@@ -494,6 +498,11 @@ int matls_send_extended_finished(SSL *s)
       PRINTK("Appended parameters", tmp2, MATLS_M_PAIR_LENGTH + mlen + 1);
     }
 
+    RECORD_LOG(time_log, SERVER_SERVER_EXTENDED_4E);
+    INTERVAL(time_log, SERVER_SERVER_EXTENDED_4S, SERVER_SERVER_EXTENDED_4E);
+
+    RECORD_LOG(time_log, SERVER_SERVER_EXTENDED_5S);
+
 		/* put hashed msg */
 		memcpy(p, digest, digest_len);
 		p += digest_len;
@@ -525,6 +534,8 @@ int matls_send_extended_finished(SSL *s)
 		s->init_num=(int)l+4; // total length including the message type
 		s->init_off=0;
     s->state = SSL3_ST_SW_EXTENDED_FINISHED_B;
+    RECORD_LOG(time_log, SERVER_SERVER_EXTENDED_5E);
+    INTERVAL(time_log, SERVER_SERVER_EXTENDED_5S, SERVER_SERVER_EXTENDED_5E);
 	}
 
 	PRINTK("Extended Finished Message", d, l);

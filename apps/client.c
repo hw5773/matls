@@ -16,6 +16,7 @@
 #include <openssl/opensslv.h>
 
 #define FAIL    -1
+#define BUF_SIZE 1024
 
 void *run(void *data);
 int open_connection(const char *hostname, int port);
@@ -23,7 +24,7 @@ SSL_CTX* init_client_CTX(void);
 void load_certificates(BIO *outbio, SSL_CTX* ctx, char* cert_file, char* key_file);
 void print_pubkey(BIO *outbio, EVP_PKEY *pkey);
 SSL_CTX *ctx;
-char *hostname, *portnum;
+const char *hostname, *portnum;
 BIO *bio_err;
 
 // Client Prototype Implementation
@@ -92,12 +93,19 @@ int main(int count, char *strings[])
 
 void *run(void *data)
 {	
-	int server;
+	int server, sent, rcvd;
+  unsigned char buf[BUF_SIZE];
 	SSL *ssl;
+  const char *request = 
+    "GET / HTTP/1.1\r\n"
+    "Host: www.matls.com\r\n\r\n";
+  int request_len = strlen(request);
 
 	server = open_connection(hostname, atoi(portnum));
   ssl = SSL_new(ctx);      /* create new SSL connection state */
   SSL_set_fd(ssl, server);    /* attach the socket descriptor */
+  SSL_set_tlsext_host_name(ssl, hostname);
+  printf("[matls] %s:%s:%d: Set server name: %s\n", __FILE__, __func__, __LINE__, hostname);
 
   struct timeval tv;
   gettimeofday( &tv, 0 );
@@ -112,6 +120,12 @@ void *run(void *data)
 		hs_end = get_current_microseconds();
     printf("PROGRESS: TLS Handshake Complete!\nConnected with %s encryption\n", SSL_get_cipher(ssl));
 		printf("ELAPSED TIME: %lu us\n", hs_end - hs_start);
+    sent = SSL_write(ssl, request, request_len);
+    //MA_LOG1s("Request", request);
+    //MA_LOG1d("Sent Length", sent);
+    rcvd = SSL_read(ssl, buf, BUF_SIZE);
+    //MA_LOG1s("Response", buf);
+    //MA_LOG1d("Rcvd Length", rcvd);
 	}
         
 	SSL_free(ssl);        /* release connection state */

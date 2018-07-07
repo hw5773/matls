@@ -82,9 +82,7 @@ int main(int count, char *strings[])
 	}
 	end = get_current_microseconds();
 
-	printf("Start Time: %lu\n", start);
-	printf("End Time: %lu\n", end);
-	printf("TOTAL TIME: %lu\n", end - start);
+	printf("TOTAL TIME: %lu us\n", end - start);
 
 	SSL_CTX_free(ctx);        /* release context */
     

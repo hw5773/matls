@@ -1490,7 +1490,9 @@ struct ssl_st
   unsigned char *phash; // Previous Hash of the Content
   unsigned char *pmr; // Previous Modification Record
   int pmr_length;
+#ifdef LOGGER
   log_t *time_log;
+#endif /* LOGGER */
 #endif /* OPENSSL_NO_MATLS */
 
 #ifndef OPENSSL_NO_SPLIT_TLS

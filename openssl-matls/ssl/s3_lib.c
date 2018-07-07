@@ -4465,7 +4465,10 @@ static int ssl3_read_internal(SSL *s, void *buf, int len, int peek)
     MSTART("modification record", "client");
     if (!s->server) // TODO: if not client authentication (need to revise this)
     {
-      RECORD_LOG(s->time_log, CLIENT_MODIFICATION_RECORD_START);
+      if (!(s->server || s->middlebox))
+      {
+        RECORD_LOG(s->time_log, CLIENT_MODIFICATION_RECORD_START);
+      }
       unsigned char *p, *mr, *chash, *phash;
       int mlen, mrlen, phlen, chlen, nk, index;
       p = (unsigned char *)buf;
@@ -4579,8 +4582,11 @@ static int ssl3_read_internal(SSL *s, void *buf, int len, int peek)
         }
       }
       buf = memmove(buf, buf + mrlen + 2, ret);
-      RECORD_LOG(s->time_log, CLIENT_MODIFICATION_RECORD_END);
-      INTERVAL(s->time_log, CLIENT_MODIFICATION_RECORD_START, CLIENT_MODIFICATION_RECORD_END);
+      if (!(s->server || s->middlebox))
+      {
+        RECORD_LOG(s->time_log, CLIENT_MODIFICATION_RECORD_END);
+        INTERVAL(s->time_log, CLIENT_MODIFICATION_RECORD_START, CLIENT_MODIFICATION_RECORD_END);
+      }
     }
     MEND("modification record", "client");
   }

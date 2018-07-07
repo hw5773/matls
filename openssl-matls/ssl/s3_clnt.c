@@ -359,21 +359,34 @@ int ssl3_connect(SSL *s)
           {
             MSTART("Before matls_get_server_certificate", "server-side");
 	
-            RECORD_LOG(s->time_log, CLIENT_CERT_VALIDATION_START);
+            if (!(s->server || s->middlebox))
+            {
+              RECORD_LOG(s->time_log, CLIENT_CERT_VALIDATION_START);
+            }
             if (s->middlebox)
               ret = matls_get_server_certificate_mb(s);
             else
               ret = matls_get_server_certificate_clnt(s);
-            RECORD_LOG(s->time_log, CLIENT_CERT_VALIDATION_END);
-            INTERVAL(s->time_log, CLIENT_CERT_VALIDATION_START, CLIENT_CERT_VALIDATION_END);
+            if (!(s->server || s->middlebox))
+            {
+              RECORD_LOG(s->time_log, CLIENT_CERT_VALIDATION_END);
+              INTERVAL(s->time_log, CLIENT_CERT_VALIDATION_START, CLIENT_CERT_VALIDATION_END);
+            }
             MEND("After matls_get_server_certificate", "server-side");
           }
           else
           {
             MSTART("Before ssl3_get_server_certificate", "server-side");
-            RECORD_LOG(s->time_log, CLIENT_CERT_VALIDATION_START);
+            if (!(s->server || s->middlebox))
+            {
+              RECORD_LOG(s->time_log, CLIENT_CERT_VALIDATION_START);
+            }
     				ret=ssl3_get_server_certificate(s);
-            RECORD_LOG(s->time_log, CLIENT_CERT_VALIDATION_END);
+            if (!(s->server || s->middlebox))
+            {
+              RECORD_LOG(s->time_log, CLIENT_CERT_VALIDATION_END);
+              INTERVAL(s->time_log, CLIENT_CERT_VALIDATION_START, CLIENT_CERT_VALIDATION_END);
+            }
             MEND("After ssl3_get_server_certificate", "server-side");
           }
 				if (ret <= 0) goto end;
@@ -700,13 +713,23 @@ int ssl3_connect(SSL *s)
     case SSL3_ST_CR_EXTENDED_FINISHED_B:
       //RECORD_LOG(time_log, CLIENT_SERVER_EXTENDED_FINISHED_START);
 	    mstart1 = get_current_microseconds();
+#ifdef TIME_LOG
 	    printf("[TT] %s:%s:%d: client) Before matls_get_extended_finished start\n", __FILE__, __func__, __LINE__);
-      RECORD_LOG(s->time_log, CLIENT_EXTENDED_FINISHED_START);
+#endif /* TIME_LOG */
+      if (!(s->server || s->middlebox))
+      {
+        RECORD_LOG(s->time_log, CLIENT_EXTENDED_FINISHED_START);
+      }
       ret = matls_get_extended_finished(s);
-      RECORD_LOG(s->time_log, CLIENT_EXTENDED_FINISHED_END);
-      INTERVAL(s->time_log, CLIENT_EXTENDED_FINISHED_START, CLIENT_EXTENDED_FINISHED_END);
+      if (!(s->server || s->middlebox))
+      {
+        RECORD_LOG(s->time_log, CLIENT_EXTENDED_FINISHED_END);
+        INTERVAL(s->time_log, CLIENT_EXTENDED_FINISHED_START, CLIENT_EXTENDED_FINISHED_END);
+      }
 	    mend1 = get_current_microseconds();
+#ifdef TIME_LOG
 	    printf("[TT] %s:%s:%d: client) After matls_get_extended_finished end: %lu us\n", __FILE__, __func__, __LINE__, mend1 - mstart1);
+#endif /* TIME_LOG */
       if (ret <= 0) goto end;
       
       if (s->hit)

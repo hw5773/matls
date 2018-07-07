@@ -5,11 +5,11 @@ KEY_FILE=matls_priv.pem
 CLIENT=client
 SERVER=server
 GCC=gcc
-#CFLAGS=-DMB_DEBUG -DDEBUG -o 
-CFLAGS=-o 
+CFLAGS=-DMB_DEBUG -DDEBUG -o 
+#CFLAGS=-o 
 CLIENT_SRC=client.c
 SERVER_SRC=server.c
-FLAGS=-I/home/versatile/openssl-matls-lib/include -L/home/versatile/openssl-matls-lib/lib
+FLAGS=-I/home/dist/openssl-matls-lib/include -L/home/dist/openssl-matls-lib/lib
 #FLAGS=-I/home/versatile/openssl_lib/include -L/home/versatile/openssl_lib/lib
 #FLAGS=-I/usr/local/include -L/usr/local/lib
 LDFLAGS=-lssl -lcrypto -ldl -lpthread
@@ -33,7 +33,7 @@ sstart:
 	./${SERVER} ${PORT} ${CERT_FILE} ${KEY_FILE}
 
 cstart:
-	./${CLIENT} ${HOST} 5016 1
+	./${CLIENT} ${HOST} ${PORT} 1
 
 debug:
 	${GDB} ./${EXEC} ${PORT} ${CERT_FILE} ${KEY_FILE} ${ORIG_CERT_FILE} ${WARRANT_FILE} -tui

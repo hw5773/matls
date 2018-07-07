@@ -4552,8 +4552,6 @@ static int ssl3_read_internal(SSL *s, void *buf, int len, int peek)
         }
 
         eidx = cidx;
-        printf("sidx: %d\n", sidx);
-        printf("eidx: %d\n", eidx);
 
         PRINTK("Hash to be hashed", chash, chlen);
         hmac = HMAC(EVP_sha256(), get_accountability_key(s, sidx), SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, chash, chlen, NULL, &hmlen);

@@ -15,6 +15,8 @@
 #include <pthread.h>
 #include <openssl/opensslv.h>
 
+#include "logs.h"
+
 #define FAIL    -1
 #define BUF_SIZE 1024
 
@@ -26,6 +28,7 @@ void print_pubkey(BIO *outbio, EVP_PKEY *pkey);
 SSL_CTX *ctx;
 const char *hostname, *portnum;
 BIO *bio_err;
+unsigned long time_log[20];
 
 // Client Prototype Implementation
 int main(int count, char *strings[])
@@ -116,14 +119,14 @@ void *run(void *data)
 	else
 	{
 		hs_end = get_current_microseconds();
-    printf("PROGRESS: TLS Handshake Complete!\nConnected with %s encryption\n", SSL_get_cipher(ssl));
+    		printf("PROGRESS: TLS Handshake Complete!\nConnected with %s encryption\n", SSL_get_cipher(ssl));
 		printf("ELAPSED TIME: %lu us\n", hs_end - hs_start);
-    sent = SSL_write(ssl, request, request_len);
-    //MA_LOG1s("Request", request);
-    //MA_LOG1d("Sent Length", sent);
-    rcvd = SSL_read(ssl, buf, BUF_SIZE);
-    //MA_LOG1s("Response", buf);
-    //MA_LOG1d("Rcvd Length", rcvd);
+    		sent = SSL_write(ssl, request, request_len);
+    		MA_LOG1s("Request", request);
+    		rcvd = SSL_read(ssl, buf, BUF_SIZE);
+		buf[rcvd] = 0;
+    		MA_LOG1s("Response", buf);
+    		MA_LOG1d("Rcvd Length", rcvd);
 	}
         
 	SSL_free(ssl);        /* release connection state */

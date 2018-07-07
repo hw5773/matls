@@ -211,7 +211,7 @@ typedef struct log_record
 #define CLIENT_EXTENDED_FINISHED_START 6
 #define CLIENT_EXTENDED_FINISHED_END 7
 #define CLIENT_TCP_CONNECT_START 8
-#define CLINET_TCP_CONNECT_END 9
+#define CLIENT_TCP_CONNECT_END 9
 #define CLIENT_MODIFICATION_RECORD_START 10
 #define CLIENT_MODIFICATION_RECORD_END 11
 
@@ -231,10 +231,10 @@ FILE *log_file;
   })
 
 #define INTERVAL(arr, a, b) \
-  printf("Time from %s to %s: %lu\n", arr[a].name, arr[b].name, arr[b].time - arr[a].time);
+  printf("Time from %s to %s: %lu us\n", arr[a].name, arr[b].name, arr[b].time - arr[a].time);
 
 #define FINALIZE(arr, fname) \
-  log_file = fname(fname, "w"); \
+  log_file = fopen(fname, "w"); \
   for (lidx = 0; lidx < NUM_OF_LOGS; lidx++) \
     fprintf(log_file, "%lu, %d, %s\n", arr[lidx].time, lidx, arr[lidx].name); \
   fclose(log_file);

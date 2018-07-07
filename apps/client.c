@@ -28,18 +28,19 @@ void print_pubkey(BIO *outbio, EVP_PKEY *pkey);
 SSL_CTX *ctx;
 const char *hostname, *portnum;
 BIO *bio_err;
-unsigned long time_log[20];
+log_t time_log[20];
 
 // Client Prototype Implementation
 int main(int count, char *strings[])
 {   
-  if ( count != 4 )
+  if ( count != 5 )
   {
-    printf("usage: %s <hostname> <portnum> <num of threads>\n", strings[0]);
+    printf("usage: %s <hostname> <portnum> <num of threads> <log file>\n", strings[0]);
     exit(0);
   }
 
 	int i, rc, num_of_threads;
+	const char *fname = strings[4];
 
 	num_of_threads = atoi(strings[3]);
 
@@ -56,6 +57,7 @@ int main(int count, char *strings[])
 	bio_err = BIO_new_fp(stdout, BIO_NOCLOSE);
 
   ctx = init_client_CTX();
+	INITIALIZE_LOG(time_log);
 
 	unsigned long start, end;
 
@@ -88,7 +90,9 @@ int main(int count, char *strings[])
 	printf("TOTAL TIME: %lu us\n", end - start);
 
 	SSL_CTX_free(ctx);        /* release context */
-    
+
+	FINALIZE(time_log, fname);    
+
     return 0;
 }
 
@@ -106,6 +110,7 @@ void *run(void *data)
   ssl = SSL_new(ctx);      /* create new SSL connection state */
   SSL_set_fd(ssl, server);    /* attach the socket descriptor */
   SSL_set_tlsext_host_name(ssl, hostname);
+	ssl->time_log = time_log;
   printf("[matls] %s:%s:%d: Set server name: %s\n", __FILE__, __func__, __LINE__, hostname);
 
   struct timeval tv;
@@ -114,19 +119,26 @@ void *run(void *data)
 	unsigned long hs_start, hs_end;
 	printf("PROGRESS: TLS Handshake Start\n");
 	hs_start = get_current_microseconds();
-    if ( SSL_connect(ssl) == FAIL )   /* perform the connection */
-      	ERR_print_errors_fp(stderr);
+	RECORD_LOG(ssl->time_log, CLIENT_HANDSHAKE_START);
+	
+  if ( SSL_connect(ssl) == FAIL )   /* perform the connection */
+    ERR_print_errors_fp(stderr);
 	else
 	{
+		RECORD_LOG(ssl->time_log, CLIENT_HANDSHAKE_END);
+		INTERVAL(ssl->time_log, CLIENT_HANDSHAKE_START, CLIENT_HANDSHAKE_END);
 		hs_end = get_current_microseconds();
-    		printf("PROGRESS: TLS Handshake Complete!\nConnected with %s encryption\n", SSL_get_cipher(ssl));
+    printf("PROGRESS: TLS Handshake Complete!\nConnected with %s encryption\n", SSL_get_cipher(ssl));
 		printf("ELAPSED TIME: %lu us\n", hs_end - hs_start);
-    		sent = SSL_write(ssl, request, request_len);
-    		MA_LOG1s("Request", request);
-    		rcvd = SSL_read(ssl, buf, BUF_SIZE);
+    RECORD_LOG(ssl->time_log, CLIENT_FETCH_HTML_START);
+    sent = SSL_write(ssl, request, request_len);
+    MA_LOG1s("Request", request);
+    rcvd = SSL_read(ssl, buf, BUF_SIZE);
+    RECORD_LOG(ssl->time_log, CLIENT_FETCH_HTML_END);
+    INTERVAL(ssl->time_log, CLIENT_FETCH_HTML_START, CLIENT_FETCH_HTML_END);
 		buf[rcvd] = 0;
-    		MA_LOG1s("Response", buf);
-    		MA_LOG1d("Rcvd Length", rcvd);
+    MA_LOG1s("Response", buf);
+    MA_LOG1d("Rcvd Length", rcvd);
 	}
         
 	SSL_free(ssl);        /* release connection state */
@@ -151,13 +163,16 @@ int open_connection(const char *hostname, int port)
   addr.sin_family = AF_INET;
   addr.sin_port = htons(port);
   addr.sin_addr.s_addr = *(long*)(host->h_addr);
-    
+
+  RECORD_LOG(time_log, CLIENT_TCP_CONNECT_START);    
   if ( connect(sd, (struct sockaddr*)&addr, sizeof(addr)) != 0 )
   {
     close(sd);
     perror(hostname);
     abort();
   }
+  RECORD_LOG(time_log, CLIENT_TCP_CONNECT_END);
+  INTERVAL(time_log, CLIENT_TCP_CONNECT_START, CLIENT_TCP_CONNECT_END);
          
   return sd;
 }

@@ -5,7 +5,7 @@ KEY_FILE=matls_priv.pem
 CLIENT=client
 SERVER=server
 GCC=gcc
-CFLAGS=-DMB_DEBUG -DDEBUG -o 
+CFLAGS=-DLOGGER -o 
 #CFLAGS=-o 
 CLIENT_SRC=client.c
 SERVER_SRC=server.c
@@ -33,7 +33,7 @@ sstart:
 	./${SERVER} ${PORT} ${CERT_FILE} ${KEY_FILE}
 
 cstart:
-	./${CLIENT} ${HOST} ${PORT} 1
+	./${CLIENT} ${HOST} ${PORT} 1 "log.csv"
 
 debug:
 	${GDB} ./${EXEC} ${PORT} ${CERT_FILE} ${KEY_FILE} ${ORIG_CERT_FILE} ${WARRANT_FILE} -tui

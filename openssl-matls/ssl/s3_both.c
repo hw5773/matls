@@ -131,9 +131,9 @@
 
 #ifndef OPENSSL_NO_MATLS
 
-int make_signature_block2(unsigned char **sigblk, unsigned char *msg, int msg_len, EVP_PKEY *priv, int nid, int *sigblk_len)
+int make_signature(unsigned char **sigblk, unsigned char *msg, int msg_len, EVP_PKEY *priv, int nid, int *sigblk_len)
 {
-	int rc, rc1, rc2;
+	int rc;
 	EVP_MD_CTX *ctx;
 	unsigned char *sig, *p;
 	size_t sig_len;
@@ -149,21 +149,14 @@ int make_signature_block2(unsigned char **sigblk, unsigned char *msg, int msg_le
 	switch (nid)
 	{
 		case NID_sha256:
-			rc1 = EVP_DigestInit_ex(ctx, EVP_sha256(), NULL);
-			rc2 = EVP_DigestSignInit(ctx, NULL, EVP_sha256(), NULL, priv);
+			rc = EVP_DigestSignInit(ctx, NULL, EVP_sha256(), NULL, priv);
 			break;
 		default:
 			//printf("Unknown Hash algorithm\n");
 			goto err;
 	}
 
-	// Make the signature
-	if (rc1 != 1)
-	{
-		//printf("PROGRESS: Digest Init Failed\n");
-		goto err;
-	}
-	if (rc2 != 1)
+	if (rc != 1)
 	{
 		//printf("PROGRESS: DigestSign Init Failed\n");
 		goto err;
@@ -210,6 +203,62 @@ err:
 	EVP_MD_CTX_cleanup(ctx);
 
 	return 0;
+}
+
+int verification(unsigned char *msg, int msg_len, uint16_t sig_type, uint16_t sig_len, unsigned char *sig, EVP_PKEY *pub)
+{
+  int rc;
+  EVP_MD_CTX *ctx;
+
+  ctx = EVP_MD_CTX_create();
+  if (ctx == NULL)
+  {
+    MA_LOG("EVP_MD_CTX_create error");
+    return 0;
+  }
+
+  switch (sig_type)
+  {
+    case NID_sha1:
+      rc = EVP_DigestVerifyInit(ctx, NULL, EVP_sha1(), NULL, pub);
+      break;
+    case NID_sha224:
+      rc = EVP_DigestVerifyInit(ctx, NULL, EVP_sha224(), NULL, pub);
+      break;
+    case NID_sha256:
+      rc = EVP_DigestVerifyInit(ctx, NULL, EVP_sha256(), NULL, pub);
+      break;
+    default:
+      MA_LOG("Unknown Signature Type");
+  }
+
+  if (rc != 1)
+  {
+    MA_LOG("EVP_DigestVerifyInit error");
+    goto err;
+  }
+
+  rc = EVP_DigestVerifyUpdate(ctx, msg, msg_len);
+  if (rc != 1)
+  {
+    MA_LOG("EVP_DigestVerifyUpdate failed");
+    goto err;
+  }
+
+  rc = EVP_DigestVerifyFinal(ctx, sig, sig_len);
+  if (rc != 1)
+  {
+    MA_LOG("EVP_DigestVerifyFinal failed");
+    goto err;
+  }
+  else
+    MA_LOG("Verify Success");
+
+  EVP_MD_CTX_cleanup(ctx);
+  return 1;
+err:
+  EVP_MD_CTX_cleanup(ctx);
+  return 0;
 }
 
 int digest_message(unsigned char *message, size_t message_len, unsigned char **digest, unsigned int *digest_len)
@@ -356,6 +405,7 @@ int matls_send_extended_finished(SSL *s)
 
     *(d++) = SSL3_MT_EXTENDED_FINISHED;
 
+    RECORD_LOG(time_log, SERVER_SERVER_EXTENDED_1S);
     if (s->middlebox)
     {
       tmp1 = (unsigned char *)malloc(s->pair->extended_finished_msg_len);
@@ -397,7 +447,10 @@ int matls_send_extended_finished(SSL *s)
       printf("mlen: %d, slen: %d, plen: %d\n", mlen, slen, plen);
 #endif /* DEBUG */
     }
+    RECORD_LOG(time_log, SERVER_SERVER_EXTENDED_1E);
+    INTERVAL(time_log, SERVER_SERVER_EXTENDED_1S, SERVER_SERVER_EXTENDED_1E);
 
+    RECORD_LOG(time_log, SERVER_SERVER_EXTENDED_2S);
 		msg = (unsigned char *)malloc(plen); //mac, version, cipher, ti
     parameters = (unsigned char *)malloc(MATLS_M_LENGTH);
 
@@ -422,6 +475,7 @@ int matls_send_extended_finished(SSL *s)
 		/* ti (12) */
 		memcpy(parameters + poff, s->s3->tmp.finish_md, MATLS_TRANSCRIPT_LENGTH);
 		poff += MATLS_TRANSCRIPT_LENGTH;
+    PRINTK("verify data", s->s3->tmp.finish_md, MATLS_TRANSCRIPT_LENGTH);
 //		l = MATLS_TRANSCRIPT_LENGTH; // length of verify_data
 
     memcpy(pp, parameters, MATLS_M_LENGTH);
@@ -445,8 +499,12 @@ int matls_send_extended_finished(SSL *s)
 
 	  PRINTK("hmac", digest, digest_len);
 
+    RECORD_LOG(time_log, SERVER_SERVER_EXTENDED_2E);
+    INTERVAL(time_log, SERVER_SERVER_EXTENDED_2S, SERVER_SERVER_EXTENDED_2E);
+
+    RECORD_LOG(time_log, SERVER_SERVER_EXTENDED_3S);
 		/* make signature block */
-		if (!make_signature_block2(&sigblk, digest, digest_len, (s->cert->key->privatekey), NID_sha256, &sigblk_len))
+		if (!make_signature(&sigblk, digest, digest_len, (s->cert->key->privatekey), NID_sha256, &sigblk_len))
 		{
 			printf("ERROR: make the signature block failed\n");
 			return 0;
@@ -454,7 +512,10 @@ int matls_send_extended_finished(SSL *s)
 #ifdef DEBUG
 		printf("PROGRESS: make the signature block\n");
 #endif /* DEBUG */
+    RECORD_LOG(time_log, SERVER_SERVER_EXTENDED_3E);
+    INTERVAL(time_log, SERVER_SERVER_EXTENDED_3S, SERVER_SERVER_EXTENDED_3E);
 
+    RECORD_LOG(time_log, SERVER_SERVER_EXTENDED_4S);
 
 		/* put num_msg */
 		*(p++) = num_msg;
@@ -494,6 +555,11 @@ int matls_send_extended_finished(SSL *s)
       PRINTK("Appended parameters", tmp2, MATLS_M_PAIR_LENGTH + mlen + 1);
     }
 
+    RECORD_LOG(time_log, SERVER_SERVER_EXTENDED_4E);
+    INTERVAL(time_log, SERVER_SERVER_EXTENDED_4S, SERVER_SERVER_EXTENDED_4E);
+
+    RECORD_LOG(time_log, SERVER_SERVER_EXTENDED_5S);
+
 		/* put hashed msg */
 		memcpy(p, digest, digest_len);
 		p += digest_len;
@@ -525,6 +591,8 @@ int matls_send_extended_finished(SSL *s)
 		s->init_num=(int)l+4; // total length including the message type
 		s->init_off=0;
     s->state = SSL3_ST_SW_EXTENDED_FINISHED_B;
+    RECORD_LOG(time_log, SERVER_SERVER_EXTENDED_5E);
+    INTERVAL(time_log, SERVER_SERVER_EXTENDED_5S, SERVER_SERVER_EXTENDED_5E);
 	}
 
 	PRINTK("Extended Finished Message", d, l);
@@ -563,11 +631,13 @@ static void ssl3_take_mac(SSL *s)
 #endif
 
 #ifndef OPENSSL_NO_MATLS
+#define MSG_LENGTH 48
 int matls_get_extended_finished(SSL *s)
-	{
-	int ok;
+{
+	int ok, nk, plen, i, hmlen, moff = 0, slen, tmp, rc;
 	long n;
-	unsigned char *p;
+	unsigned char *p, *q, *sig, *h, *hmac = NULL;
+  unsigned char msg[MSG_LENGTH];
 
 #ifdef OPENSSL_NO_NEXTPROTONEG
 	/* the mac has already been generated when we received the
@@ -577,26 +647,116 @@ int matls_get_extended_finished(SSL *s)
 
   MA_LOG("matls get extended finished");
   unsigned long start, end;
-  //printf("[TT] %s:%s:%d: server-side) Get extended finished message\n", __FILE__, __func__, __LINE__);
-  //start = get_current_microseconds();
-	n=s->method->ssl_get_message(s,
+	n = s->method->ssl_get_message(s,
 		SSL3_ST_CR_EXTENDED_FINISHED_A,
 		SSL3_ST_CR_EXTENDED_FINISHED_B,
 		SSL3_MT_EXTENDED_FINISHED,
 		20000, /* should actually be 36+4 :-) */
 		&ok);
-	//end = get_current_microseconds();
-	//printf("[TT] %s:%s:%d: server-side) Get extended finished message end: %lu us\n", __FILE__, __func__, __LINE__, end - start);
 
 	if (!ok) return((int)n);
 
 	p = (unsigned char *)s->init_msg;
 
-  s->extended_finished_msg = (volatile unsigned char *)malloc(n);
-  memcpy(s->extended_finished_msg, p, n);
-  s->extended_finished_msg_len = n;
+  if (s->middlebox)
+  {
+    s->extended_finished_msg = (volatile unsigned char *)malloc(n);
+    memcpy(s->extended_finished_msg, p, n);
+    s->extended_finished_msg_len = n;
+  }
+  else // Client
+  {
+    nk = *(p++);
+    MA_LOG1d("Number of Keys", nk);
+    if (nk <= 0)
+    {
+      MA_LOG("Wrong Number of Keys");
+      return -1;
+    }
 
-	return(1);
+    memset(msg, 0x0, MSG_LENGTH);
+    q = p;
+
+    if (nk > 1)
+    {
+      for (i=0; i<nk-1; i++)
+      {
+        tmp = *(p++);
+        p += tmp;
+      }
+    }
+
+    h = p;
+    sig = p + MATLS_H_LENGTH;
+
+    p = q;
+
+    for (i=0; i<nk-1; i++)
+    {
+      plen = *(p++);
+      if (hmac)
+      {
+        memcpy(msg, hmac, hmlen);
+        moff += hmlen;
+      }
+
+      memcpy(msg + moff, p, plen);
+      p += plen;
+      moff += plen;
+      PRINTK("Before HMAC", msg, moff);
+      PRINTK("Used Accountability Key", s->mb_info.mac_array[i], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
+      hmac = HMAC(EVP_sha256(), s->mb_info.mac_array[i], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, moff, NULL, &hmlen);
+      PRINTK("HMAC", hmac, hmlen);
+      memset(msg, 0x0, MSG_LENGTH);
+      moff = 0;
+
+      n2s(sig, slen);
+
+      rc = verification(hmac, MATLS_H_LENGTH, NID_sha256, slen, sig, s->mb_info.pkey[i]);
+      if (rc != 1)
+      {
+        MA_LOG1d("Verify Failed", i);
+        exit(1);
+      }
+      sig += slen;
+    }
+
+    if (hmac) // if nk > 1
+    {
+      memcpy(msg, hmac, hmlen);
+      moff += hmlen;
+    }
+
+    msg[moff++] = s->version >> 8;
+    msg[moff++] = s->version & 0xff;
+    ssl3_put_cipher_by_char(s->s3->tmp.new_cipher, &(msg[moff]));
+    moff += MATLS_CIPHERSUITE_LENGTH;
+    memcpy(msg + moff, s->s3->tmp.peer_finish_md, MATLS_TRANSCRIPT_LENGTH);
+    moff += MATLS_TRANSCRIPT_LENGTH;
+    PRINTK("Before HMAC", msg, moff);
+    PRINTK("Used Accountability Key", s->mb_info.mac_array[nk-1], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
+    hmac = HMAC(EVP_sha256(), s->mb_info.mac_array[nk-1], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, moff, NULL, &hmlen);
+    PRINTK("Final HMAC", hmac, hmlen);
+
+    memcpy(h, p, MATLS_H_LENGTH);
+    PRINTK("H", h, MATLS_H_LENGTH);
+
+    n2s(sig, slen);
+
+    rc = verification(hmac, MATLS_H_LENGTH, NID_sha256, slen, sig, s->mb_info.pkey[nk-1]);
+
+    if (rc == 1)
+      MA_LOG("Verify Success");
+    else
+      MA_LOG1d("Verify Failed", nk-1);
+
+    if (strncmp(hmac, h, MATLS_H_LENGTH) == 0)
+      MA_LOG("Verification Success");
+    else
+      MA_LOG("Verification Failed");
+  }
+
+	return 1;
 }
 
 #endif /* OPENSSL_NO_MATLS */

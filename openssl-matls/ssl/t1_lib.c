@@ -117,6 +117,8 @@
 #include <openssl/rand.h>
 #include "ssl_locl.h"
 
+#include "logs.h"
+
 const char tls1_version_str[]="TLSv1" OPENSSL_VERSION_PTEXT;
 
 #ifndef OPENSSL_NO_TLSEXT
@@ -476,6 +478,7 @@ unsigned char *ssl_add_clienthello_tlsext(SSL *s, unsigned char *buf, unsigned c
 			}
 
 			if ((limit - ret - 4 - el) < 0) return NULL;
+      printf("[matls] %s:%s:%d: Length of Client Hello Matls: %d\n", __FILE__, __func__, __LINE__, el);
       s2n(el, ret);
 			ret += el;
 		}
@@ -1414,10 +1417,13 @@ int ssl_parse_clienthello_tlsext(SSL *s, unsigned char **p, unsigned char *d, in
 #ifndef OPENSSL_NO_MATLS
 		else if (type == TLSEXT_TYPE_mb)
 		{
+      RECORD_LOG(time_log, SERVER_PARSE_CLIENT_TLSEXT_START);
       s->matls_received = 1;
       if (s->mb_enabled)
   		  if(!ssl_parse_clienthello_mb_ext(s, data, size, al))
 	  		  return 0;
+      RECORD_LOG(time_log, SERVER_PARSE_CLIENT_TLSEXT_END);
+      INTERVAL(time_log, SERVER_PARSE_CLIENT_TLSEXT_START, SERVER_PARSE_CLIENT_TLSEXT_END);
 		}
 #endif /* OPENSSL_NO_MATLS */
 		else if (type == TLSEXT_TYPE_signature_algorithms)

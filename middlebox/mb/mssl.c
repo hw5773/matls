@@ -317,6 +317,7 @@ void *run(void *data)
   MA_LOG1s("Start SSL connections to", ip);
 
   ssl->pair = args->ssl;
+  memcpy(&(ssl->mb_info), &(args->ssl->mb_info), sizeof(struct mb_st));
   args->ssl->pair = ssl;
 //  ssl->lock = args->ssl->lock;
 /////

@@ -23,9 +23,11 @@ default: matls
 
 matls:
 	${GCC} -DMATLS ${CFLAGS} ${SERVER} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} -DMATLS ${CFLAGS} ${CLIENT} ${CLIENT_SRC} ${FLAGS} ${LDFLAGS}
 
 split:
 	${GCC} ${CFLAGS} ${SERVER} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} ${CFLAGS} ${CLIENT} ${CLIENT_SRC} ${FLAGS} ${LDFLAGS}
 
 sstart:
 	./${SERVER} ${PORT} ${CERT_FILE} ${KEY_FILE}

@@ -14,6 +14,7 @@
 #include <sys/time.h>
 #include <assert.h>
 #include <errno.h>
+#include <pthread.h>
 
 #ifdef DEBUG
 int log_idx;
@@ -104,7 +105,7 @@ typedef struct log_record
   unsigned long time;
 } log_t;
 
-#define NUM_OF_LOGS 80
+#define NUM_OF_LOGS 100
 #define SERVER_ACCEPT_START 0
 #define SERVER_CLIENT_HELLO_START 1
 #define SERVER_CLIENT_HELLO_END 2
@@ -185,14 +186,32 @@ typedef struct log_record
 #define SERVER_PARSE_CLIENT_TLSEXT_START 74
 #define SERVER_PARSE_CLIENT_TLSEXT_END 75
 
+#define SERVER_SERVER_EXTENDED_1S 76
+#define SERVER_SERVER_EXTENDED_1E 77
+#define SERVER_SERVER_EXTENDED_2S 78
+#define SERVER_SERVER_EXTENDED_2E 79
+#define SERVER_SERVER_EXTENDED_3S 80
+#define SERVER_SERVER_EXTENDED_3E 81
+#define SERVER_SERVER_EXTENDED_4S 82
+#define SERVER_SERVER_EXTENDED_4E 83
+#define SERVER_SERVER_EXTENDED_5S 84
+#define SERVER_SERVER_EXTENDED_5E 85
+
+
 int lidx;
+FILE *log_file;
+pthread_mutex_t rlock;
+
 #define INITIALIZE_LOG(arr) \
+  pthread_mutex_init(&rlock, NULL); \
   for (lidx=0; lidx<NUM_OF_LOGS; lidx++) \
-    arr[lidx].time = 0; \
+    arr[lidx].time = 0;
 
 #define RECORD_LOG(arr, n) \
+  pthread_mutex_lock(&rlock); \
   arr[n].name = #n; \
-  arr[n].time = get_current_microseconds();
+  arr[n].time = get_current_microseconds(); \
+  pthread_mutex_unlock(&rlock);
 
 #define PRINT_LOG(arr) ({ \
   for ((lidx)=0; (lidx) < (NUM_OF_LOGS); (lidx)++) \
@@ -202,12 +221,25 @@ int lidx;
 #define INTERVAL(arr, a, b) \
   printf("Time from %s to %s: %lu\n", arr[a].name, arr[b].name, arr[b].time - arr[a].time);
 
+#define MIDDLEBOX_LOG "/home/versatile/time_log/middlebox.csv"
+#define SERVER_LOG "/home/versatile/time_log/server.csv"
+
+#define FINALIZE_LOG(arr, fname) \
+  log_file = fopen(fname, "r"); \
+  for (lidx=0; lidx<NUM_OF_LOGS; lidx++) { \
+    if (arr[lidx].time == 0) \
+      continue; \
+    fprintf(log_file, "%s, %d, %lu\n", arr[lidx].name, lidx, arr[lidx].time); \
+  } \
+  fclose(log_file);
+
 extern log_t time_log[NUM_OF_LOGS];
 #else
 #define INITIALIZE_LOG(arr) 
 #define RECORD_LOG(arr, n)
 #define PRINT_LOG(arr)
 #define INTERVAL(arr, a, b)
+#define FINALIZE_LOG(arr, fname)
 #endif /* TIME_LOG */
 
 #endif /* __MB_LOG__ */

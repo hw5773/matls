@@ -15,9 +15,10 @@ FILE=${DIRECTORY}/mb_${NUM}_read.csv
 touch ${FILE}
 
 #for i in {1..100}
+cd /home/dist/matls/apps
 for i in {1..100}
 do
    echo ${i}:${FILE}
-   /home/dist/matls/apps/make cstart PORT=${PORT} LOG_FILE=${LOG_FILE}
+   make cstart PORT=${PORT} LOG_FILE=${LOG_FILE}
 done
 echo 'done'

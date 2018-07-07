@@ -95,7 +95,7 @@ unsigned long mstart, mend;
 #define MSTART(msg, side)
 #define MEND(msg, side)
 #define MEASURE(msg, side) 
-#endif /* TIME_MEASURE */
+#endif /* TIME_LOG */
 
 #ifdef LOGGER
 typedef struct log_record
@@ -223,7 +223,7 @@ FILE *log_file;
 
 #define RECORD_LOG(arr, n) \
   arr[n].name = #n; \
-  arr[n].time = get_current_microseconds();
+  arr[n].time = get_current_microseconds(); \
 
 #define PRINT_LOG(arr) ({ \
   for ((lidx)=0; (lidx) < (NUM_OF_LOGS); (lidx)++) \

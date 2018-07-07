@@ -6,13 +6,10 @@ URL=$1
 PORT=$2
 ADDR=${URL}:${PORT}
 NUM=$3
-DIRECTORY=/home/dist/log/mb_${NUM}_read
-LOG_FILE=${DIRECTORY}/mb_${NUM}_read.csv
+DIRECTORY=/home/dist/log/mb_${NUM}_write
+LOG_FILE=${DIRECTORY}/mb_${NUM}_write.csv
 
 [ -d ${DIRECTORY} ] || mkdir ${DIRECTORY}
-
-FILE=${DIRECTORY}/mb_${NUM}_read.csv
-touch ${FILE}
 
 #for i in {1..100}
 for i in {1..100}

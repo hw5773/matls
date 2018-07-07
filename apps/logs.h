@@ -234,9 +234,12 @@ FILE *log_file;
   printf("Time from %s to %s: %lu us\n", arr[a].name, arr[b].name, arr[b].time - arr[a].time);
 
 #define FINALIZE(arr, fname) \
-  log_file = fopen(fname, "w"); \
+  log_file = fopen(fname, "a"); \
   for (lidx = 0; lidx < NUM_OF_LOGS; lidx++) \
-    fprintf(log_file, "%lu, %d, %s\n", arr[lidx].time, lidx, arr[lidx].name); \
+  { \
+    if (arr[lidx].time > 0) \
+      fprintf(log_file, "%lu, %d, %s\n", arr[lidx].time, lidx, arr[lidx].name); \
+  } \
   fclose(log_file);
   
 extern log_t time_log[NUM_OF_LOGS];

@@ -322,29 +322,29 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
       p += klen;
 
       peer_pub = EC_POINT_new(group);
-      RECORD_LOG(time_log, SERVER_CLIENT_HELLO_1S);
+      //RECORD_LOG(time_log, SERVER_CLIENT_HELLO_1S);
       char_to_pub(peer_str, klen, peer_pub, group, ctx);
-      RECORD_LOG(time_log, SERVER_CLIENT_HELLO_1E);
-      INTERVAL(time_log, SERVER_CLIENT_HELLO_1S, SERVER_CLIENT_HELLO_1E);
+      //RECORD_LOG(time_log, SERVER_CLIENT_HELLO_1E);
+      //INTERVAL(time_log, SERVER_CLIENT_HELLO_1S, SERVER_CLIENT_HELLO_1E);
 
-      RECORD_LOG(time_log, SERVER_CLIENT_HELLO_2S);
+      //RECORD_LOG(time_log, SERVER_CLIENT_HELLO_2S);
       EC_POINT_mul(group, secret, NULL, peer_pub, keypair->pri, ctx);
-      RECORD_LOG(time_log, SERVER_CLIENT_HELLO_2E);
-      INTERVAL(time_log, SERVER_CLIENT_HELLO_2S, SERVER_CLIENT_HELLO_2E);
+      //RECORD_LOG(time_log, SERVER_CLIENT_HELLO_2E);
+      //INTERVAL(time_log, SERVER_CLIENT_HELLO_2S, SERVER_CLIENT_HELLO_2E);
 
-      RECORD_LOG(time_log, SERVER_CLIENT_HELLO_3S);
+      //RECORD_LOG(time_log, SERVER_CLIENT_HELLO_3S);
       EC_POINT_get_affine_coordinates_GFp(group, secret, x, y, ctx);
-      RECORD_LOG(time_log, SERVER_CLIENT_HELLO_3E);
-      INTERVAL(time_log, SERVER_CLIENT_HELLO_3S, SERVER_CLIENT_HELLO_3E);
+      //RECORD_LOG(time_log, SERVER_CLIENT_HELLO_3E);
+      //INTERVAL(time_log, SERVER_CLIENT_HELLO_3S, SERVER_CLIENT_HELLO_3E);
 
-      RECORD_LOG(time_log, SERVER_CLIENT_HELLO_4S);
+      //RECORD_LOG(time_log, SERVER_CLIENT_HELLO_4S);
       xlen = (klen - 1) / 2;
       secret_str = (unsigned char *)malloc(xlen);
       l = BN_bn2bin(x, secret_str);
-      RECORD_LOG(time_log, SERVER_CLIENT_HELLO_4E);
-      INTERVAL(time_log, SERVER_CLIENT_HELLO_4S, SERVER_CLIENT_HELLO_4E);
+      //RECORD_LOG(time_log, SERVER_CLIENT_HELLO_4E);
+      //INTERVAL(time_log, SERVER_CLIENT_HELLO_4S, SERVER_CLIENT_HELLO_4E);
 
-      RECORD_LOG(time_log, SERVER_CLIENT_HELLO_5S);
+      //RECORD_LOG(time_log, SERVER_CLIENT_HELLO_5S);
       if (l < xlen)
       {
         diff = xlen - l;
@@ -353,8 +353,8 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
         for (j=diff-1; j>=0; j--)
           secret_str[j] = 0;
       }
-      RECORD_LOG(time_log, SERVER_CLIENT_HELLO_5E);
-      INTERVAL(time_log, SERVER_CLIENT_HELLO_5S, SERVER_CLIENT_HELLO_5E);
+      //RECORD_LOG(time_log, SERVER_CLIENT_HELLO_5E);
+      //INTERVAL(time_log, SERVER_CLIENT_HELLO_5S, SERVER_CLIENT_HELLO_5E);
 
       s->mb_info.secret[i] = (volatile unsigned char *)secret_str;
 

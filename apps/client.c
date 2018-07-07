@@ -15,7 +15,7 @@
 #include <pthread.h>
 #include <openssl/opensslv.h>
 
-#include "logs.h"
+#include <openssl/logs.h>
 
 #define FAIL    -1
 #define BUF_SIZE 1024

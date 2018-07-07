@@ -4462,8 +4462,10 @@ static int ssl3_read_internal(SSL *s, void *buf, int len, int peek)
 #ifndef OPENSSL_NO_MATLS
   if (s->mb_enabled)
   {
+    MSTART("modification record", "client");
     if (!s->server) // TODO: if not client authentication (need to revise this)
     {
+      RECORD_LOG(s->time_log, CLIENT_MODIFICATION_RECORD_START);
       unsigned char *p, *mr, *chash, *phash;
       int mlen, mrlen, phlen, chlen, nk, index;
       p = (unsigned char *)buf;
@@ -4566,12 +4568,21 @@ static int ssl3_read_internal(SSL *s, void *buf, int len, int peek)
         }
 
         if (!strncmp(hmac, smac, TLS_MD_HMAC_SIZE))
+        {
+          printf("[TT] %s:%s:%d: Verify Success\n", __FILE__, __func__, __LINE__);
           MA_LOG("Verify Success in Source MAC");
+        }
         else
+        {
+          printf("[TT} %s:%s:%d: Verify Failed\n", __FILE__, __func__, __LINE__);
           MA_LOG("Verifiy Failed in Source MAC");
+        }
       }
       buf = memmove(buf, buf + mrlen + 2, ret);
+      RECORD_LOG(s->time_log, CLIENT_MODIFICATION_RECORD_END);
+      INTERVAL(s->time_log, CLIENT_MODIFICATION_RECORD_START, CLIENT_MODIFICATION_RECORD_END);
     }
+    MEND("modification record", "client");
   }
 #endif /* OPENSSL_NO_MATLS */
 

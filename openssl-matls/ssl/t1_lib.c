@@ -478,7 +478,9 @@ unsigned char *ssl_add_clienthello_tlsext(SSL *s, unsigned char *buf, unsigned c
 			}
 
 			if ((limit - ret - 4 - el) < 0) return NULL;
+#ifdef DEBUG
       printf("[matls] %s:%s:%d: Length of Client Hello Matls: %d\n", __FILE__, __func__, __LINE__, el);
+#endif /* DEBUG */
       s2n(el, ret);
 			ret += el;
 		}
@@ -1417,13 +1419,13 @@ int ssl_parse_clienthello_tlsext(SSL *s, unsigned char **p, unsigned char *d, in
 #ifndef OPENSSL_NO_MATLS
 		else if (type == TLSEXT_TYPE_mb)
 		{
-      RECORD_LOG(time_log, SERVER_PARSE_CLIENT_TLSEXT_START);
+      //RECORD_LOG(time_log, SERVER_PARSE_CLIENT_TLSEXT_START);
       s->matls_received = 1;
       if (s->mb_enabled)
   		  if(!ssl_parse_clienthello_mb_ext(s, data, size, al))
 	  		  return 0;
-      RECORD_LOG(time_log, SERVER_PARSE_CLIENT_TLSEXT_END);
-      INTERVAL(time_log, SERVER_PARSE_CLIENT_TLSEXT_START, SERVER_PARSE_CLIENT_TLSEXT_END);
+      //RECORD_LOG(time_log, SERVER_PARSE_CLIENT_TLSEXT_END);
+      //INTERVAL(time_log, SERVER_PARSE_CLIENT_TLSEXT_START, SERVER_PARSE_CLIENT_TLSEXT_END);
 		}
 #endif /* OPENSSL_NO_MATLS */
 		else if (type == TLSEXT_TYPE_signature_algorithms)
@@ -1849,8 +1851,16 @@ int ssl_parse_serverhello_tlsext(SSL *s, unsigned char **p, unsigned char *d, in
 #ifndef OPENSSL_NO_MATLS
 		else if (type == TLSEXT_TYPE_mb)
 		{
+#ifdef TIME_LOG
+		printf("[TT] %s:%s:%d: Before parse server hello mb\n", __FILE__, __func__, __LINE__);
+		unsigned long time1 = get_current_microseconds();
+#endif /* TIME_LOG */
   		if(!ssl_parse_serverhello_mb_ext(s, data, size, al))
 	  		return 0;
+#ifdef TIME_LOG
+		unsigned long time2 = get_current_microseconds();
+		printf("[TT] %s:%s:%d: After parse server hello mb: %lu us\n", __FILE__, __func__, __LINE__, time2 - time1);
+#endif /* TIME_LOG */
 		}
 #endif /* OPENSSL_NO_MATLS */
 #ifndef OPENSSL_NO_HEARTBEATS

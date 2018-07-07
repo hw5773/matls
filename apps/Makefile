@@ -33,7 +33,7 @@ sstart:
 	./${SERVER} ${PORT} ${CERT_FILE} ${KEY_FILE}
 
 cstart:
-	./${CLIENT} ${HOST} ${PORT} 1 "log.csv"
+	./${CLIENT} ${HOST} ${PORT} 1 ${LOG_FILE}
 
 debug:
 	${GDB} ./${EXEC} ${PORT} ${CERT_FILE} ${KEY_FILE} ${ORIG_CERT_FILE} ${WARRANT_FILE} -tui

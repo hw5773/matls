@@ -167,6 +167,8 @@
 #include <openssl/safestack.h>
 #include <openssl/symhacks.h>
 
+#include "logs.h"
+
 #ifdef  __cplusplus
 extern "C" {
 #endif
@@ -1488,6 +1490,7 @@ struct ssl_st
   unsigned char *phash; // Previous Hash of the Content
   unsigned char *pmr; // Previous Modification Record
   int pmr_length;
+  log_t *time_log;
 #endif /* OPENSSL_NO_MATLS */
 
 #ifndef OPENSSL_NO_SPLIT_TLS

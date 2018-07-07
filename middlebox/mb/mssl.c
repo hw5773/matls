@@ -2,7 +2,6 @@
 #include "table.h"
 #include "common.h"
 #include "logger.h"
-#include "../common/logs.h"
 
 void handle_error(const char *file, int lineno, const char *msg) {
   fprintf(stderr, "** %s:%i %s\n", file, lineno, msg);

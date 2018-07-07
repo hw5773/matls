@@ -42,7 +42,7 @@ def main():
         usage()
 
     for i in range(start, end+1):
-        cmd1 = "/home/dist/matls/scripts/multirun.sh https://www.matls.com 50%02d %d 2>/dev/null" % (17-i, i)
+        cmd1 = "/home/dist/matls/scripts/matls_r.sh https://www.matls.com 50%02d %d 2>/dev/null" % (17-i, i)
         print (cmd1)
         os.system(cmd1)
         title = "[matls] The experiment is on going with %d middleboxes" % i

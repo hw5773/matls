@@ -1516,6 +1516,9 @@ int matls_get_server_certificate_clnt(SSL *s)
 
   s->mb_info.id_table = (unsigned char **)calloc(num_certs, sizeof(unsigned char *));
   s->mb_info.id_length = (int *)calloc(num_certs, sizeof(int));
+  s->mb_info.pkey = (EVP_PKEY **)calloc(num_certs, sizeof(EVP_PKEY *));
+  for (i=0; i<num_certs; i++)
+    s->mb_info.pkey[i] = EVP_PKEY_new();
 
   for (i=num_certs; i>1; i--)
   {
@@ -1601,8 +1604,8 @@ int matls_get_server_certificate_clnt(SSL *s)
 	  ERR_clear_error(); /* but we keep s->verify_result */
 
     x = sk_X509_value(sk, 0);
-    pkey = X509_get_pubkey(x);
-    if (!i2d_PUBKEY_bio(key, pkey))
+    s->mb_info.pkey[cert] = X509_get_pubkey(x);
+    if (!i2d_PUBKEY_bio(key, s->mb_info.pkey[cert]))
       MA_LOG("Error writing public key data in DER format");
     else
       MA_LOG("Writing public key data in DER format");
@@ -1616,7 +1619,6 @@ int matls_get_server_certificate_clnt(SSL *s)
       sk_X509_pop_free(sk, X509_free);
       BIO_reset(key);
       BIO_reset(id);
-      EVP_PKEY_free(pkey);
     }
   }
 

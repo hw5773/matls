@@ -169,6 +169,7 @@
 #endif /* OPENSSL_NO_MATLS */
 
 #include "logs.h"
+#include "matls_func.h"
 
 const char ssl3_version_str[]="SSLv3" OPENSSL_VERSION_PTEXT;
 
@@ -4217,7 +4218,7 @@ int ssl3_write(SSL *s, const void *b, int len)
 	if (s->s3->renegotiate) ssl3_renegotiate_check(s);
 
 #ifndef OPENSSL_NO_MATLS
-  if (s->mb_enabled == 1)
+  if (s->mb_enabled)
   {
     if (s->middlebox)
     {
@@ -4310,6 +4311,7 @@ int ssl3_write(SSL *s, const void *b, int len)
           memcpy(pmac, s->pmr + s->pmr_length - TLS_MD_HMAC_SIZE, TLS_MD_HMAC_SIZE);
           PRINTK("Prior HMAC", pmac, TLS_MD_HMAC_SIZE);
           hmac = HMAC(EVP_sha256(), s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, pmac, TLS_MD_HMAC_SIZE, NULL, &hmlen);
+          PRINTK("Used Accountability Key", s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
           PRINTK("Modified HMAC", hmac, TLS_MD_HMAC_SIZE);
           memcpy(s->pmr + s->pmr_length - TLS_MD_HMAC_SIZE, hmac, hmlen);
           buf = (unsigned char *)realloc(buf, len + s->pmr_length + 2);
@@ -4462,31 +4464,114 @@ static int ssl3_read_internal(SSL *s, void *buf, int len, int peek)
   {
     if (!s->server) // TODO: if not client authentication (need to revise this)
     {
-      unsigned char *p;
-      int mlen, mrlen, phlen;
+      unsigned char *p, *mr, *chash, *phash;
+      int mlen, mrlen, phlen, chlen, nk, index;
       p = (unsigned char *)buf;
       n2s(p, mrlen);
 #ifdef DEBUG
       printf("[matls] %s:%s:%d: Length of Received Message: %d\n", __FILE__, __func__, __LINE__, ret);
       printf("[matls] %s:%s:%d: Length of Modification Record: %d\n", __FILE__, __func__, __LINE__, mrlen);
 #endif /* DEBUG */
-      s->pair->pmr = (unsigned char *)malloc(mrlen);
-      memcpy(s->pair->pmr, p, mrlen);
-      s->pair->pmr_length = mrlen;
 
-      PRINTK("Previous Modification Record", s->pair->pmr, s->pair->pmr_length);
+      if (s->middlebox)
+      {
+        s->pair->pmr = (unsigned char *)malloc(mrlen);
+        memcpy(s->pair->pmr, p, mrlen);
+        s->pair->pmr_length = mrlen;
 
+        PRINTK("Previous Modification Record", s->pair->pmr, s->pair->pmr_length);
+      }
+
+      mr = p;
       p += mrlen;
       ret -= (mrlen + 2);
 
-      //mlen = get_total_length(p, ret);
-      digest_message(p, ret, &(s->pair->phash), &phlen);
+      if (s->middlebox)
+        digest_message(p, ret, &(s->pair->phash), &phlen);
+      else // Client
+        digest_message(p, ret, &chash, &chlen);
 #ifdef DEBUG
-      printf("[matls] %s:%s:%d: Length of Prior Hash: %d\n", __FILE__, __func__, __LINE__, phlen);
+      if (s->middlebox)
+        printf("[matls] %s:%s:%d: Length of Prior Hash: %d\n", __FILE__, __func__, __LINE__, phlen);
 #endif /* DEBUG */
 
       PRINTK("Message Received", p, ret);
-      PRINTK("Hash of Received Message", s->pair->phash, phlen);
+      if (s->middlebox)
+      {
+        PRINTK("Hash of Received Message", s->pair->phash, phlen);
+      }
+      else // Client
+      {
+        int i, hmlen, sidx, cidx, eidx, mlen;
+        unsigned char *hmac, *sid, *smac, *mmac, *ak, *id, *mrp, *ptr;
+        unsigned char msg[2 * TLS_MD_HMAC_SIZE];
+        PRINTK("Hash of Received Message", chash, chlen);
+        nk = s->mb_info.num_keys;
+        cidx = nk - 1;
+        mrp = mr + mrlen;
+        sid = mr;
+        mr += TLS_MD_ID_SIZE;
+        sidx = get_index_by_id(s, sid, TLS_MD_ID_SIZE);
+
+        smac = mr;
+        mr += TLS_MD_HMAC_SIZE;
+
+        PRINTK("Source MAC", smac, TLS_MD_HMAC_SIZE);
+
+        while (mrp > mr)
+        {
+          mrp -= (TLS_MD_ID_SIZE + TLS_MD_HASH_SIZE + TLS_MD_HMAC_SIZE);
+          ptr = mrp;
+          id = ptr;
+          index = get_index_by_id(s, id, TLS_MD_ID_SIZE);
+          ak = get_accountability_key(s, index);
+          ptr += TLS_MD_ID_SIZE;
+          memcpy(msg, mr, TLS_MD_HASH_SIZE);
+          ptr += TLS_MD_HASH_SIZE;
+          memcpy(msg + TLS_MD_HASH_SIZE, chash, chlen);
+          mlen = TLS_MD_HASH_SIZE + chlen;
+          mmac = ptr;
+
+          eidx = cidx;
+          cidx = index - 1;
+
+          hmac = HMAC(EVP_sha256(), get_accountability_key(s, index), SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, mlen, NULL, &hmlen);
+          index++;
+          while (index <= eidx)
+          {
+            hmac = HMAC(EVP_sha256(), get_accountability_key(s, index), SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, hmac, hmlen, NULL, &hmlen);
+            PRINTK("Used Accountability Key", get_accountability_key(s, index), SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
+            PRINTK("HMAC", hmac, hmlen);
+            index++;
+          }
+
+          if (!strncmp(hmac, mmac, TLS_MD_HMAC_SIZE))
+            MA_LOG("Verify Success in Modification MAC");
+          else
+            MA_LOG("Verify Falied in Modification MAC");
+        }
+
+        eidx = cidx;
+        printf("sidx: %d\n", sidx);
+        printf("eidx: %d\n", eidx);
+
+        PRINTK("Hash to be hashed", chash, chlen);
+        hmac = HMAC(EVP_sha256(), get_accountability_key(s, sidx), SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, chash, chlen, NULL, &hmlen);
+        sidx++;
+
+        while (sidx <= eidx)
+        {
+          hmac = HMAC(EVP_sha256(), get_accountability_key(s, sidx), SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, hmac, hmlen, NULL, &hmlen);
+          PRINTK("Used Accountability Key", get_accountability_key(s, sidx), SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
+          PRINTK("HMAC", hmac, hmlen);
+          sidx++;
+        }
+
+        if (!strncmp(hmac, smac, TLS_MD_HMAC_SIZE))
+          MA_LOG("Verify Success in Source MAC");
+        else
+          MA_LOG("Verifiy Failed in Source MAC");
+      }
       buf = memmove(buf, buf + mrlen + 2, ret);
     }
   }

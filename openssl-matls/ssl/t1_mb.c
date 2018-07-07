@@ -593,9 +593,13 @@ int ssl_parse_serverhello_mb_ext(SSL *s, unsigned char *d, int size, int *al)
 
   num_keys = *(p++);
   MA_LOG1d("Number of Keys", num_keys);
+  s->mb_info.num_keys = num_keys;
 
   if (s->middlebox)
+  {
+    s->pair->mb_info.num_keys = num_keys;
     end = 1;
+  }
   else // Client
   {
     end = num_keys;

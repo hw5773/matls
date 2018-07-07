@@ -812,6 +812,7 @@ struct mb_st {
     unsigned char **mac_array;
     volatile unsigned char **secret;
     volatile unsigned char **id_table;
+    EVP_PKEY **pkey;
     int *id_length;
     struct keypair *keypair;
     unsigned char *pub_str;

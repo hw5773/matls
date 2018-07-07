@@ -2,7 +2,6 @@
 #include "table.h"
 #include "common.h"
 #include "logger.h"
-#include "../common/logs.h"
 
 void handle_error(const char *file, int lineno, const char *msg) {
   fprintf(stderr, "** %s:%i %s\n", file, lineno, msg);
@@ -317,6 +316,7 @@ void *run(void *data)
   MA_LOG1s("Start SSL connections to", ip);
 
   ssl->pair = args->ssl;
+  memcpy(&(ssl->mb_info), &(args->ssl->mb_info), sizeof(struct mb_st));
   args->ssl->pair = ssl;
 //  ssl->lock = args->ssl->lock;
 /////

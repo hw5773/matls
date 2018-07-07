@@ -7,6 +7,7 @@
 #include <pthread.h>
 
 #include <openssl/err.h>
+#include <openssl/logs.h>
 #include <openssl/ssl.h>
 #include <openssl/bio.h>
 #include <openssl/pem.h>

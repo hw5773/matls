@@ -160,6 +160,9 @@
 #include <openssl/engine.h>
 #endif
 
+#include "logs.h"
+#include "matls_func.h"
+
 const char *SSL_version_str=OPENSSL_VERSION_TEXT;
 
 SSL3_ENC_METHOD ssl3_undef_enc_method={
@@ -361,11 +364,6 @@ SSL *SSL_new(SSL_CTX *ctx)
 	  memcpy(s->proof, ctx->proof, ctx->proof_length);
   }
 
-/*
-  s->lock = (int *)malloc(sizeof(int));
-  *(s->lock) = 0;
-*/
-
   s->extension_from_srvr_msg_len = 0;
   s->extension_from_clnt_msg_len = 0;
   s->cert_msg_len = 0;
@@ -387,6 +385,21 @@ SSL *SSL_new(SSL_CTX *ctx)
     s->id = (unsigned char *)malloc(s->id_length);
     memcpy(s->id, ctx->id, s->id_length);
   }
+
+  if (ctx->mb_info.group_id > 0)
+    s->mb_info.group_id = ctx->mb_info.group_id;
+  else
+    s->mb_info.group_id = NID_X9_62_prime256v1;
+
+  if ((ctx->mb_info.group_id == s->mb_info.group_id) && ctx->mb_info.group)
+    s->mb_info.group = ctx->mb_info.group;
+  else
+    s->mb_info.group = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
+
+  if (ctx->mb_info.bn_ctx)
+    s->mb_info.bn_ctx = ctx->mb_info.bn_ctx;
+  else
+    s->mb_info.bn_ctx = BN_CTX_new();
 #endif /* OPENSSL_NO_MATLS */
 
 	s->read_ahead=ctx->read_ahead;
@@ -465,11 +478,14 @@ SSL *SSL_new(SSL_CTX *ctx)
 #endif /* OPENSSL_NO_TTPA */
 
 #ifndef OPENSSL_NO_MATLS
-  if (s->server)
-  {
+//  if (s->server)
+//  {
     pthread_mutex_init(&(s->lock), NULL);
     s->lockp = &(s->lock);
-  }
+    make_keypair(&(s->mb_info.keypair), s->mb_info.group, s->mb_info.bn_ctx);
+    pub_to_char(s->mb_info.keypair->pub, &(s->mb_info.pub_str), &(s->mb_info.pub_length), s->mb_info.group, s->mb_info.bn_ctx);
+    PRINTK("Pregenerated DH Public Key", s->mb_info.pub_str, s->mb_info.pub_length);
+//  }
 #endif /* OPENSSL_NO_MATLS */
 
 #ifndef OPENSSL_NO_PSK
@@ -714,10 +730,8 @@ void SSL_free(SSL *s)
   if (s->x509)
     X509_free(s->x509);
 
-/*
-  if (s->lock)
-    free(s->lock);
-*/
+  if (s->mb_info.group_id != s->ctx->mb_info.group_id)
+    EC_GROUP_free(s->mb_info.group);
 #endif /* OPENSSL_NO_MATLS */
 
 	OPENSSL_free(s);
@@ -2050,6 +2064,10 @@ SSL_CTX *SSL_CTX_new(const SSL_METHOD *meth)
   ret->server_side = 0;
   ret->proof = NULL;
   ret->proof_length = 0;
+
+  ret->mb_info.group_id = 23; // SSL_CURVE_SECP256R1
+  ret->mb_info.group = EC_GROUP_new_by_curve_name(ret->mb_info.group_id);
+  ret->mb_info.bn_ctx = BN_CTX_new();
 #endif /* OPENSSL_NO_MATLS */
 
 	return(ret);
@@ -2170,6 +2188,12 @@ void SSL_CTX_free(SSL_CTX *a)
 
   if (a->x509)
     X509_free(a->x509);
+
+  if (a->mb_info.group)
+    EC_GROUP_free(a->mb_info.group);
+
+  if (a->mb_info.bn_ctx)
+    BN_CTX_free(a->mb_info.bn_ctx);
 #endif /* OPENSSL_NO_MATLS */
 
 	OPENSSL_free(a);

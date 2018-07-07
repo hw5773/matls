@@ -1,11 +1,14 @@
 #ifndef __MATLS_H__
 #define __MATLS_H__
 
+#define GROUP_ID_LENGTH 2
 #define TYPE_LENGTH 1
 #define META_LENGTH 2
+#define NUM_OF_KEYS_INFO 1
 
 #define TYPE_DUMMY 0
 #define TYPE_SERVER 1
+#define TYPE_CLIENT 1
 #define TYPE_CLIENT_SIDE 1
 #define TYPE_SERVER_SIDE 2
 #define TYPE_CLIENT_SIDE_WITH_SCT 3

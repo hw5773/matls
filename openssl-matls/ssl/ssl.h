@@ -167,6 +167,8 @@
 #include <openssl/safestack.h>
 #include <openssl/symhacks.h>
 
+#include "logs.h"
+
 #ifdef  __cplusplus
 extern "C" {
 #endif
@@ -805,11 +807,18 @@ struct keypair
 
 struct mb_st {
     int group_id;
+    EC_GROUP *group;
+    BN_CTX *bn_ctx;
     int num_keys;
     int *key_length; //ECDH key length
     unsigned char **mac_array;
     volatile unsigned char **secret;
+    volatile unsigned char **id_table;
+    EVP_PKEY **pkey;
+    int *id_length;
     struct keypair *keypair;
+    unsigned char *pub_str;
+    int pub_length;
     unsigned char lock;
     unsigned char *random[2];
 } mb_info;
@@ -1481,6 +1490,7 @@ struct ssl_st
   unsigned char *phash; // Previous Hash of the Content
   unsigned char *pmr; // Previous Modification Record
   int pmr_length;
+  log_t *time_log;
 #endif /* OPENSSL_NO_MATLS */
 
 #ifndef OPENSSL_NO_SPLIT_TLS

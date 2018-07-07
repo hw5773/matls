@@ -234,7 +234,7 @@ FILE *log_file;
   printf("Time from %s to %s: %lu us\n", arr[a].name, arr[b].name, arr[b].time - arr[a].time);
 
 #define FINALIZE(arr, fname) \
-  log_file = fopen(fname, "w"); \
+  log_file = fopen(fname, "a"); \
   for (lidx = 0; lidx < NUM_OF_LOGS; lidx++) \
   { \
     if (arr[lidx].time > 0) \

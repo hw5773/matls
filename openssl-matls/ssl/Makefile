@@ -30,7 +30,7 @@ LIBSRC=	\
 	ssl_lib.c ssl_err2.c ssl_cert.c ssl_sess.c \
 	ssl_ciph.c ssl_stat.c ssl_rsa.c \
 	ssl_asn1.c ssl_txt.c ssl_algs.c \
-	bio_ssl.c ssl_err.c kssl.c tls_srp.c t1_reneg.c t1_mb.c ssl_utst.c ttpa_func.c t1_ttpa.c logs.c
+	bio_ssl.c ssl_err.c kssl.c tls_srp.c t1_reneg.c t1_mb.c ssl_utst.c ttpa_func.c t1_ttpa.c logs.c matls_func.c
 LIBOBJ= \
 	s2_meth.o  s2_srvr.o  s2_clnt.o  s2_lib.o  s2_enc.o s2_pkt.o \
 	s3_meth.o  s3_srvr.o  s3_clnt.o  s3_lib.o  s3_enc.o s3_pkt.o s3_both.o s3_cbc.o \
@@ -41,7 +41,7 @@ LIBOBJ= \
 	ssl_lib.o ssl_err2.o ssl_cert.o ssl_sess.o \
 	ssl_ciph.o ssl_stat.o ssl_rsa.o \
 	ssl_asn1.o ssl_txt.o ssl_algs.o \
-	bio_ssl.o ssl_err.o kssl.o tls_srp.o t1_reneg.o t1_mb.o ssl_utst.o t1_ttpa.o ttpa_func.o logs.o
+	bio_ssl.o ssl_err.o kssl.o tls_srp.o t1_reneg.o t1_mb.o ssl_utst.o t1_ttpa.o ttpa_func.o logs.o matls_func.o
 
 SRC= $(LIBSRC)
 
@@ -1020,6 +1020,27 @@ t1_mb.o: ../include/openssl/ssl3.h ../include/openssl/stack.h
 t1_mb.o: ../include/openssl/symhacks.h ../include/openssl/tls1.h
 t1_mb.o: ../include/openssl/x509.h ../include/openssl/x509_vfy.h ssl_locl.h
 t1_mb.o: t1_mb.c
+matls_func.o: ../e_os.h ../include/openssl/asn1.h ../include/openssl/bio.h
+matls_func.o: ../include/openssl/buffer.h ../include/openssl/comp.h
+matls_func.o: ../include/openssl/crypto.h ../include/openssl/dsa.h
+matls_func.o: ../include/openssl/dtls1.h ../include/openssl/e_os2.h
+matls_func.o: ../include/openssl/ec.h ../include/openssl/ecdh.h
+matls_func.o: ../include/openssl/ecdsa.h ../include/openssl/err.h
+matls_func.o: ../include/openssl/evp.h ../include/openssl/hmac.h
+matls_func.o: ../include/openssl/kssl.h ../include/openssl/lhash.h
+matls_func.o: ../include/openssl/obj_mac.h ../include/openssl/objects.h
+matls_func.o: ../include/openssl/opensslconf.h ../include/openssl/opensslv.h
+matls_func.o: ../include/openssl/ossl_typ.h ../include/openssl/pem.h
+matls_func.o: ../include/openssl/pem2.h ../include/openssl/pkcs7.h
+matls_func.o: ../include/openssl/pqueue.h ../include/openssl/rsa.h
+matls_func.o: ../include/openssl/safestack.h ../include/openssl/sha.h
+matls_func.o: ../include/openssl/srtp.h ../include/openssl/ssl.h
+matls_func.o: ../include/openssl/ssl2.h ../include/openssl/ssl23.h
+matls_func.o: ../include/openssl/ssl3.h ../include/openssl/stack.h
+matls_func.o: ../include/openssl/symhacks.h ../include/openssl/tls1.h
+matls_func.o: ../include/openssl/x509.h ../include/openssl/x509_vfy.h ssl_locl.h
+matls_func.o: matls_func.c
+
 t1_meth.o: ../e_os.h ../include/openssl/asn1.h ../include/openssl/bio.h
 t1_meth.o: ../include/openssl/buffer.h ../include/openssl/comp.h
 t1_meth.o: ../include/openssl/crypto.h ../include/openssl/dsa.h

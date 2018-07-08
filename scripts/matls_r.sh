@@ -20,5 +20,6 @@ for i in {1..100}
 do
    echo ${i}:${FILE}
    make cstart PORT=${PORT} LOG_FILE=${LOG_FILE}
+   sleep 2
 done
 echo 'done'

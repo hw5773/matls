@@ -42,7 +42,7 @@ int main(int count, char *strings[])
   void *status;
   pthread_attr_t attr;
 
-	if ( count != 3 )
+	if ( count != 4 )
 	{
 		printf("Usage: %s <portnum> <forward_file> <modification>\n", strings[0]);
 		exit(0);
@@ -153,7 +153,6 @@ void *mb_run(void *data)
     }
 
     MA_LOG1d("Total Length", tot_len);
-
     tot_len -= rcvd;
 
     if (tot_len <= 0)
@@ -167,12 +166,14 @@ void *mb_run(void *data)
 
 int connect_to_server_side(char *buf, int *server)
 {
-  unsigned char *tok, *hostname, *ip;
+  unsigned char *tok1, *tok2, hostname[256], *ip;
   int index, port;
 
-  tok = strstr(buf, "\r\n\r\n");
-  tok = strtok(tok, "Host:");
-  hostname = strtok(NULL, "Host:");
+  tok1 = strstr(buf, "Host:");
+  tok1 += 6;
+  tok2 = strstr(tok1, "\r\n\r\n");
+  memcpy(hostname, tok1, tok2 - tok1);
+  hostname[tok2-tok1] = 0;
 
   index = find_by_name(hostname, strlen(hostname));
   ip = get_ip_by_index(index);

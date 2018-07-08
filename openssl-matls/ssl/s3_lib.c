@@ -4572,12 +4572,16 @@ static int ssl3_read_internal(SSL *s, void *buf, int len, int peek)
 
         if (!strncmp(hmac, smac, TLS_MD_HMAC_SIZE))
         {
-          printf("[TT] %s:%s:%d: Verify Success\n", __FILE__, __func__, __LINE__);
+#ifdef DEBUG
+          printf("[matls] %s:%s:%d: Verify Success\n", __FILE__, __func__, __LINE__);
+#endif /* DEBUG */
           MA_LOG("Verify Success in Source MAC");
         }
         else
         {
-          printf("[TT} %s:%s:%d: Verify Failed\n", __FILE__, __func__, __LINE__);
+#ifdef DEBUG
+          printf("[matls] %s:%s:%d: Verify Failed\n", __FILE__, __func__, __LINE__);
+#endif /* DEBUG */
           MA_LOG("Verifiy Failed in Source MAC");
         }
       }

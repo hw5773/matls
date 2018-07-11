@@ -27,7 +27,7 @@ int main(int count, char *strings[])
 	SSL *ssl;
 	SSL_CTX *ctx;
 	BIO *outbio = NULL;
-	int server, client;
+	int server, client, sent = 0, rcvd = 0;
 	char *portnum, *cert, *key;
 	const char *response = 	
 		"HTTP/1.1 200 OK\r\n"
@@ -84,9 +84,8 @@ int main(int count, char *strings[])
 
 		BIO_printf(outbio, "ELAPSED TIME: %lu us\n", hs_end - hs_start);
 
-		int sent = 0;
-
-		SSL_read(ssl, buf, sizeof(buf));
+		rcvd = SSL_read(ssl, buf, sizeof(buf));
+    BIO_printf(outbio, "Request (%d): %s\n", rcvd, buf);
 		sent = SSL_write(ssl, response, response_len);
 
 		BIO_printf(outbio, "SERVER: HTTP Response Length: %d\n", response_len);

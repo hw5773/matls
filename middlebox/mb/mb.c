@@ -6,6 +6,7 @@
 #include <time.h>
 #include <resolv.h>
 #include <netdb.h>
+#include <openssl/logs.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <sys/time.h>
@@ -13,7 +14,6 @@
 #include <netinet/tcp.h>
 #include "mssl.h"
 #include "table.h"
-#include "../common/logs.h"
 #include "logger.h"
 
 #define FAIL    -1

@@ -42,7 +42,11 @@ def main():
         usage()
 
     for i in range(start, end+1):
+<<<<<<< HEAD
         cmd1 = "/home/mmlab/dist/scripts/matls_w.sh https://www.matls.com 50%02d %d 2>/dev/null" % (17-i, i)
+=======
+        cmd1 = "/home/dist/matls/scripts/matls_w.sh https://www.matls.com 50%02d %d 2>/dev/null" % (17-i, i)
+>>>>>>> e796aabbe4fc5894640232339eac819266e6d47b
         print (cmd1)
         os.system(cmd1)
         title = "[matls] The experiment is on going with %d middleboxes" % i

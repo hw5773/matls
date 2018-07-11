@@ -22,8 +22,10 @@ int open_connection(const char *hostname, int port)
     sd = socket(PF_INET, SOCK_STREAM, 0);
 
     /////
-    //int flag = 1;
-    //setsockopt(sd, IPPROTO_TCP, TCP_NODELAY, (char *)&flag, sizeof(int));
+#ifdef NO_NAGLE
+    int flag = 1;
+    setsockopt(sd, IPPROTO_TCP, TCP_NODELAY, (char *)&flag, sizeof(int));
+#endif /* NO_NAGLE */
     /////
 
     bzero(&addr, sizeof(addr));

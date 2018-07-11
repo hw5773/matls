@@ -15,7 +15,7 @@ FLAGS=-I/home/dist/openssl-matls-lib/include -L/home/dist/openssl-matls-lib/lib
 LDFLAGS=-lssl -lcrypto -ldl -lpthread
 GDB=gdb
 
-HOST=127.0.0.1
+HOST=www.matls.com
 PORT=5017
 NUM_OF_THREADS=1
 
@@ -32,8 +32,11 @@ split:
 sstart:
 	./${SERVER} ${PORT} ${CERT_FILE} ${KEY_FILE}
 
+cstart:
+	./${CLIENT} ${HOST} ${PORT} 1 ${LOG_FILE}
+
 debug:
 	${GDB} ./${EXEC} ${PORT} ${CERT_FILE} ${KEY_FILE} ${ORIG_CERT_FILE} ${WARRANT_FILE} -tui
 
 clean:
-	rm ${SERVER}
+	rm ${SERVER} ${CLIENT}

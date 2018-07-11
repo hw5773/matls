@@ -1,6 +1,7 @@
 import sys
 import os
 import smtplib
+import time
 
 sender = "hwlee2014@mmlab.snu.ac.kr"
 receivers = ["hwlee2014@mmlab.snu.ac.kr"]
@@ -52,7 +53,8 @@ def final_host(lst, of):
                         print ("Final Host (by Host): ", final)
                 except:
                     continue
-        t.close()
+            t.close()
+        print("%d, %s\n" % (rank, final))
         of.write("%d,%s\n" % (rank, final))
 
 def main():

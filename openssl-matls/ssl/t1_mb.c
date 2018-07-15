@@ -177,7 +177,7 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
     BN_CTX *ctx;
 
     MA_LOG1d("Read the mb length from the extension packet", len);
-    /* Parse the length byte */
+
     if(len < 1)
     {
         return handle_parse_errors();
@@ -211,15 +211,6 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
     MA_LOG1d("Group ID", s->mb_info.group_id);
     group = s->mb_info.group;
 
-/*
-    switch(s->mb_info.group_id)
-    {
-    case SSL_CURVE_SECP256R1:
-      group = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
-    default:
-      group = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
-    }
-*/
 
     /* Check num_keys */
     nk = s->mb_info.num_keys = *(p++);

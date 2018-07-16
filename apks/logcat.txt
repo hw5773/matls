@@ -1,0 +1,31 @@
+07-16 10:32:07.984  9745  9745 I chromium: [INFO:library_loader_hooks.cc(45)] Chromium logging enabled: level = 0, default verbosity = 0
+07-16 10:32:56.314  9882  9896 I chromium: [INFO:library_loader_hooks.cc(45)] Chromium logging enabled: level = 0, default verbosity = 0
+07-16 10:32:56.374  9904  9917 I chromium: [INFO:library_loader_hooks.cc(45)] Chromium logging enabled: level = 0, default verbosity = 0
+07-16 10:33:44.404  9882  9896 I chromium: [INFO:SkFontMgr_android.cpp(164)] Requested font file /system/fonts/SamsungSans-Num3L.ttf does not exist or cannot be opened.
+07-16 10:33:44.404  9882  9896 I chromium: [INFO:SkFontMgr_android.cpp(164)] Requested font file /system/fonts/SamsungSans-Num3T.ttf does not exist or cannot be opened.
+07-16 10:33:44.404  9882  9896 I chromium: [INFO:SkFontMgr_android.cpp(164)] Requested font file /system/fonts/SamsungSans-Num4L.ttf does not exist or cannot be opened.
+07-16 10:33:44.404  9882  9896 I chromium: [INFO:SkFontMgr_android.cpp(164)] Requested font file /system/fonts/SamsungSans-Num4T.ttf does not exist or cannot be opened.
+07-16 10:33:44.404  9882  9896 I chromium: [INFO:SkFontMgr_android.cpp(164)] Requested font file /system/fonts/SamsungSans-Num35.ttf does not exist or cannot be opened.
+07-16 10:33:44.404  9882  9896 I chromium: [INFO:SkFontMgr_android.cpp(164)] Requested font file /system/fonts/SamsungSans-Num45.ttf does not exist or cannot be opened.
+07-16 10:33:44.404  9882  9896 I chromium: [INFO:SkFontMgr_android.cpp(164)] Requested font file /system/fonts/SamsungSans-Num3Lv.ttf does not exist or cannot be opened.
+07-16 10:33:44.404  9882  9896 I chromium: [INFO:SkFontMgr_android.cpp(164)] Requested font file /system/fonts/SamsungSans-Num3R.ttf does not exist or cannot be opened.
+07-16 10:33:44.404  9882  9896 I chromium: [INFO:SkFontMgr_android.cpp(164)] Requested font file /system/fonts/SamsungSans-Num4Tv.ttf does not exist or cannot be opened.
+07-16 10:33:44.404  9882  9896 I chromium: [INFO:SkFontMgr_android.cpp(164)] Requested font file /system/fonts/SamsungSans-Num4Lv.ttf does not exist or cannot be opened.
+07-16 10:33:44.534  9882  9896 I chromium: [INFO:SkFontMgr_android.cpp(164)] Requested font file /system/fonts/NanumGothic.ttf does not exist or cannot be opened.
+07-16 10:33:44.534  9882  9896 I chromium: [INFO:SkFontMgr_android.cpp(164)] Requested font file /system/fonts/DroidSansFallback.ttf does not exist or cannot be opened.
+07-16 10:33:44.534  9882  9896 I chromium: [INFO:SkFontMgr_android.cpp(164)] Requested font file /system/fonts/MTLmr3m.ttf does not exist or cannot be opened.
+07-16 10:34:12.594  9745  9811 I chromium: [INFO:tcp_socket_posix.cc(289)] 3550738687, 0, CLIENT_TCP_CONNECT_START
+07-16 10:34:12.604  9745  9811 I chromium: [INFO:tcp_socket_posix.cc(289)] 3550741713, 0, CLIENT_TCP_CONNECT_START
+07-16 10:34:12.704  9745  9811 I chromium: [INFO:tcp_socket_posix.cc(289)] 3550841159, 0, CLIENT_TCP_CONNECT_START
+07-16 10:34:12.704  9745  9811 I chromium: [INFO:tcp_socket_posix.cc(289)] 3550846831, 0, CLIENT_TCP_CONNECT_START
+07-16 10:34:12.714  9745  9811 I chromium: [INFO:tcp_socket_posix.cc(636)] 3550850119, 1, CLIENT_TCP_CONNECT_END
+07-16 10:34:12.714  9745  9811 I chromium: [INFO:tcp_socket_posix.cc(289)] 3550855455, 0, CLIENT_TCP_CONNECT_START
+07-16 10:34:20.974 10493 10516 I chromium: [INFO:library_loader_hooks.cc(45)] Chromium logging enabled: level = 0, default verbosity = 0
+07-16 10:34:21.344 10493 10550 I chromium: [INFO:tcp_socket_posix.cc(289)] 3559481149, 0, CLIENT_TCP_CONNECT_START
+07-16 10:34:21.384 10493 10550 I chromium: [INFO:tcp_socket_posix.cc(636)] 3559521402, 1, CLIENT_TCP_CONNECT_END
+07-16 10:34:34.004 10586 10608 I chromium: [INFO:library_loader_hooks.cc(45)] Chromium logging enabled: level = 0, default verbosity = 0
+07-16 10:34:34.334 10586 10647 I chromium: [INFO:tcp_socket_posix.cc(289)] 3572474629, 0, CLIENT_TCP_CONNECT_START
+07-16 10:34:34.364 10586 10647 I chromium: [INFO:tcp_socket_posix.cc(289)] 3572501852, 0, CLIENT_TCP_CONNECT_START
+07-16 10:34:34.364 10586 10647 I chromium: [INFO:tcp_socket_posix.cc(289)] 3572505467, 0, CLIENT_TCP_CONNECT_START
+07-16 10:34:34.374 10586 10647 I chromium: [INFO:tcp_socket_posix.cc(289)] 3572518057, 0, CLIENT_TCP_CONNECT_START
+07-16 10:34:34.374 10586 10647 I chromium: [INFO:tcp_socket_posix.cc(636)] 3572518830, 1, CLIENT_TCP_CONNECT_END

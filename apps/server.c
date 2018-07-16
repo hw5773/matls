@@ -12,6 +12,8 @@
 #include <sys/socket.h>
 #include "logger.h"
 
+#include <openssl/logs.h>
+
 #define FAIL    -1
 
 int open_listener(int port);
@@ -20,6 +22,7 @@ void load_certificates(BIO *outbio, SSL_CTX* ctx, char* cert_file, char* key_fil
 void print_pubkey(BIO *outbio, EVP_PKEY *pkey);
 void msg_callback(int, int, int, const void *, size_t, SSL *, void *);
 BIO *bio_err;
+log_t time_log[NUM_OF_LOGS];
 
 // Origin Server Implementation
 int main(int count, char *strings[])
@@ -67,6 +70,7 @@ int main(int count, char *strings[])
 		ssl = SSL_new(ctx);/* get new SSL state with context */
 		BIO_printf(outbio, "SSL_new() Success\n");
 		SSL_set_fd(ssl, client);      /* set connection socket to SSL state */
+    ssl->time_log = time_log;
 		BIO_printf(outbio, "SSL_set_fd() Success\n");
 #ifdef MATLS
 		SSL_enable_mb(ssl);
@@ -77,16 +81,22 @@ int main(int count, char *strings[])
 		unsigned long hs_start, hs_end;
 		BIO_printf(outbio, "PROGRESS: TLS Handshake Start\n");
 		hs_start = get_current_microseconds();
+    RECORD_LOG(ssl->time_log, SERVER_HANDSHAKE_START);
 		if ( SSL_accept(ssl) == FAIL )     /* do SSL-protocol accept */
 			ERR_print_errors_fp(stderr);
+    RECORD_LOG(ssl->time_log, SERVER_HANDSHAKE_END);
+    INTERVAL(ssl->time_log, SERVER_HANDSHAKE_START, SERVER_HANDSHAKE_END);
 		hs_end = get_current_microseconds();
 		BIO_printf(outbio, "PROGRESS: TLS Handshake Complete!\n");
 
 		BIO_printf(outbio, "ELAPSED TIME: %lu us\n", hs_end - hs_start);
 
+    RECORD_LOG(ssl->time_log, SERVER_SERVE_HTML_START);
 		rcvd = SSL_read(ssl, buf, sizeof(buf));
     BIO_printf(outbio, "Request (%d): %s\n", rcvd, buf);
 		sent = SSL_write(ssl, response, response_len);
+    RECORD_LOG(ssl->time_log, SERVER_SERVE_HTML_END);
+    INTERVAL(ssl->time_log, SERVER_SERVE_HTML_START, SERVER_SERVE_HTML_END);
 
 		BIO_printf(outbio, "SERVER: HTTP Response Length: %d\n", response_len);
 		BIO_printf(outbio, "SERVER: Send the HTTP Test Page Success: %d\n", sent);

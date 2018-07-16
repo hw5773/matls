@@ -28,7 +28,7 @@ void print_pubkey(BIO *outbio, EVP_PKEY *pkey);
 SSL_CTX *ctx;
 const char *hostname, *portnum;
 BIO *bio_err;
-log_t time_log[20];
+log_t time_log[NUM_OF_LOGS];
 
 // Client Prototype Implementation
 int main(int count, char *strings[])

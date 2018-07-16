@@ -170,7 +170,10 @@
 #endif
 #include <openssl/md5.h>
 
+#ifndef OPENSSL_NO_MATLS
 #include "logs.h"
+#include "matls_func.h"
+#endif /* OPENSSL_NO_MATLS */
 
 #ifdef LOGGER
 //log_t time_log[NUM_OF_LOGS];
@@ -260,7 +263,7 @@ int ssl3_accept(SSL *s)
 		}
 #endif
 
-  ////RECORD_LOG(time_log, SERVER_ACCEPT_START);
+  RECORD_LOG(s->time_log, SERVER_ACCEPT_START);
 	for (;;)
 		{
 		state=s->state;
@@ -363,10 +366,11 @@ int ssl3_accept(SSL *s)
 		case SSL3_ST_SR_CLNT_HELLO_B:
 		case SSL3_ST_SR_CLNT_HELLO_C:
 
-      ////RECORD_LOG(time_log, SERVER_CLIENT_HELLO_START);
+      RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_START);
 			s->shutdown=0;
 			if (s->rwstate != SSL_X509_LOOKUP)
 			{
+        MA_LOG("Before get client hello");
 				MSTART("Before get_client_hello", "client-side");
 				ret=ssl3_get_client_hello(s);
 				MEND("After get_client_hello", "client-side");
@@ -398,16 +402,19 @@ int ssl3_accept(SSL *s)
 			s->renegotiate = 2;
 			s->state=SSL3_ST_SW_SRVR_HELLO_A;
 			s->init_num=0;
-      ////RECORD_LOG(time_log, SERVER_CLIENT_HELLO_END);
-      //INTERVAL(time_log, SERVER_CLIENT_HELLO_START, SERVER_CLIENT_HELLO_END);
+      RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_END);
+      INTERVAL(s->time_log, SERVER_CLIENT_HELLO_START, SERVER_CLIENT_HELLO_END);
 			break;
 
 		case SSL3_ST_SW_SRVR_HELLO_A:
 		case SSL3_ST_SW_SRVR_HELLO_B:
-      ////RECORD_LOG(time_log, SERVER_SERVER_HELLO_START);
+      RECORD_LOG(s->time_log, SERVER_SERVER_HELLO_START);
 			MSTART("Before send_server_hello", "client-side");
 			ret=ssl3_send_server_hello(s);
 			MEND("After send_server_hello", "client-side");
+      RECORD_LOG(s->time_log, SERVER_SERVER_HELLO_END);
+      INTERVAL(s->time_log, SERVER_SERVER_HELLO_START, SERVER_SERVER_HELLO_END);
+
 			if (ret <= 0) goto end;
 #ifndef OPENSSL_NO_TLSEXT
 			if (s->hit)
@@ -424,13 +431,12 @@ int ssl3_accept(SSL *s)
 			else
 				s->state=SSL3_ST_SW_CERT_A;
 			s->init_num=0;
-      ////RECORD_LOG(time_log, SERVER_SERVER_HELLO_END);
-      //INTERVAL(time_log, SERVER_SERVER_HELLO_START, SERVER_SERVER_HELLO_END);
+      
 			break;
 
 		case SSL3_ST_SW_CERT_A:
 		case SSL3_ST_SW_CERT_B:
-      ////RECORD_LOG(time_log, SERVER_SERVER_CERTIFICATE_START);
+      RECORD_LOG(s->time_log, SERVER_SERVER_CERTIFICATE_START);
 			/* Check if it is anon DH or anon ECDH, */
 			/* normal PSK or KRB5 or SRP */
 			if (!(s->s3->tmp.new_cipher->algorithm_auth & (SSL_aNULL|SSL_aKRB5|SSL_aSRP))
@@ -481,13 +487,13 @@ int ssl3_accept(SSL *s)
 			s->state=SSL3_ST_SW_KEY_EXCH_A;
 #endif
 			s->init_num=0;
-      ////RECORD_LOG(time_log, SERVER_SERVER_CERTIFICATE_END);
-      ////INTERVAL(time_log, SERVER_SERVER_CERTIFICATE_START, SERVER_SERVER_CERTIFICATE_END);
+      RECORD_LOG(s->time_log, SERVER_SERVER_CERTIFICATE_END);
+      //INTERVAL(s->time_log, SERVER_SERVER_CERTIFICATE_START, SERVER_SERVER_CERTIFICATE_END);
 			break;
 
 		case SSL3_ST_SW_KEY_EXCH_A:
 		case SSL3_ST_SW_KEY_EXCH_B:
-      ////RECORD_LOG(time_log, SERVER_SERVER_KEY_EXCHANGE_START);
+      RECORD_LOG(s->time_log, SERVER_SERVER_KEY_EXCHANGE_START);
 			alg_k = s->s3->tmp.new_cipher->algorithm_mkey;
 
 			/* clear this, it may get reset by
@@ -548,8 +554,8 @@ int ssl3_accept(SSL *s)
 
 			s->state=SSL3_ST_SW_CERT_REQ_A;
 			s->init_num=0;
-      ////RECORD_LOG(time_log, SERVER_SERVER_KEY_EXCHANGE_END);
-      ////INTERVAL(time_log, SERVER_SERVER_KEY_EXCHANGE_START, SERVER_SERVER_KEY_EXCHANGE_END);
+      RECORD_LOG(s->time_log, SERVER_SERVER_KEY_EXCHANGE_END);
+      //INTERVAL(s->time_log, SERVER_SERVER_KEY_EXCHANGE_START, SERVER_SERVER_KEY_EXCHANGE_END);
 			break;
 
 		case SSL3_ST_SW_CERT_REQ_A:
@@ -600,7 +606,7 @@ int ssl3_accept(SSL *s)
 
 		case SSL3_ST_SW_SRVR_DONE_A:
 		case SSL3_ST_SW_SRVR_DONE_B:
-      ////RECORD_LOG(time_log, SERVER_SERVER_HELLO_DONE_START);
+      RECORD_LOG(s->time_log, SERVER_SERVER_HELLO_DONE_START);
       MSTART("Before ssl3_send_server_done", "client-side");
 			ret=ssl3_send_server_done(s);
       MEND("After ssl3_send_server_done", "client-side");
@@ -608,8 +614,18 @@ int ssl3_accept(SSL *s)
 			s->s3->tmp.next_state=SSL3_ST_SR_CERT_A;
 			s->state=SSL3_ST_SW_FLUSH;
 			s->init_num=0;
-      ////RECORD_LOG(time_log, SERVER_SERVER_HELLO_DONE_END);
-      //INTERVAL(time_log, SERVER_SERVER_HELLO_DONE_START, SERVER_SERVER_HELLO_DONE_END);
+      RECORD_LOG(s->time_log, SERVER_SERVER_HELLO_DONE_END);
+      INTERVAL(s->time_log, SERVER_SERVER_HELLO_DONE_START, SERVER_SERVER_HELLO_DONE_END);
+
+      if (s->mb_enabled)
+      {
+        RECORD_LOG(s->time_log, SERVER_GENERATE_ACCOUNTABILITY_KEYS_START);
+        generate_accountability_keys(s);
+        RECORD_LOG(s->time_log, SERVER_GENERATE_ACCOUNTABILITY_KEYS_END);
+        INTERVAL(s->time_log, SERVER_GENERATE_ACCOUNTABILITY_KEYS_START, 
+          SERVER_GENERATE_ACCOUNTABILITY_KEYS_END);
+      }
+
 			break;
 		
 		case SSL3_ST_SW_FLUSH:
@@ -658,7 +674,7 @@ int ssl3_accept(SSL *s)
 
 		case SSL3_ST_SR_KEY_EXCH_A:
 		case SSL3_ST_SR_KEY_EXCH_B:
-      ////RECORD_LOG(time_log, SERVER_CLIENT_KEY_EXCHANGE_START);
+      RECORD_LOG(s->time_log, SERVER_CLIENT_KEY_EXCHANGE_START);
       MSTART("Before ssl3_get_client_key_exchange", "client-side");
 			ret=ssl3_get_client_key_exchange(s);
       MEND("After ssl3_get_client_key_exchange", "client-side");
@@ -733,8 +749,8 @@ int ssl3_accept(SSL *s)
 						offset+=dgst_size;
 						}		
 				}
-      ////RECORD_LOG(time_log, SERVER_CLIENT_KEY_EXCHANGE_END);
-      ////INTERVAL(time_log, SERVER_CLIENT_KEY_EXCHANGE_START, SERVER_CLIENT_KEY_EXCHANGE_END);
+      RECORD_LOG(s->time_log, SERVER_CLIENT_KEY_EXCHANGE_END);
+      //INTERVAL(s->time_log, SERVER_CLIENT_KEY_EXCHANGE_START, SERVER_CLIENT_KEY_EXCHANGE_END);
 			break;
 
 		case SSL3_ST_SR_CERT_VRFY_A:
@@ -768,7 +784,7 @@ int ssl3_accept(SSL *s)
 
 		case SSL3_ST_SR_FINISHED_A:
 		case SSL3_ST_SR_FINISHED_B:
-      ////RECORD_LOG(time_log, SERVER_CLIENT_FINISHED_START);
+      RECORD_LOG(s->time_log, SERVER_CLIENT_FINISHED_START);
 			s->s3->flags |= SSL3_FLAGS_CCS_OK;
 			MSTART("Before get_finished", "client-side");
 			ret=ssl3_get_finished(s,SSL3_ST_SR_FINISHED_A,
@@ -784,7 +800,7 @@ int ssl3_accept(SSL *s)
 			else
 				s->state=SSL3_ST_SW_CHANGE_A;
 			s->init_num=0;
-      //RECORD_LOG(time_log, SERVER_CLIENT_FINISHED_END);
+      RECORD_LOG(s->time_log, SERVER_CLIENT_FINISHED_END);
 			break;
 
 #ifndef OPENSSL_NO_TLSEXT
@@ -808,7 +824,7 @@ int ssl3_accept(SSL *s)
 
 		case SSL3_ST_SW_CHANGE_A:
 		case SSL3_ST_SW_CHANGE_B:
-      //RECORD_LOG(time_log, SERVER_SERVER_CCS_START);
+      RECORD_LOG(s->time_log, SERVER_SERVER_CCS_START);
 
 			s->session->cipher=s->s3->tmp.new_cipher;
 			if (!s->method->ssl3_enc->setup_key_block(s))
@@ -830,13 +846,13 @@ int ssl3_accept(SSL *s)
 				goto end;
 				}
 
-      //RECORD_LOG(time_log, SERVER_SERVER_CCS_END);
-      //INTERVAL(time_log, SERVER_SERVER_CCS_START, SERVER_SERVER_CCS_END);
+      RECORD_LOG(s->time_log, SERVER_SERVER_CCS_END);
+      INTERVAL(s->time_log, SERVER_SERVER_CCS_START, SERVER_SERVER_CCS_END);
 			break;
 
 		case SSL3_ST_SW_FINISHED_A:
 		case SSL3_ST_SW_FINISHED_B:
-      //RECORD_LOG(time_log, SERVER_SERVER_FINISHED_START);
+      RECORD_LOG(s->time_log, SERVER_SERVER_FINISHED_START);
       MSTART("Before ssl3_send_finished", "client-side");
 			ret=ssl3_send_finished(s,
 				SSL3_ST_SW_FINISHED_A,SSL3_ST_SW_FINISHED_B,
@@ -876,14 +892,14 @@ int ssl3_accept(SSL *s)
 			else
 				s->s3->tmp.next_state=SSL_ST_OK;
 			s->init_num=0;
-      //RECORD_LOG(time_log, SERVER_SERVER_FINISHED_END);
-      //INTERVAL(time_log, SERVER_SERVER_FINISHED_START, SERVER_SERVER_FINISHED_END);
+      RECORD_LOG(s->time_log, SERVER_SERVER_FINISHED_END);
+      INTERVAL(s->time_log, SERVER_SERVER_FINISHED_START, SERVER_SERVER_FINISHED_END);
 			break;
 
 #ifndef OPENSSL_NO_MATLS
     case SSL3_ST_SW_EXTENDED_FINISHED_A:
     case SSL3_ST_SW_EXTENDED_FINISHED_B:
-      //RECORD_LOG(time_log, SERVER_SERVER_EXTENDED_FINISHED_START);
+      RECORD_LOG(s->time_log, SERVER_SERVER_EXTENDED_FINISHED_START);
       MA_LOG("waiting extended finished message");
 	    MSTART("Before srvr's get_extended_fin", "client-side");
       while ((s->middlebox) && (!(s->pair->extended_finished_msg && s->pair->extended_finished_msg_len > 0))) { __sync_synchronize(); }
@@ -908,14 +924,14 @@ int ssl3_accept(SSL *s)
         s->s3->tmp.next_state = SSL_ST_OK;
 
       s->init_num = 0;
-      //RECORD_LOG(time_log, SERVER_SERVER_EXTENDED_FINISHED_END);
-      //INTERVAL(time_log, SERVER_SERVER_EXTENDED_FINISHED_START, SERVER_SERVER_EXTENDED_FINISHED_END);
+      RECORD_LOG(s->time_log, SERVER_SERVER_EXTENDED_FINISHED_END);
+      INTERVAL(s->time_log, SERVER_SERVER_EXTENDED_FINISHED_START, SERVER_SERVER_EXTENDED_FINISHED_END);
       break;
 #endif /* OPENSSL_NO_MATLS */
 
 		case SSL_ST_OK:
-      //RECORD_LOG(time_log, SERVER_ACCEPT_END);
-      //INTERVAL(time_log, SERVER_ACCEPT_START, SERVER_ACCEPT_END);
+      RECORD_LOG(s->time_log, SERVER_ACCEPT_END);
+      INTERVAL(s->time_log, SERVER_ACCEPT_START, SERVER_ACCEPT_END);
 
 			/* clean a few things up */
 			ssl3_cleanup_key_block(s);
@@ -1312,6 +1328,7 @@ int ssl3_get_client_hello(SSL *s)
 
 #ifndef OPENSSL_NO_TLSEXT
 	/* TLS extensions*/
+  MA_LOG("TLS extensions");
 	if (s->version >= SSL3_VERSION)
 		{
 		if (!ssl_parse_clienthello_tlsext(s,&p,d,n, &al))

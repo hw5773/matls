@@ -120,7 +120,7 @@ void *run(void *data)
 	printf("PROGRESS: TLS Handshake Start\n");
 	hs_start = get_current_microseconds();
 	RECORD_LOG(ssl->time_log, CLIENT_HANDSHAKE_START);
-	
+
   if ( SSL_connect(ssl) == FAIL )   /* perform the connection */
     ERR_print_errors_fp(stderr);
 	else
@@ -258,6 +258,7 @@ SSL_CTX* init_client_CTX(void)
   SSL_CTX_disable_mb(ctx);
 #endif /* MATLS */
 
+  printf("mb_enabled in ctx? %d\n", ctx->mb_enabled);
   return ctx;
 }
  

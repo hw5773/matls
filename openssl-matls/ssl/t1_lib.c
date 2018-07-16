@@ -459,17 +459,9 @@ unsigned char *ssl_add_clienthello_tlsext(SSL *s, unsigned char *buf, unsigned c
 		{
 			int el;
       unsigned char *tmp;
-			//if (!ssl_add_clienthello_mb_ext(s, 0, &el, 0))
-			//{
-			//	SSLerr(SSL_F_SSL_ADD_CLIENTHELLO_TLSEXT, ERR_R_INTERNAL_ERROR);
-			//	return NULL;
-			//}
-
-			//if ((limit - ret - 4 - el) < 0) return NULL;
 
 			s2n(TLSEXT_TYPE_mb, ret);
       tmp = ret + 2;
-			//s2n(el, ret);
 
 			if (!ssl_add_clienthello_mb_ext(s, tmp, &el, el))
 			{

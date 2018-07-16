@@ -811,8 +811,8 @@ struct mb_st {
     BN_CTX *bn_ctx;
     int num_keys;
     int *key_length; //ECDH key length
-    unsigned char **mac_array;
-    volatile unsigned char **secret;
+    unsigned char **accountability_keys;
+    volatile unsigned char **peer_str;
     volatile unsigned char **id_table;
     EVP_PKEY **pkey;
     int *id_length;
@@ -821,7 +821,8 @@ struct mb_st {
     int pub_length;
     unsigned char lock;
     unsigned char *random[2];
-} mb_info;
+    int rlen[2];
+};
 
 #endif /* OPENSSL_NO_MATLS */
 
@@ -1064,7 +1065,7 @@ struct ssl_ctx_st
   int id_length;
 
 	unsigned char mb_enabled;
-  struct mb_st mb_info;
+  struct mb_st *mb_info;
   X509 *x509;
 #endif /* OPENSSL_NO_MATLS */
 	};
@@ -1471,7 +1472,7 @@ struct ssl_st
 
   unsigned char *proof;
   int proof_length;
-  struct mb_st mb_info;
+  struct mb_st *mb_info;
 
   volatile unsigned char *extension_from_clnt_msg;
   volatile unsigned char *extension_from_srvr_msg;
@@ -2068,6 +2069,7 @@ int SSL_set_server_side(SSL *s);
 int SSL_set_client_side(SSL *s);
 int SSL_register_id(SSL *s);
 int SSL_use_proof_file(SSL *s, const char *file);
+int SSL_set_pair(SSL *s1, SSL *s2);
 
 void SSL_CTX_is_middlebox(SSL_CTX *ctx);
 int SSL_CTX_enable_mb(SSL_CTX *ctx);

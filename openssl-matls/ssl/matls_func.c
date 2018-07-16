@@ -1,4 +1,5 @@
 #include "logs.h"
+#include "matls.h"
 #include "matls_func.h"
 
 int make_keypair(struct keypair **pair, EC_GROUP *group, BN_CTX *ctx) {
@@ -46,11 +47,11 @@ int pub_to_char(EC_POINT *secret, unsigned char **secret_str, int *slen, EC_GROU
 
 int get_index_by_id(SSL *s, unsigned char *id, int idlen)
 {
-  int ret = -1, nk = s->mb_info.num_keys, i;
+  int ret = -1, nk = s->mb_info->num_keys, i;
   
   for (i=0; i<nk; i++)
   {
-    if (!strncmp(s->mb_info.id_table[i], id, idlen))
+    if (!strncmp(s->mb_info->id_table[i], id, idlen))
     {
       ret = i;
       break;
@@ -62,5 +63,76 @@ int get_index_by_id(SSL *s, unsigned char *id, int idlen)
 
 unsigned char *get_accountability_key(SSL *s, int index)
 {
-  return s->mb_info.mac_array[index];
+  return s->mb_info->accountability_keys[index];
+}
+
+int generate_accountability_keys(SSL *s)
+{
+  MA_LOG("Generate Accountability Keys");
+  int i, j, l, diff, nk, end, klen, xlen, slen, clen;
+  BIGNUM *x, *y;
+  BN_CTX *ctx;
+  EC_GROUP *group;
+  EC_POINT *secret, *peer_pub;
+  unsigned char *secret_str, *srandom, *crandom;
+
+  nk = s->mb_info->num_keys;
+  group = s->mb_info->group;
+
+  if (s->middlebox)
+  {
+    s->mb_info->accountability_keys = (unsigned char **)calloc(2, sizeof(unsigned char *));
+    end = 2;
+  }
+  else
+  {
+    s->mb_info->accountability_keys = (unsigned char **)calloc(nk, 
+        sizeof(unsigned char *));
+    end = nk;
+  }
+
+  for (i=0; i<nk; i++)
+  {
+    s->mb_info->accountability_keys[i] = (unsigned char *)malloc(SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
+  }
+
+  ctx = BN_CTX_new();
+  x = BN_new();
+  y = BN_new();
+
+  PRINTK("Server Random", s->mb_info->random[SERVER], s->mb_info->rlen[SERVER]);
+  PRINTK("Client Random", s->mb_info->random[CLIENT], s->mb_info->rlen[CLIENT]);
+
+  for (i=0; i<end; i++)
+  {
+    secret = EC_POINT_new(group);
+    peer_pub = EC_POINT_new(group);
+    klen = s->mb_info->key_length[i];
+    char_to_pub(s->mb_info->peer_str[i], klen, peer_pub, group, ctx);
+    EC_POINT_mul(group, secret, NULL, peer_pub, s->mb_info->keypair->pri, ctx);
+    EC_POINT_get_affine_coordinates_GFp(group, secret, x, y, ctx);
+    xlen = (klen - 1) / 2;
+    secret_str = (unsigned char *)malloc(xlen);
+    l = BN_bn2bin(x, secret_str);
+
+    if (l < xlen)
+    {
+      diff = xlen - l;
+      for (j=xlen-1; j>=diff; j--)
+        secret_str[j] = secret_str[j-diff];
+      for (j=diff-1; j>=0; j--)
+        secret_str[j] = 0;
+    }
+
+    t1_prf(TLS_MD_ACCOUNTABILITY_KEY_CONST, TLS_MD_ACCOUNTABILITY_KEY_CONST_SIZE,
+        s->mb_info->random[SERVER], s->mb_info->rlen[SERVER], 
+        s->mb_info->random[CLIENT], s->mb_info->rlen[CLIENT], 
+        NULL, 0, NULL, 0, secret_str, SECRET_LENGTH, 
+        s->mb_info->accountability_keys[i], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
+
+    PRINTK("Accountability Key", s->mb_info->accountability_keys[i], 
+        SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
+  }
+
+  return 1;
 }

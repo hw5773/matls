@@ -72,11 +72,6 @@ int main(int count, char *strings[])
 		SSL_set_fd(ssl, client);      /* set connection socket to SSL state */
     ssl->time_log = time_log;
 		BIO_printf(outbio, "SSL_set_fd() Success\n");
-#ifdef MATLS
-		SSL_enable_mb(ssl);
-#else
-    SSL_disable_mb(ssl);
-#endif /* MATLS */
 
 		unsigned long hs_start, hs_end;
 		BIO_printf(outbio, "PROGRESS: TLS Handshake Start\n");
@@ -195,8 +190,13 @@ SSL_CTX* init_server_CTX(BIO *outbio)
 		abort();
 	}
 
-//	SSL_CTX_set_info_callback(ctx, apps_ssl_info_callback);
 	SSL_CTX_set_msg_callback(ctx, msg_callback);
+
+#ifdef MATLS
+  SSL_CTX_enable_mb(ctx);
+#else
+  SSL_CTX_disable_mb(ctx);
+#endif /* MATLS */
 
 	return ctx;
 }
@@ -230,12 +230,15 @@ void load_certificates(BIO *outbio, SSL_CTX* ctx, char* cert_file, char* key_fil
 	else
 		BIO_printf(outbio, "SSL_CTX_use_certificate_file success\n");
 
-	if ( SSL_CTX_register_id(ctx) <= 0 )
-	{
-		abort();
-	}
-	else
-		BIO_printf(outbio, "SSL_CTX_register_id success\n");
+  if (ctx->mb_enabled == 1)
+  {
+	  if ( SSL_CTX_register_id(ctx) <= 0 )
+	  {
+		  abort();
+	  }
+	  else
+		  BIO_printf(outbio, "SSL_CTX_register_id success\n");
+  }
 
 	/* Set the private key from KeyFile (may be the same as CertFile) */
 	if ( SSL_CTX_use_PrivateKey_file(ctx, key_file, SSL_FILETYPE_PEM) <= 0 )

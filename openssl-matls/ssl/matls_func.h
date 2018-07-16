@@ -8,3 +8,4 @@ int pub_to_char(EC_POINT *secret, unsigned char **secret_str, int *slen, EC_GROU
 
 int get_index_by_id(SSL *s, unsigned char *id, int idlen);
 unsigned char *get_accountability_key(SSL *s, int index);
+int generate_accountability_keys(SSL *s);

@@ -77,10 +77,8 @@ int main(int count, char *strings[])
 
     struct info *info = (struct info *)malloc(sizeof(struct info));
     info->sock = client;
-    /////
     tidx = get_thread_index();
     MA_LOG1d("Create thread with index", tidx);
-    /////
     rc = pthread_create(&threads[tidx], &attr, mb_run, info);
 
     if (rc < 0)
@@ -140,7 +138,9 @@ void *mb_run(void *data)
 #endif
 
   start = get_current_microseconds();
+  MA_LOG("before ssl accept");
   ret = SSL_accept(ssl);
+  MA_LOG("after ssl accept");
 
   if (SSL_is_init_finished(ssl))
     MA_LOG("complete handshake");
@@ -189,14 +189,11 @@ void *mb_run(void *data)
   }
   end = get_current_microseconds();
   MA_LOG1lu("Middlebox Execution Time", end - start);
-/////
+
   fd = SSL_get_fd(ssl->pair);
-/////
   SSL_free(ssl->pair);
   SSL_free(ssl);
-/////
   close(fd);
-/////
 //  close(client);
 }
 
@@ -321,6 +318,12 @@ SSL_CTX* init_middlebox_ctx(int server_side)
     SSL_CTX_set_server_side(ctx);
   else
     SSL_CTX_set_client_side(ctx);
+
+#ifdef MATLS
+  SSL_CTX_enable_mb(ctx);
+#else
+  SSL_CTX_disable_mb(ctx);
+#endif /* MATLS */
 
 	return ctx;
 }

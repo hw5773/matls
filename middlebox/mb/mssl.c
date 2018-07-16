@@ -315,24 +315,14 @@ void *run(void *data)
   
   MA_LOG1s("Start SSL connections to", ip);
 
-  ssl->pair = args->ssl;
-  memcpy(&(ssl->mb_info), &(args->ssl->mb_info), sizeof(struct mb_st));
-  args->ssl->pair = ssl;
-//  ssl->lock = args->ssl->lock;
-/////
-  ssl->lockp = args->ssl->lockp;
-/////
-  ssl->middlebox = 1;
-  ssl->pair->middlebox = 1;
+  SSL_set_pair(ssl, args->ssl);
 
 #ifdef MATLS
   SSL_enable_mb(ssl);
   MA_LOG1d("matls enabled", ssl->mb_enabled);
-//  printf("========== matls enabled ==========\n");
 #else
   SSL_disable_mb(ssl);
   MA_LOG1d("matls disabled", ssl->mb_enabled);
-//  printf("========== matls disabled ==========\n");
 #endif
 
   unsigned long start, end;
@@ -351,48 +341,6 @@ void *run(void *data)
     MA_LOG1s("Succeed to connect to", ip);
     MA_LOG1lu("SSL_connect time", end - start);
   }
-/*
-  FD_ZERO(&reads);
-  FD_SET(server, &reads);
-  tv.tv_sec = 10;
-  tv.tv_usec = 0;
-
-  while (1)
-  {
-    ret = select(server+1, &reads, 0, 0, &tv);
-    if (ret == -1)
-    {
-      MA_LOG("Error Happened");
-      break;
-    }
-
-    else if (ret == 0)
-    {
-      break;
-    }
-
-    else
-    {
-      if (FD_ISSET(server, &reads))
-      {
-        rcvd = SSL_read(ssl, buf, DEFAULT_BUF_SIZE);
-        if (rcvd > 0)
-        {
-          MA_LOG1d("Received from Server-side", ret);
-          printf("%.*s\n", (int)ret, buf);
-        }
-        //send_unencrypted_bytes(buf, ret);
-        sent = SSL_write(ssl->pair, buf, rcvd);
-        MA_LOG1d("Sent to Client-side", ret);
-      }
-    }
-  }
-
-  MA_LOG("Succeed to establish the secure session with the server-side entity");
-  MA_LOG("Close the session with the server");
-  SSL_free(ssl);
-  close(server);
-*/
 }
 
 void ssl_init(char *cert, char *priv) {

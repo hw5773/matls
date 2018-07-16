@@ -486,13 +486,13 @@ int matls_send_extended_finished(SSL *s)
 
     if (s->middlebox)
 	  {
-		  PRINTK("used accountability key", s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
-      digest = HMAC(EVP_sha256(), s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, plen, NULL, &digest_len);
+		  PRINTK("used accountability key", s->mb_info->accountability_keys[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
+      digest = HMAC(EVP_sha256(), s->mb_info->accountability_keys[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, plen, NULL, &digest_len);
 	  }
     else
 	  {
-		  PRINTK("used accountability key", s->mb_info.mac_array[0], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
-      digest = HMAC(EVP_sha256(), s->mb_info.mac_array[0], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, plen, NULL, &digest_len);
+		  PRINTK("used accountability key", s->mb_info->accountability_keys[0], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
+      digest = HMAC(EVP_sha256(), s->mb_info->accountability_keys[0], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, plen, NULL, &digest_len);
 	  }
 
     free(msg);
@@ -704,15 +704,15 @@ int matls_get_extended_finished(SSL *s)
       p += plen;
       moff += plen;
       PRINTK("Before HMAC", msg, moff);
-      PRINTK("Used Accountability Key", s->mb_info.mac_array[i], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
-      hmac = HMAC(EVP_sha256(), s->mb_info.mac_array[i], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, moff, NULL, &hmlen);
+      PRINTK("Used Accountability Key", s->mb_info->accountability_keys[i], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
+      hmac = HMAC(EVP_sha256(), s->mb_info->accountability_keys[i], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, moff, NULL, &hmlen);
       PRINTK("HMAC", hmac, hmlen);
       memset(msg, 0x0, MSG_LENGTH);
       moff = 0;
 
       n2s(sig, slen);
 
-      rc = verification(hmac, MATLS_H_LENGTH, NID_sha256, slen, sig, s->mb_info.pkey[i]);
+      rc = verification(hmac, MATLS_H_LENGTH, NID_sha256, slen, sig, s->mb_info->pkey[i]);
       if (rc != 1)
       {
         MA_LOG1d("Verify Failed", i);
@@ -734,8 +734,8 @@ int matls_get_extended_finished(SSL *s)
     memcpy(msg + moff, s->s3->tmp.peer_finish_md, MATLS_TRANSCRIPT_LENGTH);
     moff += MATLS_TRANSCRIPT_LENGTH;
     PRINTK("Before HMAC", msg, moff);
-    PRINTK("Used Accountability Key", s->mb_info.mac_array[nk-1], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
-    hmac = HMAC(EVP_sha256(), s->mb_info.mac_array[nk-1], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, moff, NULL, &hmlen);
+    PRINTK("Used Accountability Key", s->mb_info->accountability_keys[nk-1], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
+    hmac = HMAC(EVP_sha256(), s->mb_info->accountability_keys[nk-1], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, moff, NULL, &hmlen);
     PRINTK("Final HMAC", hmac, hmlen);
 
     memcpy(h, p, MATLS_H_LENGTH);
@@ -743,7 +743,7 @@ int matls_get_extended_finished(SSL *s)
 
     n2s(sig, slen);
 
-    rc = verification(hmac, MATLS_H_LENGTH, NID_sha256, slen, sig, s->mb_info.pkey[nk-1]);
+    rc = verification(hmac, MATLS_H_LENGTH, NID_sha256, slen, sig, s->mb_info->pkey[nk-1]);
 
     if (rc == 1)
       MA_LOG("Verify Success");

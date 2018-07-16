@@ -344,9 +344,7 @@ SSL *SSL_new(SSL_CTX *ctx)
 #endif /* OPENSSL_NO_TTPA */
 
 #ifndef OPENSSL_NO_MATLS
-	if (ctx->mb_enabled)
-		s->mb_enabled = 1;
-
+	s->mb_enabled = ctx->mb_enabled;
   s->matls_received = 0;
 
   if (ctx->middlebox)
@@ -385,21 +383,6 @@ SSL *SSL_new(SSL_CTX *ctx)
     s->id = (unsigned char *)malloc(s->id_length);
     memcpy(s->id, ctx->id, s->id_length);
   }
-
-  if (ctx->mb_info.group_id > 0)
-    s->mb_info.group_id = ctx->mb_info.group_id;
-  else
-    s->mb_info.group_id = NID_X9_62_prime256v1;
-
-  if ((ctx->mb_info.group_id == s->mb_info.group_id) && ctx->mb_info.group)
-    s->mb_info.group = ctx->mb_info.group;
-  else
-    s->mb_info.group = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
-
-  if (ctx->mb_info.bn_ctx)
-    s->mb_info.bn_ctx = ctx->mb_info.bn_ctx;
-  else
-    s->mb_info.bn_ctx = BN_CTX_new();
 #endif /* OPENSSL_NO_MATLS */
 
 	s->read_ahead=ctx->read_ahead;
@@ -478,16 +461,11 @@ SSL *SSL_new(SSL_CTX *ctx)
 #endif /* OPENSSL_NO_TTPA */
 
 #ifndef OPENSSL_NO_MATLS
-//  if (s->server)
-//  {
-    pthread_mutex_init(&(s->lock), NULL);
-    s->lockp = &(s->lock);
-    make_keypair(&(s->mb_info.keypair), s->mb_info.group, s->mb_info.bn_ctx);
-    pub_to_char(s->mb_info.keypair->pub, &(s->mb_info.pub_str), &(s->mb_info.pub_length), s->mb_info.group, s->mb_info.bn_ctx);
-    PRINTK("Pregenerated DH Public Key", s->mb_info.pub_str, s->mb_info.pub_length);
-//  }
+  if (s->mb_enabled && !s->middlebox)
+    SSL_enable_mb(s);
+  else
+    SSL_disable_mb(s);
 #endif /* OPENSSL_NO_MATLS */
-
 #ifndef OPENSSL_NO_PSK
 	s->psk_client_callback=ctx->psk_client_callback;
 	s->psk_server_callback=ctx->psk_server_callback;
@@ -730,8 +708,22 @@ void SSL_free(SSL *s)
   if (s->x509)
     X509_free(s->x509);
 
-  if (s->mb_info.group_id != s->ctx->mb_info.group_id)
-    EC_GROUP_free(s->mb_info.group);
+  if (s->mb_info)
+  {
+    if (s->mb_info->group)
+    {
+      if (s->mb_info->group_id != s->ctx->mb_info->group_id)
+        EC_GROUP_free(s->mb_info->group);
+    }
+
+    if (s->mb_info->bn_ctx)
+    {
+      if (s->mb_info->bn_ctx != s->ctx->mb_info->bn_ctx)
+        BN_CTX_free(s->mb_info->bn_ctx);
+    }
+
+    free(s->mb_info);
+  }
 #endif /* OPENSSL_NO_MATLS */
 
 	OPENSSL_free(s);
@@ -2065,9 +2057,10 @@ SSL_CTX *SSL_CTX_new(const SSL_METHOD *meth)
   ret->proof = NULL;
   ret->proof_length = 0;
 
-  ret->mb_info.group_id = 23; // SSL_CURVE_SECP256R1
-  ret->mb_info.group = EC_GROUP_new_by_curve_name(ret->mb_info.group_id);
-  ret->mb_info.bn_ctx = BN_CTX_new();
+  ret->mb_info = (struct mb_info *)malloc(sizeof(struct mb_st));
+  ret->mb_info->group_id = 23; // SSL_CURVE_SECP256R1
+  ret->mb_info->group = EC_GROUP_new_by_curve_name(ret->mb_info->group_id);
+  ret->mb_info->bn_ctx = BN_CTX_new();
 #endif /* OPENSSL_NO_MATLS */
 
 	return(ret);
@@ -2189,11 +2182,14 @@ void SSL_CTX_free(SSL_CTX *a)
   if (a->x509)
     X509_free(a->x509);
 
-  if (a->mb_info.group)
-    EC_GROUP_free(a->mb_info.group);
+  if (a->mb_info->group)
+    EC_GROUP_free(a->mb_info->group);
 
-  if (a->mb_info.bn_ctx)
-    BN_CTX_free(a->mb_info.bn_ctx);
+  if (a->mb_info->bn_ctx)
+    BN_CTX_free(a->mb_info->bn_ctx);
+
+  if (a->mb_info)
+    free(a->mb_info);
 #endif /* OPENSSL_NO_MATLS */
 
 	OPENSSL_free(a);
@@ -2712,6 +2708,32 @@ int SSL_enable_mb(SSL *s)
 #ifdef MB_DEBUG
 	printf("[DEBUG] %s:%s:%d: mb enabled\n", __FILE__, __func__, __LINE__);
 #endif
+
+  if (!(s->mb_info))
+  {
+    s->mb_info = (struct mb_info *)malloc(sizeof(struct mb_st));
+    if (s->ctx->mb_info->group_id > 0)
+      s->mb_info->group_id = s->ctx->mb_info->group_id;
+    else
+      s->mb_info->group_id = NID_X9_62_prime256v1;
+
+    if ((s->ctx->mb_info->group_id == s->mb_info->group_id) && s->ctx->mb_info->group)
+      s->mb_info->group = s->ctx->mb_info->group;
+    else
+      s->mb_info->group = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
+
+    if (s->ctx->mb_info->bn_ctx)
+      s->mb_info->bn_ctx = s->ctx->mb_info->bn_ctx;
+    else
+      s->mb_info->bn_ctx = BN_CTX_new();
+
+    pthread_mutex_init(&(s->lock), NULL);
+    s->lockp = &(s->lock);
+    make_keypair(&(s->mb_info->keypair), s->mb_info->group, s->mb_info->bn_ctx);
+    pub_to_char(s->mb_info->keypair->pub, &(s->mb_info->pub_str), 
+        &(s->mb_info->pub_length), s->mb_info->group, s->mb_info->bn_ctx);
+  }
+
 	s->mb_enabled = 1;
 	return 1;
 }
@@ -2723,6 +2745,18 @@ int SSL_disable_mb(SSL *s)
 #endif
 	s->mb_enabled = 0;
 	return 1;
+}
+
+// The first object is the new one. The second one is the old one.
+int SSL_set_pair(SSL *s1, SSL *s2)
+{
+  s1->pair = s2;
+  s2->pair = s1;
+  s1->mb_info = s2->mb_info;
+  s2->lockp = s1->lockp = &(s1->lock);
+  s2->middlebox = s1->middlebox = 1;
+
+  return 1;
 }
 
 void SSL_CTX_is_middlebox(SSL_CTX *ctx)

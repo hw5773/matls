@@ -4261,7 +4261,7 @@ int ssl3_write(SSL *s, const void *b, int len)
           memcpy(msg, s->phash, TLS_MD_HASH_SIZE);
           memcpy(msg + TLS_MD_HASH_SIZE, hash, TLS_MD_HASH_SIZE);
 
-          hmac = HMAC(EVP_sha256(), s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, mlen, NULL, &hmlen);
+          hmac = HMAC(EVP_sha256(), s->mb_info->accountability_keys[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, msg, mlen, NULL, &hmlen);
 
           buf = (unsigned char *)realloc(buf, len + 2 + mrlen);
   
@@ -4310,8 +4310,8 @@ int ssl3_write(SSL *s, const void *b, int len)
           pmac = (unsigned char *)malloc(TLS_MD_HMAC_SIZE);
           memcpy(pmac, s->pmr + s->pmr_length - TLS_MD_HMAC_SIZE, TLS_MD_HMAC_SIZE);
           PRINTK("Prior HMAC", pmac, TLS_MD_HMAC_SIZE);
-          hmac = HMAC(EVP_sha256(), s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, pmac, TLS_MD_HMAC_SIZE, NULL, &hmlen);
-          PRINTK("Used Accountability Key", s->mb_info.mac_array[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
+          hmac = HMAC(EVP_sha256(), s->mb_info->accountability_keys[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, pmac, TLS_MD_HMAC_SIZE, NULL, &hmlen);
+          PRINTK("Used Accountability Key", s->mb_info->accountability_keys[((s->server + 1) % 2)], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
           PRINTK("Modified HMAC", hmac, TLS_MD_HMAC_SIZE);
           memcpy(s->pmr + s->pmr_length - TLS_MD_HMAC_SIZE, hmac, hmlen);
           buf = (unsigned char *)realloc(buf, len + s->pmr_length + 2);
@@ -4372,9 +4372,9 @@ int ssl3_write(SSL *s, const void *b, int len)
         PRINTK("Message for Hash", buf, len);
         PRINTK("Hash for Source HMAC", hash, hlen);
 
-        hmac = HMAC(EVP_sha256(), s->mb_info.mac_array[CLIENT], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, hash, hlen, NULL, &hmlen);
+        hmac = HMAC(EVP_sha256(), s->mb_info->accountability_keys[CLIENT], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, hash, hlen, NULL, &hmlen);
 
-        PRINTK("Used Accountability Key", s->mb_info.mac_array[CLIENT], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
+        PRINTK("Used Accountability Key", s->mb_info->accountability_keys[CLIENT], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
         PRINTK("Source MAC", hmac, hmlen);
 
         memcpy(p, hmac, hmlen);
@@ -4511,7 +4511,7 @@ static int ssl3_read_internal(SSL *s, void *buf, int len, int peek)
         unsigned char *hmac, *sid, *smac, *mmac, *ak, *id, *mrp, *ptr;
         unsigned char msg[2 * TLS_MD_HMAC_SIZE];
         PRINTK("Hash of Received Message", chash, chlen);
-        nk = s->mb_info.num_keys;
+        nk = s->mb_info->num_keys;
         cidx = nk - 1;
         mrp = mr + mrlen;
         sid = mr;
@@ -4550,7 +4550,7 @@ static int ssl3_read_internal(SSL *s, void *buf, int len, int peek)
             index++;
           }
 
-          if (!strncmp(hmac, mmac, TLS_MD_HMAC_SIZE))
+          if (!strncmp((const char *)hmac, (const char *)mmac, TLS_MD_HMAC_SIZE))
             MA_LOG("Verify Success in Modification MAC");
           else
             MA_LOG("Verify Falied in Modification MAC");
@@ -4570,7 +4570,7 @@ static int ssl3_read_internal(SSL *s, void *buf, int len, int peek)
           sidx++;
         }
 
-        if (!strncmp(hmac, smac, TLS_MD_HMAC_SIZE))
+        if (!strncmp((const char *)hmac, (const char *)smac, TLS_MD_HMAC_SIZE))
         {
 #ifdef DEBUG
           printf("[matls] %s:%s:%d: Verify Success\n", __FILE__, __func__, __LINE__);

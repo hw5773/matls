@@ -546,47 +546,42 @@ int SSL_CTX_register_id(SSL_CTX *ctx)
   {
     if (!(id = BIO_new(BIO_s_mem())))
     {
-      MA_LOG("Error making memory\n");
+      MA_LOG("Error making memory");
     }
     else
     {
-      MA_LOG("Making memory success\n");
+      MA_LOG("Making memory success");
     }
 
     if (!(key = BIO_new(BIO_f_md())))
     {
-      MA_LOG("Error making md filter\n");
+      MA_LOG("Error making md filter");
     }
     else
     {
-      MA_LOG("Making md filter success\n");
+      MA_LOG("Making md filter success");
     }
 
     if (!BIO_set_md(key, EVP_sha256()))
     {
-      MA_LOG("Error setting sha256\n");
+      MA_LOG("Error setting sha256");
     }
     else
     {
-      MA_LOG("Setting sha256 success\n");
+      MA_LOG("Setting sha256 success");
     }
 
     BIO_push(key, id);
 
     if (!(pkey = X509_get_pubkey(ctx->x509)))
     {
-      MA_LOG("Error getting public key from certificate\n");
+      MA_LOG("Error getting public key from certificate");
     }
     else
     {
-      MA_LOG("Getting public key from certificate\n");
+      MA_LOG("Getting public key from certificate");
     }
-/*
-    if (!PEM_write_bio_PUBKEY(key, pkey))
-      printf("Error writing public key data in PEM format\n");
-    else
-      printf("Writing public key data in PEM format\n");
-*/
+
     if (!i2d_PUBKEY_bio(key, pkey))
     {
       MA_LOG("Error writing public key data in DER format\n");

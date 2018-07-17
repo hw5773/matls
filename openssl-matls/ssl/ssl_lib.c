@@ -699,6 +699,7 @@ void SSL_free(SSL *s)
 #endif
 
 #ifndef OPENSSL_NO_MATLS
+  int nk;
 	if (s->proof)
 		OPENSSL_free(s->proof);
 
@@ -722,12 +723,40 @@ void SSL_free(SSL *s)
         BN_CTX_free(s->mb_info->bn_ctx);
     }
 
+    if (s->mb_info->id_table)
+    {
+      for (nk = 0; nk < s->mb_info->num_keys; nk++)
+        free(s->mb_info->id_table[nk]);
+    }
+
+    if (s->mb_info->accountability_keys)
+    {
+      for (nk = 0; nk < s->mb_info->num_keys; nk++)
+        free(s->mb_info->accountability_keys[nk]);
+
+      free(s->mb_info->accountability_keys);
+    }
+
+    if (s->mb_info->keypair)
+    {
+      EC_POINT_free(s->mb_info->keypair->pub);
+      BN_free(s->mb_info->keypair->pri);
+      free(s->mb_info->keypair);
+    }
+
+    if (s->mb_info->pub_str)
+      free(s->mb_info->pub_str);
+
+    if (s->pair && s->pair->mb_info)
+      if (s->pair->mb_info == s->mb_info)
+        s->pair->mb_info = NULL;
+
     free(s->mb_info);
   }
 #endif /* OPENSSL_NO_MATLS */
 
 	OPENSSL_free(s);
-	}
+  }
 
 void SSL_set_bio(SSL *s,BIO *rbio,BIO *wbio)
 	{
@@ -2726,6 +2755,13 @@ int SSL_enable_mb(SSL *s)
       s->mb_info->bn_ctx = s->ctx->mb_info->bn_ctx;
     else
       s->mb_info->bn_ctx = BN_CTX_new();
+
+    s->mb_info->num_keys = 0;
+    s->mb_info->key_length = NULL;
+    s->mb_info->accountability_keys = NULL;
+    s->mb_info->peer_str = NULL;
+    s->mb_info->id_table = NULL;
+    s->mb_info->pkey = NULL;
 
     pthread_mutex_init(&(s->lock), NULL);
     s->lockp = &(s->lock);

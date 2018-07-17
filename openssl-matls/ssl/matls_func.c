@@ -79,22 +79,7 @@ int generate_accountability_keys(SSL *s)
   nk = s->mb_info->num_keys;
   group = s->mb_info->group;
 
-  if (s->middlebox)
-  {
-    s->mb_info->accountability_keys = (unsigned char **)calloc(2, sizeof(unsigned char *));
-    end = 2;
-  }
-  else
-  {
-    s->mb_info->accountability_keys = (unsigned char **)calloc(nk, 
-        sizeof(unsigned char *));
-    end = nk;
-  }
-
-  for (i=0; i<nk; i++)
-  {
-    s->mb_info->accountability_keys[i] = (unsigned char *)malloc(SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
-  }
+  s->mb_info->accountability_keys = (unsigned char **)calloc(nk, sizeof(unsigned char *));
 
   ctx = BN_CTX_new();
   x = BN_new();
@@ -103,8 +88,9 @@ int generate_accountability_keys(SSL *s)
   PRINTK("Server Random", s->mb_info->random[SERVER], s->mb_info->rlen[SERVER]);
   PRINTK("Client Random", s->mb_info->random[CLIENT], s->mb_info->rlen[CLIENT]);
 
-  for (i=0; i<end; i++)
+  for (i=0; i<nk; i++)
   {
+    s->mb_info->accountability_keys[i] = (unsigned char *)malloc(SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
     secret = EC_POINT_new(group);
     peer_pub = EC_POINT_new(group);
     klen = s->mb_info->key_length[i];
@@ -130,9 +116,18 @@ int generate_accountability_keys(SSL *s)
         NULL, 0, NULL, 0, secret_str, SECRET_LENGTH, 
         s->mb_info->accountability_keys[i], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
 
+    PRINTK("Secret", secret_str, xlen);
     PRINTK("Accountability Key", s->mb_info->accountability_keys[i], 
         SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
+
+    free(secret_str);
   }
+
+  for (i=0; i<nk; i++)
+    free(s->mb_info->peer_str[i]);
+
+  free(s->mb_info->peer_str);
+  free(s->mb_info->key_length);
 
   return 1;
 }

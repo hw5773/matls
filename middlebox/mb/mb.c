@@ -96,7 +96,6 @@ int main(int count, char *strings[])
       MA_LOG1d("error in join", rc);
       return 1;
     }
-    close(client);
 	}
 
   free_forward_table();
@@ -194,7 +193,7 @@ void *mb_run(void *data)
   SSL_free(ssl->pair);
   SSL_free(ssl);
   close(fd);
-//  close(client);
+  close(client);
 }
 
 int get_total_length(char *buf, int rcvd)

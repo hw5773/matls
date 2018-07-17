@@ -98,7 +98,7 @@ int main(int count, char *strings[])
 
 void *run(void *data)
 {	
-	int server, sent, rcvd;
+	int server, sent, rcvd, ret;
   unsigned char buf[BUF_SIZE];
 	SSL *ssl;
   const char *request = 
@@ -121,10 +121,14 @@ void *run(void *data)
 	hs_start = get_current_microseconds();
 	RECORD_LOG(ssl->time_log, CLIENT_HANDSHAKE_START);
 
-  if ( SSL_connect(ssl) == FAIL )   /* perform the connection */
+  if ( (ret = SSL_connect(ssl)) < 0 )   /* perform the connection */
+  {
+    printf("ret after SSL_connect: %d\n", ret);
     ERR_print_errors_fp(stderr);
+  }
 	else
 	{
+    printf("ret after SSL_connect: %d\n", ret);
 		RECORD_LOG(ssl->time_log, CLIENT_HANDSHAKE_END);
 		INTERVAL(ssl->time_log, CLIENT_HANDSHAKE_START, CLIENT_HANDSHAKE_END);
 		hs_end = get_current_microseconds();

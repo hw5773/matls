@@ -715,6 +715,7 @@ int matls_get_extended_finished(SSL *s)
       rc = verification(hmac, MATLS_H_LENGTH, NID_sha256, slen, sig, s->mb_info->pkey[i]);
       if (rc != 1)
       {
+        printf("HMAC Verify Failed\n");
         MA_LOG1d("Verify Failed", i);
         exit(1);
       }
@@ -748,12 +749,18 @@ int matls_get_extended_finished(SSL *s)
     if (rc == 1)
       MA_LOG("Verify Success");
     else
+    {
+      printf("Signature Verify Failed\n");
       MA_LOG1d("Verify Failed", nk-1);
+    }
 
     if (strncmp(hmac, h, MATLS_H_LENGTH) == 0)
       MA_LOG("Verification Success");
     else
+    {
+      printf("Final HMAC Verify Failed\n");
       MA_LOG("Verification Failed");
+    }
   }
 
 	return 1;
@@ -1216,20 +1223,18 @@ long ssl3_get_message(SSL *s, int st1, int stn, int mt, long max, int *ok)
 			/////
       */
 			while (s->init_num < 4)
-				{
-        st2 = get_current_microseconds();
-				i=s->method->ssl_read_bytes(s,SSL3_RT_HANDSHAKE,
+			{
+			  i=s->method->ssl_read_bytes(s,SSL3_RT_HANDSHAKE,
 					&p[s->init_num],4 - s->init_num, 0);
-        et2 = get_current_microseconds();
 
 				if (i <= 0)
-					{
+				{
 					s->rwstate=SSL_READING;
 					*ok = 0;
 					return i;
-					}
-				s->init_num+=i;
 				}
+				s->init_num+=i;
+			}
 			
       /*
 			/////

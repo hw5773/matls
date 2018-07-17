@@ -4349,12 +4349,10 @@ int ssl3_write(SSL *s, const void *b, int len)
     }
     else // Server
     {
-#ifdef DEBUG
-      printf("[matls] %s:%s:%d: This is the server\n", __FILE__, __func__, __LINE__);
-#endif /* DEBUG */
       if (s->matls_received)
       {
 #ifdef DEBUG
+        printf("[matls] %s:%s:%d: This is the server\n", __FILE__, __func__, __LINE__);
         printf("[matls] %s:%s:%d: Making the modification record\n", __FILE__, __func__, __LINE__);
 #endif /* DEBUG */
         mrlen = TLS_MD_ID_SIZE + TLS_MD_HMAC_SIZE;

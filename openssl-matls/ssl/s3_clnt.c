@@ -334,6 +334,7 @@ int ssl3_connect(SSL *s)
 			else
 				s->state=SSL3_ST_CR_CERT_A;
 			s->init_num=0;
+
 			break;
 
 		case SSL3_ST_CR_CERT_A:
@@ -357,41 +358,41 @@ int ssl3_connect(SSL *s)
 			/* or PSK */
 			if (!(s->s3->tmp.new_cipher->algorithm_auth & (SSL_aNULL|SSL_aSRP)) &&
 			    !(s->s3->tmp.new_cipher->algorithm_mkey & SSL_kPSK))
-				{
-          if (s->mb_enabled)
-          {
-            MSTART("Before matls_get_server_certificate", "server-side");
+			{
+        if (s->mb_enabled)
+        {
+          MSTART("Before matls_get_server_certificate", "server-side");
 	
-            if (!(s->server || s->middlebox))
-            {
-              RECORD_LOG(s->time_log, CLIENT_CERT_VALIDATION_START);
-            }
-            if (s->middlebox)
-              ret = matls_get_server_certificate_mb(s);
-            else
-              ret = matls_get_server_certificate_clnt(s);
-            if (!(s->server || s->middlebox))
-            {
-              RECORD_LOG(s->time_log, CLIENT_CERT_VALIDATION_END);
-              INTERVAL(s->time_log, CLIENT_CERT_VALIDATION_START, CLIENT_CERT_VALIDATION_END);
-            }
-            MEND("After matls_get_server_certificate", "server-side");
-          }
-          else
+          if (!(s->server || s->middlebox))
           {
-            MSTART("Before ssl3_get_server_certificate", "server-side");
-            if (!(s->server || s->middlebox))
-            {
-              RECORD_LOG(s->time_log, CLIENT_CERT_VALIDATION_START);
-            }
-    				ret=ssl3_get_server_certificate(s);
-            if (!(s->server || s->middlebox))
-            {
-              RECORD_LOG(s->time_log, CLIENT_CERT_VALIDATION_END);
-              INTERVAL(s->time_log, CLIENT_CERT_VALIDATION_START, CLIENT_CERT_VALIDATION_END);
-            }
-            MEND("After ssl3_get_server_certificate", "server-side");
+            RECORD_LOG(s->time_log, CLIENT_CERT_VALIDATION_START);
           }
+          if (s->middlebox)
+            ret = matls_get_server_certificate_mb(s);
+          else
+            ret = matls_get_server_certificate_clnt(s);
+          if (!(s->server || s->middlebox))
+          {
+            RECORD_LOG(s->time_log, CLIENT_CERT_VALIDATION_END);
+            INTERVAL(s->time_log, CLIENT_CERT_VALIDATION_START, CLIENT_CERT_VALIDATION_END);
+          }
+          MEND("After matls_get_server_certificate", "server-side");
+        }
+        else
+        {
+          MSTART("Before ssl3_get_server_certificate", "server-side");
+          if (!(s->server || s->middlebox))
+          {
+            RECORD_LOG(s->time_log, CLIENT_CERT_VALIDATION_START);
+          }
+    			ret=ssl3_get_server_certificate(s);
+          if (!(s->server || s->middlebox))
+          {
+            RECORD_LOG(s->time_log, CLIENT_CERT_VALIDATION_END);
+            INTERVAL(s->time_log, CLIENT_CERT_VALIDATION_START, CLIENT_CERT_VALIDATION_END);
+          }
+          MEND("After ssl3_get_server_certificate", "server-side");
+        }
 				if (ret <= 0) goto end;
 
 #ifndef OPENSSL_NO_MATLS

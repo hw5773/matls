@@ -819,7 +819,7 @@ struct mb_st {
     struct keypair *keypair;
     unsigned char *pub_str;
     int pub_length;
-    unsigned char lock;
+    //unsigned char lock;
     unsigned char *random[2];
     int rlen[2];
 };

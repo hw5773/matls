@@ -168,7 +168,14 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
     MA_LOG1d("Group ID", s->mb_info->group_id);
 
     /* Check num_keys */
-    nk = s->mb_info->num_keys = *(p++);
+    if (s->middlebox)
+    {
+      nk = s->mb_info->num_keys = 2;
+      p += 1;
+    }
+    else
+      nk = s->mb_info->num_keys = *(p++);
+
     MA_LOG1d("Number of Keys (nk)", nk);
     RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_2E);
     INTERVAL(s->time_log, SERVER_CLIENT_HELLO_2S, SERVER_CLIENT_HELLO_2E);
@@ -206,14 +213,31 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
 
       n2s(p, klen);
 
-      s->mb_info->key_length[i] = klen;
-      s->mb_info->peer_str[i] = (unsigned char *)malloc(klen);
-      memcpy(s->mb_info->peer_str[i], p, klen);
+      if (s->middlebox)
+      {
+        s->mb_info->key_length[CLIENT] = klen;
+        s->mb_info->peer_str[CLIENT] = (unsigned char *)malloc(klen);
+        memcpy(s->mb_info->peer_str[CLIENT], p, klen);
+      }
+      else
+      {
+        s->mb_info->key_length[i] = klen;
+        s->mb_info->peer_str[i] = (unsigned char *)malloc(klen);
+        memcpy(s->mb_info->peer_str[i], p, klen);
+      }
       p += klen;
     }
 
-    s->mb_info->random[CLIENT] = s->mb_info->peer_str[0];
-    s->mb_info->rlen[CLIENT] = s->mb_info->key_length[0];
+    if (s->middlebox)
+    {
+      s->mb_info->random[CLIENT] = s->mb_info->peer_str[CLIENT];
+      s->mb_info->rlen[CLIENT] = s->mb_info->key_length[CLIENT];
+    }
+    else
+    {
+      s->mb_info->random[CLIENT] = s->mb_info->peer_str[0];
+      s->mb_info->rlen[CLIENT] = s->mb_info->key_length[0];
+    }
 
     RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_5E);
     INTERVAL(s->time_log, SERVER_CLIENT_HELLO_5S, SERVER_CLIENT_HELLO_5E);
@@ -357,7 +381,14 @@ int ssl_parse_serverhello_mb_ext(SSL *s, unsigned char *d, int size, int *al)
   n2s(p, s->mb_info->group_id);
   MA_LOG1d("Received Group ID", s->mb_info->group_id);
 
-  nk = s->mb_info->num_keys = *(p++);
+  if (s->middlebox)
+  {
+    nk = s->mb_info->num_keys = 2;
+    p += 1;
+  }
+  else
+    nk = s->mb_info->num_keys = *(p++);
+
   MA_LOG1d("Number of Keys", nk);
   RECORD_LOG(s->time_log, CLIENT_SERVER_HELLO_1E);
   INTERVAL(s->time_log, CLIENT_SERVER_HELLO_1S, CLIENT_SERVER_HELLO_1E);
@@ -388,14 +419,32 @@ int ssl_parse_serverhello_mb_ext(SSL *s, unsigned char *d, int size, int *al)
     n2s(p, klen);
     MA_LOG1d("Received Key Length", klen);
 
-    tmp->mb_info->key_length[i] = klen;
-    tmp->mb_info->peer_str[i] = (unsigned char *)malloc(klen);
-    memcpy(s->mb_info->peer_str[i], p, klen);
+    if (s->middlebox)
+    {
+      tmp->mb_info->key_length[SERVER] = klen;
+      tmp->mb_info->peer_str[SERVER] = (unsigned char *)malloc(klen);
+      memcpy(tmp->mb_info->peer_str[SERVER], p, klen);
+    }
+    else
+    {
+      tmp->mb_info->key_length[i] = klen;
+      tmp->mb_info->peer_str[i] = (unsigned char *)malloc(klen);
+      memcpy(tmp->mb_info->peer_str[i], p, klen);
+    }
     p += klen;
+    PRINTK("Received DH Share", tmp->mb_info->peer_str[i], klen);
   }
 
-  tmp->mb_info->random[SERVER] = tmp->mb_info->peer_str[0];
-  tmp->mb_info->rlen[SERVER] = tmp->mb_info->key_length[0];
+  if (s->middlebox)
+  {
+    tmp->mb_info->random[SERVER] = tmp->mb_info->peer_str[SERVER];
+    tmp->mb_info->rlen[SERVER] = tmp->mb_info->key_length[SERVER];
+  }
+  else
+  {
+    tmp->mb_info->random[SERVER] = tmp->mb_info->peer_str[0];
+    tmp->mb_info->rlen[SERVER] = tmp->mb_info->key_length[0];
+  }
 
   RECORD_LOG(s->time_log, CLIENT_SERVER_HELLO_3E);
   INTERVAL(s->time_log, CLIENT_SERVER_HELLO_3S, CLIENT_SERVER_HELLO_3E);

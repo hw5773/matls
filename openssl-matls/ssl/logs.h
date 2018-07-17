@@ -275,29 +275,38 @@ typedef struct log_record
 int lidx;
 FILE *log_file;
 #define INITIALIZE_LOG(arr) \
-  for (lidx=0; lidx<NUM_OF_LOGS; lidx++) \
-    arr[lidx].time = 0; \
+  if (arr) { \
+    for (lidx=0; lidx<NUM_OF_LOGS; lidx++) \
+      arr[lidx].time = 0; \
+  }
 
 #define RECORD_LOG(arr, n) \
-  arr[n].name = #n; \
-  arr[n].time = get_current_microseconds(); \
+  if (arr) { \
+    arr[n].name = #n; \
+    arr[n].time = get_current_microseconds(); \
+  } 
 
-#define PRINT_LOG(arr) ({ \
-  for ((lidx)=0; (lidx) < (NUM_OF_LOGS); (lidx)++) \
-    printf("%s: %lu\n", arr[lidx].name, arr[lidx].time); \
-  })
+#define PRINT_LOG(arr) \
+  if (arr) { \
+    for ((lidx)=0; (lidx) < (NUM_OF_LOGS); (lidx)++) \
+      printf("%s: %lu\n", arr[lidx].name, arr[lidx].time); \
+  }
 
 #define INTERVAL(arr, a, b) \
-  printf("Time from %s to %s: %lu us\n", arr[a].name, arr[b].name, arr[b].time - arr[a].time);
+  if (arr) { \
+    printf("Time from %s to %s: %lu us\n", arr[a].name, arr[b].name, arr[b].time - arr[a].time); \
+  }
 
 #define FINALIZE(arr, fname) \
-  log_file = fopen(fname, "a"); \
-  for (lidx = 0; lidx < NUM_OF_LOGS; lidx++) \
-  { \
-    if (arr[lidx].time > 0) \
-      fprintf(log_file, "%lu, %d, %s\n", arr[lidx].time, lidx, arr[lidx].name); \
-  } \
-  fclose(log_file);
+  if (arr) { \
+    log_file = fopen(fname, "a"); \
+    for (lidx = 0; lidx < NUM_OF_LOGS; lidx++) \
+    { \
+      if (arr[lidx].time > 0) \
+        fprintf(log_file, "%lu, %d, %s\n", arr[lidx].time, lidx, arr[lidx].name); \
+    } \
+    fclose(log_file); \
+  }
   
 extern log_t time_log[NUM_OF_LOGS];
 #else

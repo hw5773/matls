@@ -9,7 +9,7 @@ theory matls_1box
 begin
 
 builtins: diffie-hellman
-functions: senc/2, sdec/2, h/1, mac/2, makeTLSKey/1, makeac/1, sign/2, verify/3, pk/1, true/0
+functions: decision/1, senc/2, sdec/2, h/1, mac/2, makeTLSKey/3, makeac/1, sign/2, verify/3, pk/1, true/0
 equations: sdec(senc(m, k), k) = m,
            verify(msg, sign(msg, k), pk(k)) = true
 
@@ -32,7 +32,7 @@ rule Create_Middlebox:
     [ !PublicKey('middlebox', $M, pk(~key)), !PrivateKey('middlebox', $M, ~key) ]
 
 //-------------------- Corruption Rules ---------------------//
-/*
+
 rule Corrupt_Server:
     [ !PrivateKey('server', $S, key) ]
   --[ CorruptServer($S) ]->
@@ -43,7 +43,13 @@ rule Corrupt_Middlebox:
     [ !PrivateKey('middlebox', $M, key) ]
   --[ CorruptMiddlebox($S) ]->
     [ Out(key) ]
-*/
+
+rule Gen_TLS_Exponent:
+    [ Fr(~x) ]--[ CorruptExponent(~x) ]->[ Out(~x), Out('g_tls'^~x) ]
+
+rule Gen_Acc_Exponent:
+    [ Fr(~x) ]--[ CorruptExponent(~x) ]->[ Out(~x), Out('g_acc'^~x) ]
+
 //-------------------- 'Handshake' Rules --------------------//
 
 
@@ -58,14 +64,16 @@ rule Client_Hello:
     [
      Fr(~nc),
      Fr(~c_ac),
-     Fr(~details) // Details describes arbitrary things about the communication
-                  // This can be modelled more thoroughly later
+     Fr(~details) // Details describes choices such as ciphersuite. We later check that all sessions
+                  // use choices derived from these parameters.
     ]
-  --[ REACH_TEST('1')
+  --[ REACH_TEST('1'),
+      StartThread(~nc),
+      CreateExponent(~c_ac, 'g_acc'^(~c_ac))
     ]->
     [ 
     // Session data
-     ClientHello(~nc, ~c_ac, ~details),
+     ClientHello(~nc, ~c_ac, ~details, client_hello_message),
     // Things for others
      Out( client_hello_message )
     ]
@@ -87,12 +95,16 @@ rule MB1_Hello:
       Fr(~mb1_ac),
       Fr(~n_mb1_c) // this nonce will bind all mbox session components
     ]
-  --[ REACH_TEST('2') ]->
+  --[ REACH_TEST('2'),
+      NonceUniqueness($M, details, nc),
+      StartThread(~n_mb1_c),
+      CreateExponent(~mb1_ac, 'g_acc'^(~mb1_ac))
+   ]->
     [ // Session data
-      MiddleboxHello(~n_mb1_c, middlebox_client_acc_key, ~mb1_ac,  details, nc),
+      MiddleboxHello($M, ~n_mb1_c, client_hello_message, middlebox_client_acc_key, ~mb1_ac,  details, nc, middlebox_client_hello_message, ac_keychain ),
       // Outputs for others
-      Out(middlebox_client_hello_message),
-      KeyChain( ac_keychain )
+      Out(< middlebox_client_hello_message, ac_keychain >)
+      //KeyChainForward( ac_keychain )
      ]
 
 
@@ -102,15 +114,15 @@ rule Server_Hello:
     cac_contribution = 'g_acc'^~x
     mb1ac_contribution = 'g_acc'^~y
     // Deconstructing inputs
-    ac_keychain = < cac_contribution, mb1ac_contribution >
-    in_msg = < nmb1, details >
+    forward_keychain = < cac_contribution, mb1ac_contribution >
+    in_msg = < n_mb1_c, details >
     // Creation of session data
     server_client_acc_key = makeac(cac_contribution^~s_ac )
     server_mb1_acc_key = makeac(mb1ac_contribution^~s_ac )
     // Constructing outputs
     certificate = <$S, pk(ltk) >
-    out_msg = < nmb1, ~nstls, 'g_tls'^~s_tls >
-    //signed_msg = revealingSign(out_msg, ltk)
+    chosen_details = decision(details, ~serverdetails)
+    out_msg = < 'server_hello', n_mb1_c, ~nstls, 'g_tls'^~s_tls, chosen_details >
     signature = sign(out_msg, ltk)
     signed_msg = < out_msg, signature >
   in
@@ -118,12 +130,19 @@ rule Server_Hello:
       Fr(~nstls),
       Fr(~s_ac),
       Fr(~s_tls),
-      In(in_msg),
-      KeyChain(ac_keychain)
+      Fr(~serverdetails),
+      In(< in_msg, forward_keychain >)
     ]
-  --[ REACH_TEST('3') ]->
+  --[ REACH_TEST('3'),
+      CreateSignature(ltk),
+      SourceCreated('3', ~nstls),
+      StartThread(~nstls),
+      CreateExponent(~s_ac, 'g_acc'^(~s_ac)),
+      CreateExponent(~s_tls, 'g_tls'^(~s_tls) )
+    ]->
     [ Out(<signed_msg, 'g_acc'^~s_ac >),
-       ServerHello(server_client_acc_key, server_mb1_acc_key, ~nstls, ~s_tls, nmb1, details)
+      Out(~serverdetails),
+       ServerHello(server_client_acc_key, server_mb1_acc_key, ~nstls, ~s_tls, n_mb1_c, ~serverdetails, chosen_details, in_msg, forward_keychain, out_msg,  'g_acc'^~s_ac)
     ]
 
 rule MB1_HelloForward:
@@ -133,41 +152,54 @@ rule MB1_HelloForward:
       sac_contribution = 'g_acc'^~y
       // Deconstructing inputs
       server_certificate = < $S, server_pubkey >
+      server_details_decision = decision(details, ~serverdets)
       //in_msg = getMessage(signed_in_msg)
-      in_msg = <nmb1, nstls, servertlscont>
+      in_msg = <'server_hello', n_mb1_c, nstls, servertlscont, server_details_decision>
       signed_in_msg = <in_msg, signature>
       mb_certificate = < $M, pk(ltk) >
       // Creating session data
       tls_key = makeTLSKey( servertlscont^~g_mb1_c, nstls, n_mb1_c)
       middlebox_server_acc_key = makeac( sac_contribution^~mb1_ac )
+      chosen_details = decision(details, ~mboxdets)
       // Creating outputs
       certificate_chain = < server_certificate, mb_certificate >
-      out_msg = < nc, ~n_mb1_s, 'g_tls'^~g_mb1_s >
+      out_msg = <'mbox_hello', nc, ~n_mb1_s, 'g_tls'^~g_mb1_s, server_details_decision >
       signed_out_msg = <out_msg, sign(out_msg, ltk)>
       acc_chain = < sac_contribution, 'g_acc'^~mb1_ac >
   in
-    [ MiddleboxHello( n_mb1_c, middlebox_client_acc_key, ~mb1_ac, details, nc ),
+    [ MiddleboxHello($M, n_mb1_c, client_hello_message, middlebox_client_acc_key, ~mb1_ac, details, nc, middlebox_client_hello_message, forward_keychain ),
       In(<signed_in_msg, sac_contribution>), 
+      In(~serverdets),
+      In(server_details_decision),
       !PublicKey(types, $S, server_pubkey),
       !PrivateKey('middlebox', $M, ltk ),
       Fr(~n_mb1_s), // nonce for middlebox 1 in the server role
       Fr(~g_mb1_s), // exponent for middlebox 1 in the server role
-      Fr(~g_mb1_c) // exponent for middlebox 1 in the client role (not used until the next round)
+      Fr(~g_mb1_c), // exponent for middlebox 1 in the client role (not used until the next round)
+      Fr(~mboxdets) // decision about which parameters to use for the tls session
     ]
   --[ //Equal(revealingVerify(signed_in_msg, in_msg, server_pubkey), true),
       Equal(verify(in_msg, signature, server_pubkey ), true),
+      ReadSignature(server_pubkey),
+      CreateSignature(ltk),
       REACH_TEST('4'),
-      CreateLoop(nc)
+      CreateLoop(nc),
+      SourceRequired('3', nstls),
+      SourceCreated('4', ~n_mb1_s ),
+      CreateClientDHKey(~g_mb1_s, ~x, nstls, n_mb1_c, servertlscont^~g_mb1_c),
+      AdvKnows( server_details_decision ),
+      ThreadStep(n_mb1_c, '2'),
+      CreateExponent(~g_mb1_s, 'g_tls'^(~g_mb1_s))
     ]->
     [ 
       // Session data
-      MiddleboxAccountability( n_mb1_c, ~mb1_ac, middlebox_client_acc_key, middlebox_server_acc_key), // try and bind these together
-      MiddleboxServerTwo( n_mb1_c, nc, ~n_mb1_s, ~g_mb1_s ),
-      MiddleboxClientTwo( n_mb1_c, tls_key, ~g_mb1_c,  $S ),
+      MiddleboxAccountability($M, n_mb1_c, ~mb1_ac, middlebox_client_acc_key, middlebox_server_acc_key, forward_keychain), // try and bind these together
+      MiddleboxServerTwo($M, n_mb1_c, nc, chosen_details, client_hello_message, ~n_mb1_s, chosen_details, ~g_mb1_s, out_msg, acc_chain ),
+      MiddleboxClientTwo($M, n_mb1_c, tls_key, ~g_mb1_c, server_details_decision, $S, sac_contribution, middlebox_client_hello_message, forward_keychain, in_msg ),
       // Outputs
-      Out( signed_out_msg ),
-      KeyChain(acc_chain),
-      CertificateChain(certificate_chain)
+      Out(signed_out_msg),
+      KeyChainBack(nc, acc_chain),
+      CertificateChainBack(nc, certificate_chain)
     ]  
 
 rule Client_Finished:
@@ -177,7 +209,7 @@ rule Client_Finished:
     sac_contribution = 'g_acc'^~y
     mb1ac_contribution = 'g_acc'^~z
     // Deconstruct inputs
-    in_msg = <nc, n_mb1_s, mbtlscont>
+    in_msg = <'mbox_hello', nc, n_mb1_s, mbtlscont, decision(details, ~stuff) >
     signed_in_msg = <in_msg, signature>
     // Created session data
     client_TLS_key = makeTLSKey( mbtlscont^~g_c , n_mb1_s, nc)
@@ -187,15 +219,20 @@ rule Client_Finished:
     acc_chain = <sac_contribution, mb1ac_contribution>
     certificate_chain = < server_certificate, mb_certificate >
     // Create outputs
-    transcript = < nc, 'g_tls'^c_ac, n_mb1_s,  pks > 
+    out_transcript_messages_sent = <  client_hello_message, 'g_tls'^~g_c >
+    out_transcript_messages_received = < in_msg, acc_chain > 
+    out_transcript = h(< out_transcript_messages_sent, out_transcript_messages_received >) 
+    enc_out_transcript = senc(out_transcript, client_TLS_key)
+    // Prepare for final round
+    anticipated_in_transcript = h(< out_transcript_messages_sent, out_transcript_messages_received, 'serverFinished' >)
   in
     [ 
       // Session Data
-      ClientHello(nc, c_ac, details),
+      ClientHello(nc, c_ac, details, client_hello_message),
       // Received inputs
       In(signed_in_msg),
-      KeyChain(acc_chain),
-      CertificateChain(certificate_chain),
+      KeyChainBack(nc, acc_chain),
+      CertificateChainBack(nc, certificate_chain),
       // Public keys of all people in the certificate chain
       !PublicKey(type, $M, mbox_pubkey),
       !PublicKey('server', $S, pks),
@@ -203,35 +240,58 @@ rule Client_Finished:
     ]
   --[ Equal(verify(in_msg, signature, mbox_pubkey), true),
       REACH_TEST('5'),
-      UseLoop(nc)
+      ReadSignature(mbox_pubkey),
+      UseLoop(nc),
+      SourceRequired('4', n_mb1_s),
+      CreateClientDHKey(~g_c, ~x, n_mb1_s, nc, mbtlscont^~g_c),
+      ThreadStep(nc, '2'),
+      CreateExponent(~g_c, 'g_tls'^(~g_c))
    ]->
     [ 
       // New session data
-      ClientFinished(client_TLS_key, ~g_c, $M, $S),
-      ClientAccountability($M, mb1ac_contribution^c_ac ),
-      ClientAccountability($S,  sac_contribution^c_ac ),
+      ClientFinished(nc, client_TLS_key, c_ac, details, ~g_c, $M, $S, anticipated_in_transcript),
+      ClientAccountability($M, nc, makeac(mb1ac_contribution^c_ac) ),
+      ClientAccountability($S, nc, makeac(sac_contribution^c_ac) ),
       // Outputs
-      Out( <'g_tls'^~g_c, transcript> ) // missing - transcript
+      Out( <'g_tls'^~g_c, enc_out_transcript> ) // missing - transcript
     ]
 
 rule MB1_Finished:
   let
-    // Bind group membership
-    clienttlscont = 'g_tls'^~x
     // Created things
-    server_TLS_key = makeTLSKey( clienttlscont^~g_mb1_s, ~n_mb1_s, nc ) 
+    clienttlscont = 'g_tls'^~x
+    server_tls_key = makeTLSKey( clienttlscont^~g_mb1_s, n_mb1_s, nc )  // My TLS key in the server role
+    // Bind group membership
+    // Received inputs
+    in_transcript_messages_sent = <client_hello_message, clienttlscont> // Things that the person I'm receiving the transcript ~from~ sent
+    in_transcript_messages_received = <last_msg, acc_chain> 
+    in_transcript = h(< in_transcript_messages_sent, in_transcript_messages_received >)
+    enc_in_transcript = senc(in_transcript, server_tls_key)
+    out_transcript_messages_sent = < middlebox_client_hello_message, forward_keychain, 'g_tls'^~g_mb1_c> // Messages that I sent in the session where ~I'm the client~
+    out_transcript_messages_received = <middlebox_client_in_msg, server_acc_contribution >
+    out_transcript = h(< out_transcript_messages_sent, out_transcript_messages_received >)
+    enc_out_transcript = senc(out_transcript, client_tls_key)
+    // Transcript for the return journey (this will go to the client)
+    prepared_out_transcript = h(< in_transcript_messages_sent, in_transcript_messages_received, 'serverFinished' >) // changes the structure, so it is not a rebroadcast
+    // Transcript I expect to receive from my partner in the session where I am the client
+    expected_in_transcript = h(< out_transcript_messages_sent, out_transcript_messages_received, 'serverFinished' >)
   in
-    [ In( clienttlscont ),
-      MiddleboxServerTwo( n_mb1_c, nc, ~n_mb1_s, ~g_mb1_s),
-      MiddleboxClientTwo( n_mb1_c, client_tls_key, ~g_mb1_c, $S )  // these are called this because the middlebox is the client in this split session
+    [ In(< clienttlscont, enc_in_transcript >),
+      MiddleboxServerTwo($M, n_mb1_c, nc, details, client_hello_message, n_mb1_s, chosen_details_server, ~g_mb1_s, last_msg, acc_chain),
+      MiddleboxClientTwo($M, n_mb1_c, client_tls_key, ~g_mb1_c, server_details_decision, $S, server_acc_contribution, middlebox_client_hello_message, forward_keychain, middlebox_client_in_msg ),  // these are called this because the middlebox is the client in this split session
+      !PublicKey('server', $S, pks)
     ]
-  --[ REACH_TEST('6') ]->
+  --[ REACH_TEST('6'),
+      CreateServerDHKey(~g_mb1_s, ~x, n_mb1_s, nc, clienttlscont^~g_mb1_s),
+      EncryptedUsing(enc_out_transcript, client_tls_key),
+      ThreadStep(n_mb1_c, '3')
+    ]->
     [ 
       // Session data (note mboxclient/server are for the middlebox in that role)
-      MiddleboxServerThree( n_mb1_c, server_TLS_key, ~n_mb1_s, $M, $C ), 
-      MiddleboxClientThree( n_mb1_c, client_tls_key, ~g_mb1_c, $S ),
+      MiddleboxServerThree($M, n_mb1_c, server_tls_key, n_mb1_s, chosen_details_server, $C, prepared_out_transcript ), 
+      MiddleboxClientThree($M, n_mb1_c, client_tls_key, ~g_mb1_c, server_details_decision, $S, expected_in_transcript ),
       // Outputs
-      Out( 'g_tls'^~g_mb1_c ) // missing - transcript
+      Out(< 'g_tls'^~g_mb1_c, enc_out_transcript >) // missing - transcript
     ]
 
 
@@ -241,127 +301,303 @@ rule Server_Finished:
     clienttlscont = 'g_tls'^~x
     // Session data
     server_tls_key = makeTLSKey( clienttlscont^~s_tls, ~nstls, nc ) 
-    // Constructed outputs
-    server_transcript = 'hello'
-    log = < 'acc', 'emm', 'sig' > // need better understanding of these
-    transcript_segment = senc(server_transcript, server_tls_key )
-    matls_segment = senc(log, server_tls_key )
+    // TLS transcript
+    in_transcript_messages_sent = <client_hello_message, forward_keychain, clienttlscont> // Things that the person I'm receiving the transcript ~from~ sent
+    in_transcript_messages_received = <server_hello_message, server_acc_contribution>  // Things I have sent to the transcript sender
+    in_transcript = h(< in_transcript_messages_sent, in_transcript_messages_received >)
+    enc_in_transcript = senc(in_transcript, server_tls_key)
+    //out_transcript_messages_sent = in_transcript_messages_received // The things we sent are the same as the things the other person should have received
+    //out_messages_messages_received = < in_transcript_messages_sent, clienttlscont > // The things we received are the things our partner sent, plus the tls key contribution
+    //out_transcript = h(< out_transcript_messages_sent, out_messages_messages_received >)
+    out_transcript = h(< in_transcript_messages_sent, in_transcript_messages_received, 'serverFinished' >)
+    enc_out_transcript = senc(out_transcript, server_tls_key)
+    // maTLS transcript
+    matls_parameters = <chosen_details, out_transcript>
+    matls_hash = h(<matls_parameters ,'origin', server_client_acc_key>)
+    matls_signature = sign(matls_hash, ltk)
+    out_matls_transcript = < matls_parameters, matls_hash, matls_signature >
+    enc_out_matls_transcript = senc( out_matls_transcript, server_tls_key)
   in
-    [ In( clienttlscont ),
-      ServerHello(server_client_acc_key, server_mb1_acc_key, ~nstls, ~s_tls, nc, details)
+    [ In(<clienttlscont, enc_in_transcript >),
+      !PrivateKey('server', $S, ltk),
+      ServerHello(server_client_acc_key, server_mb1_acc_key, ~nstls, ~s_tls, nc, server_details, chosen_details, client_hello_message, forward_keychain, server_hello_message, server_acc_contribution)
     ]
-  --[ REACH_TEST('7') ]->
+  --[ REACH_TEST('7'),
+      LogSegmentCreated( matls_signature ),
+      LogSegmentCreated( matls_hash ),
+      CreateFinishedSignature(ltk),
+      CreateServerDHKey(~s_tls, ~x, ~nstls, nc,  clienttlscont^~s_tls),
+      DecryptedUsing(enc_in_transcript, server_tls_key),
+      KeySource( server_tls_key ),
+      OpenLog( server_details ),
+      ThreadStep(~nstls, '2')
+      //SourceCreated('7', out_transcript)
+   ]->
     [ 
       // Session data
-      ServerSession($S, $M, server_tls_key, server_client_acc_key, server_mb1_acc_key ),
+      !ServerHandshakeComplete($S, $M, ~nstls, server_tls_key ),
+      !ServerAccountability($S, $M, ~nstls, server_mb1_acc_key),
+      !ServerAccountability($S, $C, ~nstls, server_client_acc_key),
       // Outputs
-      Out(<transcript_segment, matls_segment> )
+      Out(enc_out_transcript),
+      Out(enc_out_matls_transcript)
     ]
 
 rule MB1_FinishedForward:
   let
-    // Decoding inputs
-    in_transcript = 'hello'
-    transcript_in_segment = senc(in_transcript, client_tls_key )
-    matls_in_segment = senc(in_log, client_tls_key )
-    // Constructing outputs
-    out_transcript = 'howdy'
-    out_log = < 'acc', 'emm', 'sig' >
-    transcript_out_segment = senc(out_transcript, server_tls_key )
-    matls_out_segment = senc(out_log, server_tls_key )
+    // Preprepared
+    transcript_in_segment = senc(expected_in_transcript, client_tls_key )
+    transcript_out_segment = senc(prepared_out_transcript, server_tls_key)
+
+    // maTLS transcript (check the details are correct)
+    matls_in_parameters = <chosen_details_client, expected_in_transcript>
+    matls_in_log = <matls_in_parameters, matls_in_hash, matls_in_signature>
+    matls_in_segment = senc(matls_in_log, client_tls_key )
+
+    matls_out_parameters = <chosen_details_server, prepared_out_transcript>
+    matls_out_hash = h(<matls_out_parameters, matls_in_hash, middlebox_client_acc_key>)
+    matls_out_signature = sign(matls_out_hash, ltk)
+    matls_out_log = < matls_out_parameters, matls_out_hash, matls_out_signature >
+    
+    matls_chain = < matls_out_log, matls_in_log >
+    enc_matls_out_chain = senc(matls_chain, server_tls_key )
 
   in
-    [ In(<transcript_in_segment, matls_in_segment>),
-      MiddleboxServerThree( n_mb1_c, server_tls_key, ~n_mb1_s, $M, $C ), 
-      MiddleboxClientThree(  n_mb1_c, client_tls_key, ~g_mb1_c, $S ),
-      MiddleboxAccountability(  n_mb1_c, ~mb1_ac, middlebox_client_acc_key, middlebox_server_acc_key)
+    [ In(transcript_in_segment),
+      In(matls_in_segment),
+      MiddleboxServerThree($M, n_mb1_c, server_tls_key, ~n_mb1_s, chosen_details_server, $C, prepared_out_transcript ), 
+      MiddleboxClientThree($M, n_mb1_c, client_tls_key, ~g_mb1_c, chosen_details_client, $S, expected_in_transcript ),
+      MiddleboxAccountability($M, n_mb1_c, ~mb1_ac, middlebox_client_acc_key, middlebox_server_acc_key, forward_keychain),
+      !PrivateKey('middlebox', $M, ltk )
     ]
-  --[ REACH_TEST('8') ]->
+  --[ REACH_TEST('8'),
+      LogSegmentReferenced( matls_in_signature ),
+      LogSegmentReferenced( matls_in_hash ),
+      KeyUsed( client_tls_key ),
+      KeySource( server_tls_key ),
+      CreateFinishedSignature(ltk),
+      ThreadStep(n_mb1_c, '4')
+      //SourceRequired('7', expected_in_transcript)
+    ]->
     [ 
       // Session data
-      MiddleboxClientReady( client_tls_key, ~g_mb1_c, $S ),
-      MiddleboxServerReady( server_tls_key, ~n_mb1_s, $M, $C ),
-      MiddleboxAccountabilityReady( ~mb1_ac, middlebox_client_acc_key, middlebox_server_acc_key ),
+      !MiddleboxClientSession($M, n_mb1_c, client_tls_key, $S ),
+      !MiddleboxServerSession($M, n_mb1_c, server_tls_key, $C ),
+      !MiddleboxAccountabilitySession($M, $S, n_mb1_c, middlebox_client_acc_key, middlebox_server_acc_key ),
       // Outputs
-      Out(< transcript_out_segment, matls_out_segment >)
+      Out(transcript_out_segment),
+      Out(enc_matls_out_chain)
     ]
 
-/*
+
 // 'clientfinished' is the name of the tls rule, but this step is when the client is actually satisfied that the handshake was successful
-// after this rule, he will sart sending real messages (in client_request)
+// after this rule, he will start sending real messages (in client_request)
 rule Client_Complete:
   let
 
+    // Transcript details
+    transcript_in_segment = senc(anticipated_in_transcript, client_tls_key)
+
+    // maTLS details
+    server_matls_parameters = < decision(details, ~x), smtranscript > // The client can't read this transcript because it's hashed
+    server_matls_hash = h(<server_matls_parameters, 'origin', client_server_acc_key >)
+    server_matls_log = <server_matls_parameters, server_matls_hash, server_matls_signature >
+
+    mbox_matls_parameters = < decision(details, ~y), anticipated_in_transcript > // The client expects this transcript to be the same as the one they receive elsewhere
+    mbox_matls_hash = h(< mbox_matls_parameters, server_matls_hash, client_mb1_acc_key >)
+    mbox_matls_log = <mbox_matls_parameters, mbox_matls_hash, mbox_matls_signature >
+
+    matls_chain = <mbox_matls_log, server_matls_log>
+    enc_matls_in_chain = senc(matls_chain, client_tls_key)
   in
+    [ 
+      ClientFinished(nc, client_tls_key, c_ac, details, ~g_c, $M, $S, anticipated_in_transcript),
+      ClientAccountability($M, nc, client_mb1_acc_key ),
+      ClientAccountability($S, nc, client_server_acc_key ),
+      !PublicKey('middlebox', $M, pkm),
+      !PublicKey('server', $S, pks),
+      In(transcript_in_segment),
+      In(enc_matls_in_chain)
+    ]
+  --[
+      Equal(verify(server_matls_hash, server_matls_signature, pks), true),
+      Equal(verify(mbox_matls_hash, mbox_matls_signature, pkm), true),
+      REACH_TEST('9'),
+      ReadFinishedSignature(pks),
+      ReadFinishedSignature(pkm),
+      KeyUsed( client_tls_key ),
+      CloseLog(~x),
+      ThreadStep(nc, '3')
+    ]->
     [  ]
-  --[  ]->
-    [  ]
+
 //------------------ 'Communication' Rules ------------------//
+
+/*
 
 rule Client_Request:
   let
-
+    matls_out_log = <'origin', $C, 'origin', mac(~req, client_server_acc_key)  > 
+    out_msg = <~req, matls_out_log>
+    enc_out_msg = senc(out_msg, client_tls_key)
   in
-    [  ]
-  --[  ]->
-    [  ]
+    [  
+    Fr(~req),
+    !ClientHandshakeComplete( $S, $M, nc, client_tls_key ),
+    !ClientAccountabilityComplete($S, $S, nc, client_server_acc_key)
+    //!ClientAccountabilityComplete($M, $S, nc, client_mb1_acc_key)
+    ]
+  --[ REACH_TEST('10') ]->
+    [  
+    ClientRequest($S, nc, ~req),
+    Out(enc_out_msg)
+    ]
 
 rule MB1_Request:
   let
+    // Decode inputs
+    mb1_in_log = <'origin', $C, 'origin', weirdmac >
+    in_msg = <req, mb1_in_log >
+    enc_in_msg = senc(in_msg, server_tls_key)
 
+    // Encode outputs
+    new_req = req// no modification
+    mb1_out_log = < mb1_in_log, $M, h(req), mac(h(new_req), mb_server_acc_key) > 
+    out_msg = <req, mb1_out_log >
+    enc_out_msg = senc(out_msg, client_tls_key)
   in
-    [  ]
-  --[  ]->
-    [  ]
+    [ 
+      In(enc_in_msg),
+      !MiddleboxClientSession($M, id, client_tls_key, $S ),
+      !MiddleboxServerSession($M, id, server_tls_key, $C ),
+      !MiddleboxAccountabilitySession($M, $S, id, mb_client_acc_key, mb_server_acc_key )
+    ]
+  --[ REACH_TEST('11') ]->
+    [ 
+      Out(enc_out_msg),
+      MiddleboxRequest($S, id, req) 
+    ]
 
 rule Server_Reply:
   let
+      client_log = <'origin', $C, 'origin', mac(h(client_req), server_client_acc_key) >
+      mb_in_log = < client_log, $M, h(client_req), mac(h(mb_req), server_mb1_acc_key) >
+      in_msg = <mb_req, mb_in_log>
+      enc_in_msg = senc(in_msg, server_tls_key)
+
+      out_log = <'serverOrigin', $S, 'serverOrigin', mac(h(~resp), server_client_acc_key)>
+      out_msg = <~resp, out_log>
+      enc_out_msg = senc(out_msg, server_tls_key)
 
   in
-    [  ]
-  --[  ]->
-    [  ]
+    [ 
+      In(enc_in_msg),
+      !ServerHandshakeComplete($S, $M, ~nstls, server_tls_key ),
+      !ServerAccountability($S, $M, ~nstls, server_mb1_acc_key),
+      !ServerAccountability($S, $C, ~nstls, server_client_acc_key),
+      Fr(~resp)
+    ]
+  --[ REACH_TEST('12') ]->
+    [ 
+      Out(enc_out_msg)
+    ]
 
 rule MB1_Reply_NoModification:
   let
+    in_log = <'serverOrigin', $S, 'serverOrigin', weirdmac >
+    in_msg = <resp, in_log >
+    enc_in_msg = senc(in_msg, client_tls_key)
+
+    new_resp = resp
+    out_log = <in_log, $M, h(resp), mac(h(new_resp), mb_client_acc_key) >
+    out_msg = <resp, out_log>
+    enc_out_msg = senc(out_msg, server_tls_key)
 
   in
-    [  ]
-  --[  ]->
-    [  ]
+    [ 
+      In(enc_in_msg),
+      MiddleboxRequest($S, id, req),
+      !MiddleboxClientSession($M, id, client_tls_key, $S ),
+      !MiddleboxServerSession($M, id, server_tls_key, $C ),
+      !MiddleboxAccountabilitySession($M, $S, id, mb_client_acc_key, mb_server_acc_key )
+    ]
+  --[ REACH_TEST('13a') ]->
+    [ Out(enc_out_msg) ]
 
 rule MB1_Reply_Modification:
   let
+    in_log = <'serverOrigin', $S, 'serverOrigin', weirdmac >
+    in_msg = <resp, in_log >
+    enc_in_msg = senc(in_msg, client_tls_key)
+
+    new_resp = ~newResp
+    out_log = <in_log, $M, h(resp), mac(h(new_resp), mb_client_acc_key) >
+    out_msg = <resp, out_log>
+    enc_out_msg = senc(out_msg, server_tls_key)
 
   in
-    [  ]
-  --[  ]->
-    [  ]
+    [ 
+      Fr(~newResp),
+      In(enc_in_msg),
+      MiddleboxRequest($S, id, req),
+      !MiddleboxClientSession($M, id, client_tls_key, $S ),
+      !MiddleboxServerSession($M, id, server_tls_key, $C ),
+      !MiddleboxAccountabilitySession($M, $S, id, mb_client_acc_key, mb_server_acc_key )
+    ]
+  --[ REACH_TEST('13b') ]->
+    [ Out(enc_out_msg) ]
 
 rule Client_Receive:
   let
+    server_log = <'serverOrigin', $S, 'serverOrigin', mac(h(orig_resp), client_server_acc_key) >
+    acc_log = <server_log, $M, h(orig_resp), mac(h(mb_resp), client_mb1_acc_key) >
+    in_msg = <mb_resp, acc_log>
+    enc_in_msg = senc(in_msg, client_tls_key)
 
   in
+    [ 
+      In(enc_in_msg),
+      !ClientHandshakeComplete( $S, $M, nc, client_tls_key ),
+      !ClientAccountabilityComplete($S, $S, nc, client_server_acc_key),
+      !ClientAccountabilityComplete($M, $S, nc, client_mb1_acc_key),
+      ClientRequest($S, nc, ~req)
+    ]
+  --[ REACH_TEST('14') ]->
     [  ]
-  --[  ]->
-    [  ]
+
+*/
 
 // ----------------------------------------------------------//
 // --------------------- Restrictions -----------------------//
 // ----------------------------------------------------------//
 
-*/
 
 restriction equal:
   "
   All a b #t1. Equal(a,b)@t1 ==> a = b
   "
 
-restriction oneKey:
+restriction one_mbox_key:
   "
   All A ka kb #t1 #t2. CreateMiddlebox(A, ka)@t1 & CreateMiddlebox(A, kb)@t2 ==> #t1 = #t2
-
   "
+
+restriction one_server_key:
+  "
+  All A ka kb #t1 #t2. CreateServer(A, ka)@t1 & CreateServer(A, kb)@t2 ==> #t1 = #t2
+  "
+
+restriction middlebox_nonce_uniqueness:
+  "
+  All m nc deets #t1 #t2. NonceUniqueness(m, deets, nc)@t1 &
+                    NonceUniqueness(m, deets, nc)@t2 ==> #t1 = #t2
+  "
+
+restriction loop_nonce_uniqueness:
+  "
+  All nc #t1 #t2. CreateLoop(nc)@t1 & CreateLoop(nc)@t2 ==> #t1 = #t2  
+  "
+
 
 /*
 // ----------------------------------------------------------//
@@ -371,28 +607,250 @@ restriction oneKey:
 
 //---------------------- Helper Lemmas ----------------------//
 */
-lemma loop_sources[use_induction, reuse]:
+
+
+/*
+
+lemma secret_sources[sources]:
+    all-traces
+    "
+    All id value #tread. SourceRequired(id, value)@tread ==>
+      ( Ex #tcreate. 
+          (SourceCreated(id, value)@tcreate &
+            #tcreate < #tread
+          )
+      ) |
+      (
+        Ex #tadv.
+          (KU(value)@tadv &
+           #tadv < #tread
+          )
+      ) 
+    "
+*/
+
+// The matls logs contain some elements that are incomprehensible to
+// The receiver, but they must perform a function on them. This
+// sources lemma proves that the log elements must have come from the
+// correct place
+lemma log_segment_sources[sources]:
+  all-traces
+  "
+  All value #tread. LogSegmentReferenced(value) @ #tread ==>
+        ( Ex #tcreate. 
+          (LogSegmentCreated(value)@tcreate &
+            #tcreate < #tread
+          )
+      ) |
+      (
+        Ex #tadv.
+          (KU(value)@tadv &
+           #tadv < #tread
+          )
+      ) 
+  "
+
+lemma thread_start_uniqueness[reuse]:
+  all-traces
+  "
+  All tid #tstarta #tstartb. StartThread(tid)@tstarta & StartThread(tid)@tstartb ==>
+    #tstarta = #tstartb
+  "
+
+lemma thread_roots[reuse]:
+  all-traces
+  "
+  All tid step #tstep. ThreadStep(tid, step)@tstep ==>
+      Ex #tstart. StartThread(tid)@tstart &
+                  #tstart < #tstep
+  "
+
+lemma thread_step_uniqueness[reuse]:
+  all-traces
+  "
+  All tid step #tstepa #tstepb. ThreadStep(tid, step)@tstepa &
+                                ThreadStep(tid, step)@tstepb ==>
+                                #tstepa = #tstepb
+  "
+
+lemma exponent_reveal[reuse]:
+  all-traces
+  "
+  All x gx #tc. CreateExponent(x, gx)@tc ==> not Ex #tk. KU(x)@tk
+  "
+
+// If two people both generate the same key, then the adversary
+// cannot know both of the exponents
+lemma key_component_knowledge[reuse]:
+  all-traces
+  "
+  All x y na nb gxy #ta #tb. CreateClientDHKey(x, y, na, nb, gxy)@ta &
+                         CreateServerDHKey(y, x, na, nb, gxy)@tb &
+                         (not #ta = #tb) ==>
+                         not(Ex #tkx. KU(x)@tkx) |
+                         not(Ex #tky. KU(y)@tky)
+  "
+
+lemma key_client_part_knowledge[reuse]:
+  all-traces
+  "
+  All x y na nb gxy #ta. CreateClientDHKey(x, y, na, nb, gxy)@ta ==>
+        not (Ex #tk. KU(x)@tk)
+  "
+
+lemma key_server_part_knowledge[reuse]:
+  all-traces
+  "
+  All x y na nb gxy #ta. CreateServerDHKey(x, y, na, nb, gxy)@ta ==>
+        not (Ex #tk. KU(x)@tk)
+  "
+
+lemma maketls_client_source[reuse]:
+  all-traces
+  "
+  All x y gxy na nb #tcr #tk. 
+      (CreateClientDHKey(x, y, na, nb, gxy)@tcr
+      ) &
+      KU( makeTLSKey(gxy, na, nb ))@tk ==>
+      (Ex #tkx. KU(x)@tkx) |
+      (Ex #tky. KU(y)@tky)
+  "
+
+lemma key_client_knowledge[reuse]:
+  all-traces
+  "
+  All x y na nb gxy #ta. CreateClientDHKey(x, y, na, nb, gxy)@ta ==>
+        not (Ex #tk. KU(gxy)@tk)
+  "
+
+lemma key_server_knowledge[reuse]:
+  all-traces
+  "
+  All x y na nb gxy #ta. CreateServerDHKey(x, y, na, nb, gxy)@ta ==>
+        not (Ex #tk. KU(gxy)@tk)
+  "
+
+lemma signature_sources[reuse]:
+    all-traces
+    "
+    All pubk #tread. ReadSignature(pubk)@tread ==>
+      ( Ex ltk #tsign. 
+          (CreateSignature(ltk)@tsign &
+            #tsign < #tread &
+            pk(ltk) = pubk  
+          )
+      ) |
+      (
+        Ex ltk #tadv.
+          (KU(ltk)@tadv &
+           #tadv < #tread &
+           pk(ltk) = pubk
+          )
+      ) 
+    "
+
+lemma finished_signature_sources[reuse]:
+    all-traces
+    "
+    All pubk #tread. ReadFinishedSignature(pubk)@tread ==>
+      ( Ex ltk #tsign. 
+          (CreateFinishedSignature(ltk)@tsign &
+            #tsign < #tread &
+            pk(ltk) = pubk  
+          )
+      ) |
+      (
+        Ex ltk #tadv.
+          (KU(ltk)@tadv &
+           #tadv < #tread &
+           pk(ltk) = pubk
+          )
+      ) 
+    "
+
+
+// The core-knowledge of a DH key is hidden
+// (unless the agent intentionally revealed it)
+/*
+lemma key_construction[sources]:
+  all-traces
+  "
+  All x y na nb #tx. CreateDHKey(x, y, na, nb)@tx ==>
+    (not Ex #tk. KU(x)@tk & #tk < #tx)
+  "
+*/
+
+// If six is before seven, then four is before six, and so four is before seven
+// Which fixes a problem with thinking seven might be before four
+/*
+lemma six_before_seven[sources]:
+  all-traces
+  "
+  All msg key #tin. DecryptedUsing(msg, key)@tin ==>
+    (
+      Ex #tk. (#tk < #tin) & (KU(key)@tk)
+    ) |
+    (
+      Ex #tout. EncryptedUsing(msg, key)@tout & (#tout < #tin)
+    )
+  "
+  */
+
+
+// If a client in the server role created a DH key,
+// Then either their partner previously created the key,
+// or the second value is adversary generated
+/*
+lemma server_key_construction[sources]:
+  all-traces
+  "
+  All x y na nb #tx. CreateServerDHKey(x, y, na, nb)@tx ==>
+    ( Ex #tadv. KU(y)@tadv &
+     (#tadv < #tx)
+    ) 
+    |
+    (
+      Ex #ty. CreateDHKey(y, x, na, nb)@ty &
+      (#ty < #tx)
+    )
+  "
+*/
+
+
+lemma loop_induction[use_induction, reuse]:
     all-traces
     "
     All loopID #tloop. UseLoop(loopID)@tloop ==>
-      Ex #tsource. CreateLoop(loopID)@tsource
+      (Ex #tsource. CreateLoop(loopID)@tsource & #tsource < #tloop) |
+      (Ex #tadv. KU(loopID)@tadv & #tadv < #tloop)
     "
 
-
-
+lemma log_chain_creation[use_induction, reuse]:
+  all-traces
+  "
+  All logID #tclose. CloseLog(logID)@tclose ==>
+    Ex #topen. OpenLog(logID)@topen
+  "
 
 
 /*
 //----------------------- Check Lemmas ----------------------//
 
 */
-
+/*
 lemma reach_test:
     exists-trace
     "
     Ex #t1. REACH_TEST('4')@t1
     "
-
+*/
+lemma no_corrupt_reach_test:
+    exists-trace
+    "
+    (Ex #t1. REACH_TEST('13a')@t1) &
+    (not Ex m #tcm. CorruptMiddlebox(m)@tcm) &
+    (not Ex s #tcs. CorruptServer(s)@tcs)
+    "
 
 /*
 

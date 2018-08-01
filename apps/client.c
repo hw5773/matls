@@ -128,7 +128,6 @@ void *run(void *data)
   }
 	else
 	{
-    printf("ret after SSL_connect: %d\n", ret);
 		RECORD_LOG(ssl->time_log, CLIENT_HANDSHAKE_END);
 		INTERVAL(ssl->time_log, CLIENT_HANDSHAKE_START, CLIENT_HANDSHAKE_END);
 		hs_end = get_current_microseconds();

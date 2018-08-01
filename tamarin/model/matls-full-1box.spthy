@@ -18,8 +18,16 @@ equations: sdec(senc(m, k), k) = m,
 // ----------------------------------------------------------//
 
 
-
 //----------------------- Setup Rules -----------------------//
+
+/*
+
+These rules correspond to creation of keypairs for agents in the
+'server' role (which includes middleboxes). These keypairs
+are used for signing messages during the response phase of the
+first round trip.
+
+*/
 
 rule Create_Server:
     [ Fr(~key) ]
@@ -33,24 +41,55 @@ rule Create_Middlebox:
 
 //-------------------- Corruption Rules ---------------------//
 
+/*
+
+The protocol allows for several forms of corruption. The
+two main sources are in leaking a signing key (established
+in the above rules), or in leaking the private portion of
+a DH key. For example, given g^x, learning x.
+
+*/
+
 rule Corrupt_Server:
     [ !PrivateKey('server', $S, key) ]
-  --[ CorruptServer($S) ]->
+  --[ CorruptServer($S), LtkCorrupted(key), CorruptLtkOf($S) ]->
     [ Out(key) ]
 
 
 rule Corrupt_Middlebox:
     [ !PrivateKey('middlebox', $M, key) ]
-  --[ CorruptMiddlebox($S) ]->
+  --[ CorruptMiddlebox($M), LtkCorrupted(key), CorruptLtkOf($M) ]->
     [ Out(key) ]
 
+// These should be within the scope of adversary capability
+/*
 rule Gen_TLS_Exponent:
     [ Fr(~x) ]--[ CorruptExponent(~x) ]->[ Out(~x), Out('g_tls'^~x) ]
 
 rule Gen_Acc_Exponent:
     [ Fr(~x) ]--[ CorruptExponent(~x) ]->[ Out(~x), Out('g_acc'^~x) ]
 
+*/
+
 //-------------------- 'Handshake' Rules --------------------//
+
+/*
+
+These rules comprise the 'handshake' phase of the protocol,
+which is arguably the most complex part. It involves two round
+trips. In the first, session parameters are negotiated, and
+'accountability keys' (for the maTLS-exclusive part of the protocol)
+are constructed. In the second round trip, TLS keys are established,
+and agents send transcripts of all of the messages they have sent
+and received in the protocol so far.
+
+The final trip from server to client also includes a special
+'accountability log', where the client is given information
+about the session details of all intermediate sessions. This
+is used to ensure that the entire round trip meets some
+minimum security requirement.
+
+*/
 
 
 // nc: nonce-client, used in establishment of encryption and mac keys
@@ -69,7 +108,10 @@ rule Client_Hello:
     ]
   --[ REACH_TEST('1'),
       StartThread(~nc),
-      CreateExponent(~c_ac, 'g_acc'^(~c_ac))
+      CreateExponent(~c_ac, 'g_acc'^(~c_ac)),
+      SendMsg(~nc, client_hello_message),
+      // Security
+      ForwardAction(~nc, 'hello', $C, $M) // (the client isn't aware of M at this point, but we retroactively enforce this)
     ]->
     [ 
     // Session data
@@ -98,7 +140,13 @@ rule MB1_Hello:
   --[ REACH_TEST('2'),
       NonceUniqueness($M, details, nc),
       StartThread(~n_mb1_c),
-      CreateExponent(~mb1_ac, 'g_acc'^(~mb1_ac))
+      CreateExponent(~mb1_ac, 'g_acc'^(~mb1_ac)),
+      // Transcript with the server
+      SendMsg(~n_mb1_c, middlebox_client_hello_message),
+      SendMsg(~n_mb1_c, ac_keychain),
+      RecvMsg(~n_mb1_c, client_hello_message),
+      // Security
+      ForwardAction(nc, 'hello', $M, $S)
    ]->
     [ // Session data
       MiddleboxHello($M, ~n_mb1_c, client_hello_message, middlebox_client_acc_key, ~mb1_ac,  details, nc, middlebox_client_hello_message, ac_keychain ),
@@ -138,10 +186,17 @@ rule Server_Hello:
       SourceCreated('3', ~nstls),
       StartThread(~nstls),
       CreateExponent(~s_ac, 'g_acc'^(~s_ac)),
-      CreateExponent(~s_tls, 'g_tls'^(~s_tls) )
+      CreateExponent(~s_tls, 'g_tls'^(~s_tls) ),
+      SendPublicMessage(chosen_details, ltk),
+      SendMsg(~nstls, out_msg),
+      SendMsg(~nstls, 'g_acc'^~s_ac),
+      RecvMsg(~nstls, in_msg),
+      RecvMsg(~nstls, forward_keychain),
+      // Security
+      BackwardAction(~nc, 'hello', $S, $M),
+      ForwardAction(~nc, 'hello', $S, 'end')
     ]->
     [ Out(<signed_msg, 'g_acc'^~s_ac >),
-      Out(~serverdetails),
        ServerHello(server_client_acc_key, server_mb1_acc_key, ~nstls, ~s_tls, n_mb1_c, ~serverdetails, chosen_details, in_msg, forward_keychain, out_msg,  'g_acc'^~s_ac)
     ]
 
@@ -168,9 +223,7 @@ rule MB1_HelloForward:
       acc_chain = < sac_contribution, 'g_acc'^~mb1_ac >
   in
     [ MiddleboxHello($M, n_mb1_c, client_hello_message, middlebox_client_acc_key, ~mb1_ac, details, nc, middlebox_client_hello_message, forward_keychain ),
-      In(<signed_in_msg, sac_contribution>), 
-      In(~serverdets),
-      In(server_details_decision),
+      In(<signed_in_msg, sac_contribution>),
       !PublicKey(types, $S, server_pubkey),
       !PrivateKey('middlebox', $M, ltk ),
       Fr(~n_mb1_s), // nonce for middlebox 1 in the server role
@@ -186,10 +239,18 @@ rule MB1_HelloForward:
       CreateLoop(nc),
       SourceRequired('3', nstls),
       SourceCreated('4', ~n_mb1_s ),
-      CreateClientDHKey(~g_mb1_s, ~x, nstls, n_mb1_c, servertlscont^~g_mb1_c),
-      AdvKnows( server_details_decision ),
+      CreateClientDHKey($M, $S, ~g_mb1_s, ~x, nstls, n_mb1_c, servertlscont^~g_mb1_c),
       ThreadStep(n_mb1_c, '2'),
-      CreateExponent(~g_mb1_s, 'g_tls'^(~g_mb1_s))
+      CreateExponent(~g_mb1_s, 'g_tls'^(~g_mb1_s)),
+      ReceivePublicMessage(chosen_details, server_pubkey),
+      // Transcript with the server
+      RecvMsg(n_mb1_c, in_msg),
+      RecvMsg(n_mb1_c, sac_contribution),
+      // Transcript with the client
+      SendMsg(n_mb1_c, out_msg),
+      SendMsg(n_mb1_c, acc_chain),
+      // Security,
+      BackwardAction(nc, 'hello', $M, $C)
     ]->
     [ 
       // Session data
@@ -243,9 +304,18 @@ rule Client_Finished:
       ReadSignature(mbox_pubkey),
       UseLoop(nc),
       SourceRequired('4', n_mb1_s),
-      CreateClientDHKey(~g_c, ~x, n_mb1_s, nc, mbtlscont^~g_c),
+      CreateClientDHKey($C, $M, ~g_c, ~x, n_mb1_s, nc, mbtlscont^~g_c),
       ThreadStep(nc, '2'),
-      CreateExponent(~g_c, 'g_tls'^(~g_c))
+      CreateExponent(~g_c, 'g_tls'^(~g_c)),
+      // Transcript with local server
+      TranscriptUsesSend(nc, client_hello_message),
+      // These were sent or received in this message
+      //TranscriptUsesSend(nc, 'g_tls'^~g_c),
+      //TranscriptUsesRecv(nc, in_msg),
+      //TranscriptUsesRecv(nc, acc_chain),
+      // Security
+      ForwardAction(nc, 'transcript', $C, $M),
+      BackwardAction(nc, 'hello', $C, 'end')
    ]->
     [ 
       // New session data
@@ -258,10 +328,10 @@ rule Client_Finished:
 
 rule MB1_Finished:
   let
-    // Created things
-    clienttlscont = 'g_tls'^~x
-    server_tls_key = makeTLSKey( clienttlscont^~g_mb1_s, n_mb1_s, nc )  // My TLS key in the server role
     // Bind group membership
+    clienttlscont = 'g_tls'^~x
+    // Created things
+    server_tls_key = makeTLSKey( clienttlscont^~g_mb1_s, n_mb1_s, nc )  // My TLS key in the server role
     // Received inputs
     in_transcript_messages_sent = <client_hello_message, clienttlscont> // Things that the person I'm receiving the transcript ~from~ sent
     in_transcript_messages_received = <last_msg, acc_chain> 
@@ -281,17 +351,34 @@ rule MB1_Finished:
       MiddleboxClientTwo($M, n_mb1_c, client_tls_key, ~g_mb1_c, server_details_decision, $S, server_acc_contribution, middlebox_client_hello_message, forward_keychain, middlebox_client_in_msg ),  // these are called this because the middlebox is the client in this split session
       !PublicKey('server', $S, pks)
     ]
-  --[ REACH_TEST('6'),
-      CreateServerDHKey(~g_mb1_s, ~x, n_mb1_s, nc, clienttlscont^~g_mb1_s),
+  --[ 
+      // Reachability
+      REACH_TEST('6'),
+      // Sources/Looping
+      CreateServerDHKey($C, $M, ~g_mb1_s, ~x, n_mb1_s, nc, clienttlscont^~g_mb1_s),
       EncryptedUsing(enc_out_transcript, client_tls_key),
-      ThreadStep(n_mb1_c, '3')
+      ThreadStep(n_mb1_c, '3'),
+      // Transcript with the server
+      TranscriptUsesSend(n_mb1_c, middlebox_client_hello_message),
+      TranscriptUsesSend(n_mb1_c, forward_keychain),
+      TranscriptUsesRecv(n_mb1_c, middlebox_client_in_msg),
+      TranscriptUsesRecv(n_mb1_c, server_acc_contribution),
+      // Transcript with the client
+      TranscriptUsesSend(n_mb1_c, last_msg),
+      TranscriptUsesSend(n_mb1_c, acc_chain),
+      TranscriptUsesRecv(n_mb1_c, client_hello_message),
+      // These were sent or received in this message
+      //TranscriptUsesRecv(n_mb1_c, clienttlscont)
+      //TranscriptUsesSend(n_mb1_c, 'g_tls'^~g_mb1_c),
+      // Security
+      ForwardAction(nc, 'transcript', $M, $S)
     ]->
     [ 
       // Session data (note mboxclient/server are for the middlebox in that role)
-      MiddleboxServerThree($M, n_mb1_c, server_tls_key, n_mb1_s, chosen_details_server, $C, prepared_out_transcript ), 
-      MiddleboxClientThree($M, n_mb1_c, client_tls_key, ~g_mb1_c, server_details_decision, $S, expected_in_transcript ),
+      MiddleboxServerThree($M, nc, n_mb1_c, server_tls_key, n_mb1_s, chosen_details_server, $C, prepared_out_transcript ), 
+      MiddleboxClientThree($M, nc, n_mb1_c, client_tls_key, ~g_mb1_c, server_details_decision, $S, expected_in_transcript ),
       // Outputs
-      Out(< 'g_tls'^~g_mb1_c, enc_out_transcript >) // missing - transcript
+      Out(< 'g_tls'^~g_mb1_c, enc_out_transcript >)
     ]
 
 
@@ -306,9 +393,7 @@ rule Server_Finished:
     in_transcript_messages_received = <server_hello_message, server_acc_contribution>  // Things I have sent to the transcript sender
     in_transcript = h(< in_transcript_messages_sent, in_transcript_messages_received >)
     enc_in_transcript = senc(in_transcript, server_tls_key)
-    //out_transcript_messages_sent = in_transcript_messages_received // The things we sent are the same as the things the other person should have received
-    //out_messages_messages_received = < in_transcript_messages_sent, clienttlscont > // The things we received are the things our partner sent, plus the tls key contribution
-    //out_transcript = h(< out_transcript_messages_sent, out_messages_messages_received >)
+    // Outbound transcript (which is the same as the inbound one)
     out_transcript = h(< in_transcript_messages_sent, in_transcript_messages_received, 'serverFinished' >)
     enc_out_transcript = senc(out_transcript, server_tls_key)
     // maTLS transcript
@@ -323,19 +408,27 @@ rule Server_Finished:
       ServerHello(server_client_acc_key, server_mb1_acc_key, ~nstls, ~s_tls, nc, server_details, chosen_details, client_hello_message, forward_keychain, server_hello_message, server_acc_contribution)
     ]
   --[ REACH_TEST('7'),
-      LogSegmentCreated( matls_signature ),
-      LogSegmentCreated( matls_hash ),
+      LogSegmentCreated(matls_signature ),
+      LogSegmentCreated(matls_hash ),
       CreateFinishedSignature(ltk),
-      CreateServerDHKey(~s_tls, ~x, ~nstls, nc,  clienttlscont^~s_tls),
+      CreateServerDHKey($M, $S, ~s_tls, ~x, ~nstls, nc,  clienttlscont^~s_tls),
       DecryptedUsing(enc_in_transcript, server_tls_key),
       KeySource( server_tls_key ),
       OpenLog( server_details ),
-      ThreadStep(~nstls, '2')
+      ThreadStep(~nstls, '2'),
+      TranscriptUsesSend(~nstls, server_hello_message),
+      //TranscriptUsesSend(~nstls, server_acc_contribution),
+      TranscriptUsesRecv(~nstls, client_hello_message),
+      TranscriptUsesRecv(~nstls, forward_keychain),
       //SourceCreated('7', out_transcript)
+      // Security
+      ServerHandshakeComplete($C, $S, nc),
+      BackwardAction(nc, 'transcript', $S, $M),
+      ForwardAction(nc, 'transcript', $S, 'end')
    ]->
     [ 
       // Session data
-      !ServerHandshakeComplete($S, $M, ~nstls, server_tls_key ),
+      !ServerSession($S, $M, ~nstls, server_tls_key ),
       !ServerAccountability($S, $M, ~nstls, server_mb1_acc_key),
       !ServerAccountability($S, $C, ~nstls, server_client_acc_key),
       // Outputs
@@ -350,6 +443,7 @@ rule MB1_FinishedForward:
     transcript_out_segment = senc(prepared_out_transcript, server_tls_key)
 
     // maTLS transcript (check the details are correct)
+    matls_in_signature = sign(matls_in_hash, pubkey)
     matls_in_parameters = <chosen_details_client, expected_in_transcript>
     matls_in_log = <matls_in_parameters, matls_in_hash, matls_in_signature>
     matls_in_segment = senc(matls_in_log, client_tls_key )
@@ -365,25 +459,33 @@ rule MB1_FinishedForward:
   in
     [ In(transcript_in_segment),
       In(matls_in_segment),
-      MiddleboxServerThree($M, n_mb1_c, server_tls_key, ~n_mb1_s, chosen_details_server, $C, prepared_out_transcript ), 
-      MiddleboxClientThree($M, n_mb1_c, client_tls_key, ~g_mb1_c, chosen_details_client, $S, expected_in_transcript ),
+      MiddleboxServerThree($M, nc, n_mb1_c, server_tls_key, ~n_mb1_s, chosen_details_server, $C, prepared_out_transcript ), 
+      MiddleboxClientThree($M, nc, n_mb1_c, client_tls_key, ~g_mb1_c, chosen_details_client, $S, expected_in_transcript ),
       MiddleboxAccountability($M, n_mb1_c, ~mb1_ac, middlebox_client_acc_key, middlebox_server_acc_key, forward_keychain),
-      !PrivateKey('middlebox', $M, ltk )
+      !PrivateKey('middlebox', $M, ltk ),
+      !PublicKey(type, $A, pubkey)
     ]
-  --[ REACH_TEST('8'),
-      LogSegmentReferenced( matls_in_signature ),
-      LogSegmentReferenced( matls_in_hash ),
+  --[ 
+      // Reachability
+      REACH_TEST('8'),
+      // Sources/Looping
+      LogSegmentReferenced(matls_in_signature ),
+      LogSegmentReferenced(matls_in_hash ),
       KeyUsed( client_tls_key ),
       KeySource( server_tls_key ),
       CreateFinishedSignature(ltk),
-      ThreadStep(n_mb1_c, '4')
+      ThreadStep(n_mb1_c, '4'),
       //SourceRequired('7', expected_in_transcript)
+      // Security properties
+      MiddleboxHandshakeComplete($C, $M, $C, $S, nc),
+      MiddleboxDetails($C, $M, nc, chosen_details_server, chosen_details_client),
+      BackwardAction(nc, 'transcript', $M, $C)
     ]->
     [ 
       // Session data
-      !MiddleboxClientSession($M, n_mb1_c, client_tls_key, $S ),
-      !MiddleboxServerSession($M, n_mb1_c, server_tls_key, $C ),
-      !MiddleboxAccountabilitySession($M, $S, n_mb1_c, middlebox_client_acc_key, middlebox_server_acc_key ),
+      !MiddleboxClientSession($M, nc, n_mb1_c, client_tls_key, $S ),
+      !MiddleboxServerSession($M, nc, n_mb1_c, server_tls_key, $C ),
+      !MiddleboxAccountabilitySession($M, $S, nc, n_mb1_c, middlebox_client_acc_key, middlebox_server_acc_key ),
       // Outputs
       Out(transcript_out_segment),
       Out(enc_matls_out_chain)
@@ -427,31 +529,61 @@ rule Client_Complete:
       ReadFinishedSignature(pkm),
       KeyUsed( client_tls_key ),
       CloseLog(~x),
-      ThreadStep(nc, '3')
+      ThreadStep(nc, '3'),
+      // Security properties
+      ClientHandshakeComplete($C, $S, nc),
+      ClientHandshakeMiddleboxComplete($C, $M, $C, $S, nc),
+      ClientMiddleboxDetails($C, $M, nc, details),
+      BackwardAction(nc, 'transcript', $C, 'end'),
+      PathOrderingEstablished(nc, $C, $M),
+      PathOrderingEstablished(nc, $M, $S)
     ]->
-    [  ]
+    [ 
+    !ClientSession( $S, $M, nc, client_tls_key ),
+    !ClientAccountabilityComplete($C, $S, nc, client_server_acc_key)
+    ]
 
 //------------------ 'Communication' Rules ------------------//
 
 /*
 
+These rules refer to the 'request->response' phase of communication.
+They assume that a client and server have already established
+a session (through a set of intermediate middleboxes)
+
+Note that because the premises of these rules use persistent facts,
+multiple sets of messages can be exchanged using the same established
+TLS and accountability keys.
+
+*/
+
+
 rule Client_Request:
   let
-    matls_out_log = <'origin', $C, 'origin', mac(~req, client_server_acc_key)  > 
+    out_mac = mac(~req, client_server_acc_key)
+    matls_out_log = <'origin', $C, 'origin', out_mac  > 
     out_msg = <~req, matls_out_log>
     enc_out_msg = senc(out_msg, client_tls_key)
   in
     [  
     Fr(~req),
-    !ClientHandshakeComplete( $S, $M, nc, client_tls_key ),
-    !ClientAccountabilityComplete($S, $S, nc, client_server_acc_key)
+    !ClientSession( $S, $M, nc, client_tls_key ),
+    !ClientAccountabilityComplete($C, $S, nc, client_server_acc_key)
     //!ClientAccountabilityComplete($M, $S, nc, client_mb1_acc_key)
     ]
-  --[ REACH_TEST('10') ]->
+  --[  
+    // Reachability
+    REACH_TEST('10'),
+    // Sources
+    CtoSRecordCreated(out_mac),
+    // Security
+    ForwardAction(nc, ~req, $C, $M)
+    ]->
     [  
     ClientRequest($S, nc, ~req),
     Out(enc_out_msg)
     ]
+
 
 rule MB1_Request:
   let
@@ -468,11 +600,15 @@ rule MB1_Request:
   in
     [ 
       In(enc_in_msg),
-      !MiddleboxClientSession($M, id, client_tls_key, $S ),
-      !MiddleboxServerSession($M, id, server_tls_key, $C ),
-      !MiddleboxAccountabilitySession($M, $S, id, mb_client_acc_key, mb_server_acc_key )
+      !MiddleboxClientSession($M, nc, id, client_tls_key, $S ),
+      !MiddleboxServerSession($M, nc, id, server_tls_key, $C ),
+      !MiddleboxAccountabilitySession($M, $S, nc, id, mb_client_acc_key, mb_server_acc_key )
     ]
-  --[ REACH_TEST('11') ]->
+  --[ REACH_TEST('11'),
+      CtoSRecordReferenced(weirdmac),
+      // Security
+      ForwardAction(nc, req, $M, $S)
+   ]->
     [ 
       Out(enc_out_msg),
       MiddleboxRequest($S, id, req) 
@@ -485,19 +621,28 @@ rule Server_Reply:
       in_msg = <mb_req, mb_in_log>
       enc_in_msg = senc(in_msg, server_tls_key)
 
-      out_log = <'serverOrigin', $S, 'serverOrigin', mac(h(~resp), server_client_acc_key)>
+      out_mac = mac(h(~resp), server_client_acc_key)
+      out_log = <'serverOrigin', $S, 'serverOrigin', out_mac >
       out_msg = <~resp, out_log>
       enc_out_msg = senc(out_msg, server_tls_key)
 
   in
     [ 
       In(enc_in_msg),
-      !ServerHandshakeComplete($S, $M, ~nstls, server_tls_key ),
+      !ServerSession($S, $M, ~nstls, server_tls_key ),
       !ServerAccountability($S, $M, ~nstls, server_mb1_acc_key),
       !ServerAccountability($S, $C, ~nstls, server_client_acc_key),
       Fr(~resp)
     ]
-  --[ REACH_TEST('12') ]->
+  --[ 
+      REACH_TEST('12'),
+      StoCRecordCreated(out_mac),
+      // Security
+      ForwardAction(nc, client_req, $S, 'end'),
+      BackwardAction(nc, ~resp, $S, $M),
+      ServerSent($C, $S, nc, client_req, ~resp),
+      ServerResponseComplete($C, $S, client_req, nc)
+    ]->
     [ 
       Out(enc_out_msg)
     ]
@@ -517,11 +662,20 @@ rule MB1_Reply_NoModification:
     [ 
       In(enc_in_msg),
       MiddleboxRequest($S, id, req),
-      !MiddleboxClientSession($M, id, client_tls_key, $S ),
-      !MiddleboxServerSession($M, id, server_tls_key, $C ),
-      !MiddleboxAccountabilitySession($M, $S, id, mb_client_acc_key, mb_server_acc_key )
+      !MiddleboxClientSession($M, nc, id, client_tls_key, $S ),
+      !MiddleboxServerSession($M, nc, id, server_tls_key, $C ),
+      !MiddleboxAccountabilitySession($M, $S, nc, id, mb_client_acc_key, mb_server_acc_key )
     ]
-  --[ REACH_TEST('13a') ]->
+  --[ 
+      // Reachability
+      REACH_TEST('13a'),
+      // Sources/Looping
+      StoCRecordReferenced(weirdmac),
+      // Security
+      MiddleboxResponseComplete($C, $M, $C, $S, req, nc),
+      BackwardAction(nc, resp, $M, $C),
+      MiddleboxChanges($C, $M, req, nc, resp, new_resp)
+   ]->
     [ Out(enc_out_msg) ]
 
 rule MB1_Reply_Modification:
@@ -540,11 +694,20 @@ rule MB1_Reply_Modification:
       Fr(~newResp),
       In(enc_in_msg),
       MiddleboxRequest($S, id, req),
-      !MiddleboxClientSession($M, id, client_tls_key, $S ),
-      !MiddleboxServerSession($M, id, server_tls_key, $C ),
-      !MiddleboxAccountabilitySession($M, $S, id, mb_client_acc_key, mb_server_acc_key )
+      !MiddleboxClientSession($M, id, nc, client_tls_key, $S ),
+      !MiddleboxServerSession($M, id, nc,  server_tls_key, $C ),
+      !MiddleboxAccountabilitySession($M, $S, nc, id, mb_client_acc_key, mb_server_acc_key )
     ]
-  --[ REACH_TEST('13b') ]->
+  --[ 
+      // Reachability
+      REACH_TEST('13b'),
+      // Sources/Looping
+      StoCRecordReferenced(weirdmac),
+      // Security
+      MiddleboxResponseComplete($C, $M, $C, $S, req, nc),
+      BackwardAction(nc, resp, $M, $C),
+      MiddleboxChanges($C, $M, req, nc, resp, new_resp)
+   ]->
     [ Out(enc_out_msg) ]
 
 rule Client_Receive:
@@ -557,20 +720,46 @@ rule Client_Receive:
   in
     [ 
       In(enc_in_msg),
-      !ClientHandshakeComplete( $S, $M, nc, client_tls_key ),
-      !ClientAccountabilityComplete($S, $S, nc, client_server_acc_key),
+      !ClientSession( $S, $M, nc, client_tls_key ),
+      !ClientAccountabilityComplete($C, $S, nc, client_server_acc_key),
       !ClientAccountabilityComplete($M, $S, nc, client_mb1_acc_key),
-      ClientRequest($S, nc, ~req)
+      ClientRequest($S, nc, req)
     ]
-  --[ REACH_TEST('14') ]->
+  --[ 
+    // Reachability
+    REACH_TEST('14'),
+    // Security Properties
+    ClientResponseComplete($C, $S, req, nc),
+    ClientResponseMiddleboxComplete($C, $M, $S, $C, req, nc),
+    BackwardAction(nc, orig_resp, $C, 'end'),
+    ClientBelivesServerSent($C, $S, nc, req, orig_resp),
+    ClientSeesChange($C, $M, req, nc, orig_resp, mb_resp)
+    ]->
     [  ]
 
-*/
 
 // ----------------------------------------------------------//
 // --------------------- Restrictions -----------------------//
 // ----------------------------------------------------------//
 
+/*
+
+Restrictions ensure that we only look at a subset of traces.
+These includes a set of common-sense assumptions about how
+real-world implementations are set up.
+
+For example, the irreversibility of signing functions means
+that we cannot explicitly deconstruct a signature (since the
+recipient does not know the secret signing key of the sender).
+Instead, we must ensure that the result given by the verify()
+function is accurate.
+
+Similarly, we assume that an agent will not reuse nonces when
+running sessions. This applies to both nonces they generate
+(which is an immediate consequence of the Fr(~) fact), but also
+nonces they receive.
+
+*/
 
 restriction equal:
   "
@@ -598,14 +787,25 @@ restriction loop_nonce_uniqueness:
   All nc #t1 #t2. CreateLoop(nc)@t1 & CreateLoop(nc)@t2 ==> #t1 = #t2  
   "
 
-
-/*
 // ----------------------------------------------------------//
 // ------------------------- Lemmas -------------------------//
 // ----------------------------------------------------------//
 
 
 //---------------------- Helper Lemmas ----------------------//
+
+/*
+
+These source lemmas are important in ensuring the prover tool
+operates correctly. Some of the messages in the protocol contain
+data that the recipient cannot deconstruct. Tamarin often becomes
+concerned that there might be traces in which this mystery data
+contains key information.
+
+Source lemmas specify the origin of such mystery data. Without them,
+the prover can often get locked in the precomputation step,
+or otherwise get stuck in bizarre loops while proving.
+
 */
 
 
@@ -647,7 +847,64 @@ lemma log_segment_sources[sources]:
           (KU(value)@tadv &
            #tadv < #tread
           )
-      ) 
+      )
+  "
+
+// In the transcript phase of the protocol, agents send encrypted
+// versions of things that were sent in plaintext earlier on in the protocol
+// Tamarin tries to be clever by thinking that the encrypted version might be
+// the 'original' source, and then gets confused trying to recover the encryption key
+// So this lemma tells Tamarin that the adversary should already know the value
+lemma already_knew_that[sources]:
+  all-traces
+  "
+  All value pubkey #trecv. ReceivePublicMessage(value, pubkey)@trecv ==>
+    (Ex ltk #tsend. SendPublicMessage(value, ltk)@tsend & (#tsend < #trecv) & (pk(ltk) = pubkey)) |
+    (Ex ltk #tcompromise. LtkCorrupted(ltk)@tcompromise & (#tcompromise < #trecv) & (pk(ltk) = pubkey))
+  "
+
+// The matls accountability chains contain hashes that cannot be interpreted
+// by middleboxes (since the modification record hashes things with a key 
+// shared by the final destination, not the intermediate agents)
+// We need to reassure tamarin that these logs are of a certain type
+/*
+lemma modification_record_sources[use_induction]:
+  all-traces
+  "
+ All value #tread. CtoSRecordReferenced(value) @ #tread ==>
+      ( Ex #tcreate. 
+        (CtoSRecordCreated(value)@tcreate &
+          #tcreate < #tread
+        )
+    ) |
+    (
+      Ex #tadv.
+        (KU(value)@tadv &
+         #tadv < #tread
+        )
+    )  
+  &
+  All value #tread. StoCRecordReferenced(value) @ #tread ==>
+      ( Ex #tcreate. 
+        (StoCRecordCreated(value)@tcreate &
+          #tcreate < #tread
+        )
+    ) |
+    (
+      Ex #tadv.
+        (KU(value)@tadv &
+         #tadv < #tread
+        )
+    )   
+  "
+*/
+
+// The messages inside a built transcript must have been sent(recvd) by the person building the transcript
+lemma transcript_message_origins[use_induction, reuse]:
+  all-traces
+  "
+  (All id message #t1. TranscriptUsesRecv(id, message)@t1 ==> (Ex #t2. RecvMsg(id, message)@t2 & (#t2 < #t1))) &
+  (All id message #t1. TranscriptUsesSend(id, message)@t1 ==> (Ex #t2. SendMsg(id, message)@t2 & (#t2 < #t1)) )
   "
 
 lemma thread_start_uniqueness[reuse]:
@@ -684,8 +941,8 @@ lemma exponent_reveal[reuse]:
 lemma key_component_knowledge[reuse]:
   all-traces
   "
-  All x y na nb gxy #ta #tb. CreateClientDHKey(x, y, na, nb, gxy)@ta &
-                         CreateServerDHKey(y, x, na, nb, gxy)@tb &
+  All C S x y na nb gxy #ta #tb. CreateClientDHKey(C, S, x, y, na, nb, gxy)@ta &
+                         CreateServerDHKey(C, S, y, x, na, nb, gxy)@tb &
                          (not #ta = #tb) ==>
                          not(Ex #tkx. KU(x)@tkx) |
                          not(Ex #tky. KU(y)@tky)
@@ -694,22 +951,22 @@ lemma key_component_knowledge[reuse]:
 lemma key_client_part_knowledge[reuse]:
   all-traces
   "
-  All x y na nb gxy #ta. CreateClientDHKey(x, y, na, nb, gxy)@ta ==>
+  All C S x y na nb gxy #ta. CreateClientDHKey(C, S, x, y, na, nb, gxy)@ta ==>
         not (Ex #tk. KU(x)@tk)
   "
 
 lemma key_server_part_knowledge[reuse]:
   all-traces
   "
-  All x y na nb gxy #ta. CreateServerDHKey(x, y, na, nb, gxy)@ta ==>
+  All C S x y na nb gxy #ta. CreateServerDHKey(C, S, x, y, na, nb, gxy)@ta ==>
         not (Ex #tk. KU(x)@tk)
   "
 
 lemma maketls_client_source[reuse]:
   all-traces
   "
-  All x y gxy na nb #tcr #tk. 
-      (CreateClientDHKey(x, y, na, nb, gxy)@tcr
+  All C S x y gxy na nb #tcr #tk. 
+      (CreateClientDHKey(C, S, x, y, na, nb, gxy)@tcr
       ) &
       KU( makeTLSKey(gxy, na, nb ))@tk ==>
       (Ex #tkx. KU(x)@tkx) |
@@ -719,14 +976,15 @@ lemma maketls_client_source[reuse]:
 lemma key_client_knowledge[reuse]:
   all-traces
   "
-  All x y na nb gxy #ta. CreateClientDHKey(x, y, na, nb, gxy)@ta ==>
-        not (Ex #tk. KU(gxy)@tk)
+  All C S x y na nb gxy #ta. CreateClientDHKey(C, S, x, y, na, nb, gxy)@ta ==>
+        (not (Ex #tk. KU(gxy)@tk)) |
+        (Ex #tcorrupt. CorruptLtkOf(S)@tcorrupt)
   "
 
 lemma key_server_knowledge[reuse]:
   all-traces
   "
-  All x y na nb gxy #ta. CreateServerDHKey(x, y, na, nb, gxy)@ta ==>
+  All C S x y na nb gxy #ta. CreateServerDHKey(C, S, x, y, na, nb, gxy)@ta ==>
         not (Ex #tk. KU(gxy)@tk)
   "
 
@@ -794,7 +1052,8 @@ lemma six_before_seven[sources]:
       Ex #tout. EncryptedUsing(msg, key)@tout & (#tout < #tin)
     )
   "
-  */
+
+*/
 
 
 // If a client in the server role created a DH key,
@@ -833,31 +1092,215 @@ lemma log_chain_creation[use_induction, reuse]:
   "
 
 
+//-----------------------------------------------------------//
+//------------------ Intermediate Lemmas --------------------//
+//-----------------------------------------------------------//
+
 /*
-//----------------------- Check Lemmas ----------------------//
+
+Intermediate lemmas are multi-step lemmas that prove non-trival
+results that we intend to reuse later. Most of these relate to
+either secrecy, or on enforcing an ordering of events.
+
+Because key generation is a multi-step process, the prover often
+gets confused when working with secrecy related claims. For
+example, it will correctly deduce that the adversary will have
+to learn the key at some point. However, Tamarin puts a low
+priority on deducing ~how~ the adversary learns the key, and
+instead attempts to rebuild the rest of the trace first.
+Building an intermediate lemma that skips to the end of the
+reasoning chain (e.g. the key is secret unless a participant
+is compromised)
+
+Event ordering lemmas are related to the fact that there can be
+several sources of the same data during the key exchange. For
+example, the Middlebox transcript messages include (encrypted)
+information about the negotiated session details. This data
+is also sent in plaintext earlier. Because Tamarin searches
+exhaustively, it will check for these bizarre traces (where the
+transcript phase occurs before the 'hello' phase, and often
+gets confused. These intermediate lemmas will prove that in any
+reasonable trace, an action '5' must be preceded by an action '4',
+(and not an action '7'), for example.
 
 */
+
+//-----------------------------------------------------------//
+//----------------------- Check Lemmas ----------------------//
+//-----------------------------------------------------------//
+
 /*
-lemma reach_test:
-    exists-trace
-    "
-    Ex #t1. REACH_TEST('4')@t1
-    "
+
+These simplistic lemmas exist to show that various stages of
+the protocol are reachable. Many include clauses that prevent
+certain adversary-style actions from occuring.
+
+Note that many security goals are essentially meaningless if
+these lemmas are not true. If a security claim says "every time
+X happens, then Y must have happened", but 'X' is unreachable,
+the claim is trivially true.
+
+Therefore, although these lemmas are not directly important
+and prove nothing of 'value', they grant a greater context to
+the goals that follow.
+
 */
+
+/*
+
 lemma no_corrupt_reach_test:
     exists-trace
     "
-    (Ex #t1. REACH_TEST('13a')@t1) &
+    (Ex #t1. REACH_TEST('10')@t1) &
+    (not Ex m #tcm. CorruptMiddlebox(m)@tcm) &
+    (not Ex s #tcs. CorruptServer(s)@tcs)
+    "
+lemma no_corrupt_reach_test_9:
+    exists-trace
+    "
+    (Ex #t1. REACH_TEST('9')@t1) &
+    (not Ex m #tcm. CorruptMiddlebox(m)@tcm) &
+    (not Ex s #tcs. CorruptServer(s)@tcs)
+    "
+lemma no_corrupt_reach_test_8:
+    exists-trace
+    "
+    (Ex #t1. REACH_TEST('8')@t1) &
     (not Ex m #tcm. CorruptMiddlebox(m)@tcm) &
     (not Ex s #tcs. CorruptServer(s)@tcs)
     "
 
+*/
+
+//-----------------------------------------------------------//
+//--------------------- Security Lemmas ---------------------//
+//-----------------------------------------------------------//
+
 /*
 
-//--------------------- Security Lemmas ---------------------//
+These are the main security claims that we aim to prove. These
+are mostly authentication/agreement claims: we want to show that
+whenever a client believes that some session data has been agreed
+upon, all corresponding partners (e.g. the server and any intermediate
+middleboxes) indeed share this session data.
 
+Compared to standard TLS goals, our claims tend to include
+more requirements on the ~ordering~ of events. This is because
+of the contribution of middleboxes to the protocol: we want to
+ensure that we are always routing through them in the same order.
+
+The complexity of these claims means that Tamarin often fails to
+prove them in automatic mode. Interactive mode, or an appropriately
+constructed oracle, helps achieve termination.
 
 */
 
+// When a client believes they have established a session with
+// a server, the corresponding server believes they have established
+// a session with the client (using the same ephemeral data)
+lemma server_authentication:
+  "
+  (All C S nonces #tclient. ClientHandshakeComplete(C, S, nonces)@tclient ==>
+    Ex #tserver. ServerHandshakeComplete(C, S, nonces)@tserver & (#tserver < #tclient)
+  ) & (
+  All C S nonces req #tclient. ClientResponseComplete(C, S, req, nonces)@tclient ==>
+    Ex #tserver. ServerResponseComplete(C, S, req, nonces)@tserver & (#tserver < #tclient)
+  )
+  "
+
+// When a client believes they have established a session with
+// a server, they also share an accountability key with all
+// intermediate middleboxes on the path
+lemma middlebox_authentication:
+  "
+  (All C M lastBox nextBox nonces #tclient. ClientHandshakeMiddleboxComplete(C, M, lastBox, nextBox, nonces)@tclient
+    ==> 
+    Ex #tmbox. MiddleboxHandshakeComplete(C, M, lastBox, nextBox, nonces)@tmbox & (#tmbox < #tclient)
+  ) & ( // Response phase
+   All C M lastBox nextBox req nonces #tclient. ClientResponseMiddleboxComplete(C, M, lastBox, nextBox, req, nonces)@tclient
+    ==>
+    Ex #tmbox. MiddleboxResponseComplete(C, M, lastBox, nextBox, req, nonces)@tmbox & (#tmbox < #tclient)
+  )
+
+  "
+
+// When a client believes they have established a session with
+// a server, they also know the order of all intermediate
+// middleboxes connecting them together
+// Further, an agent cannot act unless their predecessor has acted (in any confirmed session)
+lemma middlebox_path_integrity:
+  "
+  All a1 a2 a3 nonces #ta #tb.
+        PathOrderingEstablished(nonces, a1, a2)@ta &
+        PathOrderingEstablished(nonces, a2, a3)@tb ==>
+            ( All id #tf. ForwardAction(nonces, id, a2, a3)@tf ==>
+                Ex #tp. ForwardAction(nonces, id, a1, a2)@tp &
+                (#tp < #tf) // on forward trips, it is a1->a2->a3
+            ) & (
+              All id #tf. BackwardAction(nonces, id, a2, a1)@tf ==>
+                Ex #tp. BackwardAction(nonces, id, a3, a2)@tp &
+                (#tp < #tf) // on backward trips, it is a3->a2->a1
+            )
+  "
+
+// When a client believes they have established a session with
+// a server, all intermediate sessions are using session details
+// (e.g. ciphersuite) that are derived from the client's initial
+// request
+lemma path_secrecy:
+  "
+  All C M S nonces details #tclient #tcomplete. 
+        ClientMiddleboxDetails(C, M, nonces, details)@tclient &
+        ClientHandshakeComplete(C, S, nonces)@tcomplete ==>
+  Ex mboxdetsA mboxdetsB #tmbox. // the sessions in both directions are derives from the details 
+        MiddleboxDetails(C, M, nonces, decision(mboxdetsA, details), decision(mboxdetsB, details))@tmbox &
+        (#tmbox < #tclient)
+  "
+
+// At the end of a request->response cycle, the client believes
+// that a middlebox changed the value of the response if and only
+// if the middlebox did so
+lemma modification_accountability:
+  "
+  All C S nonces req #tclient. ClientResponseComplete(C, S, req, nonces)@tclient ==>
+      ( All before after M #tc.
+        (
+           ( ClientSeesChange(C, M, req, nonces, before, after)@tc ) &
+           (( #tc < #tclient ) | (#tc = #tclient))
+        )
+           ==>
+              Ex #tm. 
+              (
+                ( MiddleboxChanges(C, M, req, nonces, before, after)@tm ) &
+                ( #tm < #tc )
+              )
+      )
+      & // Same clause but the other way around
+      ( All before after M #tm.
+        (
+           ( MiddleboxChanges(C, M, req, nonces, before, after)@tm ) &
+           ( #tm < #tclient ) 
+        )
+           ==>
+              Ex #tc. 
+              (
+                ( ClientSeesChange(C, M, req, nonces, before, after)@tc ) &
+                ( #tm < #tc )
+              )
+      )
+  "
+
+// At the end of a request->response cycle, the hash value
+// that the client received from the server is a faithful
+// representation of what the server sent
+// (Note that the client cannot actually read the initial
+// server message, but should be aware of when it changed)
+
+lemma data_authentication:
+  "
+  All C S nonces request response #trecv.
+     ClientBelivesServerSent(C, S, nonces, request, response)@trecv ==>
+        Ex #tresp. ServerSent(C, S, nonces, request, response)@tresp
+  "
 
 end

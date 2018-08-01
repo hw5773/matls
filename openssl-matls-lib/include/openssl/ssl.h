@@ -144,6 +144,7 @@
 #define HEADER_SSL_H 
 
 #include <openssl/e_os2.h>
+#include <pthread.h>
 
 #ifndef OPENSSL_NO_COMP
 #include <openssl/comp.h>
@@ -165,6 +166,8 @@
 #include <openssl/kssl.h>
 #include <openssl/safestack.h>
 #include <openssl/symhacks.h>
+
+#include "logs.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -804,14 +807,22 @@ struct keypair
 
 struct mb_st {
     int group_id;
+    EC_GROUP *group;
+    BN_CTX *bn_ctx;
     int num_keys;
     int *key_length; //ECDH key length
-    unsigned char **mac_array;
-    unsigned char **secret;
+    unsigned char **accountability_keys;
+    volatile unsigned char **peer_str;
+    volatile unsigned char **id_table;
+    EVP_PKEY **pkey;
+    int *id_length;
     struct keypair *keypair;
-    unsigned char lock;
+    unsigned char *pub_str;
+    int pub_length;
+    //unsigned char lock;
     unsigned char *random[2];
-} mb_info;
+    int rlen[2];
+};
 
 #endif /* OPENSSL_NO_MATLS */
 
@@ -1054,7 +1065,7 @@ struct ssl_ctx_st
   int id_length;
 
 	unsigned char mb_enabled;
-  struct mb_st mb_info;
+  struct mb_st *mb_info;
   X509 *x509;
 #endif /* OPENSSL_NO_MATLS */
 	};
@@ -1461,7 +1472,7 @@ struct ssl_st
 
   unsigned char *proof;
   int proof_length;
-  struct mb_st mb_info;
+  struct mb_st *mb_info;
 
   volatile unsigned char *extension_from_clnt_msg;
   volatile unsigned char *extension_from_srvr_msg;
@@ -1473,11 +1484,16 @@ struct ssl_st
   volatile int cert_msg_len;
   volatile int extended_finished_msg_len;
 
-  volatile int *lock; // Lock
+  //volatile int *lock; // Lock
+  pthread_mutex_t lock;
+  pthread_mutex_t *lockp; // lock pointer
 
   unsigned char *phash; // Previous Hash of the Content
   unsigned char *pmr; // Previous Modification Record
   int pmr_length;
+#ifdef LOGGER
+  log_t *time_log;
+#endif /* LOGGER */
 #endif /* OPENSSL_NO_MATLS */
 
 #ifndef OPENSSL_NO_SPLIT_TLS
@@ -2053,6 +2069,7 @@ int SSL_set_server_side(SSL *s);
 int SSL_set_client_side(SSL *s);
 int SSL_register_id(SSL *s);
 int SSL_use_proof_file(SSL *s, const char *file);
+int SSL_set_pair(SSL *s1, SSL *s2);
 
 void SSL_CTX_is_middlebox(SSL_CTX *ctx);
 int SSL_CTX_enable_mb(SSL_CTX *ctx);

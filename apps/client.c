@@ -255,6 +255,7 @@ SSL_CTX* init_client_CTX(void)
 
 	//SSL_CTX_set_info_callback(ctx, apps_ssl_info_callback);
 	//SSL_CTX_set_msg_callback(ctx, msg_callback);
+  //SSL_CTX_set_cipher_list(ctx, "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA256");
 
 #ifdef MATLS
 	SSL_CTX_enable_mb(ctx);

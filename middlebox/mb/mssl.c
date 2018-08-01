@@ -315,7 +315,15 @@ void *run(void *data)
   
   MA_LOG1s("Start SSL connections to", ip);
 
+  MA_LOG1p("ssl", ssl);
+  MA_LOG1p("args->ssl", args->ssl);
+  MA_LOG1p("ssl->pair", ssl->pair);
+  MA_LOG1p("args->ssl->pair", args->ssl->pair);
   SSL_set_pair(ssl, args->ssl);
+  MA_LOG1p("ssl", ssl);
+  MA_LOG1p("args->ssl", args->ssl);
+  MA_LOG1p("ssl->pair", ssl->pair);
+  MA_LOG1p("args->ssl->pair", args->ssl->pair);
 
 #ifdef MATLS
   SSL_enable_mb(ssl);

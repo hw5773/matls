@@ -144,6 +144,7 @@ void *mb_run(void *data)
   if (SSL_is_init_finished(ssl))
     MA_LOG("complete handshake");
   MA_LOG1d("end matls handshake", ret);
+  MA_LOG1p("ssl->pair", ssl->pair);
 
   while (!(ssl->pair && SSL_is_init_finished(ssl) && SSL_is_init_finished(ssl->pair))) {}
 

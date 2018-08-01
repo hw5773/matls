@@ -181,6 +181,8 @@ SSL_CTX* init_server_CTX(BIO *outbio)
 	SSL_METHOD *method;
 	SSL_CTX *ctx;
 
+	SSL_library_init();
+	OpenSSL_add_all_algorithms();
 	SSL_load_error_strings();   /* load all error messages */
 	method = (SSL_METHOD *) TLSv1_2_method();  /* create new server-method instance */
 	ctx = SSL_CTX_new(method);   /* create new context from method */
@@ -189,8 +191,11 @@ SSL_CTX* init_server_CTX(BIO *outbio)
 		BIO_printf(outbio, "SSL_CTX init failed!");
 		abort();
 	}
+	SSL_library_init();
+	OpenSSL_add_all_algorithms();
 
 	SSL_CTX_set_msg_callback(ctx, msg_callback);
+  //SSL_CTX_set_cipher_list(ctx, "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA256");
 
 #ifdef MATLS
   SSL_CTX_enable_mb(ctx);

@@ -2786,8 +2786,12 @@ int SSL_disable_mb(SSL *s)
 // The first object is the new one. The second one is the old one.
 int SSL_set_pair(SSL *s1, SSL *s2)
 {
+  printf("s1: %p\n", s1);
+  printf("s2: %p\n", s2);
   s1->pair = s2;
   s2->pair = s1;
+  printf("s1->pair: %p\n", s1->pair);
+  printf("s2->pair: %p\n", s2->pair);
   s1->mb_info = s2->mb_info;
   s2->lockp = s1->lockp = &(s1->lock);
   s2->middlebox = s1->middlebox = 1;

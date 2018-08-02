@@ -11,6 +11,7 @@ CFLAGS=-DLOGGER -o
 SERVER_SRC=mb.c mssl.c table.c common.c logger.c
 SMB_SRC=smb.c mssl.c table.c common.c logger.c
 CMB_SRC=cmb.c mssl.c table.c common.c logger.c
+TCP_SRC=tcp_mb.c table.c common.c logger.c
 SRC=mssl.c table.c common.c logger.c
 SERVER_OBJ=mb.o mssl.o table.o common.o logger.o
 FLAGS=-I../../openssl-matls-lib/include -L../../openssl-matls-lib/lib
@@ -122,6 +123,27 @@ split:
 	${GCC} ${CFLAGS} ${SERVER_16} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
 	${GCC} ${CFLAGS} ${SMB} ${SMB_SRC} ${FLAGS} ${LDFLAGS}
 	${GCC} ${CFLAGS} ${CMB} ${CMB_SRC} ${FLAGS} ${LDFLAGS}
+
+split:
+	${GCC} ${CFLAGS} ${SERVER} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} ${CFLAGS} ${SERVER_1} ${TCP_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} ${CFLAGS} ${SERVER_2} ${TCP_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} ${CFLAGS} ${SERVER_3} ${TCP_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} ${CFLAGS} ${SERVER_4} ${TCP_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} ${CFLAGS} ${SERVER_5} ${TCP_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} ${CFLAGS} ${SERVER_6} ${TCP_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} ${CFLAGS} ${SERVER_7} ${TCP_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} ${CFLAGS} ${SERVER_8} ${TCP_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} ${CFLAGS} ${SERVER_9} ${TCP_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} ${CFLAGS} ${SERVER_10} ${TCP_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} ${CFLAGS} ${SERVER_11} ${TCP_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} ${CFLAGS} ${SERVER_12} ${TCP_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} ${CFLAGS} ${SERVER_13} ${TCP_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} ${CFLAGS} ${SERVER_14} ${TCP_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} ${CFLAGS} ${SERVER_15} ${TCP_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} ${CFLAGS} ${SERVER_16} ${TCP_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} ${CFLAGS} ${SMB} ${TCP_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} ${CFLAGS} ${CMB} ${TCP_SRC} ${FLAGS} ${LDFLAGS}
 
 mstart:
 	sudo ./${SERVER} ${PORT} ${CERT_FILE} ${KEY_FILE} ${FORWARD_FILE} 0 0

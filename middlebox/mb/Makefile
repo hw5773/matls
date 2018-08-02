@@ -74,6 +74,8 @@ FORWARD_FILE_13=forward_13.txt
 FORWARD_FILE_14=forward_14.txt
 FORWARD_FILE_15=forward_15.txt
 FORWARD_FILE_16=forward_16.txt
+FORWARD_FILE_CMB=forward_cmb.txt
+FORWARD_FILE_SMB=forward_smb.txt
 
 default: matls
 
@@ -177,10 +179,10 @@ mstart16:
 	./${SERVER_16} ${PORT_16} 16.pem 16.key ${FORWARD_FILE_16} 0 0
 
 cmstart:
-	./${CMB} ${PORT_15} cmb.pem cmb.key ${FORWARD_FILE_16} 0 0
+	./${CMB} ${PORT_15} cmb.pem cmb.key ${FORWARD_FILE_CMB} 0 0
 
 smstart:
-	./${SMB} ${PORT_16} smb.pem smb.key ${FORWARD_FILE_16} 1 0 smb.txt
+	./${SMB} ${PORT_16} smb.pem smb.key ${FORWARD_FILE_SMB} 1 0 smb.txt
 
 mstart1w:
 	./${SERVER_1} ${PORT_1} 1.pem 1.key ${FORWARD_FILE_1} 0 1

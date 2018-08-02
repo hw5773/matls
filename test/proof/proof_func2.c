@@ -27,6 +27,9 @@ int make_proof_body(unsigned char **content, X509 *mb_crt, int *len)
   not_before = time(NULL);
 	not_after = not_before + 31536000;
 
+  printf("not_before: %ld\n", not_before);
+  printf("not_after: %ld\n", not_after);
+
 	printf("Making the proof\n");
   if (!(ctx = EVP_MD_CTX_create())) goto err;
   if (!(h = BIO_new(BIO_s_mem()))) goto err;
@@ -79,6 +82,16 @@ int make_proof_body(unsigned char **content, X509 *mb_crt, int *len)
 
 	BIO_gets(md, sha, SHA256_DIGEST_LENGTH);
   memcpy(c, sha, SHA256_DIGEST_LENGTH);
+
+	// Print the info
+	printf("print proof hash\n");
+	for (i=0; i<SHA256_DIGEST_LENGTH; i++)
+	{
+		if (i % 10 == 0)
+			printf("\n");
+		printf("%02X ", sha[i]);
+	}
+	printf("\n");
 
   *len = SHA256_DIGEST_LENGTH + 2 * TIME_LENGTH;
   printf("print proof body\n");
@@ -183,6 +196,8 @@ int make_signature_block(unsigned char **sigblk, unsigned char *msg, int msg_len
 	}
 	printf("\n");
 
+	printf("PROGRESS: Length of message: %d\n", msg_len);
+	printf("PROGRESS: Length of signature: %d\n", (int)sig_len);
 
 	OPENSSL_free(sig);
 	EVP_MD_CTX_cleanup(ctx);
@@ -205,7 +220,8 @@ int verify_server_proof(unsigned char *proof, int plen, X509 *crt, EVP_PKEY *ser
   BIO *h = NULL, *md = NULL;
   EVP_MD_CTX *ctx;
   unsigned char sha[SHA256_DIGEST_LENGTH];
-  unsigned char *p, *cbuf;
+  unsigned char *p, *q, *cbuf;
+  unsigned char *msg;
 
   if (!(ctx = EVP_MD_CTX_create())) goto err; 
   if (!(h = BIO_new(BIO_s_mem()))) goto err;
@@ -217,9 +233,16 @@ int verify_server_proof(unsigned char *proof, int plen, X509 *crt, EVP_PKEY *ser
 	seconds = time(NULL);
 	p = proof;
 
-  rc = BIO_write(md, p, 2 * TIME_LENGTH);
-  EVP_DigestVerifyUpdate(ctx, p, 2 * TIME_LENGTH);
+  q = msg = (unsigned char *)malloc(2 * TIME_LENGTH + SHA256_DIGEST_LENGTH);
+
+  BIO_write(md, p, TIME_LENGTH);
+  memcpy(q, p, TIME_LENGTH);
+  q += TIME_LENGTH;
 	n2t8(p, not_before);
+
+  BIO_write(md, p, TIME_LENGTH);
+  memcpy(q, p, TIME_LENGTH);
+  q += TIME_LENGTH;
 	n2t8(p, not_after);
 
 	printf("not before: %lu\n", not_before);
@@ -237,14 +260,46 @@ int verify_server_proof(unsigned char *proof, int plen, X509 *crt, EVP_PKEY *ser
   clen = i2d_X509(crt, NULL);
 	cbuf = (unsigned char *)malloc(clen);
 	i2d_X509(crt, &cbuf);
-  cbuf -= clen;
   BIO_write(md, cbuf, clen);
-  BIO_gets(md, sha, SHA256_DIGEST_LENGTH);
-  EVP_DigestVerifyUpdate(ctx, sha, SHA256_DIGEST_LENGTH);
+	BIO_gets(md, sha, SHA256_DIGEST_LENGTH);
+
+  printf("hash of cert\n");
+  for (i=0; i<SHA256_DIGEST_LENGTH; i++)
+  {
+    if (i % 10 == 0)
+      printf("\n");
+    printf("%02X ", sha[i]);
+  }
+  printf("\n");
+  memcpy(q, sha, SHA256_DIGEST_LENGTH);
+
+  printf("proof regenerated\n");
+  for (i=0; i<(2*TIME_LENGTH + SHA256_DIGEST_LENGTH); i++)
+  {
+    if (i % 10 == 0)
+      printf("\n");
+    printf("%02X ", msg[i]);
+  }
+  printf("\n");
+
+	rc = EVP_DigestVerifyUpdate(ctx, sha, SHA256_DIGEST_LENGTH);
+	if (rc != 1) goto err;
+
+  printf("digest update\n");
+
+  printf("signature\n");
+  for (i=0; i<(plen-2*TIME_LENGTH); i++)
+  {
+    if (i % 10 == 0)
+      printf("\n");
+    printf("%02X ", p[i]);
+  }
+  printf("\n");
+
 	rc = EVP_DigestVerifyFinal(ctx, p, plen - 2 * TIME_LENGTH);
 	if (rc != 1) goto err;
 
-	printf("verification success\n");
+	printf("verification success");
 
   EVP_MD_CTX_cleanup(ctx);
 

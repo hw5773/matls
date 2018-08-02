@@ -6,13 +6,15 @@ FORWARD_FILE=forward.txt
 SERVER=mb
 GCC=gcc
 #CFLAGS=-DDEBUG -o
-#CFLAGS=-DDEBUG -DLOGGER -o
-CFLAGS=-DLOGGER -o
+CFLAGS=-DDEBUG -DLOGGER -o
+#CFLAGS=-DLOGGER -o
 SERVER_SRC=mb.c mssl.c table.c common.c logger.c
+SMB_SRC=smb.c mssl.c table.c common.c logger.c
+CMB_SRC=cmb.c mssl.c table.c common.c logger.c
 SRC=mssl.c table.c common.c logger.c
 SERVER_OBJ=mb.o mssl.o table.o common.o logger.o
-FLAGS=-I../../openssl-matls-lib/include -L../../openssl-matls-lib/lib
-#FLAGS=-I/home/hwlee/openssl-matls-lib/include -L/home/hwlee/openssl-matls-lib/lib
+#FLAGS=-I../../openssl-matls-lib/include -L../../openssl-matls-lib/lib
+FLAGS=-I/home/hwlee/openssl-matls-lib/include -L/home/hwlee/openssl-matls-lib/lib
 #FLAGS=-I/home/mb2/openssl_lib/include -L/home/mb2/openssl_lib/lib
 #FLAGS=-I/usr/local/include -L/usr/local/lib
 LDFLAGS=-lssl -lcrypto -ldl -lpthread
@@ -38,6 +40,8 @@ SERVER_13=mb13
 SERVER_14=mb14
 SERVER_15=mb15
 SERVER_16=mb16
+SMB=smb
+CMB=cmb
 PORT_1=5001
 PORT_2=5002
 PORT_3=5003
@@ -91,6 +95,8 @@ matls:
 	${GCC} -DMATLS ${CFLAGS} ${SERVER_14} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
 	${GCC} -DMATLS ${CFLAGS} ${SERVER_15} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
 	${GCC} -DMATLS ${CFLAGS} ${SERVER_16} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} -DMATLS ${CFLAGS} ${SMB}	${SMB_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} -DMATLS ${CFLAGS} ${CMB} ${CMB_SRC} ${FLAGS} ${LDFLAGS}
 
 split:
 	${GCC} ${CFLAGS} ${SERVER} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
@@ -110,6 +116,8 @@ split:
 	${GCC} ${CFLAGS} ${SERVER_14} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
 	${GCC} ${CFLAGS} ${SERVER_15} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
 	${GCC} ${CFLAGS} ${SERVER_16} ${SERVER_SRC} ${FLAGS} ${LDFLAGS}
+	${GCC} ${CFLAGS} ${SMB} smb.c ${FLAGS} ${LDFLAGS}
+	${GCC} ${CFLAGS} ${CMB} cmb.c ${FLAGS} ${LDFLAGS}
 
 mstart:
 	sudo ./${SERVER} ${PORT} ${CERT_FILE} ${KEY_FILE} ${FORWARD_FILE} 0 0
@@ -168,6 +176,12 @@ mstart15:
 mstart16:
 	./${SERVER_16} ${PORT_16} 16.pem 16.key ${FORWARD_FILE_16} 0 0
 
+cmstart:
+	./${CMB} ${PORT_15} cmb.pem cmb.key ${FORWARD_FILE_16} 0 0
+
+smstart:
+	./${SMB} ${PORT_16} smb.pem smb.key ${FORWARD_FILE_16} 1 0 smb.txt
+
 mstart1w:
 	./${SERVER_1} ${PORT_1} 1.pem 1.key ${FORWARD_FILE_1} 0 1
 
@@ -220,4 +234,4 @@ debug:
 	${GDB} ./${EXEC} ${PORT} ${CERT_FILE} ${CA_CERT_FILE} ${KEY_FILE} ${ORIG_CERT_FILE} ${WARRANT_FILE} -tui
 
 clean:
-	rm ${SERVER} ${SERVER_1} ${SERVER_2} ${SERVER_3} ${SERVER_4} ${SERVER_5} ${SERVER_6} ${SERVER_7} ${SERVER_8} ${SERVER_9} ${SERVER_10} ${SERVER_11} ${SERVER_12} ${SERVER_13} ${SERVER_14} ${SERVER_15} ${SERVER_16}
+	rm ${SERVER} ${SERVER_1} ${SERVER_2} ${SERVER_3} ${SERVER_4} ${SERVER_5} ${SERVER_6} ${SERVER_7} ${SERVER_8} ${SERVER_9} ${SERVER_10} ${SERVER_11} ${SERVER_12} ${SERVER_13} ${SERVER_14} ${SERVER_15} ${SERVER_16} smb cmb

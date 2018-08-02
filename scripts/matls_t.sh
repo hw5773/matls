@@ -6,13 +6,13 @@ URL=$1
 PORT=$2
 ADDR=${URL}:${PORT}
 NUM=$3
-DIRECTORY=/home/dist/data/tcp/csv_data/mb_${NUM}_tcp
+DIRECTORY=/home/hwlee/log/mb_${NUM}_tcp
 LOG_FILE=${DIRECTORY}/mb_${NUM}_tcp.csv
 
 [ -d ${DIRECTORY} ] || mkdir ${DIRECTORY}
 
 #for i in {1..100}
-cd /home/dist/matls/apps
+cd /home/hwlee/matls/apps
 for i in {1..100}
 do
    echo ${i}:${FILE}

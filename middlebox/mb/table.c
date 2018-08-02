@@ -53,7 +53,7 @@ int find_by_name(unsigned char *buf, int len)
 {
   int i, ret = -1;
 
-  for (i=0; i<table->num_of_entries-1; i++)
+  for (i=0; i<table->num_of_entries; i++)
   {
     if (!strncmp(buf, table->forward_names[i], len))
       ret = i;

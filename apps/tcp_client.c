@@ -18,7 +18,7 @@
 void *run(void *data);
 int open_connection(const char *hostname, int port);
 const char *hostname, *portnum;
-log_t time_log[20];
+log_t time_log[NUM_OF_LOGS];
 
 // Client Prototype Implementation
 int main(int count, char *strings[])

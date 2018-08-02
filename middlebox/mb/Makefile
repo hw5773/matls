@@ -58,6 +58,8 @@ PORT_13=5013
 PORT_14=5014
 PORT_15=5015
 PORT_16=5016
+PORT_SMB=5017
+PORT_CMB=5017
 FORWARD_FILE_1=forward_1.txt
 FORWARD_FILE_2=forward_2.txt
 FORWARD_FILE_3=forward_3.txt
@@ -179,10 +181,10 @@ mstart16:
 	./${SERVER_16} ${PORT_16} 16.pem 16.key ${FORWARD_FILE_16} 0 0
 
 cmstart:
-	./${CMB} ${PORT_15} cmb.pem cmb.key ${FORWARD_FILE_CMB} 0 0
+	./${CMB} ${PORT_CMB} cmb.pem cmb.key ${FORWARD_FILE_CMB} 0 0
 
 smstart:
-	./${SMB} ${PORT_16} smb.pem smb.key ${FORWARD_FILE_SMB} 1 0 smb.txt
+	./${SMB} ${PORT_SMB} smb.pem smb.key ${FORWARD_FILE_SMB} 1 0 smb.txt
 
 mstart1w:
 	./${SERVER_1} ${PORT_1} 1.pem 1.key ${FORWARD_FILE_1} 0 1

@@ -234,6 +234,12 @@ mstart15w:
 mstart16w:
 	./${SERVER_16} ${PORT_16} 16.pem 16.key ${FORWARD_FILE_16} 0 16
 
+cmstartw:
+	./${CMB} ${PORT_CMB} cmb.pem cmb.key ${FORWARD_FILE_CMB} 0 15
+
+smstartw:
+	./${SMB} ${PORT_SMB} smb.pem smb.key ${FORWARD_FILE_SMB} 0 16 smb.txt
+
 debug:
 	${GDB} ./${EXEC} ${PORT} ${CERT_FILE} ${CA_CERT_FILE} ${KEY_FILE} ${ORIG_CERT_FILE} ${WARRANT_FILE} -tui
 

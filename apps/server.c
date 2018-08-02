@@ -15,14 +15,17 @@
 #include <openssl/logs.h>
 
 #define FAIL    -1
+#define DHFILE  "dh1024.pem"
 
 int open_listener(int port);
 SSL_CTX* init_server_CTX(BIO *outbio);
 void load_certificates(BIO *outbio, SSL_CTX* ctx, char* cert_file, char* key_file);
+void load_dh_params(SSL_CTX *ctx, char *file);
 void print_pubkey(BIO *outbio, EVP_PKEY *pkey);
 void msg_callback(int, int, int, const void *, size_t, SSL *, void *);
 BIO *bio_err;
 log_t time_log[NUM_OF_LOGS];
+
 
 // Origin Server Implementation
 int main(int count, char *strings[])
@@ -55,6 +58,7 @@ int main(int count, char *strings[])
 	key = strings[3];
 
 	ctx = init_server_CTX(outbio);        /* initialize SSL */
+  load_dh_params(ctx, DHFILE);
 	load_certificates(outbio, ctx, cert, key);
 	BIO_printf(outbio, "load_certificates success\n");
 
@@ -195,7 +199,7 @@ SSL_CTX* init_server_CTX(BIO *outbio)
 	OpenSSL_add_all_algorithms();
 
 	SSL_CTX_set_msg_callback(ctx, msg_callback);
-  //SSL_CTX_set_cipher_list(ctx, "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA256");
+  SSL_CTX_set_cipher_list(ctx, "DHE-RSA-AES256-SHA256");
 
 #ifdef MATLS
   SSL_CTX_enable_mb(ctx);
@@ -293,3 +297,18 @@ void print_pubkey(BIO *outbio, EVP_PKEY *pkey)
 		BIO_printf(outbio, "Error writing public key data in PEM format\n");
 }
 
+// Load parameters from "dh1024.pem"
+void load_dh_params(SSL_CTX *ctx, char *file){
+  DH *ret=0;
+  BIO *bio;
+
+  if ((bio=BIO_new_file(file,"r")) == NULL){
+    perror("Couldn't open DH file");
+  }
+
+  ret = PEM_read_bio_DHparams(bio, NULL, NULL, NULL);
+  BIO_free(bio);
+  if(SSL_CTX_set_tmp_dh(ctx,ret) < 0){
+    perror("Couldn't set DH parameters");
+  }
+}

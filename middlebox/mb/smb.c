@@ -18,10 +18,12 @@
 
 #define FAIL    -1
 #define BUF_SIZE 1024
+#define DHFILE  "dh1024.pem"
 
 int open_listener(int port);
 SSL_CTX* init_middlebox_ctx(int server_side);
 void load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file);
+void load_dh_params(SSL_CTX *ctx, char *file);
 void print_pubkey(EVP_PKEY *pkey);
 BIO *bio_err;
 void *mb_run(void *data);
@@ -58,6 +60,7 @@ int main(int count, char *strings[])
   proof_file = strings[7];
 
 	ctx = init_middlebox_ctx(server_side);        /* initialize SSL */
+	load_dh_params(ctx, DHFILE);
 	load_certificates(ctx, cert, key);
   init_forward_table(forward_file);
   init_thread_config();
@@ -312,6 +315,7 @@ SSL_CTX* init_middlebox_ctx(int server_side)
 	//SSL_CTX_set_info_callback(ctx, apps_ssl_info_callback);
 	//SSL_CTX_set_msg_callback(ctx, msg_callback);
   SSL_CTX_set_sni_callback(ctx, sni_callback);
+  SSL_CTX_set_cipher_list(ctx, "DHE-RSA-AES256-SHA256");
   //printf("set info callback, msg callback, sni callback complete\n");
 
   SSL_CTX_is_middlebox(ctx);
@@ -413,3 +417,20 @@ void load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file)
 	ERR_print_errors_fp(stderr);
 	ERR_print_errors_fp(stderr);
 }
+
+void load_dh_params(SSL_CTX *ctx, char *file)
+{
+  DH *ret=0;
+  BIO *bio;
+
+  if ((bio=BIO_new_file(file,"r")) == NULL){
+    perror("Couldn't open DH file");
+  }
+
+  ret = PEM_read_bio_DHparams(bio, NULL, NULL, NULL);
+  BIO_free(bio);
+  if(SSL_CTX_set_tmp_dh(ctx,ret) < 0){ 
+    perror("Couldn't set DH parameters");
+  }
+}
+

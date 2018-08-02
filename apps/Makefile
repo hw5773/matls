@@ -43,6 +43,13 @@ sstart:
 cstart:
 	./${CLIENT} ${HOST} ${PORT} 1 ${LOG_FILE}
 
+tcp_sstart:
+	./${SERVER} ${PORT}
+
+tcp_cstart:
+	./${CLIENT} ${HOST} ${PORT} 1 ${LOG_FILE}
+
+
 debug:
 	${GDB} ./${EXEC} ${PORT} ${CERT_FILE} ${KEY_FILE} ${ORIG_CERT_FILE} ${WARRANT_FILE} -tui
 

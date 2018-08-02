@@ -822,6 +822,9 @@ struct mb_st {
     //unsigned char lock;
     unsigned char *random[2];
     int rlen[2];
+    unsigned char *type;
+    unsigned char **proof;
+    int *proof_length;
 };
 
 #endif /* OPENSSL_NO_MATLS */

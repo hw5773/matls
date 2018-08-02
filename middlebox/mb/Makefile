@@ -260,7 +260,7 @@ cmstartw:
 	./${CMB} ${PORT_CMB} cmb.pem cmb.key ${FORWARD_FILE_CMB} 0 15
 
 smstartw:
-	./${SMB} ${PORT_SMB} smb.pem smb.key ${FORWARD_FILE_SMB} 0 16 smb.txt
+	./${SMB} ${PORT_SMB} smb.pem smb.key ${FORWARD_FILE_SMB} 1 16 smb.txt
 
 mstart1t:
 	./${SERVER_1} ${PORT_1} ${FORWARD_FILE_1} 0

@@ -31,18 +31,11 @@ do
   tail -n +2 proxyList > b.txt
   cat a.txt b.txt > proxyList
 
-<<<<<<< HEAD
-  for j in {1..1} #trial number
-  do
-    echo 'mb'$i
-    ./wclient -s 1 -r i -w 0 -f index.html -o 3 -a -c ssl -b 100
-=======
   for j in {1..100} #trial number
   do
     echo 'mb'$i
     mkdir -p /home/dist/data/mctls/csv_data/mb_${i}_mctls
     ${CLIENT} -s 1 -r i -w 0 -f index.html -o 3 -a -c ssl -b 100 -l /home/dist/data/mctls/csv_data/mb_${i}_mctls/mb_${i}_mctls.csv
->>>>>>> e796aabbe4fc5894640232339eac819266e6d47b
   done
 done
 

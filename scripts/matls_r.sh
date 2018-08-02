@@ -5,21 +5,21 @@
 URL=$1
 PORT=$2
 ADDR=${URL}:${PORT}
-NUM=$3
-DIRECTORY=/home/dist/log/mb_${NUM}_read
-LOG_FILE=${DIRECTORY}/mb_${NUM}_read.csv
+NATION=$3
+DIRECTORY=/home/hwlee/log/mb_${NATION}_read
+LOG_FILE=${DIRECTORY}/mb_${NATION}_read.csv
 
 [ -d ${DIRECTORY} ] || mkdir ${DIRECTORY}
 
-FILE=${DIRECTORY}/mb_${NUM}_read.csv
+FILE=${DIRECTORY}/mb_${NATION}_read.csv
 touch ${FILE}
 
-#for i in {1..100}
-cd /home/dist/matls/apps
+cd /home/hwlee/matls/apps
+
 for i in {1..100}
 do
    echo ${i}:${FILE}
-   make cstart PORT=${PORT} LOG_FILE=${LOG_FILE}
-   sleep 2
+   make cstart HOST=${URL} PORT=${PORT} LOG_FILE=${LOG_FILE}
+   sleep 0.5
 done
 echo 'done'

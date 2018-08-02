@@ -262,7 +262,6 @@ SSL_CTX* init_client_CTX(void)
   SSL_CTX_disable_mb(ctx);
 #endif /* MATLS */
 
-  printf("mb_enabled in ctx? %d\n", ctx->mb_enabled);
   return ctx;
 }
  

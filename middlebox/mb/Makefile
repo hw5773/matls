@@ -262,6 +262,61 @@ cmstartw:
 smstartw:
 	./${SMB} ${PORT_SMB} smb.pem smb.key ${FORWARD_FILE_SMB} 0 16 smb.txt
 
+mstart1t:
+	./${SERVER_1} ${PORT_1} ${FORWARD_FILE_1} 0
+
+mstart2t:
+	./${SERVER_2} ${PORT_2} ${FORWARD_FILE_2} 0
+
+mstart3t:
+	./${SERVER_3} ${PORT_3} ${FORWARD_FILE_3} 0
+
+mstart4t:
+	./${SERVER_4} ${PORT_4} ${FORWARD_FILE_4} 0
+
+mstart5t:
+	./${SERVER_5} ${PORT_5} ${FORWARD_FILE_5} 0
+
+mstart6t:
+	./${SERVER_6} ${PORT_6} ${FORWARD_FILE_6} 0
+
+mstart7t:
+	./${SERVER_7} ${PORT_7} ${FORWARD_FILE_7} 0
+
+mstart8t:
+	./${SERVER_8} ${PORT_8} ${FORWARD_FILE_8} 0
+
+mstart9t:
+	./${SERVER_9} ${PORT_9} ${FORWARD_FILE_9} 0
+
+mstart10t:
+	./${SERVER_10} ${PORT_10} ${FORWARD_FILE_10} 0
+
+mstart11t:
+	./${SERVER_11} ${PORT_11} ${FORWARD_FILE_11} 0
+
+mstart12t:
+	./${SERVER_12} ${PORT_12} ${FORWARD_FILE_12} 0
+
+mstart13t:
+	./${SERVER_13} ${PORT_13} ${FORWARD_FILE_13} 0
+
+mstart14t:
+	./${SERVER_14} ${PORT_14} ${FORWARD_FILE_14} 0
+
+mstart15t:
+	./${SERVER_15} ${PORT_15} ${FORWARD_FILE_15} 0
+
+mstart16t:
+	./${SERVER_16} ${PORT_16} ${FORWARD_FILE_16} 0
+
+cmstartt:
+	./${CMB} ${PORT_CMB} ${FORWARD_FILE_CMB} 0
+
+smstartt:
+	./${SMB} ${PORT_SMB} ${FORWARD_FILE_SMB} 0
+
+
 debug:
 	${GDB} ./${EXEC} ${PORT} ${CERT_FILE} ${CA_CERT_FILE} ${KEY_FILE} ${ORIG_CERT_FILE} ${WARRANT_FILE} -tui
 

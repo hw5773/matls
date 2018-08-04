@@ -122,11 +122,13 @@ int main(int count, char *strings[])
 }
 
 int open_listener(int port)
-{   int sd;
+{   
+  int sd, optval = 1;
 	struct sockaddr_in addr;
 
 	sd = socket(PF_INET, SOCK_STREAM, 0);
-	
+	setsocket(sd, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
+
 	bzero(&addr, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(port);

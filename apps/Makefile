@@ -38,7 +38,7 @@ tcp:
 	${GCC} ${CFLAGS} ${CLIENT} ${TCP_CLIENT_SRC} ${FLAGS} ${LDFLAGS}
 
 sstart:
-	./${SERVER} ${PORT} ${CERT_FILE} ${KEY_FILE}
+	./${SERVER} ${PORT} ${CERT_FILE} ${KEY_FILE} ${LOG_FILE}
 
 cstart:
 	./${CLIENT} ${HOST} ${PORT} 1 ${LOG_FILE}

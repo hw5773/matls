@@ -10,29 +10,37 @@
 #include <openssl/err.h>
 #include <sys/time.h>
 #include <sys/socket.h>
+#include <signal.h>
 #include "logger.h"
-
-#include <openssl/logs.h>
+#include "logs.h"
 
 #define FAIL    -1
 #define DHFILE  "dh1024.pem"
 
 int open_listener(int port);
-SSL_CTX* init_server_CTX(BIO *outbio);
-void load_certificates(BIO *outbio, SSL_CTX* ctx, char* cert_file, char* key_file);
+SSL_CTX* init_server_CTX();
+void load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file);
 void load_dh_params(SSL_CTX *ctx, char *file);
-void print_pubkey(BIO *outbio, EVP_PKEY *pkey);
 void msg_callback(int, int, int, const void *, size_t, SSL *, void *);
 BIO *bio_err;
 log_t time_log[NUM_OF_LOGS];
+char *fname;
+int running = 1; 
+FILE *fp;
 
+void int_handler(int dummy)
+{
+  fclose(fp);
+  printf("[matls] %s:%s:%d: End of experiment\n", __FILE__, __func__, __LINE__);
+  running = 0;
+  exit(0);
+}
 
 // Origin Server Implementation
 int main(int count, char *strings[])
 {  
 	SSL *ssl;
 	SSL_CTX *ctx;
-	BIO *outbio = NULL;
 	int server, client, sent = 0, rcvd = 0;
 	char *portnum, *cert, *key;
 	const char *response = 	
@@ -42,25 +50,30 @@ int main(int count, char *strings[])
 		"\r\n"
 		"<html><title>Test</title><body><h1>Test Alice's Page!</h1></body></html>";
 	int response_len = strlen(response);
-	outbio = BIO_new_fp(stdout, BIO_NOCLOSE);
-	bio_err = BIO_new_fp(stdout, BIO_NOCLOSE);
 
-	if ( count != 4 )
+
+	if ( count != 5 )
 	{
-		BIO_printf(outbio, "Usage: %s <portnum> <cert_file> <key_file>\n", strings[0]);
+		printf("Usage: %s <portnum> <cert_file> <key_file> <log_file>\n", strings[0]);
 		exit(0);
 	}
+
+  signal(SIGINT, int_handler);
 	SSL_library_init();
 	OpenSSL_add_all_algorithms();
 
 	portnum = strings[1];
 	cert = strings[2];
 	key = strings[3];
+  fname = strings[4];
 
-	ctx = init_server_CTX(outbio);        /* initialize SSL */
+  fp = fopen(fname, "w");
+
+  INITIALIZE_LOG(time_log);
+	ctx = init_server_CTX();        /* initialize SSL */
   load_dh_params(ctx, DHFILE);
-	load_certificates(outbio, ctx, cert, key);
-	BIO_printf(outbio, "load_certificates success\n");
+	load_certificates(ctx, cert, key);
+	printf("load_certificates success\n");
 
 	server = open_listener(atoi(portnum));    /* create server socket */
 
@@ -68,42 +81,40 @@ int main(int count, char *strings[])
 	unsigned char buf[2048];
 	socklen_t len = sizeof(addr);
 
-	while ((client = accept(server, (struct sockaddr *)&addr, &len)))
+	while (running)
 	{
-		BIO_printf(outbio, "New Connection\n");
-		ssl = SSL_new(ctx);/* get new SSL state with context */
-		BIO_printf(outbio, "SSL_new() Success\n");
-		SSL_set_fd(ssl, client);      /* set connection socket to SSL state */
-    ssl->time_log = time_log;
-		BIO_printf(outbio, "SSL_set_fd() Success\n");
+    if ((client = accept(server, (struct sockaddr *)&addr, &len)) > 0)
+    {
+		  printf("New Connection\n");
+		  ssl = SSL_new(ctx);/* get new SSL state with context */
+		  printf("SSL_new() Success\n");
+		  SSL_set_fd(ssl, client);      /* set connection socket to SSL state */
+      ssl->time_log = time_log;
+		  printf("SSL_set_fd() Success\n");
 
-		unsigned long hs_start, hs_end;
-		BIO_printf(outbio, "PROGRESS: TLS Handshake Start\n");
-		hs_start = get_current_microseconds();
-    RECORD_LOG(ssl->time_log, SERVER_HANDSHAKE_START);
-		if ( SSL_accept(ssl) == FAIL )     /* do SSL-protocol accept */
-			ERR_print_errors_fp(stderr);
-    RECORD_LOG(ssl->time_log, SERVER_HANDSHAKE_END);
-    INTERVAL(ssl->time_log, SERVER_HANDSHAKE_START, SERVER_HANDSHAKE_END);
-		hs_end = get_current_microseconds();
-		BIO_printf(outbio, "PROGRESS: TLS Handshake Complete!\n");
+		  unsigned long hs_start, hs_end, elapsed_time;
+		  hs_start = get_process_nanoseconds();
+		  if ( SSL_accept(ssl) == FAIL )     /* do SSL-protocol accept */
+			  ERR_print_errors_fp(stderr);
+      hs_end = get_process_nanoseconds();
+      elapsed_time = hs_end - hs_start;
 
-		BIO_printf(outbio, "ELAPSED TIME: %lu us\n", hs_end - hs_start);
+      if (elapsed_time < 0)
+        elapsed_time += 1000000000L;
+		  printf("ELAPSED TIME: %lu, %lu, %lu ns\n", hs_start, hs_end, elapsed_time);
+      fprintf(fp, "%lu, %lu, %lu\n", hs_start, hs_end, elapsed_time);
 
-    RECORD_LOG(ssl->time_log, SERVER_SERVE_HTML_START);
-		rcvd = SSL_read(ssl, buf, sizeof(buf));
-    BIO_printf(outbio, "Request (%d): %s\n", rcvd, buf);
-		sent = SSL_write(ssl, response, response_len);
-    RECORD_LOG(ssl->time_log, SERVER_SERVE_HTML_END);
-    INTERVAL(ssl->time_log, SERVER_SERVE_HTML_START, SERVER_SERVE_HTML_END);
+		  rcvd = SSL_read(ssl, buf, sizeof(buf));
+      printf("Request (%d): %s\n", rcvd, buf);
+		  sent = SSL_write(ssl, response, response_len);
 
-		BIO_printf(outbio, "SERVER: HTTP Response Length: %d\n", response_len);
-		BIO_printf(outbio, "SERVER: Send the HTTP Test Page Success: %d\n", sent);
+		  printf("SERVER: HTTP Response Length: %d\n", response_len);
+		  printf("SERVER: Send the HTTP Test Page Success: %d\n", sent);
 
-		close(client);
-		SSL_free(ssl);
-	}
-
+		  close(client);
+		  SSL_free(ssl);
+	  }
+  }
 	SSL_CTX_free(ctx);         /* release context */
 	close(server);          /* close server socket */
 
@@ -157,12 +168,12 @@ void apps_ssl_info_callback(const SSL *s, int where, int ret)
 
 	if (where & SSL_CB_LOOP)
 	{
-		BIO_printf(bio_err, "%s:%s\n", str, SSL_state_string_long(s));
+		printf("%s:%s\n", str, SSL_state_string_long(s));
 	}
 	else if (where & SSL_CB_ALERT)
 	{
 		str = (where & SSL_CB_READ)? "read" : "write";
-		BIO_printf(bio_err, "SSL3 alert %s:%s:%s\n",
+		printf("SSL3 alert %s:%s:%s\n",
 				str,
 				SSL_alert_type_string_long(ret),
 				SSL_alert_desc_string_long(ret));
@@ -170,11 +181,11 @@ void apps_ssl_info_callback(const SSL *s, int where, int ret)
 	else if (where & SSL_CB_EXIT)
 	{
 		if (ret == 0)
-			BIO_printf(bio_err, "%s:failed in %s\n",
+			printf("%s:failed in %s\n",
 				str, SSL_state_string_long(s));
 		else if (ret < 0)
 		{
-			BIO_printf(bio_err, "%s:error in %s\n",
+			printf("%s:error in %s\n",
 				str, SSL_state_string_long(s));
 		}
 	}
@@ -192,7 +203,7 @@ SSL_CTX* init_server_CTX(BIO *outbio)
 	ctx = SSL_CTX_new(method);   /* create new context from method */
 	if ( ctx == NULL )
 	{
-		BIO_printf(outbio, "SSL_CTX init failed!");
+		printf("SSL_CTX init failed!");
 		abort();
 	}
 	SSL_library_init();
@@ -210,7 +221,7 @@ SSL_CTX* init_server_CTX(BIO *outbio)
 	return ctx;
 }
 
-void load_certificates(BIO *outbio, SSL_CTX* ctx, char* cert_file, char* key_file)
+void load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file)
 {
 	/* Load certificates for verification purpose*/
 	if (SSL_CTX_load_verify_locations(ctx, NULL, "/etc/ssl/certs") != 1)
@@ -219,7 +230,7 @@ void load_certificates(BIO *outbio, SSL_CTX* ctx, char* cert_file, char* key_fil
 		abort();
 	}
 	else
-		BIO_printf(outbio, "SSL_CTX_load_verify_locations success\n");
+		printf("SSL_CTX_load_verify_locations success\n");
 
 	/* Set default paths for certificate verifications */
 	if (SSL_CTX_set_default_verify_paths(ctx) != 1)
@@ -228,7 +239,7 @@ void load_certificates(BIO *outbio, SSL_CTX* ctx, char* cert_file, char* key_fil
 		abort();
 	}
 	else
-		BIO_printf(outbio, "SSL_CTX_set_default_verify_paths success\n");
+		printf("SSL_CTX_set_default_verify_paths success\n");
 
 	/* Set the local certificate from CertFile */
 	if ( SSL_CTX_use_certificate_file(ctx, cert_file, SSL_FILETYPE_PEM) <= 0 )
@@ -237,7 +248,7 @@ void load_certificates(BIO *outbio, SSL_CTX* ctx, char* cert_file, char* key_fil
 		abort();
 	}
 	else
-		BIO_printf(outbio, "SSL_CTX_use_certificate_file success\n");
+		printf("SSL_CTX_use_certificate_file success\n");
 
   if (ctx->mb_enabled == 1)
   {
@@ -246,7 +257,7 @@ void load_certificates(BIO *outbio, SSL_CTX* ctx, char* cert_file, char* key_fil
 		  abort();
 	  }
 	  else
-		  BIO_printf(outbio, "SSL_CTX_register_id success\n");
+		  printf("SSL_CTX_register_id success\n");
   }
 
 	/* Set the private key from KeyFile (may be the same as CertFile) */
@@ -256,7 +267,7 @@ void load_certificates(BIO *outbio, SSL_CTX* ctx, char* cert_file, char* key_fil
 		abort();
 	}
 	else
-		BIO_printf(outbio, "SSL_CTX_use_PrivateKey_file success\n");
+		printf("SSL_CTX_use_PrivateKey_file success\n");
 
 	/* Verify private key */
 	if ( !SSL_CTX_check_private_key(ctx) )
@@ -265,36 +276,10 @@ void load_certificates(BIO *outbio, SSL_CTX* ctx, char* cert_file, char* key_fil
 		abort();
 	}
 	else
-		BIO_printf(outbio, "SSL_CTX_check_private_key success\n");
+		printf("SSL_CTX_check_private_key success\n");
 
 	ERR_print_errors_fp(stderr);
 	ERR_print_errors_fp(stderr);
-}
-
-// Print the public key from the certificate
-void print_pubkey(BIO *outbio, EVP_PKEY *pkey)
-{
-	if (pkey)
-	{
-		switch (EVP_PKEY_id(pkey))
-		{
-			case EVP_PKEY_RSA:
-				BIO_printf(outbio, "%d bit RSA Key\n", EVP_PKEY_bits(pkey));
-				break;
-			case EVP_PKEY_DSA:
-				BIO_printf(outbio, "%d bit DSA Key\n", EVP_PKEY_bits(pkey));
-				break;
-			case EVP_PKEY_EC:
-				BIO_printf(outbio, "%d bit EC Key\n", EVP_PKEY_bits(pkey));
-				break;
-			default:
-				BIO_printf(outbio, "%d bit non-RSA/DSA/EC Key\n", EVP_PKEY_bits(pkey));
-				break;
-		}
-	}
-
-	if (!PEM_write_bio_PUBKEY(outbio, pkey))
-		BIO_printf(outbio, "Error writing public key data in PEM format\n");
 }
 
 // Load parameters from "dh1024.pem"

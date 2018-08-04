@@ -229,10 +229,12 @@ typedef struct log_record
 #define SERVER_SERVER_HELLO_7S 132
 #define SERVER_SERVER_HELLO_7E 133
 
+/*
 #define SERVER_HANDSHAKE_START 140
 #define SERVER_HANDSHAKE_END 141
 #define SERVER_SERVE_HTML_START 142
 #define SERVER_SERVE_HTML_END 143
+*/
 
 /*
 #define SERVER_PARSE_CLIENT_TLSEXT_START 74
@@ -267,15 +269,24 @@ typedef struct log_record
 #define CLIENT_MODIFICATION_RECORD_START 10
 #define CLIENT_MODIFICATION_RECORD_END 11
 
+#define SERVER_HANDSHAKE_START 21
+#define SERVER_HANDSHAKE_END 22
+#define SERVER_SERVE_HTML_START 23
+#define SERVER_SERVE_HTML_END 24
+
 int lidx;
 FILE *log_file;
 #define INITIALIZE_LOG(arr) \
   for (lidx=0; lidx<NUM_OF_LOGS; lidx++) \
-    arr[lidx].time = 0; \
+    arr[lidx].time = 0;
 
 #define RECORD_LOG(arr, n) \
   arr[n].name = #n; \
-  arr[n].time = get_current_microseconds(); \
+  arr[n].time = get_current_microseconds();
+
+#define PROCESS_LOG(arr, n) \
+  arr[n].name = #n; \
+  arr[n].time = get_process_nanoseconds();
 
 #define PRINT_LOG(arr) ({ \
   for ((lidx)=0; (lidx) < (NUM_OF_LOGS); (lidx)++) \
@@ -298,9 +309,10 @@ extern log_t time_log[NUM_OF_LOGS];
 #else
 #define INITIALIZE_LOG(arr) 
 #define RECORD_LOG(arr, n)
+#define PROCESS_LOG(arr, n)
 #define PRINT_LOG(arr)
 #define INTERVAL(arr, a, b)
 #define FINALIZE(arr, fname)
-#endif /* TIME_LOG */
+#endif /* LOGGER */
 
 #endif /* __MB_LOG__ */

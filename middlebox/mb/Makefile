@@ -322,12 +322,17 @@ mstart15t:
 mstart16t:
 	./${SERVER_16} ${PORT_16} ${FORWARD_FILE_16} 0
 
-cmstartt:
-	./${CMB} ${PORT_CMB} ${FORWARD_FILE_CMB} 0
+cmstart1t:
+	./${CMB} ${PORT_CMB} forward_cmb1.txt 0
 
-smstartt:
-	./${SMB} ${PORT_SMB} ${FORWARD_FILE_SMB} 0
+smstart1t:
+	./${SMB} ${PORT_SMB} forward_smb1.txt 0
 
+cmstart2t:
+	./${CMB} ${PORT_CMB} forward_cmb2.txt 0
+
+smstart2t:
+	./${SMB} ${PORT_SMB} forward_smb2.txt 0
 
 debug:
 	${GDB} ./${EXEC} ${PORT} ${CERT_FILE} ${CA_CERT_FILE} ${KEY_FILE} ${ORIG_CERT_FILE} ${WARRANT_FILE} -tui

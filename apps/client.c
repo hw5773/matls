@@ -14,6 +14,7 @@
 #include <sys/socket.h>
 #include <pthread.h>
 #include <openssl/opensslv.h>
+#include <netinet/tcp.h>
 
 #include <openssl/logs.h>
 

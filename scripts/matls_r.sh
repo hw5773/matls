@@ -20,6 +20,6 @@ for i in {1..100}
 do
    echo ${i}:${FILE}
    make cstart HOST=${URL} PORT=${PORT} LOG_FILE=${LOG_FILE}
-   sleep 1
+   sleep 0.5
 done
 echo 'done'

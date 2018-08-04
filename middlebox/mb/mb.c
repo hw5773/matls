@@ -15,6 +15,7 @@
 #include "mssl.h"
 #include "table.h"
 #include "logger.h"
+#include <netinet/tcp.h>
 
 #define FAIL    -1
 #define BUF_SIZE 1024

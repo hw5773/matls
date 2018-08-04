@@ -13,6 +13,7 @@
 #include <signal.h>
 #include "logger.h"
 #include "logs.h"
+#include <netinet/tcp.h>
 
 #define FAIL    -1
 #define DHFILE  "dh1024.pem"

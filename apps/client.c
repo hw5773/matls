@@ -151,7 +151,7 @@ void *run(void *data)
 
 int open_connection(const char *hostname, int port)
 {   
-  int sd;
+  int sd, optval = 1;
   struct hostent *host;
   struct sockaddr_in addr;
             
@@ -162,6 +162,7 @@ int open_connection(const char *hostname, int port)
   }
     
   sd = socket(PF_INET, SOCK_STREAM, 0);
+  setsockopt(sd, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
   bzero(&addr, sizeof(addr));
   addr.sin_family = AF_INET;
   addr.sin_port = htons(port);

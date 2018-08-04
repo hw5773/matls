@@ -202,11 +202,17 @@ mstart15:
 mstart16:
 	./${SERVER_16} ${PORT_16} 16.pem 16.key ${FORWARD_FILE_16} 0 0
 
-cmstart:
-	./${CMB} ${PORT_CMB} cmb.pem cmb.key ${FORWARD_FILE_CMB} 0 0
+cmstart1:
+	./${CMB} ${PORT_CMB} cmb1.pem cmb1.key ${FORWARD_FILE_CMB} 0 0
 
-smstart:
-	./${SMB} ${PORT_SMB} smb.pem smb.key ${FORWARD_FILE_SMB} 1 0 smb.txt
+smstart1:
+	./${SMB} ${PORT_SMB} smb1.pem smb1.key ${FORWARD_FILE_SMB} 1 0 smb1.txt
+
+cmstart2:
+	./${CMB} ${PORT_CMB} cmb2.pem cmb2.key ${FORWARD_FILE_CMB} 0 0
+
+smstart2:
+	./${SMB} ${PORT_SMB} smb2.pem smb2.key ${FORWARD_FILE_SMB} 1 0 smb2.txt
 
 mstart1w:
 	./${SERVER_1} ${PORT_1} 1.pem 1.key ${FORWARD_FILE_1} 0 1
@@ -256,11 +262,17 @@ mstart15w:
 mstart16w:
 	./${SERVER_16} ${PORT_16} 16.pem 16.key ${FORWARD_FILE_16} 0 16
 
-cmstartw:
-	./${CMB} ${PORT_CMB} cmb.pem cmb.key ${FORWARD_FILE_CMB} 0 15
+cmstartw1:
+	./${CMB} ${PORT_CMB} cmb1.pem cmb1.key ${FORWARD_FILE_CMB} 0 1
 
-smstartw:
-	./${SMB} ${PORT_SMB} smb.pem smb.key ${FORWARD_FILE_SMB} 1 16 smb.txt
+smstartw1:
+	./${SMB} ${PORT_SMB} smb1.pem smb1.key ${FORWARD_FILE_SMB} 1 16 smb1.txt
+
+cmstartw2:
+	./${CMB} ${PORT_CMB} cmb2.pem cmb2.key ${FORWARD_FILE_CMB} 0 2
+
+smstartw2:
+	./${SMB} ${PORT_SMB} smb2.pem smb2.key ${FORWARD_FILE_SMB} 1 16 smb2.txt
 
 mstart1t:
 	./${SERVER_1} ${PORT_1} ${FORWARD_FILE_1} 0

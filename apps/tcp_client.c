@@ -86,7 +86,7 @@ void *run(void *data)
   unsigned char buf[BUF_SIZE];
   const char *request = 
     "GET / HTTP/1.1\r\n"
-    "Host: www.matls3.com\r\n\r\n";
+    "Host: www.matls.com\r\n\r\n";
   int request_len = strlen(request);
 
 	server = open_connection(hostname, atoi(portnum));

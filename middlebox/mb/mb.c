@@ -240,7 +240,7 @@ int open_listener(int port)
 	struct sockaddr_in addr;
 
 	sd = socket(PF_INET, SOCK_STREAM, 0);
-  setsocket(sd, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
+  setsockopt(sd, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
 
   /////
   //int flag = 1;

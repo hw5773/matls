@@ -10,7 +10,7 @@ int main()
   X509 *mb_crt, *serv_crt;
 
   mb_crt = X509_new();
-  mb_fp = fopen("16.der", "r");
+  mb_fp = fopen("15.der", "r");
   mb_crt = d2i_X509_fp(mb_fp, NULL);
 
   server = BIO_new(BIO_s_file());

@@ -18,8 +18,8 @@ int main(int argc, char *argv[])
   unsigned char *proof, *proof_body, *sigblk, *p;
   mb_crt = X509_new();
 
-  mb_fp = fopen("16.der", "r");
-  printf("open 16.der file complete\n");
+  mb_fp = fopen("15.der", "r");
+  printf("open 15.der file complete\n");
   mb_crt = d2i_X509_fp(mb_fp, NULL);
   fclose(mb_fp);
 

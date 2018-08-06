@@ -85,12 +85,12 @@ unsigned long get_current_microseconds();
 unsigned long mstart, mend;
 #define MSTART(msg, side) \
 	mstart = get_current_microseconds(); \
-	printf("[TT] %s:%s:%d: %s) %s start\n", __FILE__, __func__, __LINE__, side, msg);
+	fprintf(stderr, "[TT] %s:%s:%d: %s) %s start\n", __FILE__, __func__, __LINE__, side, msg);
 #define MEND(msg, side) \
 	mend = get_current_microseconds(); \
-	printf("[TT] %s:%s:%d: %s) %s end: %lu us\n", __FILE__, __func__, __LINE__, side, msg, mend - mstart);
+	fprintf(stderr, "[TT] %s:%s:%d: %s) %s end: %lu us\n", __FILE__, __func__, __LINE__, side, msg, mend - mstart);
 #define MEASURE(msg, side) \
-	printf("[TT] %s:%s:%d: %s) %s: %lu\n", __FILE__, __func__, __LINE__, side, msg, get_current_microseconds());
+	fprintf(stderr, "[TT] %s:%s:%d: %s) %s: %lu\n", __FILE__, __func__, __LINE__, side, msg, get_current_microseconds());
 #else
 #define MSTART(msg, side)
 #define MEND(msg, side)
@@ -271,6 +271,8 @@ typedef struct log_record
 #define CLIENT_TCP_CONNECT_END 9
 #define CLIENT_MODIFICATION_RECORD_START 10
 #define CLIENT_MODIFICATION_RECORD_END 11
+#define SERVER_MODIFICATION_GENERATE_START 26
+#define SERVER_MODIFICATION_GENERATE_END 27
 
 int lidx;
 FILE *log_file;

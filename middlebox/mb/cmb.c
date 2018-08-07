@@ -153,6 +153,8 @@ void *mb_run(void *data)
   MA_LOG("split tls enabled");
 #endif
 
+  ssl->time_log = time_log;
+
   start = get_current_microseconds();
   MA_LOG("before ssl accept");
   ret = SSL_accept(ssl);

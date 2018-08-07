@@ -333,6 +333,7 @@ void *run(void *data)
   MA_LOG1d("matls disabled", ssl->mb_enabled);
 #endif
 
+  ssl->time_log = args->ssl->time_log;
   unsigned long start, end;
 
   start = get_current_microseconds();

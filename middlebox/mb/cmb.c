@@ -29,11 +29,21 @@ BIO *bio_err;
 void *mb_run(void *data);
 int get_total_length(char *buf, int rcvd);
 int modification;
+FILE *fp;
+unsigned char *fname;
+log_t time_log[NUM_OF_LOGS];
 
 struct info
 {
   int sock;
 };
+
+void int_handler(int dummy)
+{
+	FINALIZE(time_log, fname);
+	printf("[matls] %s:%s:%d: End of experiment\n", __FILE__, __func__, __LINE__);
+	exit(0);
+}
 
 // Origin Server Implementation
 int main(int count, char *strings[])
@@ -42,26 +52,30 @@ int main(int count, char *strings[])
 	char *portnum, *cert, *key, *forward_file;
   void *status;
 
-	if ( count != 7 )
+	if ( count != 8 )
 	{
-		printf("Usage: %s <portnum> <cert_file> <key_file> <forward_file> <server side> <modification>\n", strings[0]);
+		printf("Usage: %s <portnum> <cert_file> <key_file> <forward_file> <server side> <modification> <log filename>\n", strings[0]);
 		exit(0);
 	}
+	signal(SIGINT, int_handler);
 	SSL_library_init();
 	OpenSSL_add_all_algorithms();
 
 	portnum = strings[1];
 	cert = strings[2];
 	key = strings[3];
-  forward_file = strings[4];
-  server_side = atoi(strings[5]);
-  modification = atoi(strings[6]);
+  	forward_file = strings[4];
+  	server_side = atoi(strings[5]);
+	modification = atoi(strings[6]);
+	fname = strings[7];
+
+	INITIALIZE_LOG(time_log);
 
 	ctx = init_middlebox_ctx(server_side);        /* initialize SSL */
 	load_dh_params(ctx, DHFILE);
 	load_certificates(ctx, cert, key);
-  init_forward_table(forward_file);
-  init_thread_config();
+  	init_forward_table(forward_file);
+  	init_thread_config();
 
 	server = open_listener(atoi(portnum));    /* create server socket */
 

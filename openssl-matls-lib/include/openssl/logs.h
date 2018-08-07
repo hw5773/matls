@@ -104,7 +104,7 @@ typedef struct log_record
   unsigned long time;
 } log_t;
 
-#define NUM_OF_LOGS 200
+#define NUM_OF_LOGS 250
 
 #define SERVER_ACCEPT_START 0
 #define SERVER_CLIENT_HELLO_START 1
@@ -273,6 +273,48 @@ typedef struct log_record
 #define CLIENT_MODIFICATION_RECORD_END 161
 #define SERVER_MODIFICATION_GENERATE_START 166
 #define SERVER_MODIFICATION_GENERATE_END 167
+
+#define MEASURE_1 171
+#define MEASURE_2 172
+#define MEASURE_3 173
+#define MEASURE_4 174
+#define MEASURE_5 175
+#define MEASURE_6 176
+#define MEASURE_7 177
+#define MEASURE_8 178
+#define MEASURE_9 179
+#define MEASURE_10 180
+#define MEASURE_11 181
+#define MEASURE_12 182
+#define MEASURE_13 183
+#define MEASURE_14 184
+#define MEASURE_15 185
+#define MEASURE_16 186
+#define MEASURE_17 187
+#define MEASURE_18 188
+#define MEASURE_19 189
+#define MEASURE_20 190
+
+#define MEASURE_21 191
+#define MEASURE_22 192
+#define MEASURE_23 193
+#define MEASURE_24 194
+#define MEASURE_25 195
+#define MEASURE_26 196
+#define MEASURE_27 197
+#define MEASURE_28 198
+#define MEASURE_29 199
+#define MEASURE_30 200
+#define MEASURE_31 201
+#define MEASURE_32 202
+#define MEASURE_33 203
+#define MEASURE_34 204
+#define MEASURE_35 205
+#define MEASURE_36 206
+#define MEASURE_37 207
+#define MEASURE_38 208
+#define MEASURE_39 209
+#define MEASURE_40 210
 
 int lidx;
 FILE *log_file;

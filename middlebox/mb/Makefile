@@ -203,16 +203,16 @@ mstart16:
 	./${SERVER_16} ${PORT_16} 16.pem 16.key ${FORWARD_FILE_16} 0 0
 
 cmstart1:
-	./${CMB} ${PORT_CMB} cmb1.pem cmb1.key forward_cmb1.txt 0 0
+	./${CMB} ${PORT_CMB} cmb1.pem cmb1.key forward_cmb1.txt 0 0 ${LOG_FILE}
 
 smstart1:
-	./${SMB} ${PORT_SMB} smb1.pem smb1.key forward_smb1.txt 1 0 smb1.txt
+	./${SMB} ${PORT_SMB} smb1.pem smb1.key forward_smb1.txt 1 0 smb1.txt ${LOG_FILE}
 
 cmstart2:
-	./${CMB} ${PORT_CMB} cmb2.pem cmb2.key forward_cmb2.txt 0 0
+	./${CMB} ${PORT_CMB} cmb2.pem cmb2.key forward_cmb2.txt 0 0 ${LOG_FILE}
 
 smstart2:
-	./${SMB} ${PORT_SMB} smb2.pem smb2.key forward_smb2.txt 1 0 smb2.txt
+	./${SMB} ${PORT_SMB} smb2.pem smb2.key forward_smb2.txt 1 0 smb2.txt ${LOG_FILE}
 
 mstart1w:
 	./${SERVER_1} ${PORT_1} 1.pem 1.key ${FORWARD_FILE_1} 0 1

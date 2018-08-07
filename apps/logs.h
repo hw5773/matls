@@ -85,12 +85,12 @@ unsigned long get_current_microseconds();
 unsigned long mstart, mend;
 #define MSTART(msg, side) \
 	mstart = get_current_microseconds(); \
-	printf("[TT] %s:%s:%d: %s) %s start\n", __FILE__, __func__, __LINE__, side, msg);
+	fprintf(stderr, "[TT] %s:%s:%d: %s) %s start\n", __FILE__, __func__, __LINE__, side, msg);
 #define MEND(msg, side) \
 	mend = get_current_microseconds(); \
-	printf("[TT] %s:%s:%d: %s) %s end: %lu us\n", __FILE__, __func__, __LINE__, side, msg, mend - mstart);
+	fprintf(stderr, "[TT] %s:%s:%d: %s) %s end: %lu us\n", __FILE__, __func__, __LINE__, side, msg, mend - mstart);
 #define MEASURE(msg, side) \
-	printf("[TT] %s:%s:%d: %s) %s: %lu\n", __FILE__, __func__, __LINE__, side, msg, get_current_microseconds());
+	fprintf(stderr, "[TT] %s:%s:%d: %s) %s: %lu\n", __FILE__, __func__, __LINE__, side, msg, get_current_microseconds());
 #else
 #define MSTART(msg, side)
 #define MEND(msg, side)
@@ -104,8 +104,8 @@ typedef struct log_record
   unsigned long time;
 } log_t;
 
-#define NUM_OF_LOGS 150
-/*
+#define NUM_OF_LOGS 200
+
 #define SERVER_ACCEPT_START 0
 #define SERVER_CLIENT_HELLO_START 1
 #define SERVER_CLIENT_HELLO_END 2
@@ -167,7 +167,7 @@ typedef struct log_record
 #define CLIENT_SERVER_MODIFICATION_GENERATE_END 57
 #define CLIENT_SERVER_MODIFICATION_VERIFY_START 58
 #define CLIENT_SERVER_MODIFICATION_VERIFY_END 59
-*/
+
 
 #define CLIENT_CLIENT_HELLO_1S 60
 #define CLIENT_CLIENT_HELLO_1E 61
@@ -229,12 +229,15 @@ typedef struct log_record
 #define SERVER_SERVER_HELLO_7S 132
 #define SERVER_SERVER_HELLO_7E 133
 
-/*
 #define SERVER_HANDSHAKE_START 140
 #define SERVER_HANDSHAKE_END 141
 #define SERVER_SERVE_HTML_START 142
 #define SERVER_SERVE_HTML_END 143
-*/
+
+#define CLIENT_GENERATE_ACCOUNTABILITY_KEYS_START 146
+#define CLIENT_GENERATE_ACCOUNTABILITY_KEYS_END 147
+#define SERVER_GENERATE_ACCOUNTABILITY_KEYS_START 148
+#define SERVER_GENERATE_ACCOUNTABILITY_KEYS_END 149
 
 /*
 #define SERVER_PARSE_CLIENT_TLSEXT_START 74
@@ -256,63 +259,64 @@ typedef struct log_record
 #define CLIENT_PARSE_SERVER_HELLO_7E 93
 */
 
-#define CLIENT_HANDSHAKE_START 0
-#define CLIENT_HANDSHAKE_END 1
-#define CLIENT_CERT_VALIDATION_START 2
-#define CLIENT_CERT_VALIDATION_END 3
-#define CLIENT_FETCH_HTML_START 4
-#define CLIENT_FETCH_HTML_END 5
-#define CLIENT_EXTENDED_FINISHED_START 6
-#define CLIENT_EXTENDED_FINISHED_END 7
-#define CLIENT_TCP_CONNECT_START 8
-#define CLIENT_TCP_CONNECT_END 9
-#define CLIENT_MODIFICATION_RECORD_START 10
-#define CLIENT_MODIFICATION_RECORD_END 11
-
-#define SERVER_HANDSHAKE_START 21
-#define SERVER_HANDSHAKE_END 22
-#define SERVER_SERVE_HTML_START 23
-#define SERVER_SERVE_HTML_END 24
+#define CLIENT_HANDSHAKE_START 150
+#define CLIENT_HANDSHAKE_END 151
+#define CLIENT_CERT_VALIDATION_START 152
+#define CLIENT_CERT_VALIDATION_END 153
+#define CLIENT_FETCH_HTML_START 154
+#define CLIENT_FETCH_HTML_END 155
+#define CLIENT_EXTENDED_FINISHED_START 156
+#define CLIENT_EXTENDED_FINISHED_END 157
+#define CLIENT_TCP_CONNECT_START 158
+#define CLIENT_TCP_CONNECT_END 159
+#define CLIENT_MODIFICATION_RECORD_START 160
+#define CLIENT_MODIFICATION_RECORD_END 161
+#define SERVER_MODIFICATION_GENERATE_START 166
+#define SERVER_MODIFICATION_GENERATE_END 167
 
 int lidx;
 FILE *log_file;
 #define INITIALIZE_LOG(arr) \
-  for (lidx=0; lidx<NUM_OF_LOGS; lidx++) \
-    arr[lidx].time = 0;
+  if (arr) { \
+    for (lidx=0; lidx<NUM_OF_LOGS; lidx++) \
+      arr[lidx].time = 0; \
+  }
 
 #define RECORD_LOG(arr, n) \
-  arr[n].name = #n; \
-  arr[n].time = get_current_microseconds();
+  if (arr) { \
+    arr[n].name = #n; \
+    arr[n].time = get_current_microseconds(); \
+  } 
 
-#define PROCESS_LOG(arr, n) \
-  arr[n].name = #n; \
-  arr[n].time = get_process_nanoseconds();
-
-#define PRINT_LOG(arr) ({ \
-  for ((lidx)=0; (lidx) < (NUM_OF_LOGS); (lidx)++) \
-    printf("%s: %lu\n", arr[lidx].name, arr[lidx].time); \
-  })
+#define PRINT_LOG(arr) \
+  if (arr) { \
+    for ((lidx)=0; (lidx) < (NUM_OF_LOGS); (lidx)++) \
+      printf("%s: %lu\n", arr[lidx].name, arr[lidx].time); \
+  }
 
 #define INTERVAL(arr, a, b) \
-  printf("Time from %s to %s: %lu us\n", arr[a].name, arr[b].name, arr[b].time - arr[a].time);
+  if (arr) { \
+    printf("Time from %s to %s: %lu us\n", arr[a].name, arr[b].name, arr[b].time - arr[a].time); \
+  }
 
 #define FINALIZE(arr, fname) \
-  log_file = fopen(fname, "a"); \
-  for (lidx = 0; lidx < NUM_OF_LOGS; lidx++) \
-  { \
-    if (arr[lidx].time > 0) \
-      fprintf(log_file, "%lu, %d, %s\n", arr[lidx].time, lidx, arr[lidx].name); \
-  } \
-  fclose(log_file);
+  if (arr) { \
+    log_file = fopen(fname, "a"); \
+    for (lidx = 0; lidx < NUM_OF_LOGS; lidx++) \
+    { \
+      if (arr[lidx].time > 0) \
+        fprintf(log_file, "%lu, %d, %s\n", arr[lidx].time, lidx, arr[lidx].name); \
+    } \
+    fclose(log_file); \
+  }
   
 extern log_t time_log[NUM_OF_LOGS];
 #else
 #define INITIALIZE_LOG(arr) 
 #define RECORD_LOG(arr, n)
-#define PROCESS_LOG(arr, n)
 #define PRINT_LOG(arr)
 #define INTERVAL(arr, a, b)
 #define FINALIZE(arr, fname)
-#endif /* LOGGER */
+#endif /* TIME_LOG */
 
 #endif /* __MB_LOG__ */

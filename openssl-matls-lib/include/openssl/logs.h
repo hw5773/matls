@@ -85,12 +85,12 @@ unsigned long get_current_microseconds();
 unsigned long mstart, mend;
 #define MSTART(msg, side) \
 	mstart = get_current_microseconds(); \
-	printf("[TT] %s:%s:%d: %s) %s start\n", __FILE__, __func__, __LINE__, side, msg);
+	fprintf(stderr, "[TT] %s:%s:%d: %s) %s start\n", __FILE__, __func__, __LINE__, side, msg);
 #define MEND(msg, side) \
 	mend = get_current_microseconds(); \
-	printf("[TT] %s:%s:%d: %s) %s end: %lu us\n", __FILE__, __func__, __LINE__, side, msg, mend - mstart);
+	fprintf(stderr, "[TT] %s:%s:%d: %s) %s end: %lu us\n", __FILE__, __func__, __LINE__, side, msg, mend - mstart);
 #define MEASURE(msg, side) \
-	printf("[TT] %s:%s:%d: %s) %s: %lu\n", __FILE__, __func__, __LINE__, side, msg, get_current_microseconds());
+	fprintf(stderr, "[TT] %s:%s:%d: %s) %s: %lu\n", __FILE__, __func__, __LINE__, side, msg, get_current_microseconds());
 #else
 #define MSTART(msg, side)
 #define MEND(msg, side)
@@ -104,7 +104,7 @@ typedef struct log_record
   unsigned long time;
 } log_t;
 
-#define NUM_OF_LOGS 150
+#define NUM_OF_LOGS 200
 
 #define SERVER_ACCEPT_START 0
 #define SERVER_CLIENT_HELLO_START 1
@@ -168,7 +168,7 @@ typedef struct log_record
 #define CLIENT_SERVER_MODIFICATION_VERIFY_START 58
 #define CLIENT_SERVER_MODIFICATION_VERIFY_END 59
 
-/*
+
 #define CLIENT_CLIENT_HELLO_1S 60
 #define CLIENT_CLIENT_HELLO_1E 61
 #define CLIENT_CLIENT_HELLO_2S 62
@@ -233,7 +233,7 @@ typedef struct log_record
 #define SERVER_HANDSHAKE_END 141
 #define SERVER_SERVE_HTML_START 142
 #define SERVER_SERVE_HTML_END 143
-*/
+
 #define CLIENT_GENERATE_ACCOUNTABILITY_KEYS_START 146
 #define CLIENT_GENERATE_ACCOUNTABILITY_KEYS_END 147
 #define SERVER_GENERATE_ACCOUNTABILITY_KEYS_START 148
@@ -259,18 +259,20 @@ typedef struct log_record
 #define CLIENT_PARSE_SERVER_HELLO_7E 93
 */
 
-#define CLIENT_HANDSHAKE_START 100
-#define CLIENT_HANDSHAKE_END 101
-#define CLIENT_CERT_VALIDATION_START 102
-#define CLIENT_CERT_VALIDATION_END 103
-#define CLIENT_FETCH_HTML_START 104
-#define CLIENT_FETCH_HTML_END 105
-#define CLIENT_EXTENDED_FINISHED_START 106
-#define CLIENT_EXTENDED_FINISHED_END 107
-#define CLIENT_TCP_CONNECT_START 108
-#define CLIENT_TCP_CONNECT_END 109
-#define CLIENT_MODIFICATION_RECORD_START 110
-#define CLIENT_MODIFICATION_RECORD_END 111
+#define CLIENT_HANDSHAKE_START 150
+#define CLIENT_HANDSHAKE_END 151
+#define CLIENT_CERT_VALIDATION_START 152
+#define CLIENT_CERT_VALIDATION_END 153
+#define CLIENT_FETCH_HTML_START 154
+#define CLIENT_FETCH_HTML_END 155
+#define CLIENT_EXTENDED_FINISHED_START 156
+#define CLIENT_EXTENDED_FINISHED_END 157
+#define CLIENT_TCP_CONNECT_START 158
+#define CLIENT_TCP_CONNECT_END 159
+#define CLIENT_MODIFICATION_RECORD_START 160
+#define CLIENT_MODIFICATION_RECORD_END 161
+#define SERVER_MODIFICATION_GENERATE_START 166
+#define SERVER_MODIFICATION_GENERATE_END 167
 
 int lidx;
 FILE *log_file;

@@ -16,7 +16,7 @@ touch ${FILE}
 
 cd /home/hwlee/matls/apps
 
-for i in {1..100}
+for i in {1..1000}
 do
    echo ${i}:${FILE}
    make cstart HOST=${URL} PORT=${PORT} LOG_FILE=${LOG_FILE} &

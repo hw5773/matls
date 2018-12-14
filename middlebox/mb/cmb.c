@@ -17,7 +17,7 @@
 #include "logger.h"
 
 #define FAIL    -1
-#define BUF_SIZE 1024
+#define BUF_SIZE 16384
 #define DHFILE	"dh1024.pem"
 
 int open_listener(int port);

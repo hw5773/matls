@@ -59,8 +59,10 @@ PORT_13=5013
 PORT_14=5014
 PORT_15=5015
 PORT_16=5016
-PORT_SMB=5017
-PORT_CMB=5017
+PORT_SMB1=5016
+PORT_CMB1=5016
+PORT_SMB2=5015
+PORT_CMB2=5015
 FORWARD_FILE_1=forward_1.txt
 FORWARD_FILE_2=forward_2.txt
 FORWARD_FILE_3=forward_3.txt
@@ -203,16 +205,16 @@ mstart16:
 	./${SERVER_16} ${PORT_16} 16.pem 16.key ${FORWARD_FILE_16} 0 0
 
 cmstart1:
-	./${CMB} ${PORT_CMB} cmb1.pem cmb1.key forward_cmb1.txt 0 0 ${LOG_FILE}
+	./${CMB} ${PORT_CMB1} cmb1.pem cmb1.key forward_cmb1.txt 0 0 ${LOG_FILE}
 
 smstart1:
-	./${SMB} ${PORT_SMB} smb1.pem smb1.key forward_smb1.txt 1 0 smb1.txt ${LOG_FILE}
+	./${SMB} ${PORT_SMB1} smb1.pem smb1.key forward_smb1.txt 1 0 smb1.txt ${LOG_FILE}
 
 cmstart2:
-	./${CMB} ${PORT_CMB} cmb2.pem cmb2.key forward_cmb2.txt 0 0 ${LOG_FILE}
+	./${CMB} ${PORT_CMB2} cmb2.pem cmb2.key forward_cmb2.txt 0 0 ${LOG_FILE}
 
 smstart2:
-	./${SMB} ${PORT_SMB} smb2.pem smb2.key forward_smb2.txt 1 0 smb2.txt ${LOG_FILE}
+	./${SMB} ${PORT_SMB2} smb2.pem smb2.key forward_smb2.txt 1 0 smb2.txt ${LOG_FILE}
 
 mstart1w:
 	./${SERVER_1} ${PORT_1} 1.pem 1.key ${FORWARD_FILE_1} 0 1
@@ -263,16 +265,16 @@ mstart16w:
 	./${SERVER_16} ${PORT_16} 16.pem 16.key ${FORWARD_FILE_16} 0 16
 
 cmstartw1:
-	./${CMB} ${PORT_CMB} cmb1.pem cmb1.key forward_cmb1.txt 0 1
+	./${CMB} ${PORT_CMB1} cmb1.pem cmb1.key forward_cmb1.txt 0 1
 
 smstartw1:
-	./${SMB} ${PORT_SMB} smb1.pem smb1.key forward_smb1.txt 1 16 smb1.txt
+	./${SMB} ${PORT_SMB1} smb1.pem smb1.key forward_smb1.txt 1 16 smb1.txt
 
 cmstartw2:
-	./${CMB} ${PORT_CMB} cmb2.pem cmb2.key forward_cmb2.txt 0 2
+	./${CMB} ${PORT_CMB2} cmb2.pem cmb2.key forward_cmb2.txt 0 2
 
 smstartw2:
-	./${SMB} ${PORT_SMB} smb2.pem smb2.key forward_smb2.txt 1 16 smb2.txt
+	./${SMB} ${PORT_SMB2} smb2.pem smb2.key forward_smb2.txt 1 16 smb2.txt
 
 mstart1t:
 	./${SERVER_1} ${PORT_1} ${FORWARD_FILE_1} 0
@@ -323,16 +325,16 @@ mstart16t:
 	./${SERVER_16} ${PORT_16} ${FORWARD_FILE_16} 0
 
 cmstart1t:
-	./${CMB} ${PORT_CMB} forward_cmb1.txt 0
+	./${CMB} ${PORT_CMB1} forward_cmb1.txt 0
 
 smstart1t:
-	./${SMB} ${PORT_SMB} forward_smb1.txt 0
+	./${SMB} ${PORT_SMB1} forward_smb1.txt 0
 
 cmstart2t:
-	./${CMB} ${PORT_CMB} forward_cmb2.txt 0
+	./${CMB} ${PORT_CMB2} forward_cmb2.txt 0
 
 smstart2t:
-	./${SMB} ${PORT_SMB} forward_smb2.txt 0
+	./${SMB} ${PORT_SMB2} forward_smb2.txt 0
 
 debug:
 	${GDB} ./${EXEC} ${PORT} ${CERT_FILE} ${CA_CERT_FILE} ${KEY_FILE} ${ORIG_CERT_FILE} ${WARRANT_FILE} -tui

@@ -17,6 +17,7 @@
 
 #define FAIL    -1
 #define DHFILE  "dh1024.pem"
+#define BUF_SIZE 16384
 
 int open_listener(int port);
 SSL_CTX* init_server_ctx();
@@ -45,7 +46,7 @@ int main(int count, char *strings[])
 {  
 	SSL *ssl;
 	SSL_CTX *ctx;
-	int server, client, sent = 0, rcvd = 0;
+	int server, client, sent = 0, rcvd = 0, cnt = 0, set = 0;
 	char *portnum, *cert, *key, *response, *p;
 	const char *header = 	
 		"HTTP/1.1 200 OK\r\n"
@@ -113,19 +114,20 @@ int main(int count, char *strings[])
 	server = open_listener(atoi(portnum));    /* create server socket */
 
 	struct sockaddr_in addr;
-	unsigned char buf[2048];
+	unsigned char buf[BUF_SIZE];
+  unsigned long start, end, curr;
 	socklen_t len = sizeof(addr);
 
 	while (running)
 	{
     if ((client = accept(server, (struct sockaddr *)&addr, &len)) > 0)
     {
-		  printf("New Connection\n");
+		  MA_LOG("New Connection");
 		  ssl = SSL_new(ctx);/* get new SSL state with context */
-		  printf("SSL_new() Success\n");
+		  MA_LOG("SSL_new() Success");
 		  SSL_set_fd(ssl, client);      /* set connection socket to SSL state */
       ssl->time_log = time_log;
-		  printf("SSL_set_fd() Success\n");
+		  MA_LOG("SSL_set_fd() Success");
 
 		  unsigned long hs_start, hs_end, elapsed_time;
 		  hs_start = get_process_nanoseconds();
@@ -136,15 +138,39 @@ int main(int count, char *strings[])
 
       if (elapsed_time < 0)
         elapsed_time += 1000000000L;
-		  printf("ELAPSED TIME: %lu, %lu, %lu ns\n", hs_start, hs_end, elapsed_time);
+		  MA_LOG("ELAPSED TIME: %lu, %lu, %lu ns", hs_start, hs_end, elapsed_time);
       fprintf(fp, "%lu, %lu, %lu\n", hs_start, hs_end, elapsed_time);
 
 		  rcvd = SSL_read(ssl, buf, sizeof(buf));
-      printf("Request (%d): %s\n", rcvd, buf);
+      MA_LOG("Request (%d): %s", rcvd, buf);
 		  sent = SSL_write(ssl, response, response_len);
 
-		  printf("SERVER: HTTP Response Length: %ld\n", response_len);
-		  printf("SERVER: Send the HTTP Test Page Success: %d\n", sent);
+		  MA_LOG("SERVER: HTTP Response Length: %ld", response_len);
+		  MA_LOG("SERVER: Send the HTTP Test Page Success: %d", sent);
+      cnt++;
+
+      if (cnt > 0)
+      {
+        if (set == 0)
+        {
+          printf("Start Counting\n");
+          start = get_current_microseconds();
+          printf("Start Time: %lu\n", start);
+          end = start + 10000000;
+          printf("End Time: %lu\n", end);
+          set++;
+        }
+        else if (set == 1)
+        {
+          curr = get_current_microseconds();
+          if (curr >= end)
+          {
+            printf("Count: %d\n", cnt);
+            cnt = 0;
+            set++;
+          }
+        }
+      }
 
 		  close(client);
 		  SSL_free(ssl);
@@ -173,7 +199,7 @@ int open_listener(int port)
 		perror("can't bind port");
 		abort();
 	}
-	if ( listen(sd, 10) != 0 )
+	if ( listen(sd, 1000) != 0 )
 	{
 		perror("Can't configure listening port");
 		abort();

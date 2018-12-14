@@ -19,20 +19,23 @@
 #define DHFILE  "dh1024.pem"
 
 int open_listener(int port);
-SSL_CTX* init_server_CTX();
-void load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file);
-void load_dh_params(SSL_CTX *ctx, char *file);
+SSL_ctx* init_server_ctx();
+void load_certificates(SSL_ctx* ctx, char* cert_file, char* key_file);
+void load_dh_params(SSL_ctx *ctx, char *file);
 void msg_callback(int, int, int, const void *, size_t, SSL *, void *);
 BIO *bio_err;
 log_t time_log[NUM_OF_LOGS];
+char *rname;
 char *fname;
 int running = 1; 
 FILE *fp;
 
 void int_handler(int dummy)
 {
-  fclose(fp);
-  printf("[matls] %s:%s:%d: End of experiment\n", __FILE__, __func__, __LINE__);
+  if (fp)
+    fclose(fp);
+
+  MA_LOG("End of experiment");
   running = 0;
   exit(0);
 }
@@ -41,7 +44,7 @@ void int_handler(int dummy)
 int main(int count, char *strings[])
 {  
 	SSL *ssl;
-	SSL_CTX *ctx;
+	SSL_ctx *ctx;
 	int server, client, sent = 0, rcvd = 0;
 	char *portnum, *cert, *key;
 	const char *response = 	
@@ -50,12 +53,12 @@ int main(int count, char *strings[])
 		"Content-Length: 72\r\n"
 		"\r\n"
 		"<html><title>Test</title><body><h1>Test Alice's Page!</h1></body></html>";
-	int response_len = strlen(response);
+	size_t response_len;
 
 
-	if ( count != 5 )
+	if ((count < 5) || (count > 6))
 	{
-		printf("Usage: %s <portnum> <cert_file> <key_file> <log_file>\n", strings[0]);
+		printf("Usage: %s <portnum> <cert_file> <key_file> <index_file> <log_file>\n", strings[0]);
 		exit(0);
 	}
 
@@ -66,12 +69,16 @@ int main(int count, char *strings[])
 	portnum = strings[1];
 	cert = strings[2];
 	key = strings[3];
-  fname = strings[4];
+  rname = strings[4];
 
-  fp = fopen(fname, "w");
+  if (count == 6)
+  {
+    fname = strings[5];
+    fp = fopen(fname, "w");
+  }
 
   INITIALIZE_LOG(time_log);
-	ctx = init_server_CTX();        /* initialize SSL */
+	ctx = init_server_ctx();        /* initialize SSL */
   load_dh_params(ctx, DHFILE);
 	load_certificates(ctx, cert, key);
 	printf("load_certificates success\n");
@@ -116,7 +123,7 @@ int main(int count, char *strings[])
 		  SSL_free(ssl);
 	  }
   }
-	SSL_CTX_free(ctx);         /* release context */
+	SSL_ctx_free(ctx);         /* release context */
 	close(server);          /* close server socket */
 
 	return 0;
@@ -147,146 +154,98 @@ int open_listener(int port)
 	return sd;
 }
 
-void msg_callback(int write_p, int version, int content_type, const void *buf, size_t len, SSL *ssl, void *arg)
-{
-	/*
-	if (write_p == 2)
-		printf("buf: %s\n", (unsigned char *)buf);
-	else
-	{
-	}
-	*/
-}
-
-void apps_ssl_info_callback(const SSL *s, int where, int ret)
-{
-	const char *str;
-	int w;
-
-	w = where & ~SSL_ST_MASK;
-
-	if (w & SSL_ST_CONNECT) str = "SSL_connect";
-	else if (w & SSL_ST_ACCEPT) str = "SSL_accept";
-	else str = "Undefined";
-
-	if (where & SSL_CB_LOOP)
-	{
-		printf("%s:%s\n", str, SSL_state_string_long(s));
-	}
-	else if (where & SSL_CB_ALERT)
-	{
-		str = (where & SSL_CB_READ)? "read" : "write";
-		printf("SSL3 alert %s:%s:%s\n",
-				str,
-				SSL_alert_type_string_long(ret),
-				SSL_alert_desc_string_long(ret));
-	}
-	else if (where & SSL_CB_EXIT)
-	{
-		if (ret == 0)
-			printf("%s:failed in %s\n",
-				str, SSL_state_string_long(s));
-		else if (ret < 0)
-		{
-			printf("%s:error in %s\n",
-				str, SSL_state_string_long(s));
-		}
-	}
-}
-
-SSL_CTX* init_server_CTX(BIO *outbio)
+SSL_ctx* init_server_ctx(BIO *outbio)
 {   
 	SSL_METHOD *method;
-	SSL_CTX *ctx;
+	SSL_ctx *ctx;
 
 	SSL_library_init();
 	OpenSSL_add_all_algorithms();
 	SSL_load_error_strings();   /* load all error messages */
 	method = (SSL_METHOD *) TLSv1_2_method();  /* create new server-method instance */
-	ctx = SSL_CTX_new(method);   /* create new context from method */
+	ctx = SSL_ctx_new(method);   /* create new context from method */
 	if ( ctx == NULL )
 	{
-		printf("SSL_CTX init failed!");
+		printf("SSL_ctx init failed!");
 		abort();
 	}
 	SSL_library_init();
 	OpenSSL_add_all_algorithms();
 
-	SSL_CTX_set_msg_callback(ctx, msg_callback);
-  SSL_CTX_set_cipher_list(ctx, "DHE-RSA-AES256-SHA256");
+  SSL_ctx_set_cipher_list(ctx, "DHE-RSA-AES256-SHA256");
 
 #ifdef MATLS
-  SSL_CTX_enable_mb(ctx);
+  SSL_ctx_enable_mb(ctx);
 #else
-  SSL_CTX_disable_mb(ctx);
+  SSL_ctx_disable_mb(ctx);
 #endif /* MATLS */
 
 	return ctx;
 }
 
-void load_certificates(SSL_CTX* ctx, char* cert_file, char* key_file)
+void load_certificates(SSL_ctx* ctx, char* cert_file, char* key_file)
 {
 	/* Load certificates for verification purpose*/
-	if (SSL_CTX_load_verify_locations(ctx, NULL, "/etc/ssl/certs") != 1)
+	if (SSL_ctx_load_verify_locations(ctx, NULL, "/etc/ssl/certs") != 1)
 	{
 		ERR_print_errors_fp(stderr);
 		abort();
 	}
 	else
-		printf("SSL_CTX_load_verify_locations success\n");
+		printf("SSL_ctx_load_verify_locations success\n");
 
 	/* Set default paths for certificate verifications */
-	if (SSL_CTX_set_default_verify_paths(ctx) != 1)
+	if (SSL_ctx_set_default_verify_paths(ctx) != 1)
 	{
 		ERR_print_errors_fp(stderr);
 		abort();
 	}
 	else
-		printf("SSL_CTX_set_default_verify_paths success\n");
+		printf("SSL_ctx_set_default_verify_paths success\n");
 
 	/* Set the local certificate from CertFile */
-	if ( SSL_CTX_use_certificate_file(ctx, cert_file, SSL_FILETYPE_PEM) <= 0 )
+	if ( SSL_ctx_use_certificate_file(ctx, cert_file, SSL_FILETYPE_PEM) <= 0 )
 	{
 		ERR_print_errors_fp(stderr);
 		abort();
 	}
 	else
-		printf("SSL_CTX_use_certificate_file success\n");
+		printf("SSL_ctx_use_certificate_file success\n");
 
   if (ctx->mb_enabled == 1)
   {
-	  if ( SSL_CTX_register_id(ctx) <= 0 )
+	  if ( SSL_ctx_register_id(ctx) <= 0 )
 	  {
 		  abort();
 	  }
 	  else
-		  printf("SSL_CTX_register_id success\n");
+		  printf("SSL_ctx_register_id success\n");
   }
 
 	/* Set the private key from KeyFile (may be the same as CertFile) */
-	if ( SSL_CTX_use_PrivateKey_file(ctx, key_file, SSL_FILETYPE_PEM) <= 0 )
+	if ( SSL_ctx_use_PrivateKey_file(ctx, key_file, SSL_FILETYPE_PEM) <= 0 )
 	{
 		ERR_print_errors_fp(stderr);
 		abort();
 	}
 	else
-		printf("SSL_CTX_use_PrivateKey_file success\n");
+		printf("SSL_ctx_use_PrivateKey_file success\n");
 
 	/* Verify private key */
-	if ( !SSL_CTX_check_private_key(ctx) )
+	if ( !SSL_ctx_check_private_key(ctx) )
 	{
 		ERR_print_errors_fp(stderr);
 		abort();
 	}
 	else
-		printf("SSL_CTX_check_private_key success\n");
+		printf("SSL_ctx_check_private_key success\n");
 
 	ERR_print_errors_fp(stderr);
 	ERR_print_errors_fp(stderr);
 }
 
 // Load parameters from "dh1024.pem"
-void load_dh_params(SSL_CTX *ctx, char *file){
+void load_dh_params(SSL_ctx *ctx, char *file){
   DH *ret=0;
   BIO *bio;
 
@@ -296,7 +255,7 @@ void load_dh_params(SSL_CTX *ctx, char *file){
 
   ret = PEM_read_bio_DHparams(bio, NULL, NULL, NULL);
   BIO_free(bio);
-  if(SSL_CTX_set_tmp_dh(ctx,ret) < 0){
+  if(SSL_ctx_set_tmp_dh(ctx,ret) < 0){
     perror("Couldn't set DH parameters");
   }
 }

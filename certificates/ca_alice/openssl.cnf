@@ -31,6 +31,7 @@ oid_section		= new_oids
 tsa_policy1 = 1.2.3.4.1
 tsa_policy2 = 1.2.3.4.5.6
 tsa_policy3 = 1.2.3.4.5.7
+testWorking = 1.2.3.4.5.8
 
 ####################################################################
 [ ca ]
@@ -157,6 +158,10 @@ emailAddress_max		= 64
 challengePassword		= A challenge password
 challengePassword_min		= 4
 challengePassword_max		= 20
+
+testWorking = This is a test attribute
+testWorking_min = 4
+testWorking_max = 10
 
 unstructuredName		= An optional company name
 

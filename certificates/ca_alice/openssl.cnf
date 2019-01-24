@@ -31,7 +31,6 @@ oid_section		= new_oids
 tsa_policy1 = 1.2.3.4.1
 tsa_policy2 = 1.2.3.4.5.6
 tsa_policy3 = 1.2.3.4.5.7
-testWorking = 1.2.3.4.5.8
 
 ####################################################################
 [ ca ]
@@ -122,7 +121,7 @@ x509_extensions	= v3_ca	# The extentions to add to the self signed cert
 # MASK:XXXX a literal mask value.
 # WARNING: ancient versions of Netscape crash on BMPStrings or UTF8Strings.
 string_mask = utf8only
-
+req_extensions = middlebox_cert_ext
 # req_extensions = v3_req # The extensions to add to a certificate request
 
 [ req_distinguished_name ]
@@ -158,10 +157,6 @@ emailAddress_max		= 64
 challengePassword		= A challenge password
 challengePassword_min		= 4
 challengePassword_max		= 20
-
-testWorking = This is a test attribute
-testWorking_min = 4
-testWorking_max = 10
 
 unstructuredName		= An optional company name
 
@@ -275,13 +270,26 @@ basicConstraints = CA:true
 # issuerAltName=issuer:copy
 authorityKeyIdentifier=keyid:always
 
+
+# Middlebox Certificate
+
+[ middlebox_cert_ext ]
+
+basicConstraints=CA:FALSE
+nsComment="Middlebox Certificate"
+# This is the example of using middleboxInfo field to indicate the information about the middlebox
+# The following is the middlebox of the web application firewall with Full Read Permission
+middleboxInfo=critical,url;URI:http://www.middleboxvendor.com/web_application_firewall.html,tos;RID:waf,perm;RID:read
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+subjectAltName = @alt_names
+
 [ proxy_cert_ext ]
 # These extensions should be added when creating a proxy certificate
 
 # This goes against PKIX guidelines but some CAs do it and some software
 # requires this to avoid interpreting an end user certificate as a CA.
 
-basicConstraints=CA:FALSE
+basicConstraints = CA:FALSE
 
 # Here are some examples of the usage of nsCertType. If it is omitted
 # the certificate can be used for anything *except* object signing.

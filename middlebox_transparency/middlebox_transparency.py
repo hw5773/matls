@@ -3,7 +3,7 @@
 
 import os, sys, logging
 from pathlib import Path
-from process import Process
+from merkle.merkle import Merkle
 from flask import Flask, json, jsonify, abort, make_response
 from flask_restful import Api, Resource, reqparse
 from flask_httpauth import HTTPBasicAuth
@@ -49,13 +49,8 @@ class PreCertChain(Resource):
 # HTTP behavior: GET
 # GET: Retrieve the latest signed tree head. Outputs tree_size, timestamp, sha256_root_hash, and tree_head_signature
 class SignedTreeHead(Resource):
-    def __init__(self):
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument("description", required = True, type = str, location = 'json', help="To make a chain, you should describe an explanation about the chain")
-        super(Chain, self).__init__()
-
-    def get(self, chain_id):
-        args = self.reqparse.parse_args()
+    def get(self):
+        
         return make_response(process.make_blockchain(chain_id, args["description"]))
 
 # URI: /ct/v1/get-sth-consistency
@@ -68,8 +63,7 @@ class MerkleConsistencyProof(Resource):
         super(Chain, self).__init__()
 
     def get(self, chain_id):
-        args = self.reqparse.parse_args()
-        return make_response(process.make_blockchain(chain_id, args["description"]))
+        return make_response(merkle.get_sth())
 
 # URI: /ct/v1/get-proof-by-hash
 # HTTP behavior: GET
@@ -86,8 +80,34 @@ class MerkleAuditProof(Resource):
 
 # URI: /ct/v1/get-entries
 # HTTP behavior: GET
-# GET: Retrieve the entries from the log. Inputs the start index of the first entry to retrieve and the end index of the last entry to retrieve
-class MerkleAuditProof(Resource):
+# GET: Retrieve the entries from the log. Inputs the start index of the first entry to retrieve and the end index of the last entry to retrieve, in decimal
+class LogEntries(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("description", required = True, type = str, location = 'json', help="To make a chain, you should describe an explanation about the chain")
+        super(Chain, self).__init__()
+
+    def get(self, chain_id):
+        args = self.reqparse.parse_args()
+        return make_response(process.make_blockchain(chain_id, args["description"]))
+
+# URI: /ct/v1/get-roots
+# HTTP behavior: GET
+# GET: Retrieve the accepted root certificates. Outputs the base64-encoded root certificates that are acceptable to the log
+class RootCertificates(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument("description", required = True, type = str, location = 'json', help="To make a chain, you should describe an explanation about the chain")
+        super(Chain, self).__init__()
+
+    def get(self, chain_id):
+        args = self.reqparse.parse_args()
+        return make_response(process.make_blockchain(chain_id, args["description"]))
+
+# URI: /ct/v1/get-entry-and-proof
+# HTTP behavior: GET
+# GET: Retrieve the entry with the merkle audit proof from the log. Inputs the index of the desired entry with the tree_size of the tree. Outputs the base64-encoded MerkleTreeLeaf structure, extra_data, and audit_path.
+class LogEntry(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("description", required = True, type = str, location = 'json', help="To make a chain, you should describe an explanation about the chain")
@@ -104,6 +124,9 @@ api.add_resource(PreCertChain, '/ct/v1/add-pre-chain')
 api.add_resource(SignedTreeHead, '/ct/v1/get-sth')
 api.add_resource(MerkleConsistencyProof, '/ct/v1/get-sth-consistency')
 api.add_resource(MerkleAuditProof, '/ct/v1/get-proof-by-hash')
+api.add_resource(LogEntries, '/ct/v1/get-entries')
+api.add_resource(RootCertificates, '/ct/v1/get-roots')
+api.add_resource(LogEntry, '/ct/v1/get-entry-and-proof')
 
 # The process when the application is starting
 if __name__ == "__main__":
@@ -140,6 +163,6 @@ if __name__ == "__main__":
                 usage()
 
     # Initialize the context object that processes requests
-    process = Process(conf_file)
+    merkle = Merkle()
 
-    app.run(host="0.0.0.0", port=7777)
+    app.run(host="0.0.0.0", port=7777, debug=True)

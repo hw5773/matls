@@ -2,7 +2,7 @@
 # @date 29 Dec 2018
 # @brief Merkle Tree implementation based on RFC 6962 (Certificate Transparency)
 
-import hashlib, json
+import hashlib, json, time, base64
 
 # The class of a merkle tree of middlebox certificates
 class Merkle:
@@ -18,6 +18,16 @@ class Merkle:
     # Get the merkle root value
     def get_merkle_root(self):
         return self.merkle_tree_hash(self.certificates)
+
+    # Get the signed tree head
+    def get_sth(self):
+        ret = {}
+        ret["tree_size"] = len(self.certificates)
+        ret["timestamp"] = int(time.time() * 1000)
+        ret["sha256_root_hash"] = base64.b64encode(get_merkle_root().encode())
+        ths = struct pack('>BBqqp', 0, 1, ret["timestamp"], ret["tree_size"], ret["sha256_root_hash"])
+        ret["tree_head_signature"] = # signature
+        return json.dumps(ret), 200
 
     # Get the largest power of two less than n
     def largest_power_of_two(self, n):

@@ -2,6 +2,7 @@
 # Most of sentences in the comments are from the RFC 6962 document.
 
 import os, sys, logging
+import OpenSSL.crypto
 from pathlib import Path
 from merkle.merkle import Merkle
 from flask import Flask, json, jsonify, abort, make_response
@@ -16,7 +17,7 @@ auth = HTTPBasicAuth()
 
 def usage():
     print ("This web server is a middlebox transparency log server")
-    print ("python3 blockchain_server.py <configuration file> [<logging level(DEBUG/INFO/WARNING/ERROR/CRITICAL)>]")
+    print ("python3 blockchain_server.py <configuration file> [<logging level(DEBUG/INFO/WARNING/ERROR/CRITICAL)>] <certificate file> <private key file>")
     exit(1)
 
 # URI: /ct/v1/add-chain
@@ -131,11 +132,14 @@ api.add_resource(LogEntry, '/ct/v1/get-entry-and-proof')
 # The process when the application is starting
 if __name__ == "__main__":
     # The application will be proceeded without logging
+    cert_name = "cert.crt"
+    priv_name = "priv.key"
+
     if len(sys.argv) == 1:
         logging.basicConfig(level=None)
 
     # Setting the logging level
-    if len(sys.argv) == 2:
+    elif len(sys.argv) == 2:
         if not sys.argv[1].startswith("--log="):
             logging.error("Invalid arguments")
             usage()
@@ -162,6 +166,22 @@ if __name__ == "__main__":
                 logging.error("Invalid arguments")
                 usage()
 
+    elif len(sys.argv) == 4:
+        cert_name = sys.argv[2]
+        priv_name = sys.argv[3]
+
+    else:
+        usage()
+
+    # Load the MT certificate
+    st_cert = open(cert_name, "rt").read()
+    c = OpenSSL.crypto
+    cert = c.load_certificate(c.FILETYPE_PEM, st_cert)
+
+    # Load the MT privatekey
+    st_key = open(priv_name, "rt").read()
+    key = c.load_privatekey(c.FILETYPE_PEM, st_key)
+ 
     # Initialize the context object that processes requests
     merkle = Merkle()
 

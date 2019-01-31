@@ -8,8 +8,10 @@ import hashlib, json, time, base64
 class Merkle:
     # Initializer
     # self.certificates: the list of the certificates involved in the tree
-    def __init__(self):
+    def __init__(self, cert, priv):
         self.certificates = []
+        self.cert = cert
+        self.priv = priv
 
     # Add one certificate
     def add_certificate(self, att):
@@ -25,8 +27,8 @@ class Merkle:
         ret["tree_size"] = len(self.certificates)
         ret["timestamp"] = int(time.time() * 1000)
         ret["sha256_root_hash"] = base64.b64encode(get_merkle_root().encode())
-        ths = struct pack('>BBqqp', 0, 1, ret["timestamp"], ret["tree_size"], ret["sha256_root_hash"])
-        ret["tree_head_signature"] = # signature
+        ths = struct.pack('>BBqqp', 0, 1, ret["timestamp"], ret["tree_size"], ret["sha256_root_hash"])
+        ret["tree_head_signature"] = OpenSSL.crypto.sign(self.priv, ths, DIGEST_METHOD)
         return json.dumps(ret), 200
 
     # Get the largest power of two less than n

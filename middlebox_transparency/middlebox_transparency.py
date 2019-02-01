@@ -5,6 +5,7 @@ import os, sys, logging
 import OpenSSL.crypto
 from pathlib import Path
 from merkle.merkle import Merkle
+from process import Process
 from flask import Flask, json, jsonify, abort, make_response
 from flask_restful import Api, Resource, reqparse
 from flask_httpauth import HTTPBasicAuth
@@ -27,11 +28,11 @@ class CertChain(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("chain", required = True, location = 'json', help="An array of base64-encoded certificates")
-        super(Chain, self).__init__()
+        super(CertChain, self).__init__()
 
-    def post(self, chain_id):
+    def post(self):
         args = self.reqparse.parse_args()
-        return make_response(process.make_blockchain(chain_id, args["description"]))
+        return make_response(process.post_certchain(args["chain"]))
 
 # URI: /ct/v1/add-pre-chain
 # HTTP behavior: POST
@@ -40,7 +41,7 @@ class PreCertChain(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("description", required = True, type = str, location = 'json', help="To make a chain, you should describe an explanation about the chain")
-        super(Chain, self).__init__()
+        super(PreCertChain, self).__init__()
 
     def post(self, chain_id):
         args = self.reqparse.parse_args()
@@ -51,7 +52,6 @@ class PreCertChain(Resource):
 # GET: Retrieve the latest signed tree head. Outputs tree_size, timestamp, sha256_root_hash, and tree_head_signature
 class SignedTreeHead(Resource):
     def get(self):
-        
         return make_response(process.make_blockchain(chain_id, args["description"]))
 
 # URI: /ct/v1/get-sth-consistency
@@ -184,5 +184,6 @@ if __name__ == "__main__":
  
     # Initialize the context object that processes requests
     merkle = Merkle(cert, priv)
+    process = Process()
 
     app.run(host="0.0.0.0", port=7777, debug=True)

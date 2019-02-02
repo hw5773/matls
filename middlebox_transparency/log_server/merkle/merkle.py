@@ -28,7 +28,7 @@ class Merkle:
         ret["timestamp"] = int(time.time() * 1000)
         ret["sha256_root_hash"] = base64.b64encode(get_merkle_root().encode())
         ths = struct.pack('>BBqqp', 0, 1, ret["timestamp"], ret["tree_size"], ret["sha256_root_hash"])
-        ret["tree_head_signature"] = OpenSSL.crypto.sign(self.priv, ths, DIGEST_METHOD)
+        ret["tree_head_signature"] = OpenSSL.crypto.sign(self.priv, ths, 'sha256')
         return json.dumps(ret), 200
 
     # Get the largest power of two less than n

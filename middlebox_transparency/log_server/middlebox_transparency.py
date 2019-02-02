@@ -27,7 +27,7 @@ def usage():
 class CertChain(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument("chain", required = True, location = 'json', help="An array of base64-encoded certificates")
+        self.reqparse.add_argument("chain", required=True, type=list, location='json', help="An array of base64-encoded certificates")
         super(CertChain, self).__init__()
 
     def post(self):
@@ -177,13 +177,14 @@ if __name__ == "__main__":
     st_cert = open(cert_name, "rt").read()
     c = OpenSSL.crypto
     cert = c.load_certificate(c.FILETYPE_PEM, st_cert)
+    pk = c.dump_publickey(c.FILETYPE_PEM, cert.get_pubkey())
 
     # Load the MT privatekey
     st_priv = open(priv_name, "rt").read()
-    priv = c.load_privatekey(c.FILETYPE_PEM, st_priv)
+    priv = sk = c.load_privatekey(c.FILETYPE_PEM, st_priv)
  
     # Initialize the context object that processes requests
     merkle = Merkle(cert, priv)
-    process = Process()
+    process = Process(pk, sk)
 
-    app.run(host="0.0.0.0", port=7777, debug=True)
+    app.run(host="0.0.0.0", port=7775, debug=True)

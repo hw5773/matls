@@ -20,3 +20,5 @@ V	190624075915Z		D929CB9B45A3BBA2	unknown	/C=KR/ST=Seoul/L=Seoul/O=SNU/OU=MMLAB/
 V	190624075922Z		D929CB9B45A3BBA3	unknown	/C=KR/ST=Seoul/L=Seoul/O=SNU/OU=MMLAB/CN=o.matls.com/emailAddress=o@matls.com
 V	190624075928Z		D929CB9B45A3BBA4	unknown	/C=KR/ST=Seoul/L=Seoul/O=SNU/OU=MMLAB/CN=p.matls.com/emailAddress=p@matls.com
 V	190624080536Z		D929CB9B45A3BBA5	unknown	/C=KR/ST=Seoul/L=Seoul/O=SNU/OU=MMLAB/CN=e.matls.com/emailAddress=e@matls.com
+V	200206153114Z		D929CB9B45A3BBA6	unknown	/C=KR/ST=Seoul/L=Seoul/O=Middlebox-aware TLS/OU=maTLS/CN=*.matls.com/emailAddress=info@matls.com
+V	200206154616Z		D929CB9B45A3BBA7	unknown	/C=KR/ST=Seoul/L=Seoul/O=Middlebox-aware TLS Company/OU=maTLS/CN=www.matls.com/emailAddress=info@matls.com

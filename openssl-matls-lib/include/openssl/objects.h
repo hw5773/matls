@@ -954,6 +954,58 @@
 #define LN_OCSP_sign			"OCSP Signing"
 #define NID_OCSP_sign			180
 #define OBJ_OCSP_sign			OBJ_id_kp,9L
+
+#ifndef OPENSSL_NO_MATLS
+#define SN_middleboxInfo   "middleboxInfo"
+#define LN_middleboxInfo   "Middlebox Information"
+#define NID_middleboxInfo  920
+#define OBJ_middleboxInfo  OBJ_id_pe,15L
+
+#define SN_id_md            "id-md"
+#define LN_id_md            "Middlebox Description"
+#define NID_id_md           921
+#define OBJ_id_md           OBJ_id_pkix,50L
+
+// The type of the middlebox description
+#define SN_md_url           "url"
+#define LN_md_url           "URL"
+#define NID_md_url          922
+#define OBJ_md_url          OBJ_id_md,1L
+
+#define SN_md_tos           "tos"
+#define LN_md_tos           "Type of Service"
+#define NID_md_tos          923
+#define OBJ_md_tos          OBJ_id_md,2L
+
+#define SN_md_perm          "perm"
+#define LN_md_perm          "Permission"
+#define NID_md_perm         924
+#define OBJ_md_perm         OBJ_id_md,3L
+
+// The type of the middlebox service
+#define SN_tos_waf          "waf"
+#define LN_tos_waf          "Web Application Firewall"
+#define NID_tos_waf         925
+#define OBJ_tos_waf         OBJ_md_tos,1L
+
+#define SN_tos_av           "av"
+#define LN_tos_av           "Anti-Virus Software"
+#define NID_tos_av          926
+#define OBJ_tos_av          OBJ_md_tos,2L
+
+// The type of the permission
+#define SN_perm_read        "read"
+#define LN_perm_read        "Full Read Permission"
+#define NID_perm_read       927
+#define OBJ_perm_read       OBJ_md_perm,1L
+
+#define SN_perm_write       "write"
+#define LN_perm_write       "Full Write Permission"
+#define NID_perm_write      928
+#define OBJ_perm_write      OBJ_md_perm,2L
+
+#endif /* OPENSSL_NO_MATLS */
+
 #endif /* USE_OBJ_MAC */
 
 #include <openssl/bio.h>

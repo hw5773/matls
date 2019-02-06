@@ -1155,6 +1155,28 @@ DECLARE_SPECIAL_STACK_OF(OPENSSL_BLOCK, void)
 #define sk_MEM_OBJECT_DATA_sort(st) SKM_sk_sort(MEM_OBJECT_DATA, (st))
 #define sk_MEM_OBJECT_DATA_is_sorted(st) SKM_sk_is_sorted(MEM_OBJECT_DATA, (st))
 
+#define sk_MIDDLEBOX_DESCRIPTION_new(cmp) SKM_sk_new(MIDDLEBOX_DESCRIPTION, (cmp))
+#define sk_MIDDLEBOX_DESCRIPTION_new_null() SKM_sk_new_null(MIDDLEBOX_DESCRIPTION)
+#define sk_MIDDLEBOX_DESCRIPTION_free(st) SKM_sk_free(MIDDLEBOX_DESCRIPTION, (st))
+#define sk_MIDDLEBOX_DESCRIPTION_num(st) SKM_sk_num(MIDDLEBOX_DESCRIPTION, (st))
+#define sk_MIDDLEBOX_DESCRIPTION_value(st, i) SKM_sk_value(MIDDLEBOX_DESCRIPTION, (st), (i))
+#define sk_MIDDLEBOX_DESCRIPTION_set(st, i, val) SKM_sk_set(MIDDLEBOX_DESCRIPTION, (st), (i), (val))
+#define sk_MIDDLEBOX_DESCRIPTION_zero(st) SKM_sk_zero(MIDDLEBOX_DESCRIPTION, (st))
+#define sk_MIDDLEBOX_DESCRIPTION_push(st, val) SKM_sk_push(MIDDLEBOX_DESCRIPTION, (st), (val))
+#define sk_MIDDLEBOX_DESCRIPTION_unshift(st, val) SKM_sk_unshift(MIDDLEBOX_DESCRIPTION, (st), (val))
+#define sk_MIDDLEBOX_DESCRIPTION_find(st, val) SKM_sk_find(MIDDLEBOX_DESCRIPTION, (st), (val))
+#define sk_MIDDLEBOX_DESCRIPTION_find_ex(st, val) SKM_sk_find_ex(MIDDLEBOX_DESCRIPTION, (st), (val))
+#define sk_MIDDLEBOX_DESCRIPTION_delete(st, i) SKM_sk_delete(MIDDLEBOX_DESCRIPTION, (st), (i))
+#define sk_MIDDLEBOX_DESCRIPTION_delete_ptr(st, ptr) SKM_sk_delete_ptr(MIDDLEBOX_DESCRIPTION, (st), (ptr))
+#define sk_MIDDLEBOX_DESCRIPTION_insert(st, val, i) SKM_sk_insert(MIDDLEBOX_DESCRIPTION, (st), (val), (i))
+#define sk_MIDDLEBOX_DESCRIPTION_set_cmp_func(st, cmp) SKM_sk_set_cmp_func(MIDDLEBOX_DESCRIPTION, (st), (cmp))
+#define sk_MIDDLEBOX_DESCRIPTION_dup(st) SKM_sk_dup(MIDDLEBOX_DESCRIPTION, st)
+#define sk_MIDDLEBOX_DESCRIPTION_pop_free(st, free_func) SKM_sk_pop_free(MIDDLEBOX_DESCRIPTION, (st), (free_func))
+#define sk_MIDDLEBOX_DESCRIPTION_shift(st) SKM_sk_shift(MIDDLEBOX_DESCRIPTION, (st))
+#define sk_MIDDLEBOX_DESCRIPTION_pop(st) SKM_sk_pop(MIDDLEBOX_DESCRIPTION, (st))
+#define sk_MIDDLEBOX_DESCRIPTION_sort(st) SKM_sk_sort(MIDDLEBOX_DESCRIPTION, (st))
+#define sk_MIDDLEBOX_DESCRIPTION_is_sorted(st) SKM_sk_is_sorted(MIDDLEBOX_DESCRIPTION, (st))
+
 #define sk_MIME_HEADER_new(cmp) SKM_sk_new(MIME_HEADER, (cmp))
 #define sk_MIME_HEADER_new_null() SKM_sk_new_null(MIME_HEADER)
 #define sk_MIME_HEADER_free(st) SKM_sk_free(MIME_HEADER, (st))
@@ -2278,6 +2300,15 @@ DECLARE_SPECIAL_STACK_OF(OPENSSL_BLOCK, void)
 	SKM_ASN1_seq_pack(GENERAL_NAME, (st), (i2d_func), (buf), (len))
 #define ASN1_seq_unpack_GENERAL_NAME(buf, len, d2i_func, free_func) \
 	SKM_ASN1_seq_unpack(GENERAL_NAME, (buf), (len), (d2i_func), (free_func))
+
+#define d2i_ASN1_SET_OF_MIDDLEBOX_DESCRIPTION(st, pp, length, d2i_func, free_func, ex_tag, ex_class) \
+	SKM_ASN1_SET_OF_d2i(MIDDLEBOX_DESCRIPTION, (st), (pp), (length), (d2i_func), (free_func), (ex_tag), (ex_class)) 
+#define i2d_ASN1_SET_OF_MIDDLEBOX_DESCRIPTION(st, pp, i2d_func, ex_tag, ex_class, is_set) \
+	SKM_ASN1_SET_OF_i2d(MIDDLEBOX_DESCRIPTION, (st), (pp), (i2d_func), (ex_tag), (ex_class), (is_set))
+#define ASN1_seq_pack_MIDDLEBOX_DESCRIPTION(st, i2d_func, buf, len) \
+	SKM_ASN1_seq_pack(MIDDLEBOX_DESCRIPTION, (st), (i2d_func), (buf), (len))
+#define ASN1_seq_unpack_MIDDLEBOX_DESCRIPTION(buf, len, d2i_func, free_func) \
+	SKM_ASN1_seq_unpack(MIDDLEBOX_DESCRIPTION, (buf), (len), (d2i_func), (free_func))
 
 #define d2i_ASN1_SET_OF_OCSP_ONEREQ(st, pp, length, d2i_func, free_func, ex_tag, ex_class) \
 	SKM_ASN1_SET_OF_d2i(OCSP_ONEREQ, (st), (pp), (length), (d2i_func), (free_func), (ex_tag), (ex_class)) 

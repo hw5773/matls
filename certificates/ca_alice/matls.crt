@@ -1,0 +1,90 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 15648262248024226727 (0xd929cb9b45a3bba7)
+    Signature Algorithm: sha1WithRSAEncryption
+        Issuer: C=US, ST=California, L=California, O=Alice CA Ltd., OU=Alice CA Ltd., CN=Alice CA Ltd./emailAddress=ca@ca_alice.com
+        Validity
+            Not Before: Feb  6 15:46:16 2019 GMT
+            Not After : Feb  6 15:46:16 2020 GMT
+        Subject: C=KR, ST=Seoul, L=Seoul, O=Middlebox-aware TLS Company, OU=maTLS, CN=www.matls.com/emailAddress=info@matls.com
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+                Modulus:
+                    00:ef:b0:f4:c4:c7:1d:c4:aa:5c:2d:3a:02:2b:f6:
+                    52:bc:67:8e:01:62:6d:75:13:7b:42:09:5d:c0:31:
+                    08:75:0c:29:43:26:7b:76:be:35:60:24:36:b1:66:
+                    9d:9f:36:03:7b:00:24:5d:20:c2:a9:b5:4b:e2:70:
+                    f2:d4:cb:66:02:dc:52:4c:53:ed:9f:82:51:67:07:
+                    d4:29:a1:fc:eb:51:52:39:a1:b6:e9:70:eb:57:23:
+                    94:c2:8a:e8:d8:b2:68:09:d6:59:3f:2c:26:ad:2c:
+                    e3:35:74:00:52:94:df:ac:f0:ae:ce:2a:7c:fb:77:
+                    27:bb:7e:fc:21:30:2f:f9:f5:fc:c5:92:a7:e5:92:
+                    83:60:f7:b4:94:cd:7c:2a:17:17:72:0d:48:78:f6:
+                    da:28:1e:de:0f:5e:a5:6b:91:61:65:f8:1b:f9:44:
+                    d5:c0:49:f7:a7:2e:98:e0:b4:5e:77:9c:76:49:e0:
+                    d2:6a:82:06:9d:37:d9:3f:34:f8:5d:33:14:4a:6b:
+                    28:d7:c8:c3:b6:04:ef:cb:9c:f4:2f:c8:f0:d2:bc:
+                    2d:76:41:02:c1:81:47:29:a5:c5:2b:0e:de:6e:4d:
+                    c8:67:90:4c:ee:13:5b:52:d2:2b:e7:f3:a5:36:cb:
+                    65:91:62:cd:5a:76:1d:3f:85:2d:fb:9f:49:bd:21:
+                    1d:17
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Comment: 
+                Middlebox Certificate
+            Middlebox Information: critical
+                URL - URI:http://www.middleboxvendor.com/web_application_firewall.html
+                Type of Service - Registered ID:Web Application Firewall
+                Permission - Registered ID:Full Read Permission
+
+            X509v3 Key Usage: 
+                Digital Signature, Non Repudiation, Key Encipherment
+            X509v3 Subject Alternative Name: 
+                DNS:*.matls.com
+    Signature Algorithm: sha1WithRSAEncryption
+         9e:79:a0:60:12:7d:78:8c:01:ce:93:28:7d:40:a1:4d:17:7c:
+         ac:d7:87:ad:4e:bc:cd:0b:08:ee:9a:d4:bb:13:57:d6:68:76:
+         01:c4:d2:99:bb:7c:a0:ec:5f:64:e7:3e:5b:b5:34:bc:d4:8f:
+         45:04:a1:fb:14:c1:03:42:10:28:e7:0f:b3:e5:42:0c:22:52:
+         af:0d:a5:6f:e1:f0:44:3b:8b:4d:63:15:93:1b:57:09:3a:e2:
+         ed:8b:9b:a3:c2:61:88:5a:57:2a:1c:16:b6:80:08:bd:f6:ef:
+         0b:ae:4b:33:d8:28:46:22:29:69:f3:8a:d4:1d:d6:29:db:11:
+         a0:21:93:13:2c:90:b4:9d:21:67:15:6b:73:47:62:c0:46:6a:
+         8a:47:d4:8b:9f:ea:7e:85:46:7d:97:8e:55:1d:c3:3a:ec:81:
+         47:91:89:26:26:d1:3f:27:15:4f:1e:d3:03:b7:ac:59:db:c3:
+         f5:2d:88:d9:24:e5:a3:70:2c:47:23:38:98:04:6a:d6:0d:7d:
+         a1:62:d6:f9:9e:bc:43:a6:80:e3:b3:39:64:5b:28:f9:83:07:
+         d7:90:76:bd:fd:ae:92:2d:cf:c8:0f:f0:63:24:88:c4:88:0c:
+         9b:31:6e:da:7a:ad:55:be:5f:81:a6:99:32:07:0d:46:1d:1d:
+         ee:90:3d:c7
+-----BEGIN CERTIFICATE-----
+MIIEpDCCA4ygAwIBAgIJANkpy5tFo7unMA0GCSqGSIb3DQEBBQUAMIGfMQswCQYD
+VQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTETMBEGA1UEBwwKQ2FsaWZvcm5p
+YTEWMBQGA1UECgwNQWxpY2UgQ0EgTHRkLjEWMBQGA1UECwwNQWxpY2UgQ0EgTHRk
+LjEWMBQGA1UEAwwNQWxpY2UgQ0EgTHRkLjEeMBwGCSqGSIb3DQEJARYPY2FAY2Ff
+YWxpY2UuY29tMB4XDTE5MDIwNjE1NDYxNloXDTIwMDIwNjE1NDYxNlowgZoxCzAJ
+BgNVBAYTAktSMQ4wDAYDVQQIDAVTZW91bDEOMAwGA1UEBwwFU2VvdWwxJDAiBgNV
+BAoMG01pZGRsZWJveC1hd2FyZSBUTFMgQ29tcGFueTEOMAwGA1UECwwFbWFUTFMx
+FjAUBgNVBAMMDXd3dy5tYXRscy5jb20xHTAbBgkqhkiG9w0BCQEWDmluZm9AbWF0
+bHMuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA77D0xMcdxKpc
+LToCK/ZSvGeOAWJtdRN7QgldwDEIdQwpQyZ7dr41YCQ2sWadnzYDewAkXSDCqbVL
+4nDy1MtmAtxSTFPtn4JRZwfUKaH861FSOaG26XDrVyOUworo2LJoCdZZPywmrSzj
+NXQAUpTfrPCuzip8+3cnu378ITAv+fX8xZKn5ZKDYPe0lM18KhcXcg1IePbaKB7e
+D16la5FhZfgb+UTVwEn3py6Y4LRed5x2SeDSaoIGnTfZPzT4XTMUSmso18jDtgTv
+y5z0L8jw0rwtdkECwYFHKaXFKw7ebk3IZ5BM7hNbUtIr5/OlNstlkWLNWnYdP4Ut
++59JvSEdFwIDAQABo4HlMIHiMAkGA1UdEwQCMAAwJAYJYIZIAYb4QgENBBcWFU1p
+ZGRsZWJveCBDZXJ0aWZpY2F0ZTCBiQYIKwYBBQUHAQ8BAf8EejB4MEgGCCsGAQUF
+BzIBhjxodHRwOi8vd3d3Lm1pZGRsZWJveHZlbmRvci5jb20vd2ViX2FwcGxpY2F0
+aW9uX2ZpcmV3YWxsLmh0bWwwFQYIKwYBBQUHMgKICSsGAQUFBzICATAVBggrBgEF
+BQcyA4gJKwYBBQUHMgMBMAsGA1UdDwQEAwIF4DAWBgNVHREEDzANggsqLm1hdGxz
+LmNvbTANBgkqhkiG9w0BAQUFAAOCAQEAnnmgYBJ9eIwBzpMofUChTRd8rNeHrU68
+zQsI7prUuxNX1mh2AcTSmbt8oOxfZOc+W7U0vNSPRQSh+xTBA0IQKOcPs+VCDCJS
+rw2lb+HwRDuLTWMVkxtXCTri7Yubo8JhiFpXKhwWtoAIvfbvC65LM9goRiIpafOK
+1B3WKdsRoCGTEyyQtJ0hZxVrc0diwEZqikfUi5/qfoVGfZeOVR3DOuyBR5GJJibR
+PycVTx7TA7esWdvD9S2I2STlo3AsRyM4mARq1g19oWLW+Z68Q6aA47M5ZFso+YMH
+15B2vf2uki3PyA/wYySIxIgMmzFu2nqtVb5fgaaZMgcNRh0d7pA9xw==
+-----END CERTIFICATE-----

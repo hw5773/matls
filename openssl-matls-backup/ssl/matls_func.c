@@ -124,15 +124,10 @@ int generate_accountability_keys(SSL *s)
   }
 
   for (i=0; i<nk; i++)
-  {
     free(s->mb_info->peer_str[i]);
-    s->mb_info->peer_str[i] = NULL;
-  }
 
   free(s->mb_info->peer_str);
-  s->mb_info->peer_str = NULL;
   free(s->mb_info->key_length);
-  s->mb_info->key_length = NULL;
 
   return 1;
 }

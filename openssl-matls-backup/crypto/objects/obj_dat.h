@@ -62,12 +62,17 @@
  * [including the GNU Public Licence.]
  */
 
-#define NUM_NID 920
-#define NUM_SN 913
-#define NUM_LN 913
-#define NUM_OBJ 857
+//#define NUM_NID 921
+//#define NUM_SN 914
+//#define NUM_LN 914
+//#define NUM_OBJ 858
 
-static const unsigned char lvalues[5974]={
+#define NUM_NID 950
+#define NUM_SN 950
+#define NUM_LN 950
+#define NUM_OBJ 950
+
+static const unsigned char lvalues[6049]={
 0x2A,0x86,0x48,0x86,0xF7,0x0D,               /* [  0] OBJ_rsadsi */
 0x2A,0x86,0x48,0x86,0xF7,0x0D,0x01,          /* [  6] OBJ_pkcs */
 0x2A,0x86,0x48,0x86,0xF7,0x0D,0x02,0x02,     /* [ 13] OBJ_md2 */
@@ -919,6 +924,16 @@ static const unsigned char lvalues[5974]={
 0x2A,0x86,0x48,0x86,0xF7,0x0D,0x01,0x01,0x08,/* [5946] OBJ_mgf1 */
 0x2A,0x86,0x48,0x86,0xF7,0x0D,0x01,0x01,0x0A,/* [5955] OBJ_rsassaPss */
 0x2A,0x86,0x48,0x86,0xF7,0x0D,0x01,0x01,0x07,/* [5964] OBJ_rsaesOaep */
+0x2B,0x06,0x01,0x05,0x05,0x07,0x01,0x0F,     /* [5973] OBJ_middleboxInfo */
+
+0x2B,0x06,0x01,0x05,0x05,0x07,0x32, /* [5981] OBJ_id_md */
+0x2B,0x06,0x01,0x05,0x05,0x07,0x32,0x01, /* [5988] OBJ_md_url */
+0x2B,0x06,0x01,0x05,0x05,0x07,0x32,0x02, /* [5996] OBJ_md_tos */
+0x2B,0x06,0x01,0x05,0x05,0x07,0x32,0x03, /* [6004] OBJ_md_perm */
+0x2B,0x06,0x01,0x05,0x05,0x07,0x32,0x02,0x01, /* [6012] OBJ_tos_waf */
+0x2B,0x06,0x01,0x05,0x05,0x07,0x32,0x02,0x02, /* [6021] OBJ_tos_av */
+0x2B,0x06,0x01,0x05,0x05,0x07,0x32,0x03,0x01, /* [6030] OBJ_perm_read */
+0x2B,0x06,0x01,0x05,0x05,0x07,0x32,0x03,0x02, /* [6039] OBJ_perm_write */
 };
 
 static const ASN1_OBJECT nid_objs[NUM_NID]={
@@ -2399,6 +2414,16 @@ static const ASN1_OBJECT nid_objs[NUM_NID]={
 {"AES-256-CBC-HMAC-SHA1","aes-256-cbc-hmac-sha1",
 	NID_aes_256_cbc_hmac_sha1,0,NULL,0},
 {"RSAES-OAEP","rsaesOaep",NID_rsaesOaep,9,&(lvalues[5964]),0},
+{"middleboxInfo","Middlebox Information",NID_middleboxInfo,8,
+	&(lvalues[5973]),0},
+{"id-md","Middlebox Description",NID_id_md,7,&(lvalues[5981]),0},
+{"url","URL",NID_md_url,8,&(lvalues[5988]),0},
+{"tos","Type of Service",NID_md_tos,8,&(lvalues[5996]),0},
+{"perm","Permission",NID_md_perm,8,&(lvalues[6004]),0},
+{"waf","Web Application Firewarll",NID_tos_waf,9,&(lvalues[6012]),0},
+{"av","Anti-Virus Software",NID_tos_av,9,&(lvalues[6021]),0},
+{"read","Full Read Permission",NID_perm_read,9,&(lvalues[6030]),0},
+{"write","Full Write Permission",NID_perm_write,9,&(lvalues[6039]),0},
 };
 
 static const unsigned int sn_objs[NUM_SN]={
@@ -2992,6 +3017,7 @@ static const unsigned int sn_objs[NUM_SN]={
 182,	/* "member-body" */
 51,	/* "messageDigest" */
 383,	/* "mgmt" */
+920,	/* "middleboxInfo" */
 504,	/* "mime-mhs" */
 506,	/* "mime-mhs-bodies" */
 505,	/* "mime-mhs-headings" */
@@ -3381,6 +3407,7 @@ static const unsigned int ln_objs[NUM_LN]={
 648,	/* "Microsoft Smartcardlogin" */
 136,	/* "Microsoft Trust List Signing" */
 649,	/* "Microsoft Universal Principal Name" */
+920,	/* "Middlebox Information" */
 393,	/* "NULL" */
 404,	/* "NULL" */
 72,	/* "Netscape Base Url" */
@@ -4725,6 +4752,7 @@ static const unsigned int obj_objs[NUM_OBJ]={
 397,	/* OBJ_ac_proxying                  1 3 6 1 5 5 7 1 10 */
 398,	/* OBJ_sinfo_access                 1 3 6 1 5 5 7 1 11 */
 663,	/* OBJ_proxyCertInfo                1 3 6 1 5 5 7 1 14 */
+920,	/* OBJ_middleboxInfo                1 3 6 1 5 5 7 1 15 */
 164,	/* OBJ_id_qt_cps                    1 3 6 1 5 5 7 2 1 */
 165,	/* OBJ_id_qt_unotice                1 3 6 1 5 5 7 2 2 */
 293,	/* OBJ_textNotice                   1 3 6 1 5 5 7 2 3 */

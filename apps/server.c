@@ -139,7 +139,8 @@ int main(int count, char *strings[])
       if (elapsed_time < 0)
         elapsed_time += 1000000000L;
 		  MA_LOG("ELAPSED TIME: %lu, %lu, %lu ns", hs_start, hs_end, elapsed_time);
-      fprintf(fp, "%lu, %lu, %lu\n", hs_start, hs_end, elapsed_time);
+      if (fp)
+        fprintf(fp, "%lu, %lu, %lu\n", hs_start, hs_end, elapsed_time);
 
 		  rcvd = SSL_read(ssl, buf, sizeof(buf));
       MA_LOG("Request (%d): %s", rcvd, buf);

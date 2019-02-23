@@ -146,7 +146,6 @@
 #include <time.h>
 #include <string.h>
 #include <errno.h>
-#include <stdint.h>
 
 #include "e_os.h"
 
@@ -259,26 +258,6 @@
 #define l2n3(l,c)	((c[0]=(unsigned char)(((l)>>16)&0xff), \
 			  c[1]=(unsigned char)(((l)>> 8)&0xff), \
 			  c[2]=(unsigned char)(((l)    )&0xff)),c+=3)
-
-#ifndef OPENSSL_NO_MATLS
-#define n2t8(c,t) 			(t =((uint64_t)(*((c)++)))<<56, \
-                         t|=((uint64_t)(*((c)++)))<<48, \
-                         t|=((uint64_t)(*((c)++)))<<40, \
-                         t|=((uint64_t)(*((c)++)))<<32, \
-                         t|=((uint64_t)(*((c)++)))<<24, \
-                         t|=((uint64_t)(*((c)++)))<<16, \
-                         t|=((uint64_t)(*((c)++)))<< 8, \
-                         t|=((uint64_t)(*((c)++))))
-
-#define t2n8(l,c)       (*((c)++)=(unsigned char)(((l)>>56)&0xff), \
-                         *((c)++)=(unsigned char)(((l)>>48)&0xff), \
-                         *((c)++)=(unsigned char)(((l)>>40)&0xff), \
-                         *((c)++)=(unsigned char)(((l)>>32)&0xff), \
-                         *((c)++)=(unsigned char)(((l)>>24)&0xff), \
-                         *((c)++)=(unsigned char)(((l)>>16)&0xff), \
-                         *((c)++)=(unsigned char)(((l)>> 8)&0xff), \
-                         *((c)++)=(unsigned char)(((l)    )&0xff))
-#endif /* OPENSSL_NO_MATLS */
 
 /* LOCAL STUFF */
 

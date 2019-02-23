@@ -403,7 +403,7 @@ int ssl3_accept(SSL *s)
 			s->state=SSL3_ST_SW_SRVR_HELLO_A;
 			s->init_num=0;
       RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_END);
-      //INTERVAL(s->time_log, SERVER_CLIENT_HELLO_START, SERVER_CLIENT_HELLO_END);
+      INTERVAL(s->time_log, SERVER_CLIENT_HELLO_START, SERVER_CLIENT_HELLO_END);
 			break;
 
 		case SSL3_ST_SW_SRVR_HELLO_A:
@@ -413,7 +413,7 @@ int ssl3_accept(SSL *s)
 			ret=ssl3_send_server_hello(s);
 			MEND("After send_server_hello", "client-side");
       RECORD_LOG(s->time_log, SERVER_SERVER_HELLO_END);
-      //INTERVAL(s->time_log, SERVER_SERVER_HELLO_START, SERVER_SERVER_HELLO_END);
+      INTERVAL(s->time_log, SERVER_SERVER_HELLO_START, SERVER_SERVER_HELLO_END);
 
 			if (ret <= 0) goto end;
 #ifndef OPENSSL_NO_TLSEXT
@@ -488,7 +488,7 @@ int ssl3_accept(SSL *s)
 #endif
 			s->init_num=0;
       RECORD_LOG(s->time_log, SERVER_SERVER_CERTIFICATE_END);
-      ////INTERVAL(s->time_log, SERVER_SERVER_CERTIFICATE_START, SERVER_SERVER_CERTIFICATE_END);
+      //INTERVAL(s->time_log, SERVER_SERVER_CERTIFICATE_START, SERVER_SERVER_CERTIFICATE_END);
 			break;
 
 		case SSL3_ST_SW_KEY_EXCH_A:
@@ -555,7 +555,7 @@ int ssl3_accept(SSL *s)
 			s->state=SSL3_ST_SW_CERT_REQ_A;
 			s->init_num=0;
       RECORD_LOG(s->time_log, SERVER_SERVER_KEY_EXCHANGE_END);
-      ////INTERVAL(s->time_log, SERVER_SERVER_KEY_EXCHANGE_START, SERVER_SERVER_KEY_EXCHANGE_END);
+      //INTERVAL(s->time_log, SERVER_SERVER_KEY_EXCHANGE_START, SERVER_SERVER_KEY_EXCHANGE_END);
 			break;
 
 		case SSL3_ST_SW_CERT_REQ_A:
@@ -615,15 +615,15 @@ int ssl3_accept(SSL *s)
 			s->state=SSL3_ST_SW_FLUSH;
 			s->init_num=0;
       RECORD_LOG(s->time_log, SERVER_SERVER_HELLO_DONE_END);
-      //INTERVAL(s->time_log, SERVER_SERVER_HELLO_DONE_START, SERVER_SERVER_HELLO_DONE_END);
+      INTERVAL(s->time_log, SERVER_SERVER_HELLO_DONE_START, SERVER_SERVER_HELLO_DONE_END);
 
       if (s->mb_enabled)
       {
         RECORD_LOG(s->time_log, SERVER_GENERATE_ACCOUNTABILITY_KEYS_START);
         generate_accountability_keys(s);
         RECORD_LOG(s->time_log, SERVER_GENERATE_ACCOUNTABILITY_KEYS_END);
-        //INTERVAL(s->time_log, SERVER_GENERATE_ACCOUNTABILITY_KEYS_START, 
-        //  SERVER_GENERATE_ACCOUNTABILITY_KEYS_END);
+        INTERVAL(s->time_log, SERVER_GENERATE_ACCOUNTABILITY_KEYS_START, 
+          SERVER_GENERATE_ACCOUNTABILITY_KEYS_END);
       }
 
 			break;
@@ -750,7 +750,7 @@ int ssl3_accept(SSL *s)
 						}		
 				}
       RECORD_LOG(s->time_log, SERVER_CLIENT_KEY_EXCHANGE_END);
-      ////INTERVAL(s->time_log, SERVER_CLIENT_KEY_EXCHANGE_START, SERVER_CLIENT_KEY_EXCHANGE_END);
+      //INTERVAL(s->time_log, SERVER_CLIENT_KEY_EXCHANGE_START, SERVER_CLIENT_KEY_EXCHANGE_END);
 			break;
 
 		case SSL3_ST_SR_CERT_VRFY_A:
@@ -847,7 +847,7 @@ int ssl3_accept(SSL *s)
 				}
 
       RECORD_LOG(s->time_log, SERVER_SERVER_CCS_END);
-      //INTERVAL(s->time_log, SERVER_SERVER_CCS_START, SERVER_SERVER_CCS_END);
+      INTERVAL(s->time_log, SERVER_SERVER_CCS_START, SERVER_SERVER_CCS_END);
 			break;
 
 		case SSL3_ST_SW_FINISHED_A:
@@ -893,7 +893,7 @@ int ssl3_accept(SSL *s)
 				s->s3->tmp.next_state=SSL_ST_OK;
 			s->init_num=0;
       RECORD_LOG(s->time_log, SERVER_SERVER_FINISHED_END);
-      //INTERVAL(s->time_log, SERVER_SERVER_FINISHED_START, SERVER_SERVER_FINISHED_END);
+      INTERVAL(s->time_log, SERVER_SERVER_FINISHED_START, SERVER_SERVER_FINISHED_END);
 			break;
 
 #ifndef OPENSSL_NO_MATLS
@@ -925,13 +925,13 @@ int ssl3_accept(SSL *s)
 
       s->init_num = 0;
       RECORD_LOG(s->time_log, SERVER_SERVER_EXTENDED_FINISHED_END);
-      //INTERVAL(s->time_log, SERVER_SERVER_EXTENDED_FINISHED_START, SERVER_SERVER_EXTENDED_FINISHED_END);
+      INTERVAL(s->time_log, SERVER_SERVER_EXTENDED_FINISHED_START, SERVER_SERVER_EXTENDED_FINISHED_END);
       break;
 #endif /* OPENSSL_NO_MATLS */
 
 		case SSL_ST_OK:
       RECORD_LOG(s->time_log, SERVER_ACCEPT_END);
-      //INTERVAL(s->time_log, SERVER_ACCEPT_START, SERVER_ACCEPT_END);
+      INTERVAL(s->time_log, SERVER_ACCEPT_START, SERVER_ACCEPT_END);
 
 			/* clean a few things up */
 			ssl3_cleanup_key_block(s);

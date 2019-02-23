@@ -69,7 +69,7 @@ unsigned char *get_accountability_key(SSL *s, int index)
 int generate_accountability_keys(SSL *s)
 {
   MA_LOG("Generate Accountability Keys");
-  int i, j, l, diff, nk, end, klen, xlen, slen, clen;
+  int i, j, l, diff, nk, end, klen, xlen, slen, clen, ilen;
   BIGNUM *x, *y;
   BN_CTX *ctx;
   EC_GROUP *group;
@@ -80,6 +80,8 @@ int generate_accountability_keys(SSL *s)
   group = s->mb_info->group;
 
   s->mb_info->accountability_keys = (unsigned char **)calloc(nk, sizeof(unsigned char *));
+  s->mb_info->id_table = (unsigned char **)calloc(nk, sizeof(unsigned char *));
+  s->mb_info->id_length = (int *)calloc(nk, sizeof(int));
 
   ctx = BN_CTX_new();
   x = BN_new();
@@ -90,6 +92,7 @@ int generate_accountability_keys(SSL *s)
 
   for (i=0; i<nk; i++)
   {
+    unsigned char *id_buf;
     s->mb_info->accountability_keys[i] = (unsigned char *)malloc(SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
     secret = EC_POINT_new(group);
     peer_pub = EC_POINT_new(group);
@@ -120,14 +123,33 @@ int generate_accountability_keys(SSL *s)
     PRINTK("Accountability Key", s->mb_info->accountability_keys[i], 
         SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
 
+    // Set the identifier of the entity: ID = H(ak)
+    // No one can derive ak from H(ak), assuming H() is a secure hash function
+    s->mb_info->id_table[i] = (unsigned char *)malloc(TLS_MD_ID_SIZE);
+    digest_message(s->mb_info->accountability_keys[i], SSL_MAX_ACCOUNTABILITY_KEY_LENGTH, 
+        &id_buf, &ilen);
+    s->mb_info->id_length[i] = ilen;
+    memcpy(s->mb_info->id_table[i], id_buf, TLS_MD_ID_SIZE);
     free(secret_str);
+    free(id_buf);
   }
 
   for (i=0; i<nk; i++)
+  {
     free(s->mb_info->peer_str[i]);
+    s->mb_info->peer_str[i] = NULL;
+  }
 
   free(s->mb_info->peer_str);
+  s->mb_info->peer_str = NULL;
   free(s->mb_info->key_length);
+  s->mb_info->key_length = NULL;
+
+  for (i=0; i<nk; i++)
+  {
+    MA_LOG("Index: %d", i);
+    PRINTK("Generated ID", s->mb_info->id_table[i], s->mb_info->id_length[i]);
+  }
 
   return 1;
 }

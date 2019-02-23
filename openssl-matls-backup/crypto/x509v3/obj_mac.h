@@ -1369,6 +1369,10 @@
 #define NID_id_ad		176
 #define OBJ_id_ad		OBJ_id_pkix,48L
 
+#define SN_id_md		"id-md"
+#define NID_id_md		921
+#define OBJ_id_md		OBJ_id_pkix,50L
+
 #define SN_id_pkix1_explicit_88		"id-pkix1-explicit-88"
 #define NID_id_pkix1_explicit_88		269
 #define OBJ_id_pkix1_explicit_88		OBJ_id_pkix_mod,1L
@@ -1862,6 +1866,41 @@
 #define LN_caRepository		"CA Repository"
 #define NID_caRepository		785
 #define OBJ_caRepository		OBJ_id_ad,5L
+
+#define SN_md_url		"url"
+#define LN_md_url		"URL"
+#define NID_md_url		922
+#define OBJ_md_url		OBJ_id_md,1L
+
+#define SN_md_tos		"tos"
+#define LN_md_tos		"Type of Service"
+#define NID_md_tos		923
+#define OBJ_md_tos		OBJ_id_md,2L
+
+#define SN_md_perm		"perm"
+#define LN_md_perm		"Permission"
+#define NID_md_perm		924
+#define OBJ_md_perm		OBJ_id_md,3L
+
+#define SN_tos_waf		"waf"
+#define LN_tos_waf		"Web Application Firewall"
+#define NID_tos_waf		925
+#define OBJ_tos_waf		OBJ_md_tos,1L
+
+#define SN_tos_av		"av"
+#define LN_tos_av		"Anti-Virus Software"
+#define NID_tos_av		926
+#define OBJ_tos_av		OBJ_md_tos,2L
+
+#define SN_perm_read		"read"
+#define LN_perm_read		"Full Read Permission"
+#define NID_perm_read		927
+#define OBJ_perm_read		OBJ_md_perm,1L
+
+#define SN_perm_write		"write"
+#define LN_perm_write		"Full Write Permission"
+#define NID_perm_write		928
+#define OBJ_perm_write		OBJ_md_perm,2L
 
 #define OBJ_id_pkix_OCSP		OBJ_ad_OCSP
 

@@ -306,7 +306,7 @@ int ssl3_connect(SSL *s)
 				s->wbio=BIO_push(s->bbio,s->wbio);
 
       RECORD_LOG(s->time_log, CLIENT_CLIENT_HELLO_END);
-      //INTERVAL(s->time_log, CLIENT_CLIENT_HELLO_START, CLIENT_CLIENT_HELLO_END);
+      INTERVAL(s->time_log, CLIENT_CLIENT_HELLO_START, CLIENT_CLIENT_HELLO_END);
 			break;
 
 		case SSL3_ST_CR_SRVR_HELLO_A:
@@ -316,7 +316,7 @@ int ssl3_connect(SSL *s)
 			ret=ssl3_get_server_hello(s);
 			MEND("After get_server_hello", "server-side");
       RECORD_LOG(s->time_log, CLIENT_SERVER_HELLO_END);
-      //INTERVAL(s->time_log, CLIENT_SERVER_HELLO_START, CLIENT_SERVER_HELLO_END);
+      INTERVAL(s->time_log, CLIENT_SERVER_HELLO_START, CLIENT_SERVER_HELLO_END);
 
 			if (ret <= 0) goto end;
 
@@ -339,6 +339,7 @@ int ssl3_connect(SSL *s)
 
 		case SSL3_ST_CR_CERT_A:
 		case SSL3_ST_CR_CERT_B:
+      RECORD_LOG(s->time_log, CLIENT_SERVER_CERTIFICATE_START);
 #ifndef OPENSSL_NO_TLSEXT
 			ret=ssl3_check_finished(s);
 			if (ret <= 0) goto end;
@@ -369,11 +370,11 @@ int ssl3_connect(SSL *s)
           if (s->middlebox)
             ret = matls_get_server_certificate_mb(s);
           else
-          {
-            RECORD_LOG(s->time_log, CLIENT_CERT_VALIDATION_START);
             ret = matls_get_server_certificate_clnt(s);
+          if (!(s->server || s->middlebox))
+          {
             RECORD_LOG(s->time_log, CLIENT_CERT_VALIDATION_END);
-            INTERVAL(s->time_log, CLIENT_CERT_VALIDATION_START, CLIENT_CERT_VALIDATION_END);;
+            INTERVAL(s->time_log, CLIENT_CERT_VALIDATION_START, CLIENT_CERT_VALIDATION_END);
           }
           MEND("After matls_get_server_certificate", "server-side");
         }
@@ -448,7 +449,7 @@ int ssl3_connect(SSL *s)
 #endif
 			s->init_num=0;
       RECORD_LOG(s->time_log, CLIENT_SERVER_CERTIFICATE_END);
-      //INTERVAL(s->time_log, CLIENT_SERVER_CERTIFICATE_START, CLIENT_SERVER_CERTIFICATE_END);
+      INTERVAL(s->time_log, CLIENT_SERVER_CERTIFICATE_START, CLIENT_SERVER_CERTIFICATE_END);
 			break;
 
 		case SSL3_ST_CR_KEY_EXCH_A:
@@ -469,7 +470,7 @@ int ssl3_connect(SSL *s)
 				goto end;
 				}
       RECORD_LOG(s->time_log, CLIENT_CLIENT_KEY_EXCHANGE_END);
-      //INTERVAL(s->time_log, CLIENT_CLIENT_KEY_EXCHANGE_START, CLIENT_CLIENT_KEY_EXCHANGE_END);
+      INTERVAL(s->time_log, CLIENT_CLIENT_KEY_EXCHANGE_START, CLIENT_CLIENT_KEY_EXCHANGE_END);
 			break;
 
 		case SSL3_ST_CR_CERT_REQ_A:
@@ -488,7 +489,7 @@ int ssl3_connect(SSL *s)
 			ret=ssl3_get_server_done(s);
       MEND("After ssl3_get_server_done", "server-side");
       RECORD_LOG(s->time_log, CLIENT_SERVER_HELLO_DONE_END);
-      //INTERVAL(s->time_log, CLIENT_SERVER_HELLO_DONE_START, CLIENT_SERVER_HELLO_DONE_END);
+      INTERVAL(s->time_log, CLIENT_SERVER_HELLO_DONE_START, CLIENT_SERVER_HELLO_DONE_END);
 
 			if (ret <= 0) goto end;
 #ifndef OPENSSL_NO_SRP
@@ -514,8 +515,8 @@ int ssl3_connect(SSL *s)
         if (!s->middlebox)
           generate_accountability_keys(s);
         RECORD_LOG(s->time_log, CLIENT_GENERATE_ACCOUNTABILITY_KEYS_END);
-        //INTERVAL(s->time_log, CLIENT_GENERATE_ACCOUNTABILITY_KEYS_START, 
-        //  CLIENT_GENERATE_ACCOUNTABILITY_KEYS_END);
+        INTERVAL(s->time_log, CLIENT_GENERATE_ACCOUNTABILITY_KEYS_START, 
+          CLIENT_GENERATE_ACCOUNTABILITY_KEYS_END);
       }
 
 			break;
@@ -567,7 +568,7 @@ int ssl3_connect(SSL *s)
 
 			s->init_num=0;
       RECORD_LOG(s->time_log, CLIENT_CLIENT_KEY_EXCHANGE_END);
-      //INTERVAL(s->time_log, CLIENT_CLIENT_KEY_EXCHANGE_START, CLIENT_CLIENT_KEY_EXCHANGE_END);
+      INTERVAL(s->time_log, CLIENT_CLIENT_KEY_EXCHANGE_START, CLIENT_CLIENT_KEY_EXCHANGE_END);
 			break;
 
 		case SSL3_ST_CW_CERT_VRFY_A:
@@ -624,7 +625,7 @@ int ssl3_connect(SSL *s)
 				}
 
       RECORD_LOG(s->time_log, CLIENT_CLIENT_KEY_EXCHANGE_END);
-      //INTERVAL(s->time_log, CLIENT_CLIENT_KEY_EXCHANGE_START, CLIENT_CLIENT_KEY_EXCHANGE_END);
+      INTERVAL(s->time_log, CLIENT_CLIENT_KEY_EXCHANGE_START, CLIENT_CLIENT_KEY_EXCHANGE_END);
 			break;
 
 #if !defined(OPENSSL_NO_TLSEXT) && !defined(OPENSSL_NO_NEXTPROTONEG)
@@ -726,6 +727,7 @@ int ssl3_connect(SSL *s)
 #ifndef OPENSSL_NO_MATLS
     case SSL3_ST_CR_EXTENDED_FINISHED_A:
     case SSL3_ST_CR_EXTENDED_FINISHED_B:
+      RECORD_LOG(s->time_log, CLIENT_SERVER_EXTENDED_FINISHED_START);
 	    mstart1 = get_current_microseconds();
 #ifdef TIME_LOG
 	    printf("[TT] %s:%s:%d: client) Before matls_get_extended_finished start\n", __FILE__, __func__, __LINE__);
@@ -1269,7 +1271,6 @@ err:
 	}
 
 #ifndef OPENSSL_NO_MATLS
-#define TIME_LENGTH 8
 ///// Add for matls /////
 int matls_get_server_certificate_mb(SSL *s)
 {
@@ -1514,69 +1515,15 @@ err:
 	return(ret);
 	}
 
-int ssl_verify_server_proof(SSL *s, unsigned char *cdmp, int clen, int idx)
-{
-  // proof: not_before (8 bytes) || not_after (8 bytes) || signature
-  // signature: Sign(pk, not_before||not_after||H(mb's cert))
-
-  time_t seconds, not_before = 0, not_after = 0;
-  int ret = -1, rc;
-  BIO *h = NULL, *md = NULL;
-  EVP_MD_CTX *ctx;
-  unsigned char sha[SHA256_DIGEST_LENGTH];
-  unsigned char *p;
-  
-  if (!(ctx = EVP_MD_CTX_create())) goto err;
-  if (!(h = BIO_new(BIO_s_mem()))) goto c_err;
-  if (!(md = BIO_new(BIO_f_md()))) goto k_err;
-  if (!BIO_set_md(md, EVP_sha256())) goto m_err;
-  if (!EVP_DigestVerifyInit(ctx, NULL, EVP_sha256(), NULL, s->mb_info->pkey[0])) goto m_err;
-  BIO_push(md, h);
-
-  seconds = time(NULL);
-
-  p = s->mb_info->proof[idx];
-
-  BIO_write(md, p, 2 * TIME_LENGTH);
-  rc = EVP_DigestVerifyUpdate(ctx, p, 2 * TIME_LENGTH);
-  n2t8(p, not_before);
-  n2t8(p, not_after);
-
-  if ((seconds < not_before) || (seconds > not_after))
-  {
-    printf("[matls] %s:%s:%d: Error in validity period\n", __FILE__, __func__, __LINE__);
-    goto m_err;
-  }
-
-  rc = BIO_write(md, cdmp, clen);
-  BIO_gets(md, sha, SHA256_DIGEST_LENGTH);
-  rc = EVP_DigestVerifyUpdate(ctx, sha, SHA256_DIGEST_LENGTH);
-  if (rc != 1) goto m_err;
-
-  rc = EVP_DigestVerifyFinal(ctx, p, s->mb_info->proof_length[idx] - 2 * TIME_LENGTH);
-  if (rc != 1) goto m_err;
-
-  return 1;
-
-m_err:
-  BIO_free(md);
-k_err:
-  BIO_free(h);
-c_err:
-  EVP_MD_CTX_cleanup(ctx);
-err:
-  return -1;
-}
-
 int matls_get_server_certificate_clnt(SSL *s)
 {
   // num of chains (1 byte) || total length (3 bytes) 
   // || 1st chain length (3 bytes) || leaf length (3 bytes) || leaf cert || ...
   MA_LOG("matls_get_server_certificate");
-	int al,i,ok,ret = -1, num_certs, tmp, offset = 0, cert, clen, pret;
+	int al,i,ok,ret = -1, num_certs, tmp, offset = 0, cert;
 	unsigned long n,nc,llen,l;
 	X509 *x = NULL;
-	const unsigned char *q, *p, *cdmp, *pos;
+	const unsigned char *q, *p, *pos;
 	unsigned char *d;
 	STACK_OF(X509) *sk = NULL;
 	SESS_CERT *sc;
@@ -1593,7 +1540,6 @@ int matls_get_server_certificate_clnt(SSL *s)
 
 	if (!ok) return((int)n);
 
-  RECORD_LOG(s->time_log, MEASURE_21);
 	if ((s->s3->tmp.message_type == SSL3_MT_SERVER_KEY_EXCHANGE) ||
 		((s->s3->tmp.new_cipher->algorithm_auth & SSL_aKRB5) && 
 		(s->s3->tmp.message_type == SSL3_MT_SERVER_DONE)))
@@ -1602,7 +1548,6 @@ int matls_get_server_certificate_clnt(SSL *s)
 		return(1);
 	}
 
-  RECORD_LOG(s->time_log, MEASURE_21);
 	if (s->s3->tmp.message_type != SSL3_MT_CERTIFICATE)
 	{
 		al=SSL_AD_UNEXPECTED_MESSAGE;
@@ -1610,7 +1555,6 @@ int matls_get_server_certificate_clnt(SSL *s)
 		goto f_err;
 	}
 
-  RECORD_LOG(s->time_log, MEASURE_22);
 	p = d = (unsigned char *)s->init_msg;
   num_certs = *(p++);
   MA_LOG1d("Number of Certificates", num_certs);
@@ -1618,14 +1562,12 @@ int matls_get_server_certificate_clnt(SSL *s)
   
   pos = p;
 
-  RECORD_LOG(s->time_log, MEASURE_23);
   s->mb_info->id_table = (unsigned char **)calloc(num_certs, sizeof(unsigned char *));
   s->mb_info->id_length = (int *)calloc(num_certs, sizeof(int));
   s->mb_info->pkey = (EVP_PKEY **)calloc(num_certs, sizeof(EVP_PKEY *));
   for (i=0; i<num_certs; i++)
     s->mb_info->pkey[i] = EVP_PKEY_new();
 
-  RECORD_LOG(s->time_log, MEASURE_24);
   for (i=num_certs; i>1; i--)
   {
     n2l3(p, tmp);
@@ -1656,7 +1598,6 @@ int matls_get_server_certificate_clnt(SSL *s)
   if (!BIO_set_md(key, EVP_sha256())) goto m_err;
   BIO_push(key, id);
 
-  RECORD_LOG(s->time_log, MEASURE_25);
   for (cert = 0; cert < num_certs; cert++)
   {
     n2l3(p, llen); // Length of certificate chain
@@ -1670,8 +1611,6 @@ int matls_get_server_certificate_clnt(SSL *s)
 	  {
 		  n2l3(p,l);
       q = p;
-      cdmp = (unsigned char *)malloc(l);
-      memcpy(cdmp, q, l);
 		  x = d2i_X509(NULL, &q, l);
 
 		  if (x == NULL)
@@ -1699,9 +1638,7 @@ int matls_get_server_certificate_clnt(SSL *s)
 		  p=q;
 		}
 
-  RECORD_LOG(s->time_log, MEASURE_26);
 	  i = ssl_verify_cert_chain(s,sk);
-  RECORD_LOG(s->time_log, MEASURE_27);
 
 	  if ((s->verify_mode != SSL_VERIFY_NONE) && (i <= 0)
 #ifndef OPENSSL_NO_KRB5
@@ -1723,16 +1660,6 @@ int matls_get_server_certificate_clnt(SSL *s)
     else
       MA_LOG("Writing public key data in DER format");
 
-    if (s->mb_info->type[cert] == TYPE_SERVER_SIDE)
-      pret = ssl_verify_server_proof(s, cdmp, clen, cert);
-
-    if (pret < 0)
-    {
-      MA_LOG("Error in verifying server's proof for a server-side middlebox");
-      goto f_err;
-    }
-
-    free(cdmp);
     s->mb_info->id_table[cert] = (unsigned char *)malloc(TLS_MD_ID_SIZE);
     s->mb_info->id_length[cert] = TLS_MD_ID_SIZE;
     BIO_gets(key, s->mb_info->id_table[cert], s->mb_info->id_length[cert]);
@@ -1745,15 +1672,12 @@ int matls_get_server_certificate_clnt(SSL *s)
     }
   }
 
-  RECORD_LOG(s->time_log, MEASURE_28);
 	sc = ssl_sess_cert_new();
 	if (sc == NULL) goto err;
 
-  RECORD_LOG(s->time_log, MEASURE_29);
 	if (s->session->sess_cert) ssl_sess_cert_free(s->session->sess_cert);
 	s->session->sess_cert = sc;
 
-  RECORD_LOG(s->time_log, MEASURE_30);
 	sc->cert_chain = sk;
 	/* Inconsistency alert: cert_chain does include the peer's
 	 * certificate, which we don't include in s3_srvr.c */
@@ -1761,7 +1685,6 @@ int matls_get_server_certificate_clnt(SSL *s)
 	sk = NULL;
  	/* VRS 19990621: possible memory leak; sk=null ==> !sk_pop_free() @end*/
 
-  RECORD_LOG(s->time_log, MEASURE_31);
 	pkey = X509_get_pubkey(x);
 
 	/* VRS: allow null cert if auth == KRB5 */
@@ -1776,7 +1699,6 @@ int matls_get_server_certificate_clnt(SSL *s)
 		s->s3->tmp.new_cipher->algorithm_mkey, s->s3->tmp.new_cipher->algorithm_auth, need_cert);
 #endif    /* KSSL_DEBUG */
 
-  RECORD_LOG(s->time_log, MEASURE_32);
 	if (need_cert && ((pkey == NULL) || EVP_PKEY_missing_parameters(pkey)))
 		{
 		x=NULL;
@@ -1786,7 +1708,6 @@ int matls_get_server_certificate_clnt(SSL *s)
 		goto f_err;
 		}
 
-  RECORD_LOG(s->time_log, MEASURE_33);
 	i=ssl_cert_type(x,pkey);
 	if (need_cert && i < 0)
 		{
@@ -1797,7 +1718,6 @@ int matls_get_server_certificate_clnt(SSL *s)
 		goto f_err;
 		}
 
-  RECORD_LOG(s->time_log, MEASURE_34);
 	if (need_cert)
 		{
 		sc->peer_cert_type=i;
@@ -1825,11 +1745,9 @@ int matls_get_server_certificate_clnt(SSL *s)
 		}
 	s->session->verify_result = s->verify_result;
 
-  RECORD_LOG(s->time_log, MEASURE_35);
 	x=NULL;
 	ret=1;
 
-  RECORD_LOG(s->time_log, MEASURE_36);
 	if (0)
 	{
 f_err:

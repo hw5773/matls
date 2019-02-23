@@ -51,7 +51,7 @@ int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len,
       pub_str = s->mb_info->pub_str;
       pub_length = s->mb_info->pub_length;
 
-      ////RECORD_LOG(s->time_log, CLIENT_CLIENT_HELLO_1S);
+      RECORD_LOG(s->time_log, CLIENT_CLIENT_HELLO_1S);
       if (s->middlebox)
       {
         MA_LOG("Before waiting the message");
@@ -83,8 +83,7 @@ int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len,
         {
           *p = TYPE_SERVER_SIDE;
           p++;
-//          *len = plen + TYPE_LENGTH + META_LENGTH + pub_length + META_LENGTH + s->proof_length;
-          *len = plen + TYPE_LENGTH + META_LENGTH + pub_length;
+          *len = plen + TYPE_LENGTH + META_LENGTH + pub_length + META_LENGTH + s->proof_length;
         }
         else
         {
@@ -115,8 +114,8 @@ int ssl_add_clienthello_mb_ext(SSL *s, unsigned char *p, int *len,
         memcpy(p, pub_str, pub_length);
         *len = ext_len + 2;
       }
-      ////RECORD_LOG(s->time_log, CLIENT_CLIENT_HELLO_1E);
-      //INTERVAL(s->time_log, CLIENT_CLIENT_HELLO_1S, CLIENT_CLIENT_HELLO_1E);
+      RECORD_LOG(s->time_log, CLIENT_CLIENT_HELLO_1E);
+      INTERVAL(s->time_log, CLIENT_CLIENT_HELLO_1S, CLIENT_CLIENT_HELLO_1E);
     }
 
     return 1;
@@ -142,7 +141,7 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
         return handle_parse_errors();
     }
 
-    ////RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_1S);
+    RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_1S);
     if (s->middlebox)
     {
       MA_LOG("Copy this extension message to my SSL struct (not to pair)");
@@ -150,10 +149,10 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
       memcpy(s->extension_from_clnt_msg, d, len);
       s->extension_from_clnt_msg_len = len;
     }
-    ////RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_1E);
-    //INTERVAL(s->time_log, SERVER_CLIENT_HELLO_1S, SERVER_CLIENT_HELLO_1E);
+    RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_1E);
+    INTERVAL(s->time_log, SERVER_CLIENT_HELLO_1S, SERVER_CLIENT_HELLO_1E);
 
-    ////RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_2S);
+    RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_2S);
     p = d;
 #ifdef DEBUG
     int ext_len;
@@ -178,18 +177,18 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
       nk = s->mb_info->num_keys = *(p++);
 
     MA_LOG1d("Number of Keys (nk)", nk);
-    ////RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_2E);
-    //INTERVAL(s->time_log, SERVER_CLIENT_HELLO_2S, SERVER_CLIENT_HELLO_2E);
+    RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_2E);
+    INTERVAL(s->time_log, SERVER_CLIENT_HELLO_2S, SERVER_CLIENT_HELLO_2E);
 
-    ////RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_3S);
+    RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_3S);
     if (s->middlebox) // middlebox, index 0: client->server, index 1: server->client
       nk = 2;
     s->mb_info->key_length = (int *)calloc(nk, sizeof(int));
     s->mb_info->peer_str = (volatile unsigned char **)calloc(nk, sizeof(unsigned char *));
-    ////RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_3E);
-    //INTERVAL(s->time_log, SERVER_CLIENT_HELLO_3S, SERVER_CLIENT_HELLO_3E);
+    RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_3E);
+    INTERVAL(s->time_log, SERVER_CLIENT_HELLO_3S, SERVER_CLIENT_HELLO_3E);
 
-    ////RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_4S);
+    RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_4S);
     if(nk < 1)
     {
         return handle_parse_errors();
@@ -199,19 +198,19 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
       end = 1;
     else
       end = nk;
-    ////RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_4E);
-    //INTERVAL(s->time_log, SERVER_CLIENT_HELLO_4S, SERVER_CLIENT_HELLO_4E);
+    RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_4E);
+    INTERVAL(s->time_log, SERVER_CLIENT_HELLO_4S, SERVER_CLIENT_HELLO_4E);
 
-    ////RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_5S);
+    RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_5S);
     for (i=0; i<end; i++)
     {
       type = *(p++);
-/*
+
       if (type != TYPE_CLIENT_SIDE)
       {
         MA_LOG1d("Wrong Type", type);
       }
-*/
+
       n2s(p, klen);
 
       if (s->middlebox)
@@ -240,8 +239,8 @@ int ssl_parse_clienthello_mb_ext(SSL *s, unsigned char *d, int len, int *al)
       s->mb_info->rlen[CLIENT] = s->mb_info->key_length[0];
     }
 
-    ////RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_5E);
-    //INTERVAL(s->time_log, SERVER_CLIENT_HELLO_5S, SERVER_CLIENT_HELLO_5E);
+    RECORD_LOG(s->time_log, SERVER_CLIENT_HELLO_5E);
+    INTERVAL(s->time_log, SERVER_CLIENT_HELLO_5S, SERVER_CLIENT_HELLO_5E);
 
     s->mb_enabled = 1; // Enable the mb mode
     MA_LOG("MB Extension is enabled");
@@ -270,7 +269,7 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
     pub_length = s->mb_info->pub_length;
     pub_str = s->mb_info->pub_str;
 
-    //RECORD_LOG(s->time_log, SERVER_SERVER_HELLO_2S);
+    RECORD_LOG(s->time_log, SERVER_SERVER_HELLO_2S);
     if (s->middlebox)
     {
       MA_LOG("Before waiting the message");
@@ -335,8 +334,8 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
       p += pub_length;
       *len = META_LENGTH + META_LENGTH + 1 + TYPE_LENGTH + META_LENGTH + pub_length;
 	  }
-    //RECORD_LOG(s->time_log, SERVER_SERVER_HELLO_2E);
-    //INTERVAL(s->time_log, SERVER_SERVER_HELLO_2S, SERVER_SERVER_HELLO_2E);
+    RECORD_LOG(s->time_log, SERVER_SERVER_HELLO_2E);
+    INTERVAL(s->time_log, SERVER_SERVER_HELLO_2S, SERVER_SERVER_HELLO_2E);
   }
 
   return 1;
@@ -348,10 +347,10 @@ int ssl_add_serverhello_mb_ext(SSL *s, unsigned char *p, int *len,
 int ssl_parse_serverhello_mb_ext(SSL *s, unsigned char *d, int size, int *al)
 {
   unsigned char *p, *peer_str;
-  int i, j, diff, klen, nk, type, xlen, plen, len, end;
+  int i, j, diff, klen, nk, type, xlen, len, end;
   SSL *tmp;
 
-  //RECORD_LOG(s->time_log, CLIENT_SERVER_HELLO_1S);
+  RECORD_LOG(s->time_log, CLIENT_SERVER_HELLO_1S);
   if (size < 0)
   {
     return handle_parse_errors();
@@ -391,35 +390,26 @@ int ssl_parse_serverhello_mb_ext(SSL *s, unsigned char *d, int size, int *al)
     nk = s->mb_info->num_keys = *(p++);
 
   MA_LOG1d("Number of Keys", nk);
-  //RECORD_LOG(s->time_log, CLIENT_SERVER_HELLO_1E);
-  //INTERVAL(s->time_log, CLIENT_SERVER_HELLO_1S, CLIENT_SERVER_HELLO_1E);
+  RECORD_LOG(s->time_log, CLIENT_SERVER_HELLO_1E);
+  INTERVAL(s->time_log, CLIENT_SERVER_HELLO_1S, CLIENT_SERVER_HELLO_1E);
 
-  //RECORD_LOG(s->time_log, CLIENT_SERVER_HELLO_2S);
+  RECORD_LOG(s->time_log, CLIENT_SERVER_HELLO_2S);
   if (s->middlebox)
     end = 1;
   else // Client
   {
     end = nk;
-    tmp->mb_info->key_length = (int *)calloc(nk, sizeof(int));
-    tmp->mb_info->peer_str = (volatile unsigned char **)calloc(nk, sizeof(unsigned char *));
-    tmp->mb_info->accountability_keys = (unsigned char **)calloc(nk, sizeof(unsigned char *));
-    tmp->mb_info->type = (unsigned char *)calloc(nk, sizeof(unsigned char));
-    tmp->mb_info->proof = (unsigned char **)calloc(nk, sizeof(unsigned char *));
-    tmp->mb_info->proof_length = (int *)calloc(nk, sizeof(int));
+    s->mb_info->key_length = (int *)calloc(nk, sizeof(int));
+    s->mb_info->peer_str = (volatile unsigned char **)calloc(nk, sizeof(unsigned char *));
+    s->mb_info->accountability_keys = (unsigned char **)calloc(nk, sizeof(unsigned char *));
 
     for (i=0; i<nk; i++)
-    {
-      tmp->mb_info->accountability_keys[i] = 
-        (unsigned char *)malloc(SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
-      tmp->mb_info->proof[i] = NULL;
-      tmp->mb_info->proof_length[i] = 0;
-    }
-    
+      s->mb_info->accountability_keys[i] = (unsigned char *)malloc(SSL_MAX_ACCOUNTABILITY_KEY_LENGTH);
   }
-  //RECORD_LOG(s->time_log, CLIENT_SERVER_HELLO_2E);
-  //INTERVAL(s->time_log, CLIENT_SERVER_HELLO_2S, CLIENT_SERVER_HELLO_2E);
+  RECORD_LOG(s->time_log, CLIENT_SERVER_HELLO_2E);
+  INTERVAL(s->time_log, CLIENT_SERVER_HELLO_2S, CLIENT_SERVER_HELLO_2E);
 
-  //RECORD_LOG(s->time_log, CLIENT_SERVER_HELLO_3S);
+  RECORD_LOG(s->time_log, CLIENT_SERVER_HELLO_3S);
 
   for (i=0; i<end; i++)
   {
@@ -435,7 +425,7 @@ int ssl_parse_serverhello_mb_ext(SSL *s, unsigned char *d, int size, int *al)
       tmp->mb_info->peer_str[SERVER] = (unsigned char *)malloc(klen);
       memcpy(tmp->mb_info->peer_str[SERVER], p, klen);
     }
-    else // Client
+    else
     {
       tmp->mb_info->key_length[i] = klen;
       tmp->mb_info->peer_str[i] = (unsigned char *)malloc(klen);
@@ -443,22 +433,6 @@ int ssl_parse_serverhello_mb_ext(SSL *s, unsigned char *d, int size, int *al)
     }
     p += klen;
     PRINTK("Received DH Share", tmp->mb_info->peer_str[i], klen);
-
-    switch (type)
-    {
-      case TYPE_CLIENT_SIDE:
-        break;
-      case TYPE_SERVER_SIDE:
-        n2s(p, plen);
-        tmp->mb_info->proof_length[i] = plen;
-        tmp->mb_info->proof[i] = (unsigned char *)malloc(plen);
-        memcpy(tmp->mb_info->proof[i], p, plen);
-        tmp->mb_info->proof_length[i] = plen;
-        p += plen;
-        break;
-      default:
-        MA_LOG("Wrong Type");
-    }
   }
 
   if (s->middlebox)
@@ -472,8 +446,8 @@ int ssl_parse_serverhello_mb_ext(SSL *s, unsigned char *d, int size, int *al)
     tmp->mb_info->rlen[SERVER] = tmp->mb_info->key_length[0];
   }
 
-  //RECORD_LOG(s->time_log, CLIENT_SERVER_HELLO_3E);
-  //INTERVAL(s->time_log, CLIENT_SERVER_HELLO_3S, CLIENT_SERVER_HELLO_3E);
+  RECORD_LOG(s->time_log, CLIENT_SERVER_HELLO_3E);
+  INTERVAL(s->time_log, CLIENT_SERVER_HELLO_3S, CLIENT_SERVER_HELLO_3E);
 
   s->mb_enabled = 1;
 

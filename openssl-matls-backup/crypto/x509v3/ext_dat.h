@@ -69,6 +69,10 @@ extern X509V3_EXT_METHOD v3_policy_mappings, v3_policy_constraints;
 extern X509V3_EXT_METHOD v3_name_constraints, v3_inhibit_anyp, v3_idp;
 extern X509V3_EXT_METHOD v3_addr, v3_asid;
 
+#ifndef OPENSSL_NO_MATLS
+extern X509V3_EXT_METHOD v3_mbi;
+#endif /* OPENSSL_NO_MATLS */
+
 /* This table will be searched using OBJ_bsearch so it *must* kept in
  * order of the ext_nid values.
  */
@@ -124,6 +128,9 @@ static const X509V3_EXT_METHOD *standard_exts[] = {
 &v3_idp,
 &v3_alt[2],
 &v3_freshest_crl,
+#ifndef OPENSSL_NO_MATLS
+&v3_mbi,
+#endif /* OPENSSL_NO_MATLS */
 };
 
 /* Number of standard extensions */

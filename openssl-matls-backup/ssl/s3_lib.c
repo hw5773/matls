@@ -4218,6 +4218,7 @@ int ssl3_write(SSL *s, const void *b, int len)
 	if (s->s3->renegotiate) ssl3_renegotiate_check(s);
 
 #ifndef OPENSSL_NO_MATLS
+RECORD_LOG(s->time_log, SERVER_MODIFICATION_GENERATE_START);
   if (s->mb_enabled)
   {
     if (s->middlebox)
@@ -4394,6 +4395,8 @@ int ssl3_write(SSL *s, const void *b, int len)
       }
     }
   }
+RECORD_LOG(s->time_log, SERVER_MODIFICATION_GENERATE_END);
+INTERVAL(s->time_log, SERVER_MODIFICATION_GENERATE_START, SERVER_MODIFICATION_GENERATE_END);
 #endif /* OPENSSL_NO_MATLS */
 
 	/* This is an experimental flag that sends the
